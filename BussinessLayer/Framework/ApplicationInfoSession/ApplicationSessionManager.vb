@@ -1,13 +1,8 @@
 Option Explicit On
 Option Strict On
 
-Imports System.IO
-Imports Microsoft.Win32
-Imports System.Globalization
-Imports System.Configuration
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.TO
-Imports System.Security.Cryptography
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -84,7 +79,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 myApplicationInfoSession.ActivateSystemLog = GlobalBase.WriteToSystemLog
 
                 'Application Setting area
-                Dim myApplicationSetting As New ApplicationSettingDelegate()
+                'Dim myApplicationSetting As New ApplicationSettingDelegate()
                 'myApplicationInfoSession.ApplicationVersion = myApplicationSetting.GetApplicationSettingCurrentValueBySettingID("ApplicationVersion")
                 'myApplicationInfoSession.DatabaseVersion = myApplicationSetting.GetApplicationSettingCurrentValueBySettingID("DatabaseVersion")
 

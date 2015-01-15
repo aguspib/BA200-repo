@@ -4,10 +4,8 @@ Option Explicit On
 Option Strict On
 
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 
 Namespace Biosystems.Ax00.DAL.DAO
 

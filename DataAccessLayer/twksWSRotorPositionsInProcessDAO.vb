@@ -2,7 +2,6 @@
 Option Explicit On
 
 Imports System.Text
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 

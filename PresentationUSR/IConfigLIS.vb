@@ -1,15 +1,12 @@
 ﻿Option Explicit On
 Option Strict Off
 
-Imports System.IO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.Threading
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports Biosystems.Ax00.PresentationCOM
 Imports System.Text
 
 Public Class IConfigLIS

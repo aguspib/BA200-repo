@@ -1,7 +1,6 @@
-﻿Imports System
+﻿
 Imports System.Windows.Forms
 Imports System.ComponentModel
-Imports System.Drawing
 
 Namespace Biosystems.Ax00.Controls.UserControls
 

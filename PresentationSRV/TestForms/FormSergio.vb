@@ -1,33 +1,20 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Microsoft.Win32
-Imports System.Configuration
-Imports System.Globalization
 Imports System.Management
-Imports System.Data.Sql
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.Windows.Forms
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.BL
 Imports System.IO
-Imports System.Threading
-Imports Biosystems.Ax00.PresentationCOM
 
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.Global.TO
 
-Imports System.Xml.Serialization
-
 Imports Biosystems.Ax00.InfoAnalyzer
-
-Imports System.Xml
 
 Imports System.Runtime.CompilerServices
 

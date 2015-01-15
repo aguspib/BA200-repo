@@ -3,11 +3,8 @@ Option Explicit On
 
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Types.TestRefRangesDS
 
 'User Control that allows the edition of Reference Ranges for Tests of whatever type: 
 'Standard, Calculated, ISE and/or Off-System Tests
@@ -1079,7 +1076,7 @@ Public Class BSTestRefRanges
     Public Sub RefUpdateDetailDataGridViewBySampleType(ByVal pTestID As Integer, ByVal pNewSampleType As String)
         Dim NewSampleType As String
         Dim FirstSampleType As String
-        Dim NewDetailedRows As New List(Of DataGridViewRow)
+        'Dim NewDetailedRows As New List(Of DataGridViewRow)
 
         Try
             NewSampleType = pNewSampleType
@@ -1161,7 +1158,7 @@ Public Class BSTestRefRanges
     Public Sub RefUpdateGenericBySampleType(ByVal pTestID As Integer, ByVal pNewSampleType As String)
         Dim NewSampleType As String
         Dim FirstSampleType As String
-        Dim NewDetailedRows As New List(Of DataGridViewRow)
+        'Dim NewDetailedRows As New List(Of DataGridViewRow)
 
         Try
             NewSampleType = pNewSampleType

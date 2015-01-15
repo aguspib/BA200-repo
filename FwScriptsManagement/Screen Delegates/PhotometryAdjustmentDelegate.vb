@@ -8,7 +8,6 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Math
-Imports System.Drawing
 
 Namespace Biosystems.Ax00.FwScriptsManagement
 

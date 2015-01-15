@@ -308,7 +308,7 @@ Public Class IInstrumentUpdateUtil
                 Else
                     MyClass.AdjustmentsEditionChangesMade = False
                     Me.BsAdjustmentsRTextBox.BackColor = Color.LightYellow
-                    MyClass.HideCaret(Me.BsAdjustmentsRTextBox.Handle)
+                    HideCaret(Me.BsAdjustmentsRTextBox.Handle)
                 End If
             End If
 

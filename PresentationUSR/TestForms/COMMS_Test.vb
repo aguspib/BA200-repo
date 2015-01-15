@@ -8,7 +8,6 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Calculations
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports System.Xml
 
 Public Class bsReception
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm

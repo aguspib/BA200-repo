@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalConstants
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.BL
 

@@ -1,9 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Configuration
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.DAL
 

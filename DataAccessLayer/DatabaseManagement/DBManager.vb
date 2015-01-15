@@ -1,14 +1,10 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports Microsoft.Win32
-Imports System.Data.SqlClient
 Imports System.ServiceProcess
 Imports Biosystems.Ax00.Global
 Imports Microsoft.SqlServer.Management.Smo
 Imports Microsoft.SqlServer.Management.Smo.Wmi
-Imports Microsoft.SqlServer.Management.Sdk
-Imports Microsoft.SqlServer.Management.Common
 
 Namespace Biosystems.Ax00.DAL
 

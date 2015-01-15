@@ -154,7 +154,7 @@ Public Class tcfgReportsTestsSortingDAO
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
-                Dim myGlobalBase As New GlobalBase
+                'Dim myGlobalBase As New GlobalBase
                 Dim cmdText As New StringBuilder
 
                 For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pReportsTestsSortingDS.tcfgReportsTestsSorting.Rows

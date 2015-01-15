@@ -5,17 +5,10 @@ Option Strict On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.IO
-Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Globalization
-Imports Biosystems.Ax00.InfoAnalyzer
 Imports Biosystems.Ax00.PresentationCOM
 
 Public Class IHisBlankCalibResults

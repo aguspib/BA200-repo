@@ -88,7 +88,6 @@ Namespace Biosystems.Ax00.BL
                                               ByVal pManualRecalculation As Boolean) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Dim aa As String
 
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)

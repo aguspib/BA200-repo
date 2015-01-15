@@ -1,19 +1,11 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
-Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Types
 
-Imports PerpetuumSoft.Instrumentation
 Imports PerpetuumSoft.Instrumentation.Windows.Forms
 Imports PerpetuumSoft.Instrumentation.Model
 Imports PerpetuumSoft.Framework.Drawing
-
-Imports System.Drawing.Design
 
 Namespace Biosystems.Ax00.Controls.UserControls
 

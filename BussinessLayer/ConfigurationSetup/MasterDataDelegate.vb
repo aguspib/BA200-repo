@@ -5,8 +5,6 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
-Imports System.Data.Common
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.BL
 
@@ -116,7 +114,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     Dim myMasteDataDS As New MasterDataDS()
                     Dim myMasterDataDelegate As New MasterDataDelegate()
-                    Dim qSampleType As New List(Of MasterDataDS.tcfgMasterDataRow)
+                    'Dim qSampleType As New List(Of MasterDataDS.tcfgMasterDataRow)
 
                     resultData = myMasterDataDelegate.GetList(Nothing, "SAMPLE_TYPES")
 

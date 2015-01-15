@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myResult As String = ""
             Dim myGlobalDataTO As New GlobalDataTO()
             Try
-                Dim myInstruction As New Instructions()
+                'Dim myInstruction As New Instructions()
                 If myParametersList.Count > 0 Then
                     For Each myParameterTO As ParametersTO In myParametersList
                         myResult &= myParameterTO.ParameterID

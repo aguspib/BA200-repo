@@ -750,7 +750,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 'Object to save the port list.
-                Dim myPortsList As New List(Of Management.ManagementObject)
                 'Get the list of invalid ports name from AppConfig.
                 'Dim InvalidPortsName As String = ConfigurationManager.AppSettings("InvalidPortsList").ToString()
                 'TR 25/01/2011 -Replace by corresponding value on global base.
@@ -768,7 +767,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Dim validPortList As New List(Of String)
 
-                Dim qPort As New List(Of Management.ManagementObject)
+                'Dim qPort As New List(Of Management.ManagementObject)
                 'search the post modem and virtual ports
                 Dim InternalDev As Management.ManagementObjectSearcher = _
                   New Management.ManagementObjectSearcher("SELECT * FROM Win32_POTSModem")
@@ -882,7 +881,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Sub SortPortList(ByRef PortsList As List(Of String))
             Try
                 Dim myHT As New Hashtable()
-                Dim qPortList As New List(Of String)
+                'Dim qPortList As New List(Of String)
                 Dim qObjList As New List(Of Object)
                 For Each myPort As String In PortsList
                     myHT.Add(GetPortNumbert(myPort), myPort)

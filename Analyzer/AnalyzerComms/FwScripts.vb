@@ -2,8 +2,6 @@
 Option Explicit On
 
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports System.Configuration
 Imports System.Windows.Forms
 Imports System.IO
 Imports System.Xml.Serialization
@@ -231,7 +229,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function SetFwScriptData(ByVal pNewFwScriptsData As FwScriptsDataTO) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             Dim XMLFwScriptFileNamePath As String = Application.StartupPath & GlobalBase.XmlFwScripts
             Dim XMLCopyFwScriptFileNamePath As String = Application.StartupPath & "\temp.xml"
             Dim CopyOfFwScriptsData As New FwScriptsDataTO
@@ -492,7 +490,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'End If
                         Next
 
-                       
+
                     Else
                         ' without parameters
                         If pars(0).Contains(";") Then

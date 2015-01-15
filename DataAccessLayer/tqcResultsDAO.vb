@@ -2,7 +2,6 @@
 Option Explicit On
 
 Imports System.Text
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
@@ -129,7 +128,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = String.Empty
-                    Dim currentSession As New GlobalBase
+                    'Dim currentSession As New GlobalBase
                     For Each qcResultsRow As QCResultsDS.tqcResultsRow In pQCResultsDS.tqcResults.Rows
                         cmdText &= " DELETE FROM tqcResults " & vbCrLf & _
                                    " WHERE  QCTestSampleID = " & qcResultsRow.QCTestSampleID & vbCrLf & _
@@ -270,7 +269,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 ElseIf (pQCResultsDS.tqcResults.Count > 0) Then
-                    Dim currentSession As New GlobalBase
+                    'Dim currentSession As New GlobalBase
                     Dim cmdText As String = " UPDATE tqcResults SET "
 
                     If (Not pQCResultsDS.tqcResults(0).IsResultCommentNull) Then
@@ -401,7 +400,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                    ByVal pAnalyzerID As String, ByVal pRunsGroupNumber As Integer, ByVal pValStatus As String, _
                                                    ByVal pRunNumber As Integer) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            'Dim dbConnection As New SqlClient.SqlConnection
 
             Try
                 If (pDBConnection Is Nothing) Then

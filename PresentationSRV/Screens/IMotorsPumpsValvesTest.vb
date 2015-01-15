@@ -4219,7 +4219,7 @@ Public Class IMotorsPumpsValvesTest
                             Else
 
                                 'keep on
-                                System.Threading.Thread.Sleep(MyClass.SwitchInterval) 'PDT continuous switch interval?
+                                System.Threading.Thread.Sleep(SwitchInterval) 'PDT continuous switch interval?
 
                                 If MyClass.CurrentActivationMode = ACTIVATION_MODES.CONTINUOUS Then
                                     Select Case MyClass.SwitchRequestedElement.ActivationState
@@ -4330,7 +4330,7 @@ Public Class IMotorsPumpsValvesTest
                                         '    SimulatePumpPreActivations(MyClass.SwitchRequestedElement.Identity)
                                         'End If
                                         'keep on
-                                        System.Threading.Thread.Sleep(MyClass.SwitchInterval) 'PDT continuous switch interval?
+                                        System.Threading.Thread.Sleep(SwitchInterval) 'PDT continuous switch interval?
                                         MyClass.StartActionTimer()
                                         MyClass.CurrentActionStep = ActionSteps.ACTION_REQUESTING
                                         Application.DoEvents()
@@ -5063,7 +5063,7 @@ Public Class IMotorsPumpsValvesTest
         End Try
     End Sub
 
-    
+
 
 #End Region
 
@@ -5745,7 +5745,7 @@ Public Class IMotorsPumpsValvesTest
     Private Function StartReadingTimer() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
-            
+
             If MyBase.SimulationMode Then
                 Dim myExcept As BsScadaControl = Nothing
                 If MyClass.IsContinuousSwitching Then
@@ -6692,7 +6692,7 @@ Public Class IMotorsPumpsValvesTest
                     MyBase.CurrentMode = ADJUSTMENT_MODES.ERROR_MODE
                 End If
 
-                End If
+            End If
 
         Catch ex As Exception
             myGlobal.HasError = True
@@ -6740,7 +6740,7 @@ Public Class IMotorsPumpsValvesTest
     End Sub
 
 
-   
+
 #End Region
 
 #Region "Encoder Test Methods"
@@ -7728,7 +7728,7 @@ Public Class IMotorsPumpsValvesTest
 #End Region
 
 
-    
+
 #Region "Refresh Event Handler"
 
     ''' <summary>
@@ -7793,413 +7793,7 @@ Public Class IMotorsPumpsValvesTest
             End If
 
             Exit Sub
-            'end SGM 17/04/2012
 
-
-
-
-
-
-
-            '' XBC 09/11/2011
-            'myScreenDelegate.RefreshDelegate(pRefreshEventType, pRefreshDS)
-            '' XBC 09/11/2011
-
-            'MANIFOLD ELEMENTS
-            If MyClass.IsManifoldRequested And pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.MANIFOLDVALUE_CHANGED) Then
-
-                Dim myManifoldValueChangedDT As New UIRefreshDS.ManifoldValueChangedDataTable
-                myManifoldValueChangedDT = pRefreshDS.ManifoldValueChanged
-                For Each E As UIRefreshDS.ManifoldValueChangedRow In myManifoldValueChangedDT.Rows
-
-                    Dim IsMotorUpdated As Boolean = False
-
-                    Select Case E.ElementID
-
-                        'states
-                        Case MANIFOLD_ELEMENTS.JE1_MR1.ToString
-                            'Me.InDo_Reagent1_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR1H.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.InDo_Reagent1_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR1A.ToString
-                            Me.InDo_Reagent1_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR2.ToString
-                            'Me.InDo_Reagent2_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR2H.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.InDo_Reagent2_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MR2A.ToString
-                            Me.InDo_Reagent2_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MS.ToString
-                            'Me.InDo_Samples_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_MSH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.InDo_Samples_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_MSA.ToString
-                            Me.InDo_Samples_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-                        Case MANIFOLD_ELEMENTS.JE1_B1.ToString
-                            Me.InDo_Samples_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B2.ToString
-                            Me.InDo_Reagent1_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B3.ToString
-                            Me.InDo_Reagent2_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV1.ToString
-                            Me.InDo_Samples_EValve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV2.ToString
-                            Me.InDo_Reagent1_EValve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV3.ToString
-                            Me.InDo_Reagent2_EValve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV4.ToString
-                            Me.InDo_Air_Ws_3Evalve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV5.ToString
-                            Me.InDo_AirWs_Pw_3Evalve.ActivationState = ConvertFwStringToState(E.Value)
-
-
-
-                            'diagnosis
-
-                        Case MANIFOLD_ELEMENTS.JE1_B1D.ToString
-                            Me.InDo_Samples_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B2D.ToString
-                            Me.InDo_Reagent1_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_B3D.ToString
-                            Me.InDo_Reagent2_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV1D.ToString
-                            Me.InDo_Samples_EValve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV2D.ToString
-                            Me.InDo_Reagent1_EValve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV3D.ToString
-                            Me.InDo_Reagent2_EValve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV4D.ToString
-                            Me.InDo_Air_Ws_3Evalve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case MANIFOLD_ELEMENTS.JE1_EV5D.ToString
-                            Me.InDo_AirWs_Pw_3Evalve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                    End Select
-
-                    'update motor adjust control
-                    If IsMotorUpdated And MyClass.CurrentActionStep <> ActionSteps.PREVIOUS_READING Then
-                        If MyClass.CurrentMotorAdjustControl IsNot Nothing Then
-                            If MyClass.SelectedMotor IsNot Nothing Then
-                                'If E.ElementID.ToString.Contains(MyClass.SelectedMotor.Identity.ToUpper) Then
-                                If E.ElementID.ToString.Contains(MyClass.SelectedMotor.Identity) Then
-                                    MyClass.CurrentMotorAdjustControl.CurrentValue = CInt(E.Value)
-                                End If
-                            End If
-                        End If
-                    End If
-
-
-                Next
-
-                MyClass.IsManifoldRequested = False
-
-            End If
-
-            If MyClass.SelectedPage = TEST_PAGES.INTERNAL_DOSING Then
-                MyClass.Indo_UpdateSource()
-            End If
-
-            'FLUIDICS ELEMENTS
-            If MyClass.IsFluidicsRequested And pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FLUIDICSVALUE_CHANGED) Then
-                Dim myFluidicsValueChangedDT As New UIRefreshDS.FluidicsValueChangedDataTable
-                myFluidicsValueChangedDT = pRefreshDS.FluidicsValueChanged
-                For Each E As UIRefreshDS.FluidicsValueChangedRow In myFluidicsValueChangedDT.Rows
-
-                    Dim IsMotorUpdated As Boolean = False
-
-                    Select Case E.ElementID
-
-                        'states
-
-                        Case FLUIDICS_ELEMENTS.SF1_B1.ToString
-                            Me.ExWa_Samples_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B2.ToString
-                            Me.ExWa_Reagent1_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B3.ToString
-                            Me.ExWa_Reagent2_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B4.ToString
-                            Me.InOut_PW_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B5.ToString
-                            Me.InOut_LC_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B6.ToString
-                            Me.WsAsp_B6_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B7.ToString
-                            Me.WsAsp_B7_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B8.ToString
-                            Me.WsAsp_B8_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B9.ToString
-                            Me.WsAsp_B9_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B10.ToString
-                            Me.WsAsp_B10_Pump.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV1.ToString
-                            Me.InOut_PWTank_Valve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV2.ToString
-                            Me.InOut_PWSource_Valve.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_GE1.ToString
-                            Me.WsDisp_GE1_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE2_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE3_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE4_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WsDisp_GE5_Valve.ActivationState = ConvertFwStringToState(E.Value)
-                            Me.WSDisp_ValvesGroupDCUnit.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_MS.ToString
-                            'Me.WsDisp_M1_Motor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_MSH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.WsDisp_M1_Motor, E.Value).ToString
-                            IsMotorUpdated = True
-
-
-                        Case FLUIDICS_ELEMENTS.SF1_MSA.ToString
-                            Me.WsDisp_M1_Motor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-
-                            'diagnosis
-                        Case FLUIDICS_ELEMENTS.SF1_B1D.ToString
-                            Me.ExWa_Samples_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B2D.ToString
-                            Me.ExWa_Reagent1_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B3D.ToString
-                            Me.ExWa_Reagent2_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B4D.ToString
-                            Me.InOut_PW_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B5D.ToString
-                            Me.InOut_LC_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B6D.ToString
-                            Me.WsAsp_B6_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B7D.ToString
-                            Me.WsAsp_B7_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B8D.ToString
-                            Me.WsAsp_B8_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B9D.ToString
-                            Me.WsAsp_B9_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_B10D.ToString
-                            Me.WsAsp_B10_Pump.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV1D.ToString
-                            Me.InOut_PWTank_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_EV2D.ToString
-                            Me.InOut_PWSource_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-
-                        Case FLUIDICS_ELEMENTS.SF1_GE1D.ToString
-                            Me.WsDisp_GE1_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE2_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE3_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE4_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WsDisp_GE5_Valve.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-                            Me.WSDisp_ValvesGroupDCUnit.IsAlarm = ConvertFwStringToDiagnosis(E.Value)
-
-
-                            'tanks
-                        Case FLUIDICS_ELEMENTS.SF1_HCW.ToString
-                            MyClass.CurrentHighContaminationTankLevel = CInt(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_WSW.ToString
-                            MyClass.CurrentDistilledWaterTankLevel = CInt(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_WAS.ToString
-                            MyClass.UpdateCurrentExternalTankLevels(E.ElementID, E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_SLS.ToString
-                            MyClass.UpdateCurrentExternalTankLevels(E.ElementID, E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_WTS.ToString
-                            MyClass.IsNotLowContaminationTankEmptying = ConvertFwStringToBoolean(E.Value)
-
-                        Case FLUIDICS_ELEMENTS.SF1_STS.ToString
-                            MyClass.IsNotSystemLiquidTankFilling = ConvertFwStringToBoolean(E.Value)
-
-                    End Select
-
-                    If IsMotorUpdated And MyClass.CurrentActionStep <> ActionSteps.PREVIOUS_READING Then
-                        If MyClass.CurrentMotorAdjustControl IsNot Nothing Then
-                            If MyClass.SelectedMotor IsNot Nothing Then
-                                MyClass.CurrentMotorAdjustControl.CurrentValue = CInt(E.Value)
-                            End If
-                        End If
-                    End If
-
-                Next
-
-                MyClass.IsFluidicsRequested = False
-
-            End If
-
-            'PHOTOMETRICS ELEMENTS
-            If MyClass.IsPhotometricsRequested And pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.PHOTOMETRICSVALUE_CHANGED) Then
-                Dim myPhotometricsValueChangedDT As New UIRefreshDS.PhotometricsValueChangedDataTable
-                myPhotometricsValueChangedDT = pRefreshDS.PhotometricsValueChanged
-                For Each E As UIRefreshDS.PhotometricsValueChangedRow In myPhotometricsValueChangedDT.Rows
-
-                    Dim IsMotorUpdated As Boolean = False
-
-                    Select Case E.ElementID
-
-                        'states
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MR.ToString
-                            'Me.Enco_ReactionsRotorMotor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.Enco_ReactionsRotorMotor, E.Value).ToString
-                            IsMotorUpdated = True
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRA.ToString
-                            Me.Enco_ReactionsRotorMotor.CurrentPosition = CInt(E.Value)
-                            IsMotorUpdated = True
-
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRE.ToString
-                            If Not MyClass.CurrentActionStep = ActionSteps.PREVIOUS_READING Then
-                                Me.Enco_ReactionsRotorEncoderPos = CInt(E.Value)
-                                Me.Enco_EncoderPosLabel.Text = E.Value
-                            End If
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MW.ToString
-                            Me.Col_WashingStationMotor.ActivationState = ConvertFwStringToState(E.Value)
-
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MWH.ToString
-                            E.Value = ConvertFwStringToHomeStatus(Me.Col_WashingStationMotor, E.Value).ToString
-
-
-
-                            'diagnosis
-                        Case PHOTOMETRICS_ELEMENTS.GLF_MRED.ToString
-                            Me.IsReactionsRotorEncoderError = ConvertFwStringToDiagnosis(E.Value)
-
-                    End Select
-
-                    If IsMotorUpdated And MyClass.CurrentActionStep <> ActionSteps.PREVIOUS_READING Then
-                        If MyClass.CurrentMotorAdjustControl IsNot Nothing Then
-                            If MyClass.SelectedMotor IsNot Nothing Then
-                                If MyClass.CurrentMotorAdjustControl.CurrentValue <> CInt(E.Value) Then
-                                    MyClass.CurrentMotorAdjustControl.CurrentValue = CInt(E.Value)
-                                End If
-                            End If
-                        End If
-                    End If
-
-                Next
-
-                MyClass.IsPhotometricsRequested = False
-
-                If Me.Enco_ReactionsRotorMotor.CurrentPosition <> Me.Enco_ReactionsRotorEncoderPos Then
-                    Me.Enco_EncoderPosLabel.ForeColor = Color.Red
-
-                Else
-                    Me.Enco_EncoderPosLabel.ForeColor = Color.LightSteelBlue ' Color.LawnGreen
-
-                End If
-            End If
-
-            'FIRMWARE EVENTS ELEMENTS
-            If MyBase.CurrentMode = ADJUSTMENT_MODES.COLLISION_TEST_ENABLED Then
-                If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.FWEVENT_CHANGED) Then
-                    Dim myCollisionTestValueChangedDT As New UIRefreshDS.FirmwareEventsValueChangedDataTable
-                    myCollisionTestValueChangedDT = pRefreshDS.FirmwareEventsValueChanged
-                    'For Each E As UIRefreshDS.FirmwareEventsValueChangedRow In myCollisionTestValueChangedDT.Rows
-                    '    'Dim IsMotorUpdated As Boolean = False
-
-                    '    Select Case E.EventID
-
-                    '        'status
-                    '        Case FW_EVENTS.WSCD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_WashingStationLED.CurrentStatus
-                    '            Me.Col_WashingStationLED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_WashingStationLED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '        Case FW_EVENTS.SCD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_SamplesLED.CurrentStatus
-                    '            Me.Col_SamplesLED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_SamplesLED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '        Case FW_EVENTS.R1CD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_Reagent1LED.CurrentStatus
-                    '            Me.Col_Reagent1LED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_Reagent1LED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '        Case FW_EVENTS.R2CD.ToString
-                    '            Dim myPreviousStatus As BSMonitorLED.Status = Me.Col_Reagent2LED.CurrentStatus
-                    '            Me.Col_Reagent2LED.CurrentStatus = ConvertFwStringToCollisionStatus(E.Value)
-                    '            If Me.Col_Reagent2LED.CurrentStatus <> myPreviousStatus Then
-                    '                If CInt(E.Value) > 0 Then
-                    '                    MyClass.ReportHistory(MotorsPumpsValvesTestDelegate.HISTORY_RESULTS.OK)
-                    '                End If
-                    '            End If
-
-                    '    End Select
-                    'Next
-
-                End If
-            End If
-
-            If MyClass.SelectedPage = TEST_PAGES.INTERNAL_DOSING Then
-                MyClass.InDo_UpdateSyringeColors()
-            End If
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _

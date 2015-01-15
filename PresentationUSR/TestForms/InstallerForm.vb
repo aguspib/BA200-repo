@@ -1,21 +1,14 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Configuration
-Imports System.Deployment
-Imports System.Deployment.Application
 
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports System.Windows.Forms
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Xml
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Microsoft.Win32
-Imports System.IO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class InstallerForm

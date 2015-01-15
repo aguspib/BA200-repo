@@ -4,7 +4,6 @@ Option Strict On
 Imports Biosystems.Ax00.Global.TO
 Imports System.Reflection
 Imports System.IO
-Imports System.Configuration
 
 
 Namespace Biosystems.Ax00.Global

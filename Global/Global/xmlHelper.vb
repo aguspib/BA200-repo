@@ -4,8 +4,6 @@
 'AG 13/03/2013 Moved to Global project because the WorkSession project also requires this class
 
 Imports System.Xml
-Imports System.Xml.XPath
-Imports System.IO
 Imports System.Xml.Schema
 
 

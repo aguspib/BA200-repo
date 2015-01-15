@@ -1,8 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Configuration
-Imports System.IO
 Imports Microsoft.SqlServer.Management.Smo
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL

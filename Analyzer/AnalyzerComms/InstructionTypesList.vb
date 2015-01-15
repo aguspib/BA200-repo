@@ -2,10 +2,8 @@
 Option Explicit On
 
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL.DAO
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
@@ -25,7 +23,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function GetInstructionParameterList() As List(Of InstructionParameterTO)
             Dim Instructions As New List(Of InstructionParameterTO)
             Try
-                Dim myInstructionTO As New InstructionParameterTO
+                'Dim myInstructionTO As New InstructionParameterTO
 
                 'TEST INSTRUCTION (Sw -> Fw)
                 GetTESTInstruction(Instructions)

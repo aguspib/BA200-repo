@@ -1,8 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
@@ -30,7 +28,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalBase As New GlobalBase
                     Dim cmdText As String = String.Empty
                     cmdText &= " UPDATE tfmwGeneralSettings" & Environment.NewLine
                     cmdText &= " SET  CurrentValue = '" & pCurrentValue & "'" & Environment.NewLine

@@ -1,7 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -227,7 +226,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim mylocalBase As New GlobalBase
+                        'Dim mylocalBase As New GlobalBase
 
                         cmdText = " SELECT SubTableID, ItemID, FixedItemDesc, Position, Status " & _
                                   " FROM tfmwPreloadedMasterData WITH (NOLOCK) " & _
@@ -285,7 +284,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         cmdText &= "SELECT SubTableID, ItemID, FixedItemDesc, Position, Status " & vbCrLf
                         cmdText &= " FROM  tfmwPreloadedMasterData " & vbCrLf

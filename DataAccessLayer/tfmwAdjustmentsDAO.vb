@@ -29,7 +29,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
 
                     Dim myAdjustmentsDS As SRVAdjustmentsDS
-                    Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
+                    'Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
                     
                     myAdjustmentsDS = pAdjDS
 
@@ -227,7 +227,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
 
                     Dim myAdjustmentsDS As SRVAdjustmentsDS
-                    Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
+                    'Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
                     resultData = MyClass.GetMasterData(Nothing, "MasterData")
                     If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                         myAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)

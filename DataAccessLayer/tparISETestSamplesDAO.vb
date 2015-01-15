@@ -4,8 +4,6 @@ Option Explicit On
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports System.Data.SqlTypes
 Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO

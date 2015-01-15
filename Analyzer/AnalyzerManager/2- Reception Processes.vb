@@ -12,7 +12,6 @@ Imports Biosystems.Ax00.Types
 'Imports Biosystems.Ax00.InfoAnalyzer
 'Imports System.Timers
 Imports System.Data
-Imports System.Windows.Forms
 'Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
 
@@ -3592,7 +3591,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 Dim myExecutionsDS As New ExecutionsDS
-                Dim affectedExecutions As New ExecutionsDS
+                'Dim affectedExecutions As New ExecutionsDS
                 Dim exeDelegate As New ExecutionsDelegate
 
                 'If the Preparation to sent is an ISE one, get all affected Executions (all ISE Tests requested for the same 

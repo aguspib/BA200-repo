@@ -3,15 +3,6 @@ Option Explicit On
 
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
-Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Types
-
-Imports PerpetuumSoft.Instrumentation
-Imports PerpetuumSoft.Instrumentation.Windows.Forms
-Imports PerpetuumSoft.Instrumentation.Model
-Imports PerpetuumSoft.Framework.Drawing
 
 'RH 23/03/2012 Remove every Try/Catch
 'It is a bad practice to catch an exception, do nothing with it and throw it again.

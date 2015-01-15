@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.Global.TO
 Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.BL.Framework

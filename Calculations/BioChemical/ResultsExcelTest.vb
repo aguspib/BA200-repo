@@ -3062,7 +3062,7 @@ Namespace Biosystems.Ax00.BL
         End Sub
 
         'DL 27/09/2012. GetCell
-        Private Function GetCell(ByVal cells As Object, ByVal row As Integer, ByVal column As Integer) As String
+        Private Sub GetCell(ByVal cells As Object, ByVal row As Integer, ByVal column As Integer)
             Dim parameters As Object() = New [Object](1) {}
             parameters(0) = row
             parameters(1) = column
@@ -3070,7 +3070,7 @@ Namespace Biosystems.Ax00.BL
             'Return
             myobj = cells.[GetType]().InvokeMember("Item", BindingFlags.GetProperty, Nothing, cells, parameters).ToString()
 
-        End Function
+        End Sub
 
 
 

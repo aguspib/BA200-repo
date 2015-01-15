@@ -4,24 +4,13 @@ Option Explicit On
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Types.AlarmsDS
-Imports Biosystems.Ax00.Types.AlarmsDS.tfmwAlarmsRow
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Configuration
-Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.PresentationCOM
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Xml
 Imports Biosystems.Ax00.DAL.DAO
 Imports System.Threading
 Imports System.Net.Sockets
-Imports System.Text
 Imports System.Diagnostics
 
 Public Class LIS_Test

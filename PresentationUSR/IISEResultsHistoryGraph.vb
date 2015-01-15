@@ -1,9 +1,7 @@
 ﻿Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Types
 Imports DevExpress.XtraCharts
-Imports Biosystems.Ax00.PresentationCOM
 Imports System.Globalization
 
 Public Class IISEResultsHistoryGraph

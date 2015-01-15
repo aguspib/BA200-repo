@@ -5,10 +5,8 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
-Imports System.Data.Common
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.IO
-Imports System.Configuration
 Imports Biosystems.Ax00.BL.Framework
 
 Namespace Biosystems.Ax00.BL

@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Forms.Integration
+﻿
 Imports System.Windows.Xps.Packaging
 Imports System.IO
 

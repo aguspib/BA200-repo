@@ -5,9 +5,6 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
-Imports System.Data.SqlClient
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.IO 'AG 11/06/2014 #1661
 
 Namespace Biosystems.Ax00.BL

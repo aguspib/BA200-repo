@@ -4,7 +4,6 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.IO
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion

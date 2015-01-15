@@ -3,7 +3,6 @@ Option Strict On
 
 Imports System.IO
 Imports System.Xml
-Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.Types

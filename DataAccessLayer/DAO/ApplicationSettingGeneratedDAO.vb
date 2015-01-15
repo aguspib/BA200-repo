@@ -6,12 +6,9 @@ Option Strict On
 
 Imports System
 Imports System.Data
-Imports System.Data.Common
-Imports System.Configuration
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.TO
 
 
 Namespace Biosystems.Ax00.DAL.DAO

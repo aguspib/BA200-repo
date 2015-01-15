@@ -4,7 +4,6 @@ Option Strict On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.DAL.DAO
 Imports System.Globalization
 
 Namespace Biosystems.Ax00.BL.UpdateVersion

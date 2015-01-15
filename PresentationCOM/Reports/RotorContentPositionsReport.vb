@@ -1,4 +1,4 @@
-Imports DevExpress.XtraReports.UI
+
 
 Public Class RotorContentPositionsReport
     Public Sub SetHeaderLabel(ByVal aText As String)

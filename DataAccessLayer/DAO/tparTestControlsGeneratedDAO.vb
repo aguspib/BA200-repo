@@ -7,9 +7,9 @@
     Imports System.Data.SqlClient
     Imports Biosystems.Ax00.Types
     Imports Biosystems.Ax00.Global
-    Imports Biosystems.Ax00.Global.TO
-    
-    namespace Biosystems.Ax00.DAL.DAO
+
+
+namespace Biosystems.Ax00.DAL.DAO
   
 
     Partial Public Class TparTestControlsGeneratedDAO

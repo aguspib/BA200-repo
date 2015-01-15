@@ -1,13 +1,10 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.InfoAnalyzer
 Imports System.Data
@@ -2343,9 +2340,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'This property is updated every test completed
         Private Property TestsCountSinceLastClean() As Integer
             Get
-                Dim myglobal As New GlobalDataTO
-                Dim myUtil As New Utilities
-                myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.SAMPLES_SINCE_LAST_CLEAN)
+                'Dim myglobal As New GlobalDataTO
+                'Dim myUtil As New Utilities
+                Dim myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.SAMPLES_SINCE_LAST_CLEAN)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
                     TestsCountSinceLastCleanAttr = CInt(myglobal.SetDatos)
                 Else
@@ -3851,8 +3848,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function LoadISEParameters() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
-            Dim myAllParametersDS As New ParametersDS
-            Dim myGlobalbase As New GlobalBase
+            'Dim myAllParametersDS As New ParametersDS
+            'Dim myGlobalbase As New GlobalBase
             Try
                 If MyClass.AnalyzerModelAttr.Length > 0 Then
                     myGlobal = myParams.GetAllISEList(Nothing)
@@ -5091,7 +5088,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by SGM 05/06/2012</remarks>
         Private Function ValidateBiosystemsPack() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities
             Dim myLogAcciones As New ApplicationLogManager()
             Try
 
@@ -5137,124 +5134,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                     result = CBool(myGlobal.SetDatos)
                                 End If
-
-
-
-                                ''Obtain SerialID 64 bits integer
-                                ''Serial ID[8] = (ID7,ID6,ID5,ID4,ID3,ID2,ID1,ID0)
-                                'Dim mySerialID_0 As String = MyClass.ISEDallasSN.SerialNumber.Substring(0, 2)
-                                'Dim mySerialID_1 As String = MyClass.ISEDallasSN.SerialNumber.Substring(2, 2)
-                                'Dim mySerialID_2 As String = MyClass.ISEDallasSN.SerialNumber.Substring(4, 2)
-                                'Dim mySerialID_3 As String = MyClass.ISEDallasSN.SerialNumber.Substring(6, 2)
-                                'Dim mySerialID_4 As String = MyClass.ISEDallasSN.SerialNumber.Substring(8, 2)
-                                'Dim mySerialID_5 As String = MyClass.ISEDallasSN.SerialNumber.Substring(10, 2)
-                                'Dim mySerialID_6 As String = MyClass.ISEDallasSN.SerialNumber.Substring(12, 2)
-                                'Dim mySerialID_7 As String = MyClass.ISEDallasSN.SerialNumber.Substring(14, 2)
-
-                                'Dim mySerialID As String = mySerialID_7 & mySerialID_6 & mySerialID_5 & mySerialID_4 & _
-                                '            mySerialID_3 & mySerialID_2 & mySerialID_1 & mySerialID_0
-
-                                ''X = ([ID4][ID3][ID2][ID1]) 4 Bytes
-                                'Dim strX As String = mySerialID.Substring(6, 8)
-                                'myGlobal = myUtil.ConvertHexToUInt32(strX)
-                                'If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '    Dim X As UInt32 = Convert.ToUInt32(myGlobal.SetDatos)
-
-                                '    'SGM 31/08/2012 - This does not work!!!
-                                '    'Dim X2old As UInt64 = Convert.ToUInt64(Math.Pow(X, 2))
-
-                                '    'new way for power to 2 SGM 31/08/2012
-                                '    Dim X2 As UInt64
-                                '    myGlobal = myUtil.PowUint64To2(X)
-                                '    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '        X2 = Convert.ToUInt64(myGlobal.SetDatos)
-                                '        'X2 = Convert.ToUInt64((Convert.ToUInt64(X)) * (Convert.ToUInt64(X)))
-                                '        Dim MMask As UInt64 = 4294901760 ' &HFFFF0000
-                                '        Dim LMask As UInt64 = 65535 '&HFFFF
-                                '        Dim High As UInt32 = CType(((X2 And MMask) >> 16), UInt32)
-                                '        Dim Low As UInt32 = CType((X2 And LMask), UInt32)
-
-                                '        Dim strHigh As String = ""
-                                '        myGlobal = myUtil.ConvertUint32ToHex(High)
-                                '        If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '            strHigh = CStr(myGlobal.SetDatos)
-
-                                '            'SGM 14/12/2012, V1.0.0 - prevent that result's length is minor than 4 bytes. add as many "0" up to 4
-                                '            If strHigh.Length < 4 Then
-                                '                For c As Integer = 1 To 4 - strHigh.Length Step 1
-                                '                    strHigh = "0" & strHigh
-                                '                Next
-                                '            ElseIf strHigh.Length > 4 Then
-                                '                myLogAcciones.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.ValidateBiosystemsPack", EventLogEntryType.Error, False)
-                                '            End If
-                                '            'end SGM 14/12/2012
-
-                                '        End If
-
-                                '        Dim strLow As String = ""
-                                '        myGlobal = myUtil.ConvertUint32ToHex(Low)
-                                '        If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '            strLow = CStr(myGlobal.SetDatos)
-
-                                '            'SGM 14/12/2012, V1.0.0 - prevent that result's length is minor than 4 bytes. add as many "0" up to 4
-                                '            If strLow.Length < 4 Then
-                                '                For c As Integer = 1 To 4 - strLow.Length Step 1
-                                '                    strLow = "0" & strLow
-                                '                Next
-                                '            ElseIf strLow.Length > 4 Then
-                                '                myLogAcciones.CreateLogActivity("ISE reagents Pack validation algorithm error", "ISEManager.ValidateBiosystemsPack", EventLogEntryType.Error, False)
-                                '            End If
-                                '            'end SGM 14/12/2012
-
-                                '        End If
-
-
-                                '        'MSB =(16 bits of Odd bits of X) -> [31][29][27][25]....[1]
-                                '        'LSB =(16 bits of Even bits of X) -> [30][28][26][24]....[0]
-                                '        If strHigh.Length = 4 And strLow.Length = 4 Then
-
-                                '            Dim strHighLow As String = strHigh & strLow
-                                '            Dim difTo8 As Integer = 8 - strHighLow.Length
-                                '            For c As Integer = 1 To difTo8 Step 1
-                                '                strHighLow = "0" & strHighLow
-                                '            Next
-                                '            myGlobal = myUtil.ConvertHexToBinaryString(strHighLow)
-                                '            If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '                Dim myBinary As String = CStr(myGlobal.SetDatos)
-                                '                If myBinary.Length = 32 Then
-                                '                    Dim strbMSB As String = ""
-                                '                    Dim strbLSB As String = ""
-                                '                    For B As Integer = 1 To myBinary.Length - 1 Step 2
-                                '                        strbMSB &= myBinary.Substring(B - 1, 1)
-                                '                        strbLSB &= myBinary.Substring(B, 1)
-                                '                    Next
-
-                                '                    'Y = 0x[MSB][LSB]
-                                '                    Dim strMSBLSB As String = strbMSB & strbLSB
-                                '                    myGlobal = myUtil.ConvertBinaryStringToDecimal(strMSBLSB)
-                                '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                                '                        Dim intY As UInt64 = Convert.ToUInt64(myGlobal.SetDatos)
-                                '                        myGlobal = myUtil.ConvertDecimalToHex(Convert.ToInt64(intY))
-                                '                        If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-
-                                '                            'Security Key Validation:
-                                '                            'these bytes must match the readed Security code from Dallas Page 00
-                                '                            Dim myResultantCode As String = CStr(myGlobal.SetDatos)
-                                '                            Dim dif8 As Integer = 8 - myResultantCode.Length
-                                '                            'bug fixed: dif8 used
-                                '                            For c As Integer = 1 To dif8 Step 1
-                                '                                myResultantCode = "0" & myResultantCode
-                                '                            Next
-                                '                            result = (myResultantCode = MyClass.ISEDallasPage00.SecurityCode)
-
-                                '                        End If
-                                '                    End If
-                                '                End If
-                                '            End If
-                                '        End If
-                                '    End If
-                                'End If
-
 
                             End If
                         Else

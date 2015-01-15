@@ -6,7 +6,6 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
-Imports System.Configuration
 Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.FwScriptsManagement
@@ -435,7 +434,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
 
 
-                Dim myHomeScriptList As New List(Of FwScriptQueueItem)
+                'Dim myHomeScriptList As New List(Of FwScriptQueueItem)
 
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO

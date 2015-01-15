@@ -3,12 +3,8 @@
 Option Explicit On
 'Option Strict On
 
-Imports DevExpress.XtraGrid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.XtraGrid.Views.Base
 Imports DevExpress.XtraGrid.Views.Grid
 Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
-Imports DevExpress.XtraGrid.Repository
 Imports DevExpress.XtraEditors.Controls
 Imports DevExpress.Utils
 

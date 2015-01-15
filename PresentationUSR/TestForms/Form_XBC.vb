@@ -2,9 +2,7 @@
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports System.Xml
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports System.Text
 
 Public Class Form_XBC
 

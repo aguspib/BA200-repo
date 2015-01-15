@@ -4,7 +4,6 @@ Imports System.Drawing
 Imports System.Diagnostics
 Imports System.Globalization
 Imports System.Windows.Forms
-Imports System.Collections.Generic
 Imports System.ComponentModel
 #End Region
 
