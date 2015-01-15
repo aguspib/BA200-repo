@@ -11148,7 +11148,7 @@ Partial Public Class IAx00MainMDI
     ''' <remarks>
     ''' Created by  AG 28/02/2013
     ''' Modified by XB 22/07/2013 - Add HQProcessByUserFlag condition for LIS auto HQ management
-    ''' AG 14/01/2014 - BT #1435 message informing change reactions rotor recommended is not shown when user clicks the HQ button in MDI horizontal bar</remarks>
+    ''' AG 14/01/2014 - BT #1435 message informing change reactions rotor recommended is not shown when user clicks the HQ button in MDI horizontal bar
     ''' </remarks>
     Private Sub bsTSHostQueryButton_Click(sender As Object, e As EventArgs) Handles bsTSHostQueryButton.Click
         Try
