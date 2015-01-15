@@ -3,12 +3,8 @@ Option Explicit On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Global.TO
-Imports System.Configuration
 Imports System.Windows.Forms
 Imports System.IO
-Imports System.Xml.Serialization
 
 Public Class FwAdjustmentsDelegate
 

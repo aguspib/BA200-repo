@@ -3,11 +3,6 @@ Option Strict On
 
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.FwScriptsManagement
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.DAL.DAO
 
 Public Class IMsgBox
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm

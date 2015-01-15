@@ -6,7 +6,6 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 'Imports System.Configuration
 'Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class IQCCumulateControlResults
 

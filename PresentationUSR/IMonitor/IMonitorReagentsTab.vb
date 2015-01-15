@@ -1,5 +1,4 @@
 ﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL
 
 'Put here your business code for the tab ReagentsTab inside Monitor Form
 Partial Public Class IMonitor

@@ -1,7 +1,6 @@
 ﻿Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports System.IO
 
 Public Class IWarningAfectedElements
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm

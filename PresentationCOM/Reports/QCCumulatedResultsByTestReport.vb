@@ -4,10 +4,7 @@ Option Explicit On
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Imports System.Drawing
-Imports DevExpress.XtraCharts
 Imports DevExpress.XtraReports.UI
 
 Public Class QCCumulatedResultsByTestReport

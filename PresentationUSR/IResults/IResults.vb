@@ -12,7 +12,6 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports System.Text
 Imports System.ComponentModel
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports System.Threading
 
 Public Class IResults
     'RH 13/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)

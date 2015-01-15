@@ -1,7 +1,6 @@
 Option Strict On
 Option Explicit On
 
-Imports System.IO
 Imports System.Drawing
 Imports System.Windows.Forms
 

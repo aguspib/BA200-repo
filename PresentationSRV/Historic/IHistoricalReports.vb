@@ -4,18 +4,11 @@ Option Strict On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Imports DevExpress.XtraGrid
-Imports DevExpress.Data
 Imports DevExpress.XtraGrid.Views.Grid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.Utils
-Imports DevExpress.XtraPrinting
 Imports DevExpress.XtraEditors.Repository
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports System.IO
-Imports Biosystems.Ax00.DAL.DAO
 Imports System.Globalization
 
 

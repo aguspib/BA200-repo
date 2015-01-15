@@ -3,14 +3,11 @@ Option Strict On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.IO
 Imports Biosystems.Ax00.Controls.UserControls
 Imports System.Globalization
 Imports Biosystems.Ax00.InfoAnalyzer
@@ -214,6 +211,9 @@ Public Class IISEResultsHistory
     ''' Created by: JB 02/08/2012
     ''' </remarks>
     Private Function GetDescAlarm(ByVal pAlarmId As String) As String
+
+        Dim result As String = String.Empty
+
         Try
             Dim myAlarmsDelegate As New AlarmsDelegate
             Dim myGlobal As GlobalDataTO = myAlarmsDelegate.Read(Nothing, pAlarmId)
@@ -222,15 +222,17 @@ Public Class IISEResultsHistory
                 Dim myAlarmsDS As AlarmsDS
                 myAlarmsDS = CType(myGlobal.SetDatos, AlarmsDS)
                 If myAlarmsDS.tfmwAlarms.Count > 0 Then
-                    Return myAlarmsDS.tfmwAlarms(0).Description
+                    result = myAlarmsDS.tfmwAlarms(0).Description
                 End If
             End If
 
-            Return ""
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetDescAlarm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetDescAlarm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
+
+        Return result
+
     End Function
 
     ''' <summary>

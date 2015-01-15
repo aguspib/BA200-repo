@@ -5,13 +5,10 @@ Imports System.IO
 'Imports System.Configuration
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports System.Drawing
 Imports System.Windows.Forms

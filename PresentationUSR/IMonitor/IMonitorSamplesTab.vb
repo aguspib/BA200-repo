@@ -1,7 +1,5 @@
-﻿Imports Biosystems.Ax00.Types
+﻿
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Global.TO
 
 'Put here your business code for the tab SamplesTab inside Monitor Form
 Partial Public Class IMonitor

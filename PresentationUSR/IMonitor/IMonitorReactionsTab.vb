@@ -1,6 +1,4 @@
 ﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 
 'Put here your business code for the tab ReactionsTab inside Monitor Form

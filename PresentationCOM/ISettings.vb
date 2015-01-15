@@ -3,10 +3,7 @@ Option Strict Off
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
-Imports System.IO
 
 Imports Biosystems.Ax00.CommunicationsSwFw
 

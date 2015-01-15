@@ -3,7 +3,6 @@ Option Explicit On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
-Imports System.Configuration
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
 

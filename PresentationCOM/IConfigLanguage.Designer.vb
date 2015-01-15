@@ -1,4 +1,4 @@
-﻿Imports System.Windows.Forms
+﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class IConfigLanguage

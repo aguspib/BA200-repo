@@ -6,8 +6,6 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.DAL.DAO
-Imports System.IO
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types

@@ -1,13 +1,8 @@
 Option Explicit On
 Option Strict On
 
-Imports System.IO
-Imports Microsoft.Win32
-Imports System.Globalization
-Imports System.Configuration
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.TO
-Imports System.Security.Cryptography
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global.GlobalEnumerates

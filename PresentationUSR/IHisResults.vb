@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
-Imports System.Globalization
 Imports DevExpress.XtraEditors.Repository
 Imports DevExpress.XtraEditors
 Imports DevExpress.XtraEditors.Controls

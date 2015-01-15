@@ -2,17 +2,11 @@
 'Option Strict On
 
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
-Imports Biosystems.Ax00.CommunicationsSwFw
+'AG 26/07/2010
 
-Imports System.Text
-Imports System.ComponentModel
 'Imports DevExpress.XtraReports.UI
 'Imports DevExpress.XtraPrinting
 'Imports DevExpress.XtraPrintingLinks

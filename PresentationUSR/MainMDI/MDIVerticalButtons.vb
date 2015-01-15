@@ -4,17 +4,12 @@ Option Explicit On
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Controls.UserControls
-Imports System.Globalization
-Imports LIS.Biosystems.Ax00.LISCommunications 'AG 25/02/2013 - for LIS communications
-Imports System.Xml 'AG 25/02/2013 - for LIS communications
-Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
-Imports System.Timers
+'AG 25/02/2013 - for LIS communications
+'AG 25/02/2013 - for LIS communications
+'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
 
 
 'Refactoring code in VericalButtons partial class inherits form MDI (specially method ActivateActionButtonBarOrSendNewAction)

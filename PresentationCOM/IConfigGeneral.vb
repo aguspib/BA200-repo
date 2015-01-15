@@ -5,14 +5,12 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports System.Configuration
 Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
 
 Imports Biosystems.Ax00.CommunicationsSwFw  ' XBC 06/09/2011
 
 Imports Biosystems.Ax00.FwScriptsManagement 'SGM 28/10/2011
-Imports System.IO
 
 Public Class IConfigGeneral
 

@@ -2,15 +2,12 @@
 Option Explicit On
 Option Strict On
 
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports System.Runtime.InteropServices 'WIN32
+'WIN32
 Imports Biosystems.Ax00.CommunicationsSwFw
 
 

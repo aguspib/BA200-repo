@@ -8,21 +8,14 @@
 'Also specific business for BAx00 application when notifications are received
 
 Imports System
-Imports System.ComponentModel
-Imports System.Text
 Imports System.Xml
-Imports System.Runtime.InteropServices
 Imports System.Diagnostics
-Imports NteCommunicationCoreModuleLib
 
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports System.IO
 
 Namespace Biosystems.Ax00.LISCommunications
 

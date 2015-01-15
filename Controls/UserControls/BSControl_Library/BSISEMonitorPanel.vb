@@ -2,7 +2,6 @@ Option Explicit On
 Option Strict On
 
 
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports System.Windows.Forms
 Imports System.Drawing

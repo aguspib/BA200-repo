@@ -1,24 +1,13 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Xml
 Imports System.Windows.Forms
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Controls.UserControls
-Imports LIS.Biosystems.Ax00.LISCommunications
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.DAL.DAO
-
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraPrinting
-Imports DevExpress.XtraEditors
 
 
 Public Class Ax00MainForm

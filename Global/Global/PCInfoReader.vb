@@ -9,9 +9,7 @@ Imports System.IO
 Imports System.Management
 Imports System.Data.Sql
 
-Imports Biosystems.Ax00.Types
 'Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global
 'Imports Biosystems.Ax00
 
 'Reference:

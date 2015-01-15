@@ -3,8 +3,6 @@ Option Strict On
 
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports System.Windows.Forms.VisualStyles
-Imports Biosystems.Ax00.Controls.UserControls
 
 
 ''' <summary>

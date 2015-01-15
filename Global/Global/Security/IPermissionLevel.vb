@@ -1,4 +1,4 @@
-﻿Imports System
+﻿
 
 Public Interface IPermissionLevel
 

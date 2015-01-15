@@ -1,7 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports System.Text
 Imports Biosystems.Ax00.Types

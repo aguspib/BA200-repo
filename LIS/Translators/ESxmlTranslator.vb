@@ -5,13 +5,9 @@ Option Strict On
 Option Explicit On
 
 Imports System.Xml
-Imports System.Xml.XPath
-Imports System.IO
-Imports System.Xml.Schema
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
@@ -4300,7 +4296,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
 
                     Dim myXmlNode As XmlNode = TryCast(myXmlDoc.DocumentElement, XmlNode)
-                    Dim myXmlHelper As New xmlHelper(myXmlNode.GetPrefixOfNamespace(myXmlNode.NamespaceURI), MyClass.TraceSchema, Nothing, Nothing)
+                    Dim myXmlHelper As New xmlHelper(myXmlNode.GetPrefixOfNamespace(myXmlNode.NamespaceURI), TraceSchema, Nothing, Nothing)
                     Dim myXmlNodeList As XmlNodeList = myXmlNode.ChildNodes
                     If myXmlNodeList IsNot Nothing Then
                         For Each E As XmlNode In myXmlNodeList

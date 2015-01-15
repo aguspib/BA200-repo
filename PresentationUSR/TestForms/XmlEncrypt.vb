@@ -2,29 +2,12 @@
 Option Strict On
 
 Imports System
-Imports System.Reflection ' For Missing.Value and BindingFlags
-Imports System.Runtime.InteropServices ' For COMException
+' For Missing.Value and BindingFlags
+' For COMException
 Imports System.IO
 ''''''
-Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.Types.BaseLinesDS
-Imports Biosystems.Ax00.Types.twksWSReadingsDS
-Imports Biosystems.Ax00.Types.ExecutionsDS
-Imports Biosystems.Ax00.DAL
-Imports System.Data.SqlClient
-Imports System.Configuration
-Imports Biosystems.Ax00.BL.UpdateVersion
-Imports Biosystems.Ax00
 'Imports History.Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-
 
 
 Public Class XmlEncrypt

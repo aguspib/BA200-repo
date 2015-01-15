@@ -899,7 +899,7 @@ Public Class IPhotometryAdjustments
                 myResultData = PrepareScreen()
 
                 ' Check Previous completed BLDC tests
-                Dim myPathBLFile As String = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+                Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
                 If IO.File.Exists(myPathBLFile) Then
                     ' Recover BLDC test previously completed
                     myResultData = myScreenDelegate.GetLastBLDCCompletedTest(myPathBLFile)
@@ -1115,7 +1115,7 @@ Public Class IPhotometryAdjustments
                                 Me.BsExitButton.Enabled = True
 
                                 ' Save BLDC Test
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+                                myPath = Application.StartupPath & GlobalBase.PhotometryTestsFile
                                 myResultData = myScreenDelegate.SaveBLDCFile(myPath, Me.ActiveAnalyzer)
 
                                 MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
@@ -1129,7 +1129,7 @@ Public Class IPhotometryAdjustments
                                 PopulateBLChart(myScreenDelegate.BaseLineMainCounts, myScreenDelegate.BaseLineRefCounts)
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryBLFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryBLFileOut
                                 CreateBLResultsFileOutput(myPath)
                             Else
                                 If myScreenDelegate.HomesDone Then
@@ -1239,7 +1239,7 @@ Public Class IPhotometryAdjustments
                                 End If
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryRepeatabilityFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryRepeatabilityFileOut
                                 CreateRepeatabilityResultsFileOutput(myPath)
 
                             Else
@@ -1337,7 +1337,7 @@ Public Class IPhotometryAdjustments
                                 'End If
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryStabilityFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryStabilityFileOut
                                 CreateStabilityResultsFileOutput(myPath)
 
                             Else

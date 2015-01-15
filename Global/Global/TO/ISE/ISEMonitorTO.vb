@@ -1,7 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.Global
 

@@ -1,9 +1,7 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Configuration
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.DAL
 
 
 Namespace Biosystems.Ax00.BL.UpdateVersion

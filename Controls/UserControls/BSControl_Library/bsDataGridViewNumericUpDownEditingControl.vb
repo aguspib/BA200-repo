@@ -2,7 +2,7 @@
 Imports System
 Imports System.Drawing
 Imports System.Windows.Forms
-Imports System.Diagnostics
+
 #End Region
 
 Namespace Biosystems.Ax00.Controls.UserControls

@@ -6,8 +6,6 @@ Imports System.Windows.Forms
 Imports System.IO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.BL
 
 Namespace Biosystems.Ax00.BL.UpdateVersion
 

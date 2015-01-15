@@ -4,11 +4,8 @@ Option Strict On
 
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
 
 'Put here your business code for the tab ISETab inside Monitor Form
 Partial Public Class IMonitor

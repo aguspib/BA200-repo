@@ -3,14 +3,11 @@ Option Strict On
 
 
 Imports System.IO
-Imports System.Windows.Forms
-Imports System.Configuration
 Imports ICSharpCode.SharpZipLib.Zip
 Imports System.Text         'PG 23/11/2010
 Imports System.Security     'PG 23/11/2010
 Imports System.Runtime.Serialization
 Imports System.Runtime.Serialization.Formatters.Binary
-Imports System.Security.Cryptography
 Imports Biosystems.Ax00.Types
 Imports System.Runtime.InteropServices
 Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Decimal values (Bugs tracking #1122)

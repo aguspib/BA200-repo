@@ -2,7 +2,6 @@
 Option Strict On
 
 
-Imports Biosystems.Ax00.Global
 
 Public Class FwScriptTO
 

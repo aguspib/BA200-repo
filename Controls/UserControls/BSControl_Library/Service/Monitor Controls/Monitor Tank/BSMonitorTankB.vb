@@ -2,9 +2,6 @@
 Option Explicit On
 
 Imports PerpetuumSoft.Instrumentation
-Imports PerpetuumSoft.Instrumentation.Windows.Forms
-Imports PerpetuumSoft.Instrumentation.Model
-Imports PerpetuumSoft.Framework.Drawing
 
 
 Namespace Biosystems.Ax00.Controls.UserControls

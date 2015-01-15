@@ -6,7 +6,6 @@ Imports Biosystems.Ax00.Types
 'Imports Biosystems.Ax00.DAL
 'Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
@@ -6261,7 +6260,7 @@ Public Class Ax00ServiceMainMDI
         Try
             Me.Text = My.Application.Info.ProductName 'SGM 22/02/2012
 
-            Dim XMLScriptFileNamePath As String = Application.StartupPath & myGlobalbase.XmlFwScripts
+            Dim XMLScriptFileNamePath As String = Application.StartupPath & GlobalBase.XmlFwScripts
             Me.ErrorStatusLabel.Text = ""
 
             'Search the current user level

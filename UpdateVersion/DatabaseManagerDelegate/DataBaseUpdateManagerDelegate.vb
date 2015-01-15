@@ -2,7 +2,6 @@
 Option Strict On
 
 Imports Biosystems.Ax00.Global
-Imports System.Configuration
 Imports Biosystems.Ax00.BL.Framework
 Imports System.Windows.Forms
 Imports Microsoft.SqlServer.Management.Smo

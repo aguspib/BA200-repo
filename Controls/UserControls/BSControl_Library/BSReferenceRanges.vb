@@ -7,7 +7,6 @@ Imports System.Drawing
 'Imports Biosystems.Ax00.Controls
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Types.TestRefRangesDS
 
 'User Control that allows the edition of Reference Ranges for Tests of whatever type: 
 'Standard, Calculated, ISE and/or Off-System Tests

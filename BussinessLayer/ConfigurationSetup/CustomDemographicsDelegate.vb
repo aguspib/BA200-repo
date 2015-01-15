@@ -1,10 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.DAL
 
 Namespace Biosystems.Ax00.BL
 
