@@ -25,7 +25,6 @@ Namespace Biosystems.Ax00.BL.Framework
         Public Function GetApplicationSettingBySettingID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal SettingID As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
-
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then

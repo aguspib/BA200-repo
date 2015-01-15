@@ -762,8 +762,9 @@ Namespace Biosystems.Ax00.BL
 
                                 'Fill ReportMaster table ********************************************************************************************
                                 For i As Integer = 0 To 1
+                                    Dim linqIndex = i
                                     SamplesList = (From row In pHisWSResults _
-                                                   Where String.Compare(row.SampleClass, "PATIENT", False) = 0 AndAlso row.StatFlag = StatFlag(i) _
+                                                   Where String.Compare(row.SampleClass, "PATIENT", False) = 0 AndAlso row.StatFlag = StatFlag(linqIndex) _
                                                    Select row).ToList()
 
                                     For Each sampleRow As HisWSResultsDS.vhisWSResultsRow In SamplesList
