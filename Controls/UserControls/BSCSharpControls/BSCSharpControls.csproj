@@ -100,7 +100,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BSCustomMessageBox.cs" />
-    <Compile Include="CalendarCell1.cs" />
+    <Compile Include="CalendarCell1.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="DataGridViewPrinter.cs" />
     <Compile Include="DataGridViewTextBoxSpanCell.cs" />
     <Compile Include="FlexibleMessageBox.cs" />
