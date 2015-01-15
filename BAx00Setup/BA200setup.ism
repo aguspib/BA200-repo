@@ -2581,6 +2581,10 @@
 		<row><td>dilutions.png1</td><td>UserSw_Images</td><td>DILUTI~1.PNG|Dilutions.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Dilutions.png</td><td>1</td><td/></row>
 		<row><td>down.png</td><td>ServiceSw_Images</td><td>Down.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Down.png</td><td>1</td><td/></row>
 		<row><td>down.png1</td><td>UserSw_Images</td><td>Down.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Down.png</td><td>1</td><td/></row>
+		<row><td>dynamicbaselineempty.png</td><td>UserSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineEmpty.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineEmpty.png</td><td>1</td><td/></row>
+		<row><td>dynamicbaselineempty.png1</td><td>ServiceSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineEmpty.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineEmpty.png</td><td>1</td><td/></row>
+		<row><td>dynamicbaselineread.png</td><td>UserSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineRead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineRead.png</td><td>1</td><td/></row>
+		<row><td>dynamicbaselineread.png1</td><td>ServiceSw_Images</td><td>DYNAMI~1.PNG|DynamicBaseLineRead.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\DynamicBaseLineRead.png</td><td>1</td><td/></row>
 		<row><td>edit.png</td><td>ServiceSw_Images</td><td>Edit.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\Edit.png</td><td>1</td><td/></row>
 		<row><td>edit.png1</td><td>UserSw_Images</td><td>Edit.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images&gt;\Edit.png</td><td>1</td><td/></row>
 		<row><td>editreport.png</td><td>ServiceSw_Images</td><td>EDITRE~1.PNG|EditReport.png</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;Images1&gt;\EditReport.png</td><td>1</td><td/></row>
