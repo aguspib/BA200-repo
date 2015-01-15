@@ -1171,7 +1171,7 @@ Namespace Biosystems.Ax00.Global
         Public Function SerializeDataset(ByVal pDataset As DataSet, ByVal pPath As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myStreamWriter As StreamWriter
+            Dim myStreamWriter As StreamWriter = Nothing
 
             Try
                 Dim stream As New MemoryStream()
@@ -1209,7 +1209,7 @@ Namespace Biosystems.Ax00.Global
         ''' <remarks>Created by SGM 07/12/2011</remarks>
         Public Function DeserializeDataset(ByVal pDatasetType As Type, ByVal pPath As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim myStringReader As System.IO.StringReader
+            Dim myStringReader As System.IO.StringReader = Nothing
 
             Try
                 myStringReader = New System.IO.StringReader(pPath)
@@ -1479,7 +1479,7 @@ Namespace Biosystems.Ax00.Global
         Public Function WriteBinaryFile(ByVal pPath As String, ByVal pContent() As Byte) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myFileStream As FileStream
+            Dim myFileStream As FileStream = Nothing
 
             Try
 

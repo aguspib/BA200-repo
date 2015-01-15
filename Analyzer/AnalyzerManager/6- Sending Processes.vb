@@ -1583,7 +1583,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
 
                                 Dim auxOrderTestID As Integer = -1
-                                Dim otInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                Dim otInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                 For Each row As ExecutionsDS.twksWSExecutionsRow In toSendList
                                     If row.OrderTestID <> auxOrderTestID Then
@@ -1625,7 +1625,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             '1) Search contamination between previous reagents and the first in toSendList
                             Dim previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
-                            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow)
+                            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
                             Dim contaminationFound As Boolean = False
                             Dim myLogAcciones As New ApplicationLogManager() 'Add temporal traces 'AG 28/03/2014 - #1563
 

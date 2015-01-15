@@ -576,13 +576,13 @@ Public Class IResultsAbsCurve
 
         Try
             Dim mySerieName As String
-            Dim mySerie As Series
+            Dim mySerie As Series = Nothing
             Dim Min As Single
             Dim Max As Single
             Dim FilterAbs As List(Of GraphDS.tReplicatesRow)
 
             If Not ReplicateDS Is Nothing AndAlso ReplicateDS.tReplicates.Count > 0 Then
-                Dim qReplicateFilter As List(Of GraphDS.tReplicatesRow)
+                Dim qReplicateFilter As List(Of GraphDS.tReplicatesRow) = Nothing
 
                 CreateChartControl()
 

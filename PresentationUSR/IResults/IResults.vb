@@ -3873,7 +3873,7 @@ Public Class IResults
         Try
             Dim ContinuePro As Boolean = True
 
-            Dim ExecutionResultRow As ExecutionsDS.vwksWSExecutionsResultsRow
+            Dim ExecutionResultRow As ExecutionsDS.vwksWSExecutionsResultsRow = Nothing
             If (Not dgv.Rows(RowIndex).Tag Is Nothing) Then
                 ExecutionResultRow = CType(dgv.Rows(RowIndex).Tag, ExecutionsDS.vwksWSExecutionsResultsRow)
             Else
@@ -5341,7 +5341,7 @@ Public Class IResults
     End Sub
 
     Public Function ExportResultsWithParameters(ByVal pFileName As String, ByVal pPath As String, ByVal pWorkSessionID As String) As GlobalDataTO
-        Dim resultData As GlobalDataTO
+        Dim resultData As GlobalDataTO = Nothing
 
         Try
 

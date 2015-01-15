@@ -693,7 +693,7 @@ Namespace Biosystems.Ax00.BL
         Private Function CreateExportFileNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pLIMSResultsList As ResultsDS, _
                                              Optional ByVal pManualFileName As Boolean = False) As GlobalDataTO
 
-            Dim TextFileWriter As StreamWriter
+            Dim TextFileWriter As StreamWriter = Nothing
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try

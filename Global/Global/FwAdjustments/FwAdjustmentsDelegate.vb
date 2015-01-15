@@ -121,7 +121,7 @@ Public Class FwAdjustmentsDelegate
                                    Optional ByVal pEncrypt As Boolean = False) As GlobalDataTO
 
         Dim resultData As New GlobalDataTO
-        Dim myStreamWriter As StreamWriter
+        Dim myStreamWriter As StreamWriter = Nothing
 
         Try
 

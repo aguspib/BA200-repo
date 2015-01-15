@@ -6486,7 +6486,7 @@ Public Class Ax00ServiceMainMDI
                 End If
 
                 'SGM 19/09/2012 - special case for ISE utilities screen
-                Dim myISEUtilities As IISEUtilities
+                Dim myISEUtilities As IISEUtilities = Nothing
                 If TypeOf ActiveMdiChild Is IISEUtilities Then
                     myISEUtilities = CType(ActiveMdiChild, IISEUtilities)
                     If myISEUtilities.IsCompletelyClosed Then
@@ -7743,7 +7743,7 @@ Public Class Ax00ServiceMainMDI
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             Dim myMessage As String = ""
-            Dim myMessages As List(Of String)
+            Dim myMessages As List(Of String) = Nothing
 
             Dim myErrorsString As String = MyClass.MDIAnalyzerManager.ErrorCodes
 
