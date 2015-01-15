@@ -175,7 +175,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function ImportFwScript(ByVal pImportPath As String, ByVal pTargetFwScriptsData As FwScriptsDataTO) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim TextFileReader As StreamReader
+            Dim TextFileReader As StreamReader = Nothing
             Try
                 If File.Exists(pImportPath) Then
                     TextFileReader = New StreamReader(pImportPath)

@@ -294,7 +294,7 @@ Partial Class IResults
 
             'AG 22/09/2014 - BA-1940 declare new variables
             Dim patientIDSpecimensList As New List(Of PatientSpecimenTO)
-            Dim linqRes As List(Of PatientSpecimenTO)
+            Dim linqRes As List(Of PatientSpecimenTO) = Nothing
             Dim auxPatientToolTipInfo As String = String.Empty
             Dim updateRow As Boolean = False 'Update an existing item in grid list
             'AG 22/09/2014 - BA-1940

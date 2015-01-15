@@ -2345,7 +2345,7 @@ Namespace Biosystems.Ax00.BL
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myQCResultsDS As QCResultsDS
+                        Dim myQCResultsDS As QCResultsDS = Nothing
 
                         If (pQCResultsDS Is Nothing) Then
                             'Get the QC Results accepted and validated in the informed WorkSession

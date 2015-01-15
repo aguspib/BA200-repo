@@ -641,11 +641,11 @@ Public Class BSTestRefRanges
     ''' </remarks>
     Public Sub UpdateTestRefRanges(ByVal pTestId As Integer, ByVal pSampleType As String)
         Dim sampleType As String
-        Dim testRefRangesRowGeneric As TestRefRangesDS.tparTestRefRangesRow
+        Dim testRefRangesRowGeneric As TestRefRangesDS.tparTestRefRangesRow = Nothing
         Dim testRefRangesRowDetailed As TestRefRangesDS.tparTestRefRangesRow
 
         Try
-            Dim qTestSampleRow As List(Of TestSamplesDS.tparTestSamplesRow)
+            Dim qTestSampleRow As List(Of TestSamplesDS.tparTestSamplesRow) = Nothing
             Dim qISETestSampleRow As List(Of ISETestSamplesDS.tparISETestSamplesRow)
             Dim qOFFSTestSampleRow As List(Of OffSystemTestSamplesDS.tparOffSystemTestSamplesRow)
             Dim myTestType As String = "STD"
@@ -1654,7 +1654,7 @@ Public Class BSTestRefRanges
     ''' Modified by: SA 17/11/2010 - Use the Code of the selected AgeUnit, not the multilanguage description
     ''' </remarks>
     Private Sub RefDetailAgeLimitsSetUp()
-        Dim myFieldLimits As FieldLimitsDS.tfmwFieldLimitsRow
+        Dim myFieldLimits As FieldLimitsDS.tfmwFieldLimitsRow = Nothing
 
         Try
             If (bsRefDetailAgeComboBox.SelectedIndex > -1) Then

@@ -3880,7 +3880,7 @@ Namespace Biosystems.Ax00.BL
                         Dim offSet As Integer = 0
                         Dim remainingTime As Single = 0
                         Dim previousTestID As Integer = -1
-                        Dim myReadingNumbersDS As TimeEstimationDS
+                        Dim myReadingNumbersDS As TimeEstimationDS = Nothing
                         Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
 
                         If (Not resultData.HasError) Then
@@ -5915,7 +5915,7 @@ Namespace Biosystems.Ax00.BL
                 Dim ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) 'Last Reagent in previous element group (reverse order)
                 Dim ReagentContaminatedID As Integer = -1
                 Dim myExecLinqByOT As List(Of ExecutionsDS.twksWSExecutionsRow)
-                Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow)
+                Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
 
                 If myOTListLinq.Count > 1 Then
                     Dim itera As Integer = 0
@@ -6281,7 +6281,7 @@ Namespace Biosystems.Ax00.BL
                                 myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                 Dim myOrderTestID As Integer = -1
-                                Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                 For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
                                     If (rowBlank.OrderTestID <> myOrderTestID) Then
@@ -6314,7 +6314,7 @@ Namespace Biosystems.Ax00.BL
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                             'Get all executions for CALIBRATORS included in the WorkSession
-                            Dim myCalibratorExecutionsDS As ExecutionsDS
+                            Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
 
                             If (Not resultData.HasError) Then
                                 resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -6322,7 +6322,7 @@ Namespace Biosystems.Ax00.BL
                                     myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                     Dim myOrderTestID As Integer = -1
-                                    Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                     For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
                                         'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -6358,7 +6358,7 @@ Namespace Biosystems.Ax00.BL
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                             'Get all executions for CONTROLS included in the WorkSession
-                            Dim myControlExecutionsDS As ExecutionsDS
+                            Dim myControlExecutionsDS As ExecutionsDS = Nothing
 
                             If (Not resultData.HasError) Then
                                 resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -6366,7 +6366,7 @@ Namespace Biosystems.Ax00.BL
                                     myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                     Dim myOrderTestID As Integer = -1
-                                    Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                     For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
                                         'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -6404,7 +6404,7 @@ Namespace Biosystems.Ax00.BL
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                             'Get all executions for PATIENT SAMPLES included in the WorkSession
-                            Dim myPatientExecutionsDS As ExecutionsDS
+                            Dim myPatientExecutionsDS As ExecutionsDS = Nothing
 
                             If (Not resultData.HasError) Then
                                 resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -6412,7 +6412,7 @@ Namespace Biosystems.Ax00.BL
                                     myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                     Dim myOrderTestID As Integer = -1
-                                    Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                     For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
                                         'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -7307,7 +7307,7 @@ Namespace Biosystems.Ax00.BL
                                         myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                         Dim myOrderTestID As Integer = -1
-                                        Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                        Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                         For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
                                             If (rowBlank.OrderTestID <> myOrderTestID) Then
@@ -7340,7 +7340,7 @@ Namespace Biosystems.Ax00.BL
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                                     'Get all executions for CALIBRATORS included in the WorkSession
-                                    Dim myCalibratorExecutionsDS As ExecutionsDS
+                                    Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
 
                                     If (Not resultData.HasError) Then
                                         resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -7348,7 +7348,7 @@ Namespace Biosystems.Ax00.BL
                                             myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                             Dim myOrderTestID As Integer = -1
-                                            Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                            Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                             For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
                                                 'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -7384,7 +7384,7 @@ Namespace Biosystems.Ax00.BL
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                                     'Get all executions for CONTROLS included in the WorkSession
-                                    Dim myControlExecutionsDS As ExecutionsDS
+                                    Dim myControlExecutionsDS As ExecutionsDS = Nothing
 
                                     If (Not resultData.HasError) Then
                                         resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -7392,7 +7392,7 @@ Namespace Biosystems.Ax00.BL
                                             myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                             Dim myOrderTestID As Integer = -1
-                                            Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                            Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                             For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
                                                 'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -7430,7 +7430,7 @@ Namespace Biosystems.Ax00.BL
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                                     'Get all executions for PATIENT SAMPLES included in the WorkSession
-                                    Dim myPatientExecutionsDS As ExecutionsDS
+                                    Dim myPatientExecutionsDS As ExecutionsDS = Nothing
 
                                     If (Not resultData.HasError) Then
                                         resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -7438,7 +7438,7 @@ Namespace Biosystems.Ax00.BL
                                             myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                             Dim myOrderTestID As Integer = -1
-                                            Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                            Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                             For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
                                                 'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)

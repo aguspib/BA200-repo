@@ -187,7 +187,7 @@ Partial Public Class XPSViewer
 #Region "private Methods"
 
     Private Function GetToolBar() As Controls.ToolBar
-        Dim myToolBar As Controls.ToolBar
+        Dim myToolBar As Controls.ToolBar = Nothing
         Try
             Dim myGrid As Controls.Grid = CType(MyClass.DocumentViewer1.Template.FindName("DocumentViewerGrid", DocumentViewer1), Controls.Grid)
             If myGrid IsNot Nothing Then

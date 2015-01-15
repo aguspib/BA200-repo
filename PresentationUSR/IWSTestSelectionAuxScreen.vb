@@ -252,7 +252,7 @@ Public Class IWSTestSelectionAuxScreen
     ''' </remarks>
     Private Sub DeleteProfileInformation(ByVal pTestType As String, pTestID As Integer, ByVal pTestProfileID As Integer)
         Try
-            Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow)
+            Dim qSelectedTest As List(Of SelectedTestsDS.SelectedTestTableRow) = Nothing
 
             'Search the Test in the proper SelectedTestsDS according its type
             Select Case (pTestType)

@@ -1619,7 +1619,7 @@ Public Class IResultsCalibCurve
             Dim Remark As String = String.Empty
 
             'XB 30/07/2014 - BA-1863
-            Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+            Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = Nothing
             Dim myOrderTestID As Integer
             Dim myTestVersion As Integer
             ' XB 30/07/2014 - BA-1863

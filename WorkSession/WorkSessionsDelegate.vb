@@ -95,7 +95,7 @@ Namespace Biosystems.Ax00.BL
                             Dim i As Integer = 0
                             Dim newElement As Boolean = True
                             Dim visibleElement As Boolean = True
-                            Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow
+                            Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow = Nothing
 
                             'SGM 29/04/2013
                             'From table twksOrderTestsLISInfo,  get all different SpecimenID sent by LIS for each Patient/Sample Type
@@ -5888,7 +5888,7 @@ Namespace Biosystems.Ax00.BL
 
             Try
                 Dim myResults As New ResultsDelegate
-                Dim myErrorCodes As List(Of String)
+                Dim myErrorCodes As List(Of String) = Nothing
                 Dim myErrorCode As String
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

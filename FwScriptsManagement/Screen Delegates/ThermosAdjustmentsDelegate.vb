@@ -3429,7 +3429,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </remarks>
         Private Function SendQueueForPRIME_NEEDLE() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myHomeScriptsList As List(Of FwScriptQueueItem)
+            Dim myHomeScriptsList As List(Of FwScriptQueueItem) = Nothing
             Dim myFwScript1 As New FwScriptQueueItem
             Dim myFwScript2 As New FwScriptQueueItem
             Try
@@ -3516,7 +3516,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </remarks>
         Private Function SendQueueForDISPENSE_NEEDLE() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myHomeScriptsList As List(Of FwScriptQueueItem)
+            Dim myHomeScriptsList As List(Of FwScriptQueueItem) = Nothing
             Dim myFwScript1 As New FwScriptQueueItem
             Dim myFwScript2 As New FwScriptQueueItem
             Try
@@ -3644,7 +3644,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </remarks>
         Private Function SendQueueForWS_HEATER_TEST() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myHomeScriptsList As List(Of FwScriptQueueItem)
+            Dim myHomeScriptsList As List(Of FwScriptQueueItem) = Nothing
             Dim myFwScript1 As New FwScriptQueueItem
             Dim myFwScript2 As New FwScriptQueueItem
             Try
@@ -3853,7 +3853,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </remarks>
         Private Function SendQueueForCONDITIONING_ROTOR() As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myHomeScriptsList As List(Of FwScriptQueueItem)
+            Dim myHomeScriptsList As List(Of FwScriptQueueItem) = Nothing
             Dim myFwPrimeStartScript As New FwScriptQueueItem
             Dim myFwPrimeScriptsList As New List(Of FwScriptQueueItem)
             Dim myFwPrimeEndScript As New FwScriptQueueItem

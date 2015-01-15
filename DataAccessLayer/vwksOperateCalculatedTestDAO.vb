@@ -79,7 +79,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' </remarks>
         Public Function Evaluate(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pFormula As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbDataReader As SqlClient.SqlDataReader
+            Dim dbDataReader As SqlClient.SqlDataReader = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try

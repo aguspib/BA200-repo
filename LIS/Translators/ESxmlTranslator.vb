@@ -5080,7 +5080,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 For Each item As String In distinctPatientList
                     qPatientsList = (From o In pOrderTestsLISInfoDS.twksOrderTestsLISInfo Where o.ESPatientID = item Select o Distinct Order By o.ESPatientID).ToList()
                     Dim counter As Integer = 0
-                    Dim myPatientNode As XmlNode
+                    Dim myPatientNode As XmlNode = Nothing
                     For Each p As OrderTestsLISInfoDS.twksOrderTestsLISInfoRow In qPatientsList
                         If counter = 0 Then
                             counter += 1

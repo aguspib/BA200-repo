@@ -827,7 +827,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XBC 08/05/2012
                 Dim myVersionsDelegate As New VersionsDelegate
                 Dim myVersionsDS As New VersionsDS
-                Dim myFwScriptsDBVersion() As String
+                Dim myFwScriptsDBVersion() As String = Nothing
 
                 resultData = myVersionsDelegate.GetVersionsByPackage(Nothing, "1") ' By now Package is a temporal TODO
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then

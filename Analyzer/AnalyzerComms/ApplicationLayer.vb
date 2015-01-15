@@ -1888,7 +1888,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myData As String = My.Resources.AdjustmentsMasterData
 
 
-                        Dim myFileAdjustmentsDS As SRVAdjustmentsDS
+                        Dim myFileAdjustmentsDS As SRVAdjustmentsDS = Nothing
                         Dim myFwAdjustmentsDelegate As New FwAdjustmentsDelegate(MyClass.myFwAdjustmentsDS)
                         myGlobal = myFwAdjustmentsDelegate.ConvertReceivedDataToDS(myData, "Simulated Analyzer", "Simulated Firmware")
 

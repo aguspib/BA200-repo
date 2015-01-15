@@ -3088,7 +3088,7 @@ Public Class FwScriptsEdition
 
             MyClass.CurrentScreenMode = ScreenModes.GRIDCHANGING
 
-            Dim myCell As DataGridViewCell
+            Dim myCell As DataGridViewCell = Nothing
             If bsInstructionsListDataGridView.SelectedCells.Count > 0 Then
                 myCell = bsInstructionsListDataGridView.SelectedCells(0)
             End If

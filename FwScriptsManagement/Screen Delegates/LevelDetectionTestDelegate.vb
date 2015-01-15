@@ -888,7 +888,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <remarks>Created by SGM 15/12/2012</remarks>
         Private Function SendQueueForLEVEL_DETECTION_START(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myHomeScriptsList As List(Of FwScriptQueueItem)
+            Dim myHomeScriptsList As List(Of FwScriptQueueItem) = Nothing
             Dim myFwScript1 As New FwScriptQueueItem
             Dim myFwScript2 As New FwScriptQueueItem
             Try

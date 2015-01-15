@@ -1212,7 +1212,7 @@ Namespace Biosystems.Ax00.BL
 
                         'Calculate the Number of Serie to show in the screen of QC Results Review and load the DS needed for function ApplyWestgardRules
                         Dim myResultsForWestgardDS As New QCResultsForWestgardDS
-                        Dim myResultsForWestgardRow As QCResultsForWestgardDS.tQCResultsForWestgardRow
+                        Dim myResultsForWestgardRow As QCResultsForWestgardDS.tQCResultsForWestgardRow = Nothing
 
                         If (Not myGlobalDataTO.HasError) Then
                             myGlobalDataTO = myQCResultsDAO.GetRunNumberListByTestSample(dbConnection, pQCTestSampleID, pAnalyzerID)
@@ -1631,7 +1631,7 @@ Namespace Biosystems.Ax00.BL
                             Dim mySumXi2 As Double
 
                             Dim myQCControlLotID As Integer = 0
-                            Dim myControlRow As OpenQCResultsDS.tOpenResultsRow
+                            Dim myControlRow As OpenQCResultsDS.tOpenResultsRow = Nothing
 
                             For Each qcControlResult As QCResultsDS.tqcResultsRow In myStatisticsResultsDS.tqcResults.Rows
                                 If (qcControlResult.QCControlLotID <> myQCControlLotID) Then

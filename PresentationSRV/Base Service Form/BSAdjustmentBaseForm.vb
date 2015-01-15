@@ -2719,7 +2719,7 @@ Public Class BSAdjustmentBaseForm
             Dim y As Integer
 
             Dim myCurrentControl As BSAdjustControl
-            Dim myNextControl As Control
+            Dim myNextControl As Control = Nothing
             If myFocusedAdjustControl IsNot Nothing Then
                 For x As Integer = 0 To myAdjustControls.Count - 1 Step 1
                     myCurrentControl = myAdjustControls(x)

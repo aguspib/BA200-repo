@@ -187,7 +187,7 @@ Public Class ISortingTestsAux
     Private Function GetSortedTestList() As ReportsTestsSortingDS
         Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
         Try
-            Dim myGlobalDataTO As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
 
             'AG 02/09/2014 - BA-1869
             'Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
