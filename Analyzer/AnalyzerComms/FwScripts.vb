@@ -58,7 +58,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 Dim myGlobalbase As New GlobalBase
                 Dim XMLFactoryFwScriptFileNamePath As String = Application.StartupPath & myGlobalbase.FactoryXmlFwScripts
-                Dim XMLFwScriptFileNamePath As String = Application.StartupPath & myGlobalbase.XmlFwScripts
+                Dim XMLFwScriptFileNamePath As String = Application.StartupPath & GlobalBase.XmlFwScripts
 
 
                 If Not File.Exists(XMLFwScriptFileNamePath) Then
@@ -169,16 +169,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim XMLFwScriptFileNamePath As String
 
                 If pPath.Length = 0 Then
-                    XMLFwScriptFileNamePath = Application.StartupPath & myGlobalbase.XmlFwScripts
+                    XMLFwScriptFileNamePath = Application.StartupPath & GlobalBase.XmlFwScripts
                 Else
                     XMLFwScriptFileNamePath = pPath
 
                     'make a backup of the current Scripts data file
-                    File.Copy(Application.StartupPath & myGlobalbase.XmlFwScripts, Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting, True)
+                    File.Copy(Application.StartupPath & GlobalBase.XmlFwScripts, Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting, True)
 
                     System.Threading.Thread.Sleep(1)
                     'import the file
-                    File.Copy(pPath, Application.StartupPath & myGlobalbase.XmlFwScripts, True)
+                    File.Copy(pPath, Application.StartupPath & GlobalBase.XmlFwScripts, True)
                 End If
 
                 resultData = ImportFwScriptsDataFromXML(OriginalFwScriptsData.GetType, XMLFwScriptFileNamePath, True)
@@ -198,7 +198,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pPath.Length > 0 Then
                     If resultData.HasError Then
                         'restore the backup
-                        File.Copy(Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting, Application.StartupPath & myGlobalbase.XmlFwScripts, True)
+                        File.Copy(Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting, Application.StartupPath & GlobalBase.XmlFwScripts, True)
                     End If
 
                     'File.Delete(Application.StartupPath & myGlobalbase.XmlScriptsWhileImporting)
@@ -232,7 +232,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Dim resultData As New GlobalDataTO
             Dim myGlobalbase As New GlobalBase
-            Dim XMLFwScriptFileNamePath As String = Application.StartupPath & myGlobalbase.XmlFwScripts
+            Dim XMLFwScriptFileNamePath As String = Application.StartupPath & GlobalBase.XmlFwScripts
             Dim XMLCopyFwScriptFileNamePath As String = Application.StartupPath & "\temp.xml"
             Dim CopyOfFwScriptsData As New FwScriptsDataTO
 
