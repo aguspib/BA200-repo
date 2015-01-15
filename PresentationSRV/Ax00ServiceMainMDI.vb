@@ -3021,21 +3021,21 @@ Public Class Ax00ServiceMainMDI
         Dim MLRD As New MultilanguageResourcesDelegate
         Try
             With Me.BsMonitor
-                .SetSensorText(AnalyzerSensors.BOTTLE_WASHSOLUTION.ToString, MLRD.GetResourceText("LBL_SRV_WashSolution"))
-                .SetSensorText(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE.ToString, MLRD.GetResourceText("LBL_SRV_HIGH_CONCENTRATION"))
-                .SetSensorText(AnalyzerSensors.TEMPERATURE_REACTIONS.ToString, MLRD.GetResourceText("LBL_SRV_REACTIONS_ROTOR_TEMP"))
-                .SetSensorText(AnalyzerSensors.TEMPERATURE_FRIDGE.ToString, MLRD.GetResourceText("LBL_SRV_FRIDGE_TEMP"))
-                .SetSensorText(AnalyzerSensors.TEMPERATURE_R1.ToString, MLRD.GetResourceText("LBL_SRV_REAGENT1_TEMP"))
-                .SetSensorText(AnalyzerSensors.TEMPERATURE_R2.ToString, MLRD.GetResourceText("LBL_SRV_REAGENT2_TEMP"))
-                .SetSensorText(AnalyzerSensors.TEMPERATURE_WASHINGSTATION.ToString, MLRD.GetResourceText("LBL_SRV_WS_HEATER_TEMP"))
-                .SetSensorText(AnalyzerSensors.COVER_GENERAL.ToString, MLRD.GetResourceText("LBL_SRV_GeneralCover_Short"))
-                .SetSensorText(AnalyzerSensors.COVER_FRIDGE.ToString, MLRD.GetResourceText("LBL_SRV_REAGENTS_COVER"))
-                .SetSensorText(AnalyzerSensors.COVER_SAMPLES.ToString, MLRD.GetResourceText("LBL_SRV_SAMPLE_COVER"))
-                .SetSensorText(AnalyzerSensors.COVER_REACTIONS.ToString, MLRD.GetResourceText("LBL_SRV_REACTIONS_COVER"))
+                .SetSensorText(AnalyzerSensors.BOTTLE_WASHSOLUTION.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_WashSolution"))
+                .SetSensorText(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_HIGH_CONCENTRATION"))
+                .SetSensorText(AnalyzerSensors.TEMPERATURE_REACTIONS.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_REACTIONS_ROTOR_TEMP"))
+                .SetSensorText(AnalyzerSensors.TEMPERATURE_FRIDGE.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_FRIDGE_TEMP"))
+                .SetSensorText(AnalyzerSensors.TEMPERATURE_R1.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_REAGENT1_TEMP"))
+                .SetSensorText(AnalyzerSensors.TEMPERATURE_R2.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_REAGENT2_TEMP"))
+                .SetSensorText(AnalyzerSensors.TEMPERATURE_WASHINGSTATION.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_WS_HEATER_TEMP"))
+                .SetSensorText(AnalyzerSensors.COVER_GENERAL.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_GeneralCover_Short"))
+                .SetSensorText(AnalyzerSensors.COVER_FRIDGE.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_REAGENTS_COVER"))
+                .SetSensorText(AnalyzerSensors.COVER_SAMPLES.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_SAMPLE_COVER"))
+                .SetSensorText(AnalyzerSensors.COVER_REACTIONS.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_REACTIONS_COVER"))
                 If MyClass.MDIAnalyzerManager.Connected Then
-                    .SetSensorText(AnalyzerSensors.CONNECTED.ToString, MLRD.GetResourceText("LBL_SRV_CONNECTED"))
+                    .SetSensorText(AnalyzerSensors.CONNECTED.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_CONNECTED"))
                 Else
-                    .SetSensorText(AnalyzerSensors.CONNECTED.ToString, MLRD.GetResourceText("LBL_SRV_NOT_CONNECTED"))
+                    .SetSensorText(AnalyzerSensors.CONNECTED.ToString, MultilanguageResourcesDelegate.GetResourceText("LBL_SRV_NOT_CONNECTED"))
                 End If
             End With
 

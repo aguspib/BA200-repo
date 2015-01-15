@@ -1821,7 +1821,7 @@ Public Class AnalyzerInfo
         Dim myRotorInfo As UIRefreshDS.RotorValueChangedRow
         Try
             ' Write Results into output file
-            myPath = Application.StartupPath & myGlobalbase.AnalyzerInfoFileOut
+            myPath = Application.StartupPath & GlobalBase.AnalyzerInfoFileOut
 
             If File.Exists(myPath) Then File.Delete(myPath)
             Dim myStreamWriter As StreamWriter = File.CreateText(myPath)
@@ -3353,7 +3353,7 @@ Public Class AnalyzerInfo
         Try
             If Not myScreenDelegate Is Nothing Then
                 myScreenDelegate.SerialNumber = Me.bsModelTextBox.Text + Me.bsSerialTextBox.Text
-                Me.bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = MyClass.SpecifiedSerialNumberLength) 'SGM 15/10/2012
+                Me.bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = SpecifiedSerialNumberLength) 'SGM 15/10/2012
                 MyClass.IsEditingSN = True
             End If
         Catch ex As Exception

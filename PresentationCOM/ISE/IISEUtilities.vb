@@ -4358,7 +4358,7 @@ Public Class IISEUtilities
             Me.PrepareTreeViewImages()
 
             'hide Caret of the textbox
-            MyClass.HideCaret(Me.BsRichTextBox1.Handle)
+            HideCaret(Me.BsRichTextBox1.Handle)
 
             If ThisIsService Then
 
@@ -4954,7 +4954,7 @@ Public Class IISEUtilities
     Private Sub BsRichTextBox1_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsRichTextBox1.GotFocus
         Try
             'hide Caret of the textbox
-            MyClass.HideCaret(Me.BsRichTextBox1.Handle)
+            HideCaret(Me.BsRichTextBox1.Handle)
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsRichTextBox1_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRichTextBox1_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

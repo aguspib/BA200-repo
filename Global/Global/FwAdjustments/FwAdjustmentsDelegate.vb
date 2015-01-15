@@ -143,13 +143,13 @@ Public Class FwAdjustmentsDelegate
 
                 Else
                     If pAnalyzerSN.Length > 0 Then
-                        Dim myDir As String = Application.StartupPath & myGlobalbase.FwAdjustmentsPath  'SGM 24/11/2011
+                        Dim myDir As String = Application.StartupPath & GlobalBase.FwAdjustmentsPath  'SGM 24/11/2011
                         myPath = myDir & "Adj_" & pAnalyzerSN & ".txt"
                     Else
                         If pPath.Length > 0 Then
                             myPath = pPath
                         Else
-                            myPath = Application.StartupPath & myGlobalbase.FwAdjustmentsPath & "FwAdjustments.txt"
+                            myPath = Application.StartupPath & GlobalBase.FwAdjustmentsPath & "FwAdjustments.txt"
                         End If
                     End If
                 End If

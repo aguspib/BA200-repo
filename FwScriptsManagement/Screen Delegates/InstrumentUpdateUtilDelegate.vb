@@ -1186,13 +1186,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     Dim myLine As String = myLines(L)
                     If myLine.Length > 0 Then
-                        If myLine.Contains(MyClass.FirmwareTag) Then
-                            myVersion = myLine.Substring(myLine.IndexOf(MyClass.FirmwareTag) + 2).Trim
+                        If myLine.Contains(FirmwareTag) Then
+                            myVersion = myLine.Substring(myLine.IndexOf(FirmwareTag) + 2).Trim
 
-                        ElseIf myLine.Contains(MyClass.ChecksumTag) Then
+                        ElseIf myLine.Contains(ChecksumTag) Then
                             myCRC32Hex = myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim    '.ToUpper
 
-                        ElseIf myLine.Contains(MyClass.SizeTag) Then
+                        ElseIf myLine.Contains(SizeTag) Then
                             mySize = CInt(myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim)
                             'If mySize Mod 4 > 0 Then
                             '    myGlobal.HasError = True
