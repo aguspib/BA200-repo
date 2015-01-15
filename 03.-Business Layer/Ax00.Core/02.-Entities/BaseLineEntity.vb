@@ -427,6 +427,11 @@ Namespace Biosystems.Ax00.Core.Entities
                                     Exit For
                                 End If
                             Next
+
+                            'AG 08/01/2014 BA-2197 after restart the application this flag must be reseted again
+                            rejectionParameters.wellsNotUsedAfterALight = 0
+                            InitializationComplete = False
+                            'AG 08/01/2014
                         End If
 
                         linqRes = Nothing
@@ -915,10 +920,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <remarks>
         ''' Created by:  AG 14/11/2014 - BA-2065 Creation
         ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
+        ''' Modified by: AG 17/12/2014 BA-2182 (1) Use +same Dinamic BaseLine ID for saving FLIGHT information related to wells: 1 to 120 + well used into FIFO initialization (overwrited)
+        '''                            BA-2182 (2) Discard (not to save into sw data) reading of Static BL of first wells (118, 119, etc) because are performed with air, not with water. Then results are not correct
+        '''                                        NOTE: In order to check if these wells are valid for preparations, it must be used Dinamic BL value
         ''' </remarks>
         Public Function ControlDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO Implements IBaseLineEntity.ControlDynamicBaseLine
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim temporalValue As Integer = rejectionParameters.wellsNotUsedAfterALight 'AG 17/12/2014 (2) store the value of this property that will be restored after Finally...
 
             Try
                 Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
@@ -935,12 +944,14 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         Dim LastDynamicBaseLineDS As New BaseLinesDS
                         Dim convertIntoWellBaseLineDS As New BaseLinesDS
+                        Dim auxDS As New BaseLinesDS 'AG 17/12/2014 BA-2182 (1)
                         Dim newReactionsWellsDS As New ReactionsRotorDS
                         Dim linqRes As New List(Of BaseLinesDS.twksWSBaseLinesRow)
 
                         '120 wells in rotor + 10 items required to initiate the FIFO  (the 7 wells not used after ALIGHT are not taken into account)
                         rejectionParameters.wellsNotUsedAfterALight = BL_WELLREJECT_ITEMS_NOTUSED + 1 'FLIGHT is read withl all well filled, so wellsNotUsedAfterALight can not be taken into account
-                        Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER)
+                        Dim endLoopIndex As Integer = (MAX_REACTROTOR_WELLS) 'AG 17/12/2014 BA-2182 (1) old end loop = (MAX_REACTROTOR_WELLS + BL_WELLREJECT_INI_WELLNUMBER)
+
                         Dim wellID As Integer = 0
                         Dim newBaseLineID As Integer = 0
 
@@ -954,70 +965,98 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         If Not resultData.HasError AndAlso LastDynamicBaseLineDS.twksWSBaseLines.Rows.Count > 0 Then
 
-                            '3) Loop calling well rejections algorithm for all wells in reactions rotor
-                            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                            For myIndex As Integer = pInitialWell To endLoopIndex + (pInitialWell - 1)
-                                'Get the well number in the interval [1, 120]
-                                wellID = myReactionsDlg.GetRealWellNumber(myIndex, MAX_REACTROTOR_WELLS)
+                            'AG 17/12/2014 BA-2182 (1) get the max baseLineID and increment 1 for all wells in dynamic
+                            'Use it for all wells 1 to 120
+                            resultData = myBLineByWellDlg.GetAllWellsLastTurn(dbConnection, myAnalyzerID, pWorkSessionID, "")
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                auxDS = DirectCast(resultData.SetDatos, BaseLinesDS)
 
-                                'Get next baselineID in table twksWSBLinesByWell for wellID
-                                resultData = myBLineByWellDlg.GetCurrentBaseLineID(dbConnection, myAnalyzerID, pWorkSessionID, wellID)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    newBaseLineID = DirectCast(resultData.SetDatos, Integer) + 1
-                                Else
-                                    Exit For
+                                'Using linq get the max
+                                If auxDS.twksWSBaseLines.Rows.Count > 0 Then
+                                    newBaseLineID = (From a As BaseLinesDS.twksWSBaseLinesRow In auxDS.twksWSBaseLines Select a.BaseLineID).Max
                                 End If
+                            End If
 
-                                'Read the last dynamic values for wellID (all leds)
-                                linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
-                                           Where a.WellUsed = wellID Select a).ToList
+                            If Not resultData.HasError Then
 
-                                convertIntoWellBaseLineDS.twksWSBaseLines.Clear()
-                                For Each row As BaseLinesDS.twksWSBaseLinesRow In linqRes
-                                    convertIntoWellBaseLineDS.twksWSBaseLines.ImportRow(row)
-                                Next
-                                convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
+                                '3) We are in STANDBY so we can perform loop twice instead of loop from 1 to 120 + 10 (FIFO)
+                                '2 Later we will delete the 1st rotor turn and will renumerate the ID of the 2on turn
+                                For rotorTurn As Integer = 1 To 2
+                                    newBaseLineID += 1 'Current max ID has to be incremented +1
+                                    'AG 17/12/2014 BA-2182 (1)
 
-                                'Transform into data required for ControlWellBaseLine
-                                For Each blRow As BaseLinesDS.twksWSBaseLinesRow In convertIntoWellBaseLineDS.twksWSBaseLines.Rows
-                                    blRow.BeginEdit()
-                                    blRow.BaseLineID = newBaseLineID
-                                    blRow.WorkSessionID = pWorkSessionID
-                                    blRow.WellUsed = wellID
-                                    blRow.DateTime = Now
-                                    blRow.Type = BaseLineType.DYNAMIC.ToString() 'BA-2067
+                                    '4) Loop calling well rejections algorithm for all wells in reactions rotor
+                                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                    For myIndex As Integer = pInitialWell To endLoopIndex + (pInitialWell - 1)
+                                        'Get the well number in the interval [1, 120]
+                                        wellID = myReactionsDlg.GetRealWellNumber(myIndex, MAX_REACTROTOR_WELLS)
 
-                                    blRow.SetMainDarkNull() 'This field is only used in base line with adjust
-                                    blRow.SetRefDarkNull() 'This field is only used in base line with adjust
-                                    blRow.SetDACNull() 'This field is only used in base line with adjust
-                                    blRow.SetITNull() 'This field is only used in base line with adjust
-                                    blRow.SetABSvalueNull() 'This field is informed after base line by well calculations
-                                    blRow.SetIsMeanNull()  'This field is informed after base line by well calculations
-                                    blRow.EndEdit()
-                                Next
-                                convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
-                                resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, BaseLineType.DYNAMIC)
+                                        'Read the last dynamic values for wellID (all leds)
+                                        linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
+                                                   Where a.WellUsed = wellID Select a).ToList
 
-                                'Evaluate the result: no alarm, base line WARN or base line ERR
-                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                                    If DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms) <> GlobalEnumerates.Alarms.NONE Then
-                                        'If there is still not alarm informed --> Get it
-                                        If myAlarm = GlobalEnumerates.Alarms.NONE Then
-                                            myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                        convertIntoWellBaseLineDS.twksWSBaseLines.Clear()
+                                        For Each row As BaseLinesDS.twksWSBaseLinesRow In linqRes
+                                            convertIntoWellBaseLineDS.twksWSBaseLines.ImportRow(row)
+                                        Next
+                                        convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
 
-                                            'Alarm can change from WARM to ERROR but not from ERROR to WARN
-                                        ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                                            myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                        'Transform into data required for ControlWellBaseLine
+                                        For Each blRow As BaseLinesDS.twksWSBaseLinesRow In convertIntoWellBaseLineDS.twksWSBaseLines.Rows
+                                            blRow.BeginEdit()
+                                            blRow.BaseLineID = newBaseLineID
+                                            blRow.WorkSessionID = pWorkSessionID
+                                            blRow.WellUsed = wellID
+                                            blRow.DateTime = Now
+                                            blRow.Type = BaseLineType.DYNAMIC.ToString() 'BA-2067
 
+                                            blRow.SetMainDarkNull() 'This field is only used in base line with adjust
+                                            blRow.SetRefDarkNull() 'This field is only used in base line with adjust
+                                            blRow.SetDACNull() 'This field is only used in base line with adjust
+                                            blRow.SetITNull() 'This field is only used in base line with adjust
+                                            blRow.SetABSvalueNull() 'This field is informed after base line by well calculations
+                                            blRow.SetIsMeanNull()  'This field is informed after base line by well calculations
+                                            blRow.EndEdit()
+                                        Next
+                                        convertIntoWellBaseLineDS.twksWSBaseLines.AcceptChanges()
+                                        resultData = ControlWellBaseLine(dbConnection, False, convertIntoWellBaseLineDS, BaseLineType.DYNAMIC)
+
+                                        'Evaluate the result: no alarm, base line WARN or base line ERR
+                                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                            If DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms) <> GlobalEnumerates.Alarms.NONE Then
+                                                'If there is still not alarm informed --> Get it
+                                                If myAlarm = GlobalEnumerates.Alarms.NONE Then
+                                                    myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                                    'Alarm can change from WARM to ERROR but not from ERROR to WARN
+                                                ElseIf myAlarm <> GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
+                                                    myAlarm = DirectCast(resultData.SetDatos, GlobalEnumerates.Alarms)
+
+                                                End If
+                                            End If
+                                        ElseIf resultData.HasError Then
+                                            Exit For
                                         End If
-                                    End If
-                                ElseIf resultData.HasError Then
-                                    Exit For
-                                End If
-                            Next
-                            linqRes = Nothing
+                                    Next
 
-                            '4) Finally prepare a refreshDS for the whole reactions rotor
+                                    If resultData.HasError Then
+                                        Exit For
+                                    End If
+                                Next 'AG 17/12/2014 BA-2182 (1)
+
+                                linqRes = Nothing
+
+                                'AG 17/12/2014 BA-2182 (1) - Remove the initial rotor turn and leave only the last. Renaming the ID
+                                If Not resultData.HasError Then
+                                    'Delete by BaseLineID = newBaseLineID - 1
+                                    'Later Rename BaseLineId from  (= newBaseLineID) to (= newBaseLineID - 1)
+                                    resultData = myBLineByWellDlg.UpdateByID(dbConnection, myAnalyzerID, pWorkSessionID, newBaseLineID, newBaseLineID - 1)
+                                End If
+
+                            End If
+
+
+                            '5) Finally prepare a refreshDS for the whole reactions rotor
                             '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                             If Not resultData.HasError Then
                                 resultData = myReactionsDlg.RepaintAllReactionsRotor(dbConnection, myAnalyzerID)
@@ -1056,6 +1095,7 @@ Namespace Biosystems.Ax00.Core.Entities
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
+            rejectionParameters.wellsNotUsedAfterALight = temporalValue 'AG 17/12/2014 (2) restore the value of this property before start this function
             Return resultData
         End Function
 
@@ -1308,12 +1348,19 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pWellAbsorbance"></param>
         ''' <param name="pDiodePosition"></param>
         ''' <param name="pAddToRejectionParameters" ></param>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modify AG 08/01/2015 BA-2197 when pWell already exists in rejectionParameter.wellUsed we has to update the well(diode) absorbance instead of add new item to list
+        '''                              (A) pwell not exits: (ORIGINAL CODE)
+        '''                                  - Add the well into list .wellUsed
+        '''                                  - Add the well absorbance (by led) into list .absByWell
+        '''                              (B) pwell already exists (NEW CODE for BA-2197)
+        '''                                  - Get the position into list .wellUsed where exists pWell -- position
+        '''                                  - Update the well absorbance (by led): .absByWELL(pDiodePosition).Abs(position) = new well abs by led
+        ''' </remarks>
         Private Sub InitialiazeWellRejectionControl(ByVal pWell As Integer, ByVal pWellAbsorbance As Single, ByVal pDiodePosition As Integer, ByVal pAddToRejectionParameters As Boolean)
             Try
 
                 If pAddToRejectionParameters Then
-
                     With rejectionParameters
                         'Add well used, increment initialization item and flags into average control
                         If Not .wellUsed.Contains(pWell) Then
@@ -1322,6 +1369,8 @@ Namespace Biosystems.Ax00.Core.Entities
                             .initializationParameterItem += 1
                         End If
 
+                        Dim wellCurrentIndex As Integer = -1 'AG 08/01/204 BA-2197
+
                         '1st in Initialization mode: Add absorbance to average control
                         If .absByWELL Is Nothing Then
                             ReDim Preserve .absByWELL(pDiodePosition)
@@ -1329,8 +1378,26 @@ Namespace Biosystems.Ax00.Core.Entities
                         ElseIf .absByWELL.Length - 1 < pDiodePosition Then
                             ReDim Preserve .absByWELL(pDiodePosition)
                             .absByWELL(pDiodePosition).Abs = New List(Of Single)
+
+                            'AG 08/01/2015 BA-2197
+                        Else
+                            wellCurrentIndex = .wellUsed.FindIndex(Function(x) x = pWell)
+                            If .absByWELL(pDiodePosition).Abs.Count - 1 < wellCurrentIndex Then
+                                wellCurrentIndex = -1
+                            End If
+                            'AG 08/01/2015 BA-2197
                         End If
-                        .absByWELL(pDiodePosition).Abs.Add(pWellAbsorbance)
+
+                        'AG 08/01/2015 BA-2197
+                        '.absByWELL(pDiodePosition).Abs.Add(pWellAbsorbance)
+                        If wellCurrentIndex = -1 Then
+                            'Just added
+                            .absByWELL(pDiodePosition).Abs.Add(pWellAbsorbance)
+                        Else
+                            'Not added, well already exsits in structure
+                            .absByWELL(pDiodePosition).Abs(wellCurrentIndex) = pWellAbsorbance
+                        End If
+                        'AG 08/01/2015
 
                     End With
 
@@ -1361,6 +1428,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
 
                 End If
+
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -1545,7 +1613,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' </summary>
         ''' <returns>Integer indicating the excluded well from rejection parameters (if -1 no excluded wells)</returns>
         ''' <remarks>
-        ''' AG 26/09/2012 - infoRejection string get new value only if current value is ""</remarks>
+        ''' AG 26/09/2012 - infoRejection string get new value only if current value is ""
+        ''' AG 11/12/2014 BA-2170 more information, well abs when rejected</remarks>
         Private Function TreatWellRejectionResults() As Integer
             Dim myExcludedWell As Integer = -1
             Try
@@ -1561,7 +1630,8 @@ Namespace Biosystems.Ax00.Core.Entities
                                     wellBL.rejected = True
                                     'If Not myListOfRejectedWells.Contains(wellBL.well) Then myListOfRejectedWells.Add(wellBL.well)
                                     If wellBL.rejected AndAlso String.Compare(infoRejection, "", False) = 0 Then 'AG 26/09/2012
-                                        infoRejection = "Well: " & wellBL.well & ", Wavelenght ID: " & wl + 1 & ", Avg Abs(wavelenght): " & .absAVG(wl) & ", SD(wavelenght): " & .absSD(wl) 'AG 14/05/2012 (AG 17/09/2012 add 1 to the wavelenght ID)
+                                        'infoRejection = "Well: " & wellBL.well & ", Wavelenght ID: " & wl + 1 & ", Avg Abs(wavelenght): " & .absAVG(wl) & ", SD(wavelenght): " & .absSD(wl) 'AG 14/05/2012 (AG 17/09/2012 add 1 to the wavelenght ID)
+                                        infoRejection = "Well: " & wellBL.well & ", Wavelenght ID: " & wl + 1 & ", Well Abs: " & wellBL.Abs(wl) & ", Avg Abs(wavelenght): " & .absAVG(wl) & ", SD(wavelenght): " & .absSD(wl) 'AG 11/12/2014 BA-2170 (add the well abs)
                                     End If
 
                                 End If

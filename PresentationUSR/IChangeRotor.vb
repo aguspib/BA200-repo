@@ -529,6 +529,7 @@ Public Class IChangeRotor
             CreateLogActivity("Btn ChangeRotor", Me.Name & ".bsChangeRotortButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
             bsStatusImage.Visible = False 'DL 22/02/2012
             dxProgressBar.Position = 0
+            _processIsPaused = False 'BA-2143
 
             If (AnalyzerController.IsAnalyzerInstantiated) Then
 
