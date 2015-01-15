@@ -656,15 +656,16 @@ Partial Public Class IMonitor
 
                 Dim query As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
                 For i As Integer = 1 To 120
+                    Dim auxI = i
                     RotorContentByPositionRow = myRotorContentByPositionDSForm.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow()
                     RotorContentByPositionRow.RotorType = "REACTIONS"
                     RotorContentByPositionRow.AnalyzerID = ActiveAnalyzer
                     RotorContentByPositionRow.WorkSessionID = ActiveWorkSession
-                    RotorContentByPositionRow.CellNumber = i
+                    RotorContentByPositionRow.CellNumber = auxI
 
                     If Not myReactionsRotorDS Is Nothing AndAlso myReactionsRotorDS.twksWSReactionsRotor.Rows.Count > 0 Then
                         query = (From a In myReactionsRotorDS.twksWSReactionsRotor _
-                                Where a.WellNumber = i _
+                                Where a.WellNumber = auxI _
                               AndAlso a.AnalyzerID = ActiveAnalyzer _
                                Select a).ToList()
 

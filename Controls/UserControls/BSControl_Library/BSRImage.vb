@@ -40,7 +40,7 @@ Public Class BSRImage
                 cos_theta = Nothing
                 cx = Nothing
                 cy = Nothing
-                i = Nothing
+                'i = Nothing
                 bm_out = Nothing
                 corners = Nothing
                 threepoints = Nothing
@@ -89,7 +89,7 @@ Public Class BSRImage
     Private cos_theta As Single
     Private cx As Integer
     Private cy As Integer
-    Private i As Integer
+    'Private i As Integer
     Private bm_out As Bitmap
     Private corners(3) As Point
     Private threepoints(2) As Point
@@ -490,6 +490,8 @@ Public Class BSRImage
 
             Dim X As Integer
             Dim Y As Integer
+
+            'Print(i)
 
             For i = 0 To 3
                 X = corners(i).X

@@ -628,8 +628,9 @@ Public Class IResultsAbsCurve
 
                     End Select
 
-                    For iReplicate As Integer = 0 To qReplicates.Count - 1
-                        mySerieName = qReplicates(iReplicate) & ". " & myGraph
+                    For indexReplicate As Integer = 0 To qReplicates.Count - 1
+                        Dim auxIndexReplicate = indexReplicate
+                        mySerieName = qReplicates(auxIndexReplicate) & ". " & myGraph
 
                         Select Case myGraph
                             Case "Abs1"
@@ -641,7 +642,7 @@ Public Class IResultsAbsCurve
 
                                 'RH 24/02/2012 Do not convert apples into apples
                                 qReplicateFilter = (From row As GraphDS.tReplicatesRow In ReplicateDS.tReplicates _
-                                                    Where row.Replicate = qReplicates(iReplicate) AndAlso Not row.IsAbs1Null _
+                                                    Where row.Replicate = qReplicates(auxIndexReplicate) AndAlso Not row.IsAbs1Null _
                                                     Select row).ToList
 
                             Case "Abs2"
@@ -653,7 +654,7 @@ Public Class IResultsAbsCurve
 
                                 'RH 24/02/2012 Do not convert apples into apples
                                 qReplicateFilter = (From row As GraphDS.tReplicatesRow In ReplicateDS.tReplicates _
-                                                    Where row.Replicate = qReplicates(iReplicate) AndAlso Not row.IsAbs2Null _
+                                                    Where row.Replicate = qReplicates(auxIndexReplicate) AndAlso Not row.IsAbs2Null _
                                                     Select row).ToList
 
                         End Select
@@ -695,7 +696,7 @@ Public Class IResultsAbsCurve
 
                         ResultChartControl.Series.AddRange(New Series() {mySerie})
 
-                    Next iReplicate
+                    Next
 
                     CreateDiagram(Min, Max)
 
