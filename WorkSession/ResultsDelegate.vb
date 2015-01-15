@@ -5371,10 +5371,11 @@ Namespace Biosystems.Ax00.BL
                                         Dim linqSpecimenFromResults As List(Of ResultsDS.vwksResultsRow) 'AG 28/06/2013
                                         'Fill ReportMaster table
                                         For i As Integer = 0 To 1
+                                            Dim aux_i = i
                                             SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
                                                           Where row.SampleClass = "PATIENT" _
                                                         AndAlso row.OrderToPrint = True _
-                                                        AndAlso row.StatFlag = StatFlag(i) _
+                                                        AndAlso row.StatFlag = StatFlag(aux_i) _
                                                         AndAlso row.RerunNumber = 1 _
                                                          Select row).ToList()
 
@@ -5439,7 +5440,7 @@ Namespace Biosystems.Ax00.BL
                                                 End If
                                             Next sampleRow
 
-                                        Next i
+                                        Next
                                         linqSpecimenFromResults = Nothing 'AG 28/06/2013
                                         SamplesList = Nothing 'AG 23/09/2014 - BA-1940
                                         BarcodesByPatient = Nothing 'AG 23/09/2014 - BA-1940
