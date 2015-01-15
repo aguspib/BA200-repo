@@ -435,7 +435,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     If myPortsList.Count > 0 Then 'AG 13/07/2010
                         'Order detected ports
-                        myPortsList = (From a In myPortsList Select a Order By a).ToList()
+                        Dim auxPortsList = myPortsList
+                        myPortsList = (From a In auxPortsList Select a Order By a).ToList()
                         'search last conected port.
                         'If ConfigurationManager.AppSettings("LastPortConnected").ToString() <> "" Then
                         'TR 25/01/2011 -Replace by corresponding value on global base.

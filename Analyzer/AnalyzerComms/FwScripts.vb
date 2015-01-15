@@ -608,7 +608,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     ' Select to obtain instructions list that belong to ScriptID
                     If myFwScript.Count > 0 Then
-                        resultData.SetDatos = (From a In myFwScript(0).Instructions Select a).ToList()
+                        Dim auxFwScriptList = myFwScript    'Data type inferred.
+                        resultData.SetDatos = (From a In auxFwScriptList(0).Instructions Select a).ToList()
                     Else
                         resultData.HasError = True
                     End If

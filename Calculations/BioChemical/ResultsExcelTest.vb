@@ -968,24 +968,6 @@ Namespace Biosystems.Ax00.BL
                                 End If
                             End If
 
-
-                            'Dim myOrdersDelegate As New OrdersDelegate
-                            'Dim mySampleID As String = ""
-
-                            'Orderdata = myOrdersDelegate.GetSampleIDbyOrderTestID(pDBConnection, CType(qExecutionsGrouped(indexExecutionGroup).ToString, Integer))
-                            'If Not Orderdata.HasError Then
-                            '    Dim myOrdersDS As New OrderTestsDetailsDS
-                            '    myOrdersDS = DirectCast(Orderdata.SetDatos, OrderTestsDetailsDS)
-
-                            '    If myOrdersDS.OrderTestsDetails.Rows.Count > 0 Then
-                            '        If Not myOrdersDS.OrderTestsDetails.First.IsSampleIDNull Then
-                            '            mySampleID = myOrdersDS.OrderTestsDetails.First.SampleID     'Set the patienID if not null
-                            '        ElseIf Not myOrdersDS.OrderTestsDetails.First.IsPatientIDNull Then
-                            '            mySampleID = myOrdersDS.OrderTestsDetails.First.PatientID     'Set the sampleID if not null
-                            '        End If
-                            '    End If
-                            'End If
-
                             'myheadcell1 &= "OrderTest: " & qExecutionsGrouped(indexExecutionGroup).ToString & " ("  
                             myheadcell1 &= "SampleID: " & myElementID & " ("
                             'DL 12/01/2012. End
@@ -1256,11 +1238,12 @@ Namespace Biosystems.Ax00.BL
                                               Select OrderTest_ID).ToList
 
                         For indexExecution As Integer = 0 To qExecutionsGrouped.Count - 1
+                            Dim auxIndexExecution = indexExecution
                             ' Write execution header
                             Dim myOrderTestData As New OrderTestsDelegate
                             Dim myTestID As Integer
 
-                            resultdata = myOrderTestData.GetTestID(pDBConnection, qExecutionsGrouped(indexExecution)) '0))
+                            resultdata = myOrderTestData.GetTestID(pDBConnection, qExecutionsGrouped(auxIndexExecution)) '0))
 
                             If Not resultdata.HasError Then
                                 Dim myOrderTestDS As New OrderTestsDS
@@ -1316,7 +1299,7 @@ Namespace Biosystems.Ax00.BL
                             Orderdata = myExecutionsDelegate.GetByOrderTestID(pDBConnection, _
                                                                               myAnalyzerID, _
                                                                               myWSID, _
-                                                                              CType(qExecutionsGrouped(indexExecution).ToString, Integer))
+                                                                              CType(qExecutionsGrouped(auxIndexExecution).ToString, Integer))
 
                             Dim myElementID As String = ""
                             If (Not Orderdata.HasError AndAlso Not Orderdata.SetDatos Is Nothing) Then
@@ -1343,7 +1326,7 @@ Namespace Biosystems.Ax00.BL
 
                             Dim qExecutionInfo As List(Of ExecutionsDS.twksWSExecutionsRow)
                             qExecutionInfo = (From a In myExecutionDS.twksWSExecutions _
-                                              Where a.OrderTestID = qExecutionsGrouped(indexExecution) _
+                                              Where a.OrderTestID = qExecutionsGrouped(auxIndexExecution) _
                                               Select a Order By a.RerunNumber, a.ReplicateNumber).ToList
 
                             If qExecutionInfo.Count > 0 Then
@@ -1366,7 +1349,7 @@ Namespace Biosystems.Ax00.BL
                                         SetCellValue(myPage, "E" & myCellRow, myTestName)
                                         SetCellValue(myPage, "F" & myCellRow, "Rerun Number:", True)
                                         SetCellValue(myPage, "G" & myCellRow, myRerunNumber)
-                                        
+
                                         'myheadcell2 &= " ) Test " & myTestName & " Well / Rotor "
                                         'myheadcell2 &= " ) Test " & myTestName & " Rerun Number = "
 
@@ -1402,7 +1385,7 @@ Namespace Biosystems.Ax00.BL
 
                                         Dim qExecutionList As New List(Of twksWSExecutionsRow)
                                         qExecutionList = (From a In myExecutionDS.twksWSExecutions _
-                                                              Where a.OrderTestID = qExecutionsGrouped(indexExecution) _
+                                                              Where a.OrderTestID = qExecutionsGrouped(auxIndexExecution) _
                                                                 And a.AnalyzerID = myAnalyzerID _
                                                                 And a.WorkSessionID = myWSID _
                                                                 And a.RerunNumber = myRerunNumber _
