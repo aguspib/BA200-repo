@@ -581,7 +581,7 @@ Public Class IResults
                                                                                                                            bsCalibratorsDataGridView.CellMouseClick, _
                                                                                                                            bsControlsDataGridView.CellMouseClick
 
-        Dim resultRow As ResultsDS.vwksResultsRow
+        Dim resultRow As ResultsDS.vwksResultsRow = Nothing
         Dim key As String = String.Empty
         Dim executionRow As ExecutionsDS.vwksWSExecutionsResultsRow 'SG 30/08/2010
         Dim ParentControl As System.Windows.Forms.Control

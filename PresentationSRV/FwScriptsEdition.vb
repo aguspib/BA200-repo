@@ -2168,7 +2168,7 @@ Public Class FwScriptsEdition
     Private Function CheckGrid(Optional ByVal pShowMessage As Boolean = False) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim CopyOfSelectedScript As FwScriptTO
+        Dim CopyOfSelectedScript As FwScriptTO = Nothing
         Dim SyntaxOK As Boolean = True
         Dim SequenceOK As Boolean = True
         Dim myPreviousScreenMode As ScreenModes = MyClass.CurrentScreenMode

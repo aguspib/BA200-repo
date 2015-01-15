@@ -281,7 +281,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return resultData
         End Function
 
-        
+
 
         ''' <summary>
         ''' Generate a script instruction with the corresponding values

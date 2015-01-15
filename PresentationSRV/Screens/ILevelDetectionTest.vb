@@ -214,7 +214,7 @@ Public Class ILevelDetectionTest
                 For Each P As UIRefreshDS.ProbeValueChangedRow In myProbeValueChangedDT.Rows
 
                     Dim myFreqValue As Single = P.DetectionFrequency
-                    Dim myDisplayLabel As Label
+                    Dim myDisplayLabel As Label = Nothing
                     Dim myArm As LevelDetectionTestDelegate.Arms
 
                     Select Case P.ProbeID.ToUpperBS.Trim  ' ToUpper.Trim
@@ -896,7 +896,7 @@ Public Class ILevelDetectionTest
     Private Sub SetFrequencyTooltip(ByVal pArm As LevelDetectionTestDelegate.Arms, ByVal pIsOut As Boolean)
         Try
             Dim MLRD As New MultilanguageResourcesDelegate
-            Dim myLabel As Label
+            Dim myLabel As Label = Nothing
 
             Select Case pArm
                 Case LevelDetectionTestDelegate.Arms.SAMPLE : myLabel = Me.BsFreqSampleValueLabel

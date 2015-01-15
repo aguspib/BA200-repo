@@ -2231,7 +2231,7 @@ Public Class IMotorsPumpsValvesTest
     ''' <remarks>Created by SGM 13/05/2011</remarks>
     Private Sub DisableCurrentPage(Optional ByRef pExcept As BsScadaControl = Nothing)
 
-        Dim myCopyOfExcept As BsScadaControl
+        Dim myCopyOfExcept As BsScadaControl = Nothing
         If pExcept IsNot Nothing Then
             myCopyOfExcept = pExcept
         End If

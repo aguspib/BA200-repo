@@ -671,7 +671,7 @@ Namespace Biosystems.Ax00.BL
                 Dim additionalInfoDS As New WSAnalyzerAlarmsDS
 
                 'create connection
-                Dim dbConnection As SqlClient.SqlConnection
+                Dim dbConnection As SqlClient.SqlConnection = Nothing
 
                 Dim myAlarmMessage As String = ""
 

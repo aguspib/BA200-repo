@@ -213,11 +213,11 @@ Namespace Biosystems.Ax00.LISCommunications
                         Dim pHostProvider As String
                         Dim pInstrumentID As String
                         Dim pInstrumentProvider As String
-                        Dim pFieldSeparator As String
-                        Dim pComponentSeparator As String
-                        Dim pRepeatSeparator As String
-                        Dim pSpecialSeparator As String
-                        Dim pSubComponentSeparator As String
+                        Dim pFieldSeparator As String = Nothing
+                        Dim pComponentSeparator As String = Nothing
+                        Dim pRepeatSeparator As String = Nothing
+                        Dim pSpecialSeparator As String = Nothing
+                        Dim pSubComponentSeparator As String = Nothing
 
                         resultData = settingsDelg.GetCurrentValueBySettingID(Nothing, UserSettingsEnum.LIS_PROTOCOL_NAME.ToString())
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then

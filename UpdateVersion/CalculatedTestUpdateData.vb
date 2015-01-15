@@ -647,7 +647,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myRefRanges As New TestRefRangesDS
                 Dim myCustomerCalcTestsDS As New CalculatedTestsDS
                 Dim myFactoryCalcTestDS As New CalculatedTestsDS
-                Dim myFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow
+                Dim myFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow = Nothing
                 Dim myPreloadedCALCTestList As New List(Of CalculatedTestsDS.tparCalculatedTestsRow)
 
                 Dim myFormulasDelegate As New FormulasDelegate

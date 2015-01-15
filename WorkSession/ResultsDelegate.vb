@@ -5495,7 +5495,7 @@ Namespace Biosystems.Ax00.BL
                                             Next row
 
                                             'TR 27/05/2013 -Get a list of sample types separated by commas
-                                            Dim SampleTypes() As String
+                                            Dim SampleTypes() As String = Nothing
                                             Dim myMasterDataDelegate As New MasterDataDelegate
 
                                             resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
@@ -6655,7 +6655,7 @@ Namespace Biosystems.Ax00.BL
                                       ByVal SampleClassLiteral As String, Optional ByVal pReplicates As Boolean = True)
 
             Dim SampleClass As String
-            Dim Name As String
+            Dim Name As String = Nothing
             Dim SampleType As String
             Dim ReplicateNumber As String
             Dim ABSValue As String

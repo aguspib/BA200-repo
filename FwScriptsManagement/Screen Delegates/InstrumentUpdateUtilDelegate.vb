@@ -1049,7 +1049,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
                 Dim myUtil As New Utilities
-                Dim myFileBytes As Byte()
+                Dim myFileBytes As Byte() = Nothing
 
                 '0- Decrypt if needed
                 If pDecrypt Then

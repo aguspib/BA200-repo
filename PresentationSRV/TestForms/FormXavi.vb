@@ -2866,7 +2866,7 @@ Public Class FormXavi
             myData &= "HWV:" & FwValues(FW_INFO.HWV).ToString & ";"
 
             If myData.Length > 1 Then
-                Dim myBoard As String
+                Dim myBoard As String = Nothing
                 Select Case pBoard
                     Case POLL_IDs.BM1, POLL_IDs.BR1, POLL_IDs.BR2, POLL_IDs.AG1, POLL_IDs.AG2 : myBoard = "ANSFBX"
                     Case POLL_IDs.DM1, POLL_IDs.DR1, POLL_IDs.DR2 : myBoard = "ANSFDX"

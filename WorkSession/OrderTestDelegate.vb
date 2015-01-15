@@ -161,7 +161,7 @@ Namespace Biosystems.Ax00.BL
                     End If
 
                     'SA 26/03/2013 - When function is used for processing LIS Order Tests, the icon is not obtained
-                    Dim bArrImage As Byte()
+                    Dim bArrImage As Byte() = Nothing
                     If (Not pFromLIS) Then
                         'Get the Blank Icon image byte array
                         Dim preloadedDataConfig As New PreloadedMasterDataDelegate
@@ -601,7 +601,7 @@ Namespace Biosystems.Ax00.BL
                     End If
 
                     'SA 26/03/2013 - When function is used for processing LIS Order Tests, the icon is not obtained
-                    Dim bArrImage As Byte()
+                    Dim bArrImage As Byte() = Nothing
                     If (Not pFromLIS) Then
                         'Get the Calibrator Icon image byte array
                         Dim preloadedDataConfig As New PreloadedMasterDataDelegate
@@ -9136,7 +9136,7 @@ Namespace Biosystems.Ax00.BL
 			Try
 				'Load data in SelectedTestsDS.SelectedTestTableRow to a SavedWSOrderTestsDS.tparSavedWSOrderTestsRow before calling
 				'the function that add the information to the DS containing the Awos to reject
-				Dim row As SavedWSOrderTestsDS.tparSavedWSOrderTestsRow
+                Dim row As SavedWSOrderTestsDS.tparSavedWSOrderTestsRow = Nothing
 				With row
 					If (Not mySavedrow.IsAwosIDNull) Then .AwosID = mySavedrow.AwosID
 					If (Not mySavedrow.IsSpecimenIDNull) Then .SpecimenID = mySavedrow.SpecimenID

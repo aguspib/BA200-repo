@@ -2844,7 +2844,7 @@ Partial Public Class IMonitor
 #Region "TO DELETE - OLD"
     Private Sub MarkSelectedPositionOLD(ByVal pRingNumber As Integer, ByVal pCellNumber As Integer, ByVal pMarkPosition As Boolean)
         Try
-            Dim rotorPrefix As String
+            Dim rotorPrefix As String = Nothing
             Dim controlQuery As List(Of BSRImage)
             Dim FilterName As String
 

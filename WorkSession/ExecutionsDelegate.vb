@@ -8083,7 +8083,7 @@ Namespace Biosystems.Ax00.BL
                             Dim SampleClasses() As String = {"BLANK", "CALIB", "CTRL", "PATIENT"}
 
                             'TR 27/05/2013 -Get a list of sample types separated by commas
-                            Dim SampleTypes() As String
+                            Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
                             resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
                             If Not resultData.HasError Then
@@ -8126,7 +8126,7 @@ Namespace Biosystems.Ax00.BL
                                                         Dim SType As String = sortedSampleType
 
                                                         Dim AllTestTypeOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests executions
-                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'Only STD test order tests executions
+                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) = Nothing  'Only STD test order tests executions
 
                                                         'NEW: When a patient OR CTRL has Ise & std test executions the ISE executions are the first
                                                         If SClass = "PATIENT" OrElse SClass = "CTRL" Then 'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type
@@ -9043,7 +9043,7 @@ Namespace Biosystems.Ax00.BL
                             Dim Stats() As Boolean = {True, False}
                             Dim SampleClasses() As String = {"BLANK", "CALIB", "CTRL", "PATIENT"}
                             'TR 27/05/2013 -Get a list of sample types separated by commas
-                            Dim SampleTypes() As String
+                            Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
 
                             resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
@@ -9097,7 +9097,7 @@ Namespace Biosystems.Ax00.BL
                                                         Dim SType As String = sortedSampleType
 
                                                         Dim AllTestTypeOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests
-                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'Only STD test order tests
+                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) = Nothing  'Only STD test order tests
 
                                                         'NEW: When a patient or ctrl has Ise & std test executions the ISE executions are the first
                                                         If SClass = "PATIENT" OrElse SClass = "CTRL" Then 'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type

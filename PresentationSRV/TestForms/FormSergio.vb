@@ -886,7 +886,7 @@ Public Class FormSergio
         Dim myGlobal As New GlobalDataTO
         Try
             Dim myUtil As New Utilities
-            Dim myImage As Image
+            Dim myImage As Image = Nothing
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("ADJUSTMENT")
             If System.IO.File.Exists(iconPath & auxIconName) Then

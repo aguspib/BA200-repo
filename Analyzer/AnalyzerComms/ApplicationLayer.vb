@@ -1524,7 +1524,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'SGM 05/07/2011
                     Case GlobalEnumerates.AppLayerEventList.UPDATE_FIRMWARE
-                        Dim queryMode() As Byte
+                        Dim queryMode() As Byte = Nothing
                         If Not pSwEntry Is Nothing Then
                             queryMode = CType(pSwEntry, Byte())
                         End If

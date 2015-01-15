@@ -82,7 +82,7 @@ Public Class ISortingTestsAux
         Try
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
-            Dim myReportsTestsSortingList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+            Dim myReportsTestsSortingList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow) = Nothing
             Dim myDefaultSortedTestDS As New ReportsTestsSortingDS
 
             'AG 03/09/2014 - BA-1869

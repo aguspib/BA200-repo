@@ -2474,7 +2474,7 @@ Public Class IISEUtilities
 
                                     'SGM 25/09/2012 - check if any calibration is needed
                                     Dim isReady As Boolean = False
-                                    Dim myAffectedElectrodes As List(Of String)
+                                    Dim myAffectedElectrodes As List(Of String) = Nothing
                                     myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                         isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
@@ -3667,7 +3667,7 @@ Public Class IISEUtilities
                                         If CBool(myGlobal.SetDatos) Then
                                             'SGM 25/09/2012 - check if calibrations are ok
                                             Dim isReady As Boolean = False
-                                            Dim myAffectedElectrodes As List(Of String)
+                                            Dim myAffectedElectrodes As List(Of String) = Nothing
                                             myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
 
@@ -4551,7 +4551,7 @@ Public Class IISEUtilities
 
                         'SGM 25/09/2012 - check if any calibration is needed
                         Dim isReady As Boolean = False
-                        Dim myAffectedElectrodes As List(Of String)
+                        Dim myAffectedElectrodes As List(Of String) = Nothing
                         myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)

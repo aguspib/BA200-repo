@@ -823,7 +823,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 Dim myEndIndex As Integer
                 Dim myDebugModeOn As Boolean = True
-                Dim myISEResultTO As ISEResultTO
+                Dim myISEResultTO As ISEResultTO = Nothing
                 Dim myISEResultItemType As ISEResultTO.ISEResultItemTypes = ISEResultTO.ISEResultItemTypes.None
 
                 Dim myResultStr As String = pISEResult.ReceivedResults.Trim
@@ -1903,9 +1903,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myPumpCalibrationValues As ISEResultTO.PumpCalibrationValues
                 Dim myBubbleCalibrationValues As ISEResultTO.BubbleCalibrationValues
 
-                Dim myDallasSN As ISEDallasSNTO
-                Dim myDallas00 As ISEDallasPage00TO
-                Dim myDallas01 As ISEDallasPage01TO
+                Dim myDallasSN As ISEDallasSNTO = Nothing
+                Dim myDallas00 As ISEDallasPage00TO = Nothing
+                Dim myDallas01 As ISEDallasPage01TO = Nothing
                 Dim myResultErrors As New List(Of ISEErrorTO)
                 myResultErrors = pISEResultTO.Errors
 

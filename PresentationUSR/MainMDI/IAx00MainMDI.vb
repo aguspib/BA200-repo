@@ -5089,7 +5089,7 @@ Partial Public Class IAx00MainMDI
         Dim myGlobal As New GlobalDataTO
         Try
             Dim isReady As Boolean = False
-            Dim myAffectedElectrodes As List(Of String)
+            Dim myAffectedElectrodes As List(Of String) = Nothing
             myGlobal = MDIAnalyzerManager.ISE_Manager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
