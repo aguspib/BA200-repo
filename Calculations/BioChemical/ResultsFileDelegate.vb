@@ -2898,15 +2898,15 @@ Namespace Biosystems.Ax00.BL
         End Sub
 
         'DL 27/09/2012. GetCell
-        Private Function GetCell(ByVal cells As Object, ByVal row As Integer, ByVal column As Integer) As String
-            Dim parameters As Object() = New [Object](1) {}
-            parameters(0) = row
-            parameters(1) = column
-            Dim myobj As Object
-            'Return
-            myobj = cells.[GetType]().InvokeMember("Item", BindingFlags.GetProperty, Nothing, cells, parameters).ToString()
-
-        End Function
+        'Private Function GetCell(ByVal cells As Object, ByVal row As Integer, ByVal column As Integer) As String
+        '    Dim parameters As Object() = New [Object](1) {}
+        '    parameters(0) = row
+        '    parameters(1) = column
+        '    Dim myobj As Object
+        '    'Return
+        '    myobj = cells.[GetType]().InvokeMember("Item", BindingFlags.GetProperty, Nothing, cells, parameters).ToString()
+        '    Return myobj
+        'End Function
 
 
 
