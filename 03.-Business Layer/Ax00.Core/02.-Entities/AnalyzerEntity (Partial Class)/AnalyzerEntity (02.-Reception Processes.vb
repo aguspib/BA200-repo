@@ -3794,17 +3794,19 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
         ''' <remarks>AG 31/10/2014 BA-2062
-        '''             AG 11/12/2014 BA-2170 update the flag DynamicBL_Read to "MIDDLE" when sw receives ANSFBLD instruction</remarks>
+        '''             AG 11/12/2014 BA-2170 update the flag DynamicBL_Read to "MIDDLE" when sw receives ANSFBLD instruction
+        '''             AG 15/01/2015 cancel the new value MIDDLE, it is not required</remarks>
         Private Function ProcessANSFBLDReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Try
-                'AG 11/12/2014 BA-2170 inform that some ANSFBLD instruction has been received
-                Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "MIDDLE")
-                If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                    resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
-                End If
+                ''AG 11/12/2014 BA-2170 inform that some ANSFBLD instruction has been received
+                'Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+                'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "MIDDLE")
+                'If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                '    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                '    resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                'End If
+
                 If Not resultData.HasError Then
                     'AG 11/12/2014 BA-2170
 
@@ -3877,7 +3879,6 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <summary>
         ''' Method used to process the data that are read from the FLIGHT instruction.
         ''' </summary>
-        ''' <param name="myAnalyzerFlagsDS"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process

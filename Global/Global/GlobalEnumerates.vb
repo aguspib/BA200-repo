@@ -1213,9 +1213,9 @@ Namespace Biosystems.Ax00.Global
             SoftwareWSonRUNNING
 
             'AG 14/11/2014 BA-2065 new flags for perform Dynamic base line (flow, validation, results, ...)
-            DynamicBL_Fill
-            DynamicBL_Read
-            DynamicBL_Empty
+            DynamicBL_Fill 'INI, END, CANCELED or NULL
+            DynamicBL_Read 'INI, END, CANCELED or NULL
+            DynamicBL_Empty 'INI, END, CANCELED or NULL
         End Enum
 
 #End Region
