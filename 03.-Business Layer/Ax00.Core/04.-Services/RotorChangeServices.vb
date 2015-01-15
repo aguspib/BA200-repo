@@ -389,7 +389,9 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <remarks></remarks>
+        ''' <remarks>
+        ''' Modified AG 15/01/2015 BA-2212
+        ''' </remarks>
         Private Sub ExecuteStaticBaseLineStep()
             Dim resultData As New GlobalDataTO
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
@@ -404,7 +406,7 @@ Namespace Biosystems.Ax00.Core.Services
             'Before send ALIGHT process ... delete the all ALIGHT/FLIGHT results
             If Not resultData.HasError Then
                 Dim ALightDelg As New WSBLinesDelegate
-                resultData = ALightDelg.ResetBLinesValues(Nothing, _analyzer.ActiveAnalyzer, _analyzer.ActiveWorkSession, "")
+                resultData = ALightDelg.DeleteBLinesValues(Nothing, _analyzer.ActiveAnalyzer, _analyzer.ActiveWorkSession, "", _analyzer.BaseLineTypeForCalculations.ToString) 'AG 15/01/2015 BA-2212 inform new parameter BaseLineTypeForCalculations)
                 If Not resultData.HasError Then
                     'Once the conditioning is finished the Sw send an ALIGHT instruction 
                     _analyzer.ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066

@@ -12,7 +12,7 @@ Namespace Biosystems.Ax00.BL
     'AG 14/05/2010 - change name WSBaseLinesDelegate for WSBLinesDelegate
     Public Class WSBLinesDelegate
 
-#Region "Public Methods"
+#Region "CRUD"
         ''' <summary>
         ''' Create an adjustment BaseLine
         ''' </summary>
@@ -59,6 +59,7 @@ Namespace Biosystems.Ax00.BL
             End Try
             Return (resultData)
         End Function
+
 
         ''' <summary>
         ''' Verify if exists the specified BaseLineID in table twksWSBLines
@@ -116,6 +117,156 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+
+        ''' <summary>
+        ''' Get values for all WaveLengths for the specified adjustment Base Line
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">NOT USED!!</param>
+        ''' <param name="pBaseLineID">Identifier of the adjustment Base Line</param>
+        ''' <param name="pWellUsed"></param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all data for the informed BaseLine</returns>
+        ''' <remarks>
+        ''' Created by:  DL 19/02/2010
+        ''' Modified by: AG 13/05/2010 - Changed the method name to READ and some field names 
+        '''              AG 20/05/2010 - Added parameters AnalyzerID and WorkSessionID
+        ''' AG 29/10/2014 BA-2057 parameter pWellUsed, pType
+        ''' </remarks>
+        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                             ByVal pBaseLineID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim mytwksWSBaseLines As New twksWSBLinesDAO
+                        resultData = mytwksWSBaseLines.Read(pDBConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pType)
+                    End If
+                End If
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Read", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+
+        ''' <summary>
+        ''' Update data of the specified adjustment Base Line
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pBaseLinesDS">Typed DataSet BaseLinesDS containing all data of the adjustment BaseLine to update</param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: GDS 21/05/2010
+        ''' </remarks>
+        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesDAO
+                        resultData = myDAO.Update(dbConnection, pBaseLinesDS)
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
+                    End If
+                End If
+            Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Update", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+#End Region
+
+#Region "Read for calculations"
+        ''' <summary>
+        ''' Return all Base Lines data needed for calculations
+        ''' STATIC base line: Read ligth values from twksWSBLinesByWell, read dark and adjust (TI, DAC) values from twksWSBLines
+        ''' DYNAMIC base line: Read ligth values from twksWSBLines (DYNAMIC), read dark and adjust (TI, DAC) values from twksWSBLines (STATIC with adjust)
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
+        ''' <param name="pBaseLineWellID">Identifier of a BaseLine by Well</param>
+        ''' <param name="pWell">Rotor Well Number</param>
+        ''' <param name="pBaseLineAdjustID">Identifier of an adjustment Base Line</param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
+        ''' <returns>GlobalDataTO containing a typed DataSet BaseLineDS</returns>
+        ''' <remarks>
+        ''' Created by:  AG 04/01/2011
+        ''' AG 29/10/2014 BA-2064 adapt for static or dynamic base lines (new parameter pType) (renamed, old name GetBaseLineValues)
+        ''' AG 19/11/2014 BA-2064 reinterprete the formula and get the correct information for calculations using dynamic base line
+        ''' </remarks>
+        Public Function ReadValuesForCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+                                                  ByVal pBaseLineWellID As Integer, ByVal pWell As Integer, ByVal pBaselineAdjustID As Integer, ByVal pType As String) As GlobalDataTO
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        Dim myDAO As New twksWSBLinesDAO
+                        If pType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
+                            resultData = myDAO.ReadValuesForCalculations(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineWellID, pWell, pBaselineAdjustID, pType)
+                        ElseIf pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                            resultData = myDAO.ReadValuesForCalculationsDYNAMIC(dbConnection, pAnalyzerID, pWell, pBaselineAdjustID)
+                        End If
+
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ReadValuesForCalculations", EventLogEntryType.Error, False)
+            Finally
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+#End Region
+
+#Region "Several Get by ..."
         ''' <summary>
         ''' Return all Base Lines data for the specified Wave Length (light counts are get from twksWSBLinesByWell and dark counts 
         ''' are get from twksWSBLines)
@@ -152,7 +303,7 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                     End If
-                    End If
+                End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
@@ -197,7 +348,7 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                     End If
-                    End If
+                End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
@@ -293,108 +444,16 @@ Namespace Biosystems.Ax00.BL
         End Function
 
 
-        ''' <summary>
-        ''' Get values for all WaveLengths for the specified adjustment Base Line
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">NOT USED!!</param>
-        ''' <param name="pBaseLineID">Identifier of the adjustment Base Line</param>
-        ''' <param name="pWellUsed"></param>
-        ''' <param name="pType">STATIC or DYNAMIC</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet BaseLinesDS with all data for the informed BaseLine</returns>
-        ''' <remarks>
-        ''' Created by:  DL 19/02/2010
-        ''' Modified by: AG 13/05/2010 - Changed the method name to READ and some field names 
-        '''              AG 20/05/2010 - Added parameters AnalyzerID and WorkSessionID
-        ''' AG 29/10/2014 BA-2057 parameter pWellUsed, pType
-        ''' </remarks>
-        Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                             ByVal pBaseLineID As Integer, ByVal pWellUsed As Integer, ByVal pType As String) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+#End Region
 
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim mytwksWSBaseLines As New twksWSBLinesDAO
-                        resultData = mytwksWSBaseLines.Read(pDBConnection, pAnalyzerID, pWorkSessionID, pBaseLineID, pWellUsed, pType)
-                    End If
-                End If
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Read", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
-        ''' <summary>
-        ''' Return all Base Lines data needed for calculations
-        ''' STATIC base line: Read ligth values from twksWSBLinesByWell, read dark and adjust (TI, DAC) values from twksWSBLines
-        ''' DYNAMIC base line: Read ligth values from twksWSBLines (DYNAMIC), read dark and adjust (TI, DAC) values from twksWSBLines (STATIC with adjust)
-        ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pWorkSessionID">WorkSession Identifier</param>
-        ''' <param name="pBaseLineWellID">Identifier of a BaseLine by Well</param>
-        ''' <param name="pWell">Rotor Well Number</param>
-        ''' <param name="pBaseLineAdjustID">Identifier of an adjustment Base Line</param>
-        ''' <param name="pType">STATIC or DYNAMIC</param>
-        ''' <returns>GlobalDataTO containing a typed DataSet BaseLineDS</returns>
-        ''' <remarks>
-        ''' Created by:  AG 04/01/2011
-        ''' AG 29/10/2014 BA-2064 adapt for static or dynamic base lines (new parameter pType) (renamed, old name GetBaseLineValues)
-        ''' AG 19/11/2014 BA-2064 reinterprete the formula and get the correct information for calculations using dynamic base line
-        ''' </remarks>
-        Public Function ReadValuesForCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
-                                                  ByVal pBaseLineWellID As Integer, ByVal pWell As Integer, ByVal pBaselineAdjustID As Integer, ByVal pType As String) As GlobalDataTO
-            Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-            Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                    If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSBLinesDAO
-                        If pType = GlobalEnumerates.BaseLineType.STATIC.ToString Then
-                            resultData = myDAO.ReadValuesForCalculations(dbConnection, pAnalyzerID, pWorkSessionID, pBaseLineWellID, pWell, pBaselineAdjustID, pType)
-                        ElseIf pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
-                            resultData = myDAO.ReadValuesForCalculationsDYNAMIC(dbConnection, pAnalyzerID, pWell, pBaselineAdjustID)
-                        End If
-
-                    End If
-                End If
-
-            Catch ex As Exception
-                resultData = New GlobalDataTO()
-                resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                resultData.ErrorMessage = ex.Message
-
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ReadValuesForCalculations", EventLogEntryType.Error, False)
-            Finally
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-            End Try
-            Return resultData
-        End Function
-
+#Region "Reset (new results or reset WS)"
         ''' <summary>
         ''' Delete of adjustment BaseLines for the specified Analyzer
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
         ''' <param name="pAnalyzerID">Analyzer Identifier</param>
         ''' <param name="pType">IF ="" delete ALL, if different delete by all by Type</param>
+        ''' <param name="pBaseLineTypeForCalculation"></param>
         ''' <returns>GlobalDataTO containing success/error information</returns>
         ''' <remarks>
         ''' Created by: GDS 21/04/2010
@@ -403,10 +462,10 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: AG 31/10/2014 BA-2057 new parameter pType
         ''' AG 16/11/2014 BA-2065 rename method from ResetAdjustsBLines to ResetBLinesValues
         ''' AG 21/11/2014 BA-2062 when Reset the ALIGHT results reset also the table twksWSBLinesByWell
-        ''' AG 15/01/2015 BA-2212 skip the business of this method when parameter RDI_CUMULATE_ALL_BASELINES = 1
+        ''' AG 15/01/2015 BA-2212 skip the process for delete not used baseline records when pBaseLineTypeForCalculation = DYNAMIC and parameter RDI_CUMULATE_ALL_BASELINES = 1
         ''' </remarks>
-        Public Function ResetBLinesValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                           ByVal pWorkSessionID As String, ByVal pType As String) As GlobalDataTO
+        Public Function DeleteBLinesValues(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                           ByVal pWorkSessionID As String, ByVal pType As String, ByVal pBaseLineTypeForCalculation As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -416,41 +475,41 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'AG 15/01/2015 BA-2212
-                        Dim myParams As New SwParametersDelegate
-                        resultData = myParams.ReadByParameterName(dbConnection, GlobalEnumerates.SwParameters.RDI_CUMULATE_ALL_BASELINES.ToString, Nothing)
-                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
-                            Dim auxDataSet As ParametersDS
-                            Dim skipBaseLinesDeletion As Integer = 0
-                            auxDataSet = DirectCast(resultData.SetDatos, ParametersDS)
-                            If auxDataSet.tfmwSwParameters.Rows.Count > 0 AndAlso Not auxDataSet.tfmwSwParameters.First.IsValueNumericNull Then
-                                skipBaseLinesDeletion = CInt(auxDataSet.tfmwSwParameters.First.ValueNumeric)
-                            End If
-
-                            'When value = 1 skip the process that evaluates if previous baselines can be deleted or not
-                            If skipBaseLinesDeletion <> 1 Then
-                                'AG 15/01/2015 BA-2212
-
-
-                                Dim myExecDel As New ExecutionsDelegate
-                                resultData = myExecDel.CountExecutionsUsingAdjustBaseLine(dbConnection, pAnalyzerID, pWorkSessionID)
-
-                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                    Dim counter As Integer = CType(resultData.SetDatos, Integer)
-                                    If (counter = 0) Then
-                                        'Remove ALIGHT/FLIGHT results (or both) only when no executions are using these adjust base line identifiers
-                                        Dim myDAO As New twksWSBLinesDAO
-                                        resultData = myDAO.ResetBLinesValues(dbConnection, pAnalyzerID, pType)
-
-                                        'AG 21/11/2014 BA-2062 if pType = "" (ALL) also delete the twksWSBLinesByWell table (inform the model is not required then)
-                                        If Not resultData.HasError AndAlso pType = "" Then
-                                            Dim myBLByWellDlgte As New WSBLinesByWellDelegate
-                                            resultData = myBLByWellDlgte.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, "", True)
-                                        End If
-
-                                    End If
+                        Dim skipBaseLinesDeletionProcess As Integer = 0 'By default execute the process for delete the not used baseline records
+                        If pBaseLineTypeForCalculation = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                            Dim myParams As New SwParametersDelegate
+                            resultData = myParams.ReadByParameterName(dbConnection, GlobalEnumerates.SwParameters.RDI_CUMULATE_ALL_BASELINES.ToString, Nothing)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim auxDataSet As ParametersDS
+                                auxDataSet = DirectCast(resultData.SetDatos, ParametersDS)
+                                If auxDataSet.tfmwSwParameters.Rows.Count > 0 AndAlso Not auxDataSet.tfmwSwParameters.First.IsValueNumericNull Then
+                                    skipBaseLinesDeletionProcess = CInt(auxDataSet.tfmwSwParameters.First.ValueNumeric)
                                 End If
+                            End If
+                        End If
 
-                            End If 'AG 15/01/2015 BA-2212
+                        'When value = 1 skip the process that evaluates if previous baselines can be deleted or not
+                        If skipBaseLinesDeletionProcess <> 1 Then
+                            'AG 15/01/2015 BA-2212
+
+                            Dim myExecDel As New ExecutionsDelegate
+                            resultData = myExecDel.CountExecutionsUsingAdjustBaseLine(dbConnection, pAnalyzerID, pWorkSessionID)
+
+                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                Dim counter As Integer = CType(resultData.SetDatos, Integer)
+                                If (counter = 0) Then
+                                    'Remove ALIGHT/FLIGHT results (or both) only when no executions are using these adjust base line identifiers
+                                    Dim myDAO As New twksWSBLinesDAO
+                                    resultData = myDAO.DeleteBLinesValues(dbConnection, pAnalyzerID, pType)
+
+                                    'AG 21/11/2014 BA-2062 if pType = "" (ALL) also delete the twksWSBLinesByWell table (inform the model is not required then)
+                                    If Not resultData.HasError AndAlso pType = "" Then
+                                        Dim myBLByWellDlgte As New WSBLinesByWellDelegate
+                                        resultData = myBLByWellDlgte.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, "", True)
+                                    End If
+
+                                End If
+                            End If
                         End If 'AG 15/01/2015 BA-2212
 
                         If (Not resultData.HasError) Then
@@ -472,59 +531,52 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ResetBLinesValues", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.DeleteBLinesValues", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
 
+
         ''' <summary>
-        ''' Update data of the specified adjustment Base Line
+        ''' Verify if the adjustment Base Line has been already moved to Historic Module (if field MovedToHistoric is TRUE)
         ''' </summary>
         ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pBaseLinesDS">Typed DataSet BaseLinesDS containing all data of the adjustment BaseLine to update</param>
-        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pAdjustBaseLineID">Identifier of the adjustment Base Line</param>
+        ''' <returns>GlobalDataTO containing an integer value indicating if the adjustment Base Line has been moved to Historic Module</returns>
         ''' <remarks>
-        ''' Created by: GDS 21/05/2010
+        ''' Created by: SA 26/09/2012
         ''' </remarks>
-        Public Function Update(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBaseLinesDS As BaseLinesDS) As GlobalDataTO
+        Public Function VerifyBLMovedToHistoric(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                                ByVal pAdjustBaseLineID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
+                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myDAO As New twksWSBLinesDAO
-                        resultData = myDAO.Update(dbConnection, pBaseLinesDS)
-
-                        If (Not resultData.HasError) Then
-                            'When the Database Connection was opened locally, then the Commit is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-                        Else
-                            'When the Database Connection was opened locally, then the Rollback is executed
-                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-                        End If
+                        resultData = myDAO.VerifyBLMovedToHistoric(dbConnection, pAnalyzerID, pAdjustBaseLineID)
                     End If
                 End If
             Catch ex As Exception
-                'When the Database Connection was opened locally, then the Rollback is executed
-                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.Update", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.VerifyBLMovedToHistoric", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
+
 
         ''' <summary>
         ''' For all WaveLengths of the informed Analyzer/Adjustment Base Line, set field MovedToHistoric = TRUE to indicate the
@@ -575,43 +627,111 @@ Namespace Biosystems.Ax00.BL
             Return resultData
         End Function
 
+
         ''' <summary>
-        ''' Verify if the adjustment Base Line has been already moved to Historic Module (if field MovedToHistoric is TRUE)
+        ''' Delete all records in table except the last baseLineID for both types: STATIC and DYNAMIC
+        ''' (process for delete baseline records MUST BE EXECUTED ONLY when pBaseLineTypeForCalculation = DYNAMIC and parameter RDI_CUMULATE_ALL_BASELINES = 1)
         ''' </summary>
-        ''' <param name="pDBConnection">Open DB Connection</param>
-        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
-        ''' <param name="pAdjustBaseLineID">Identifier of the adjustment Base Line</param>
-        ''' <returns>GlobalDataTO containing an integer value indicating if the adjustment Base Line has been moved to Historic Module</returns>
-        ''' <remarks>
-        ''' Created by: SA 26/09/2012
-        ''' </remarks>
-        Public Function VerifyBLMovedToHistoric(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                                ByVal pAdjustBaseLineID As Integer) As GlobalDataTO
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pAnalyzerModel"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 15/01/2015 BA-2212</remarks>
+        Public Function ResetWSForDynamicBL(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                              ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
-                resultData = DAOBase.GetOpenDBConnection(pDBConnection)
+                resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim myDAO As New twksWSBLinesDAO
-                        resultData = myDAO.VerifyBLMovedToHistoric(dbConnection, pAnalyzerID, pAdjustBaseLineID)
+
+                        'Read parameters and evaluate if deletion process must be or not executed (by default NOT)
+                        Dim myParams As New SwParametersDelegate
+                        Dim auxDataSet As ParametersDS
+                        Dim deletionProcess As Integer = 0
+
+                        resultData = myParams.ReadByParameterName(dbConnection, GlobalEnumerates.SwParameters.BL_TYPE_FOR_CALCULATIONS.ToString, pAnalyzerModel)
+                        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                            auxDataSet = DirectCast(resultData.SetDatos, ParametersDS)
+                            If auxDataSet.tfmwSwParameters.Rows.Count > 0 AndAlso Not auxDataSet.tfmwSwParameters.First.IsValueTextNull _
+                                AndAlso auxDataSet.tfmwSwParameters.First.ValueText = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+
+                                resultData = myParams.ReadByParameterName(dbConnection, GlobalEnumerates.SwParameters.RDI_CUMULATE_ALL_BASELINES.ToString, Nothing)
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    auxDataSet = DirectCast(resultData.SetDatos, ParametersDS)
+                                    If auxDataSet.tfmwSwParameters.Rows.Count > 0 AndAlso Not auxDataSet.tfmwSwParameters.First.IsValueNumericNull Then
+                                        deletionProcess = CInt(auxDataSet.tfmwSwParameters.First.ValueNumeric)
+                                    End If
+                                End If
+
+                            End If
+                        End If
+
+                        If Not resultData.HasError AndAlso deletionProcess = 1 Then
+                            'Get the maximum BaseLineID with type STATIC
+                            Dim myDAO As New twksWSBLinesDAO
+                            Dim myDS As New BaseLinesDS
+                            Dim skippedBaseLineID As Integer = 0
+
+                            'STATIC records: Delete ALL except those with the maximum BaseLineID
+                            resultData = myDAO.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, 1, GlobalEnumerates.BaseLineType.STATIC.ToString)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                skippedBaseLineID = DirectCast(resultData.SetDatos, Integer)
+                                resultData = myDAO.DeleteByType(dbConnection, pAnalyzerID, GlobalEnumerates.BaseLineType.STATIC.ToString, skippedBaseLineID)
+                            End If
+
+                            'DYNAMIC records: Delete ALL except those with the maximum BaseLineID
+                            If Not resultData.HasError Then
+                                resultData = myDAO.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, 1, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    skippedBaseLineID = DirectCast(resultData.SetDatos, Integer)
+                                    resultData = myDAO.DeleteByType(dbConnection, pAnalyzerID, GlobalEnumerates.BaseLineType.DYNAMIC.ToString, skippedBaseLineID)
+                                End If
+                            End If
+
+                            'Update remaining STATIC records with BaseLineID = 1
+                            If Not resultData.HasError Then
+                                resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, 1, GlobalEnumerates.BaseLineType.STATIC.ToString)
+                            End If
+
+                            'Update remaining DYNAMIC records with BaseLineID = 2
+                            If Not resultData.HasError Then
+                                resultData = myDAO.UpdateBaseLineIDByType(dbConnection, pAnalyzerID, 2, GlobalEnumerates.BaseLineType.DYNAMIC.ToString)
+                            End If
+
+                        End If
+
+                        If (Not resultData.HasError) Then
+                            'When the Database Connection was opened locally, then the Commit is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
+                        Else
+                            'When the Database Connection was opened locally, then the Rollback is executed
+                            If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+                        End If
                     End If
                 End If
             Catch ex As Exception
+                'When the Database Connection was opened locally, then the Rollback is executed
+                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
+
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.VerifyBLMovedToHistoric", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "WSBLinesDelegate.ResetWSForDynamicBL", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
             Return resultData
         End Function
+
 #End Region
+
     End Class
 End Namespace

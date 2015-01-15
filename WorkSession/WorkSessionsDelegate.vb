@@ -2365,7 +2365,8 @@ Namespace Biosystems.Ax00.BL
         '''                              in an internal Virtual Rotor before reset all positions
         '''              SA 04/10/2011 - Activated again the code for deleting WSAnalyzerAlarms
         '''             XBC 14/06/2012 - Add pPreserveRotorPositions parameter with the aim to delete Rotor Positions when change of Analyzer
-        '''              AG 17/11/2014 BA-2065 new parameter pAnalyzerModel
+        '''             AG 17/11/2014 BA-2065 new parameter pAnalyzerModel
+        '''             AG 15/01/2015 BA-2212
         ''' </remarks>
         Public Function ResetWS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String, _
                                 Optional ByVal pPreserveRotorPositions As Boolean = True) As GlobalDataTO
@@ -2466,6 +2467,13 @@ Namespace Biosystems.Ax00.BL
                             Dim myWSBaseLinesByWell As New WSBLinesByWellDelegate
                             resultData = myWSBaseLinesByWell.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, pAnalyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
                         End If
+
+                        'AG 15/01/2015 BA-2212
+                        If (Not resultData.HasError) Then
+                            Dim myWSBaseLines As New WSBLinesDelegate
+                            resultData = myWSBaseLines.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, pAnalyzerModel)
+                        End If
+                        'AG 15/01/2015
 
                         If (Not resultData.HasError) Then
                             'Delete all WS Preparations for the specified AnalyzerID/WorkSessionID
@@ -5828,6 +5836,7 @@ Namespace Biosystems.Ax00.BL
         '''              AG 18/11/2013 - (#1385) Delete all positions in process for analyzer
         '''              XB 05/02/2014 - Do not save previous Orders from LIS (Patch 2.1.1c) - Task #1491
         '''              AG 17/11/2014 BA-2065 inform analyzerModel
+        '''              AG 15/01/2015 BA-2212
         ''' </remarks>
         Public Function ResetWS_5DB_TRANS(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String, _
                                    Optional ByVal pPreserveRotorPositions As Boolean = True, Optional ByVal pSaveLISPendingOrders As Boolean = True, _
@@ -6007,6 +6016,13 @@ Namespace Biosystems.Ax00.BL
                             Dim myWSBaseLinesByWell As New WSBLinesByWellDelegate
                             resultData = myWSBaseLinesByWell.ResetWS(dbConnection, pAnalyzerID, pWorkSessionID, pAnalyzerModel) 'AG 17/11/2014 BA-2065 inform analyzerModel
                         End If
+
+                        'AG 15/01/2015 BA-2212
+                        If (Not resultData.HasError) Then
+                            Dim myWSBaseLines As New WSBLinesDelegate
+                            resultData = myWSBaseLines.ResetWSForDynamicBL(dbConnection, pAnalyzerID, pWorkSessionID, pAnalyzerModel)
+                        End If
+                        'AG 15/01/2015
 
                         If (Not resultData.HasError) Then
                             'Delete all WS Preparations for the specified AnalyzerID/WorkSessionID

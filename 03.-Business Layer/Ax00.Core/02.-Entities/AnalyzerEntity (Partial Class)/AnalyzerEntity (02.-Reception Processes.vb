@@ -4139,7 +4139,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'Before send ALIGHT in wup process ... delete the all ALIGHT/FLIGHT results
                                     Dim ALightDelg As New WSBLinesDelegate
-                                    myGlobal = ALightDelg.ResetBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "")
+                                    myGlobal = ALightDelg.DeleteBLinesValues(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, "", BaseLineTypeForCalculations.ToString) 'AG 15/01/2015 BA-2212 inform new parameter BaseLineTypeForCalculations
                                     If Not myGlobal.HasError Then
                                         'Once the conditioning is finished the Sw send an ALIGHT instruction 
                                         ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066

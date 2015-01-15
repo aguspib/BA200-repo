@@ -691,7 +691,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''' Modified by: AG 31/10/2014 BA-2057 new parameter pType
         ''' AG 16/11/2014 BA-2065 rename method from ResetAdjustsBLines to ResetBLinesValues
         ''' </remarks>
-        Public Function ResetBLinesValues(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
+        Public Function DeleteBLinesValues(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
 
             Try
@@ -718,7 +718,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.ResetBLinesValues", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.DeleteBLinesValues", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -942,6 +942,86 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.GetByWaveLengthDYNAMIC", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Delete all records by type except the ID = pBaseLineIdSkipped
+        ''' </summary>
+        ''' <param name="pDBConnection">Open DB Connection</param>
+        ''' <param name="pAnalyzerID">Analyzer Identifier</param>
+        ''' <param name="pType">IF ="" delete ALL, if different delete by all by Type</param>
+        ''' <param name="pBaseLineIDSkipped"></param>
+        ''' <returns>GlobalDataTO containing success/error information</returns>
+        ''' <remarks>
+        ''' Created by: AG 15/01/2015 BA-2212
+        ''' </remarks>
+        Public Function DeleteByType(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pType As String, ByVal pBaseLineIDSkipped As Integer) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = " DELETE twksWSBLines WHERE AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' "
+                    cmdText &= " AND BaseLineID <> " & pBaseLineIDSkipped.ToString
+                    If pType <> "" Then
+                        cmdText &= " AND Type = '" & pType.Trim.Replace("'", "''") & "' "
+                    End If
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.SetDatos = dbCmd.ExecuteNonQuery()
+                        resultData.HasError = False
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.DeleteByType", EventLogEntryType.Error, False)
+            End Try
+            Return resultData
+        End Function
+
+        ''' <summary>
+        ''' Update the base line ID (filtering by Type) to a new value
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pAnalyzerID"></param>
+        ''' <param name="NewBaseLineID"></param>
+        ''' <param name="pType"></param>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' AG 21/11/2014 BA-2212
+        ''' </remarks>
+        Public Function UpdateBaseLineIDByType(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal NewBaseLineID As Integer, ByVal pType As String) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    resultData.HasError = True
+                    resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
+                Else
+                    Dim cmdText As String = String.Empty
+                    cmdText &= " UPDATE twksWSBLines SET BaseLineID = " & NewBaseLineID & vbCrLf & _
+                               " WHERE  AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                               " AND  Type = '" & pType.Trim.Replace("'", "''") & "' " & vbCrLf
+
+                    Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
+                        resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
+                    End Using
+                End If
+            Catch ex As Exception
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "twksWSBLinesDAO.UpdateBaseLineIDByType", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
