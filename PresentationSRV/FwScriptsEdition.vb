@@ -48,19 +48,19 @@ Public Class FwScriptsEdition
 
 #Region "Properties"
 
-    Private ReadOnly Property SimulationMode() As Boolean
-        Get
-            If GlobalConstants.REAL_DEVELOPMENT_MODE = 1 Then
-                SimulationModeAttr = True ' Simulation mode
-            ElseIf GlobalConstants.REAL_DEVELOPMENT_MODE = 2 Then
-                SimulationModeAttr = False ' Developer mode
-            Else
-                SimulationModeAttr = False ' Real mode
-            End If
-
-            Return SimulationModeAttr
-        End Get
-    End Property
+    'already implemented in base class. Inheritance is your friend!
+    'Private ReadOnly Property SimulationMode() As Boolean
+    '    Get
+    '        If GlobalConstants.REAL_DEVELOPMENT_MODE = 1 Then
+    '            SimulationModeAttr = True ' Simulation mode
+    '        ElseIf GlobalConstants.REAL_DEVELOPMENT_MODE = 2 Then
+    '            SimulationModeAttr = False ' Developer mode
+    '        Else
+    '            SimulationModeAttr = False ' Real mode
+    '        End If
+    '        Return SimulationModeAttr
+    '    End Get
+    'End Property
 
     Private Property CurrentScreenMode() As ScreenModes
         Get
