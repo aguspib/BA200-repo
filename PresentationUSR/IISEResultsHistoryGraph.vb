@@ -155,6 +155,29 @@ Public Class IISEResultsHistoryGraph
     End Sub
 
     ''' <summary>
+    ''' Adds a serie to the graph passed as parameter
+    ''' </summary>
+    ''' <param name="pGraph">Graph that will contain the new serie</param>
+    ''' <param name="serieName">name of the serie to be added to the chart</param>
+    ''' <param name="viewType">type of the view desired to this serie</param>
+    ''' <param name="thisColor">color of the line of the serie</param>
+    ''' <remarks></remarks>
+    Private Sub AddSerieToGraph(ByVal pGraph As ChartControl, ByVal serieName As String, ByVal viewType As ViewType, ByVal thisColor As Color)
+        pGraph.Series.Add(serieName, viewType)
+
+        With pGraph.Series(serieName)
+            .ShowInLegend = True
+            .Label.Visible = False
+            .ArgumentScaleType = ScaleType.Qualitative
+            .View.Color = thisColor
+        End With
+
+        'AJG OJO!!!! TODAVÍA COMENTADA PORQUE NO ESTÁ ADAPTADA A DEVEXPRESS 14.2.3
+        'CType(pGraph.Series(serieName).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
+    End Sub
+
+
+    ''' <summary>
     ''' Initializes the Graph
     ''' </summary>
     ''' <remarks>
@@ -170,40 +193,13 @@ Public Class IISEResultsHistoryGraph
             pGraph.AppearanceName = "Light"
 
             'Na+
-            pGraph.Series.Add("MeanNa", ViewType.Line)
-            With pGraph.Series("MeanNa")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.Green
-            End With
-
+            AddSerieToGraph(pGraph, "MeanNa", ViewType.Line, Color.Green)
             'K+
-            pGraph.Series.Add("MeanK", ViewType.Line)
-            With pGraph.Series("MeanK")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.Blue
-            End With
-
+            AddSerieToGraph(pGraph, "MeanK", ViewType.Line, Color.Blue)
             'Cl-
-            pGraph.Series.Add("MeanCl", ViewType.Line)
-            With pGraph.Series("MeanCl")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.DarkOrange
-            End With
-
+            AddSerieToGraph(pGraph, "MeanCl", ViewType.Line, Color.DarkOrange)
             'Li+
-            pGraph.Series.Add("MeanLi", ViewType.Line)
-            With pGraph.Series("MeanLi")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.DarkViolet
-            End With
+            AddSerieToGraph(pGraph, "MeanLi", ViewType.Line, Color.DarkViolet)
 
             Dim myDiagram As New XYDiagram
 
