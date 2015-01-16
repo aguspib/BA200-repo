@@ -189,7 +189,7 @@ Public Class IThermosAdjustments
                     End If
 
                     'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_TestStop")
-                    MyBase.bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
                 Else
                     MyBase.myServiceMDI.SEND_INFO_START()
@@ -202,7 +202,7 @@ Public Class IThermosAdjustments
                     End If
 
                     'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_Conditionate")
-                    MyBase.bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
 
                 End If
 
@@ -898,25 +898,25 @@ Public Class IThermosAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
             'MyBase.bsScreenToolTips.SetToolTip(Tab1MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
             'MyBase.bsScreenToolTips.SetToolTip(Tab1UndoMeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab1AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String uification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab1AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String uification
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab2ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab2MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab2AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
             'MyBase.bsScreenToolTips.SetToolTip(Tab2AuxButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_ToParking", currentLanguage)) SGM 01/12/2011
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab3ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab3AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab3ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab3AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
 
             ' XBC 20/04/2012
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

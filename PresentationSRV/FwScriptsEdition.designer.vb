@@ -19,53 +19,52 @@ Partial Class FwScriptsEdition
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Me.BsSaveAllButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsImportAllButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsScriptPropertiesGrpbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsDescriptionTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.BsDescriptionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsAuthorTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.BsAuthorLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsModifiedTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.BsModifiedLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsCreatedTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.BsCreatedLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.BsActionScriptLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsUnTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsMoveDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsMoveUpButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsRemoveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsAddButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsExportButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsImportButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsCheckButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsInstructionsListDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
-        Me.BsInstructionsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsScreenActionsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.BsScreenActionsTreeView = New Biosystems.Ax00.Controls.UserControls.BSTreeView
+        Me.components = New System.ComponentModel.Container()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.BsSaveAllButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsImportAllButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsScriptPropertiesGrpbox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsDescriptionTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.BsDescriptionLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsAuthorTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.BsAuthorLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsModifiedTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.BsModifiedLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsCreatedTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.BsCreatedLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsNameTextBox = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.BsActionScriptLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsNameLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsUnTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsMoveDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsMoveUpButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsRemoveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsAddButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsExportButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsImportButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsCheckButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsInstructionsListDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
+        Me.BsInstructionsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsScreenActionsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.BsScreenActionsTreeView = New Biosystems.Ax00.Controls.UserControls.BSTreeView()
         Me.BStreeScreenIcons = New System.Windows.Forms.ImageList(Me.components)
-        Me.BsAnalyzerLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BSAnalyzerCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox
-        Me.BsRestoreButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsExportAllToFileButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.Panel1 = New System.Windows.Forms.Panel
+        Me.BsAnalyzerLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BSAnalyzerCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
+        Me.BsRestoreButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsExportAllToFileButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.Panel1 = New System.Windows.Forms.Panel()
         Me.bsScriptPropertiesGrpbox.SuspendLayout()
         CType(Me.bsInstructionsListDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BsScreenErrorProvider, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -561,7 +560,7 @@ Partial Class FwScriptsEdition
         'BsMessagesPanel
         '
         Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.BsExportAllToFileButton)
         Me.BsMessagesPanel.Controls.Add(Me.BsImportAllButton)
@@ -586,7 +585,7 @@ Partial Class FwScriptsEdition
         'BsPanel1
         '
         Me.BsPanel1.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsPanel1.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsPanel1.Controls.Add(Me.BsExitButton)
         Me.BsPanel1.Location = New System.Drawing.Point(281, 552)
@@ -633,6 +632,7 @@ Partial Class FwScriptsEdition
         Me.Controls.Add(Me.BsScreenActionsTreeView)
         Me.Controls.Add(Me.BsScreenActionsLabel)
         Me.Controls.Add(Me.bsScriptPropertiesGrpbox)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
@@ -655,7 +655,6 @@ Partial Class FwScriptsEdition
     Friend WithEvents BsInstructionsLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents BsSaveAllButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsImportAllButton As Biosystems.Ax00.Controls.Usercontrols.BSButton
-    Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents BsScreenActionsLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents BsExitButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsScreenErrorProvider As Biosystems.Ax00.Controls.UserControls.BSErrorProvider

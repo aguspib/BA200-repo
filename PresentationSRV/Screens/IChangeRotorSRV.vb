@@ -96,9 +96,9 @@ Public Class IChangeRotorSRV
             bsNewAdjLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NEW_ROTOR", currentLanguage) 'LBL_SRV_NEW_ROTOR
 
             'For Tooltips...
-            bsScreenToolTips.SetToolTip(bsWSUpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RISINGUP", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsNewRotorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_NEWADJUSTROTOR", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            ScreenTooltips.SetToolTip(bsWSUpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RISINGUP", currentLanguage))
+            ScreenTooltips.SetToolTip(bsNewRotorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_NEWADJUSTROTOR", currentLanguage))
+            ScreenTooltips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             'RH 14/02/2012
             MSG_StartInstrument = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_StartInstrument", currentLanguage)

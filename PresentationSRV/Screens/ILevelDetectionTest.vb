@@ -359,8 +359,8 @@ Public Class ILevelDetectionTest
             Dim MLRD As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsFrequencyButton, MLRD.GetResourceText(Nothing, "SRV_BTN_ReadFrequency", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsDetectionButton, MLRD.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsFrequencyButton, MLRD.GetResourceText(Nothing, "SRV_BTN_ReadFrequency", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsDetectionButton, MLRD.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
 
 
         Catch ex As Exception
@@ -905,9 +905,9 @@ Public Class ILevelDetectionTest
 
             If myLabel IsNot Nothing Then
                 If pIsOut Then
-                    MyBase.bsScreenToolTips.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_OUT_LIMITS", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_OUT_LIMITS", currentLanguage))
                 Else
-                    MyBase.bsScreenToolTips.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_IN_LIMITS", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_IN_LIMITS", currentLanguage))
                 End If
             End If
 

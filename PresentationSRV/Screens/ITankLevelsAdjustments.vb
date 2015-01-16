@@ -838,12 +838,12 @@ Public Class ITankLevelsAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            bsScreenToolTips.SetToolTip(Me.BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
-            bsScreenToolTips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
-            bsScreenToolTips.SetToolTip(Me.BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
 
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsStartTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsStopTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsStartTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsStopTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
