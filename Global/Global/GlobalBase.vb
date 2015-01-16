@@ -714,56 +714,9 @@ Namespace Biosystems.Ax00.Global
                 MyApplicationLogTO.LogModule = LogModule
                 MyApplicationLogTO.LogType = LogType
 
-
-                'Insert information in the Log
-                MyApplicationLogManager.InsertLog(MyApplicationLogTO)
-
-
-                'If Not GlobalConstants.AnalyzerIsRunningFlag Then
-                '    'MyApplicationLogManager.InsertLog(MyApplicationLogTO, InformSystem)
-                '    MyApplicationLogManager.InsertLog(MyApplicationLogTO)
-                'Else
-                '    'MyApplicationLogManager.InsertInfoInLOG(MyApplicationLogTO)
-                '    MyApplicationLogManager.InsertLog(MyApplicationLogTO)
-                'End If
-
+                ApplicationLogManager.InsertLog(MyApplicationLogTO)
 
             Catch ex As Exception
-                'consists of trying first to solve an eventual error because of missing End Of File
-                'If (TypeOf ex Is Xml.XmlException) Then
-                '    Dim myGlobal As GlobalDataTO
-
-                '    myGlobal = MyApplicationLogManager.BackupWrongLogXmlFile()
-                '    If (Not myGlobal.HasError) Then
-                '        Dim MyExceptionAppLogTO As New ApplicationLogTO
-
-                '        MyExceptionAppLogTO.LogDate = DateTime.Now
-                '        MyExceptionAppLogTO.LogMessage = "The previous Xml Log file was wrong. A new one has been just created and the old one was saved and zipped "
-                '        MyExceptionAppLogTO.LogModule = "ApplicationLogManager"
-                '        MyExceptionAppLogTO.LogType = System.Diagnostics.EventLogEntryType.Error
-
-                '        'Insert the Exception in the LOG and also the initial error
-                '        Dim MyTempLogManager As New ApplicationLogManager
-                '        'MyTempLogManager.InsertLog(MyExceptionAppLogTO, True)
-                '        MyTempLogManager.InsertLog(MyExceptionAppLogTO)
-                '        MyTempLogManager.InsertLog(MyApplicationLogTO, InformSystem)
-                '    Else
-                '        'If the backup of the XML file failed, create a new one and write the exception and the initial error in the Log
-                '        Dim MyExceptionAppLogTO As New ApplicationLogTO
-
-                '        MyExceptionAppLogTO.LogDate = DateTime.Now
-                '        MyExceptionAppLogTO.LogMessage = "The previous Xml Log file was wrong and it was no possible to recover it. A new one has been just created"
-                '        MyExceptionAppLogTO.LogModule = "ApplicationLogManager"
-                '        MyExceptionAppLogTO.LogType = System.Diagnostics.EventLogEntryType.Error
-
-                '        Dim MyTempLogManager As New ApplicationLogManager(True)
-                '        MyTempLogManager.InsertLog(MyExceptionAppLogTO, True)
-                '        MyTempLogManager.InsertLog(MyApplicationLogTO, InformSystem)
-                '    End If
-                'Else
-                ''Throw ex
-                'Throw 'RH 02/12/2011 Remove ex 'AG 11/06/2012 - comment this line, when Access Denied error can cause not treat some instructions
-                'End If
             End Try
         End Sub
 

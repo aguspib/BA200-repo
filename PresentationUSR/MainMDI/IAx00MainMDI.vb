@@ -1449,10 +1449,10 @@ Partial Public Class IAx00MainMDI
                                 resultData = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
                                 If (Not resultData.HasError) Then myLogMaxDays = CInt(resultData.SetDatos)
 
-                                resultData = myLogAcciones.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
+                                resultData = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
                                 If (Not resultData.HasError) Then
                                     'If expor to xml OK then delete all records on Application log Table
-                                    resultData = myLogAcciones.DeleteAll()
+                                    resultData = ApplicationLogManager.DeleteAll()
                                 Else
                                     'AG 30/05/2013 - Reset WS process must ignore errors in previous subprocesses (the warning will show later)
                                     existsErrorFlag = True

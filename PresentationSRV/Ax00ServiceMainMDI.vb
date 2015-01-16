@@ -2225,9 +2225,9 @@ Public Class Ax00ServiceMainMDI
             myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
             If Not myGlobalDataTO.HasError Then myLogMaxDays = CInt(myGlobalDataTO.SetDatos)
 
-            myGlobalDataTO = myLogAcciones.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
+            myGlobalDataTO = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
             'If expor to xml OK then delete all records on Application log Table
-            If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = myLogAcciones.DeleteAll()
+            If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = ApplicationLogManager.DeleteAll()
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".CleanApplicationLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

@@ -828,10 +828,10 @@ Public Class IRestPointUpdateProc
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myGlobal = myLogAcciones.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
+                    myGlobal = ApplicationLogManager.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
-                        myGlobal = myLogAcciones.DeleteAll()
+                        myGlobal = ApplicationLogManager.DeleteAll()
                     Else
                         'DL 31/05/2013
                         'The Reset process will continue even if errors in ExportLogToXML
