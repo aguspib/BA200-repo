@@ -77,7 +77,7 @@ Partial Public Class tparReagentsDAO
 
                     If (reagentRow.IsTS_UserNull) Then
                         Dim myGlobalBase As New GlobalBase
-                        values &= " N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        values &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         values &= " N'" & reagentRow.TS_User & "', "
                     End If
@@ -112,7 +112,7 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Create", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -161,7 +161,7 @@ Partial Public Class tparReagentsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Read", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Read", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -214,7 +214,7 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.ReadByReagentName", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.ReadByReagentName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -270,7 +270,7 @@ Partial Public Class tparReagentsDAO
                     values &= " TS_User = "
                     If (reagentRow.IsTS_UserNull) Then
                         Dim myGlobalBase As New GlobalBase
-                        values &= " N'" & myGlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        values &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         values &= " N'" & reagentRow.TS_User.Trim.Replace("'", "''") & "', "
                     End If
@@ -302,7 +302,7 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Update", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Update", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -349,7 +349,7 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.Delete", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -425,7 +425,7 @@ Partial Public Class tparReagentsDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function
@@ -477,7 +477,7 @@ Partial Public Class tparReagentsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.GetByCodeTest", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.GetByCodeTest", EventLogEntryType.Error, False)
 
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -521,7 +521,7 @@ Partial Public Class tparReagentsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.GetMaxReagentID", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.GetMaxReagentID", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try

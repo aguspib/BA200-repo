@@ -135,7 +135,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryUpdates", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryUpdates", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -202,7 +202,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryRemoves", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryRemoves", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -288,7 +288,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryUpdates", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryUpdates", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -360,7 +360,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryRemoves", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryRemoves", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -395,7 +395,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("Elememt Update Error.", "UpdateElementParent.GetActionFromFactoryUpdates", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("Elememt Update Error.", "UpdateElementParent.GetActionFromFactoryUpdates", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
@@ -431,7 +431,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "UpdateElementParent.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("CALC Test Update Error.", "UpdateElementParent.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message

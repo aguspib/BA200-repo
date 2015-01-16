@@ -61,7 +61,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetMaxRingNumber", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetMaxRingNumber", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) Then dbConnection.Close()
@@ -121,7 +121,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerRotorsConfiguration", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerRotorsConfiguration", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -180,7 +180,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerRotorsRingConfiguration", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerRotorsRingConfiguration", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -237,7 +237,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerRotorTypes", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerRotorTypes", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -288,7 +288,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerModel", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelRotorsConfigDAO.GetAnalyzerModel", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

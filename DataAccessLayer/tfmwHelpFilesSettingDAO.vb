@@ -53,7 +53,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwHelpFilesSettingDAO.ReadByIDAndLanguage", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwHelpFilesSettingDAO.ReadByIDAndLanguage", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

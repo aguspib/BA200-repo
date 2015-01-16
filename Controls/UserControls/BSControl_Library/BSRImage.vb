@@ -2,6 +2,7 @@ Imports System.ComponentModel
 Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Math
+Imports Biosystems.Ax00.Global
 
 ''' <summary>
 ''' This control is a picturebox that rotate the image on the control.
@@ -233,7 +234,7 @@ Public Class BSRImage
         Catch ex As Exception
             ' Write into Log
             Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "BSRImage.New", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSRImage.New", EventLogEntryType.Error, False)
             ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
         End Try
 
@@ -272,7 +273,7 @@ Public Class BSRImage
         Catch ex As Exception
             ' Write into Log
             Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "BSRImage.ValidRotation", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSRImage.ValidRotation", EventLogEntryType.Error, False)
             ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
         End Try
 
@@ -452,7 +453,7 @@ Public Class BSRImage
         Catch ex As Exception
             ' Write into Log
             Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "BSRImage.OnPaint", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSRImage.OnPaint", EventLogEntryType.Error, False)
             ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
         End Try
     End Sub
@@ -572,7 +573,7 @@ Public Class BSRImage
         Catch ex As Exception
             ' Write into Log
             Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "BSRImage.InitValues", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSRImage.InitValues", EventLogEntryType.Error, False)
             ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
         End Try
 
@@ -611,7 +612,7 @@ Public Class BSRImage
         Catch ex As Exception
             ' Write into Log
             Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "BSRImage.CreateTransRegion", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSRImage.CreateTransRegion", EventLogEntryType.Error, False)
             ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             Return Nothing
         End Try

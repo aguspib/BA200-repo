@@ -54,7 +54,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.GetLastHistAdjustBaseLine", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.GetLastHistAdjustBaseLine", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -107,7 +107,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.GenerateNextAdjustBaseLineID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.GenerateNextAdjustBaseLineID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -157,7 +157,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.InsertNewBaseLines", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.InsertNewBaseLines", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -197,7 +197,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.DeleteNotInUseAdjustBL", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisAdjustBaseLinesDAO.DeleteNotInUseAdjustBL", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function

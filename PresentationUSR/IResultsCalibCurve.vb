@@ -801,7 +801,7 @@ Public Class IResultsCalibCurve
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 22/06/2012 - Use the same AnalyzerManager as the MDI
@@ -2379,7 +2379,7 @@ Public Class IResultsCalibCurve
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChangesNEW", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChangesNEW", EventLogEntryType.Error, False)
         Finally
             Me.Cursor = Cursors.Default
         End Try

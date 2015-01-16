@@ -266,7 +266,7 @@ Public Class IProgCalculatedTest
             If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 'Get the current User from the Appliction Session
                 Dim currentSession As New ApplicationSessionManager
-                Dim loggedUser As String = currentSession.GetSessionInfo().UserName
+                Dim loggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                 'Load all selected Calculated Tests in a typed DataSet CalculatedTestsDS
                 Dim calTestDataDS As New CalculatedTestsDS
@@ -999,7 +999,7 @@ Public Class IProgCalculatedTest
 
             'Gets from the Session the Username of the connected User; get also the current datetime
             Dim currentSession As New ApplicationSessionManager
-            calTestRow.TS_User = currentSession.GetSessionInfo().UserName
+            calTestRow.TS_User = GlobalBase.GetSessionInfo().UserName
             calTestRow.TS_DateTime = Now
 
             calTestData.tparCalculatedTests.Rows.Add(calTestRow)
@@ -1947,7 +1947,7 @@ Public Class IProgCalculatedTest
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -2373,7 +2373,7 @@ Public Class IProgCalculatedTest
     Private Sub IProgCalculatedTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             ScreenLoad()
         Catch ex As Exception

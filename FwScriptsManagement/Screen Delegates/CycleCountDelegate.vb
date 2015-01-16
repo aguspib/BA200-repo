@@ -336,7 +336,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendREAD_CYCLES", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendREAD_CYCLES", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -353,7 +353,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendWRITE_CYCLES", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendWRITE_CYCLES", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -389,7 +389,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.RefreshCyclesData", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.RefreshCyclesData", EventLogEntryType.Error, False)
             End Try
 
             Return myResultData
@@ -412,7 +412,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Catch ex As Exception
                 returnValue = False
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerInfoDelegate.CheckFirmwareCompatibility", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerInfoDelegate.CheckFirmwareCompatibility", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function

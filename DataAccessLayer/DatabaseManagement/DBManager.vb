@@ -93,7 +93,7 @@ Namespace Biosystems.Ax00.DAL
 
                 result = True ' if ok then set true to the result.
 
-                myLogAcciones.CreateLogActivity("Create " & BackupFileName & " BackUp Database OK", "BackUpDataBase", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("Create " & BackupFileName & " BackUp Database OK", "BackUpDataBase", EventLogEntryType.Information, False)
 
             Catch ex As Exception
                 Dim Message As String
@@ -103,7 +103,7 @@ Namespace Biosystems.Ax00.DAL
                     Message = ex.Message
                 End If
 
-                myLogAcciones.CreateLogActivity(Message, "BackUpDataBase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(Message, "BackUpDataBase", EventLogEntryType.Error, False)
 
                 'Throw ex  'Commented line RH 10/11/2010
                 'Do prefer using an empty throw when catching and re-throwing an exception.
@@ -195,7 +195,7 @@ Namespace Biosystems.Ax00.DAL
 
                 result = True ' if ok then set true to the result.
 
-                myLogAcciones.CreateLogActivity("Create " & BackupFileName & " BackUp Database OK", "BackUpDataBase", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("Create " & BackupFileName & " BackUp Database OK", "BackUpDataBase", EventLogEntryType.Information, False)
 
             Catch ex As Exception
                 Dim Message As String
@@ -205,7 +205,7 @@ Namespace Biosystems.Ax00.DAL
                     Message = ex.Message
                 End If
 
-                myLogAcciones.CreateLogActivity(Message, "BackUpDataBaseAndMoveBkFile", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(Message, "BackUpDataBaseAndMoveBkFile", EventLogEntryType.Error, False)
 
                 'Throw ex  'Commented line RH 10/11/2010
                 'Do prefer using an empty throw when catching and re-throwing an exception.
@@ -303,7 +303,7 @@ Namespace Biosystems.Ax00.DAL
                     result = True
 
                     'BT #1643 - No writes in ApplicationLog table after the RESTORE: the table structure can be different
-                    'myLogAcciones.CreateLogActivity("Restore " & BackUpFileName & " Database OK", "RestoreDataBase", EventLogEntryType.Information, False)
+                    'GlobalBase.CreateLogActivity("Restore " & BackUpFileName & " Database OK", "RestoreDataBase", EventLogEntryType.Information, False)
                 Else
                     Throw New Exception("Unable to set DB to Single User.")
                 End If
@@ -316,7 +316,7 @@ Namespace Biosystems.Ax00.DAL
                     Message = ex.Message
                 End If
 
-                myLogAcciones.CreateLogActivity(Message, "RestoreDataBase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(Message, "RestoreDataBase", EventLogEntryType.Error, False)
 
                 'Throw ex  'Commented line RH 10/11/2010
                 'Do prefer using an empty throw when catching and re-throwing an exception.
@@ -359,7 +359,7 @@ Namespace Biosystems.Ax00.DAL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.ExecuteScripts", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.ExecuteScripts", EventLogEntryType.Error, False)
 
             End Try
 
@@ -399,7 +399,7 @@ Namespace Biosystems.Ax00.DAL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DataBaseExist", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DataBaseExist", EventLogEntryType.Error, False)
 
             End Try
 
@@ -435,7 +435,7 @@ Namespace Biosystems.Ax00.DAL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.IsSQLServer2005", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.IsSQLServer2005", EventLogEntryType.Error, False)
 
             End Try
 
@@ -483,7 +483,7 @@ Namespace Biosystems.Ax00.DAL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DropDatabaseFromServer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DropDatabaseFromServer", EventLogEntryType.Error, False)
 
             End Try
 
@@ -505,13 +505,13 @@ Namespace Biosystems.Ax00.DAL
             Try
                 If Not String.IsNullOrEmpty(SQLScript) Then ' validate if not empty
                     result = ExecuteScripts(pServer, DataBaseName, SQLScript) ' execute the script and validate the result(True/False)
-                    myLogAcciones.CreateLogActivity("Script success", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Script success", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
                 Else
-                    myLogAcciones.CreateLogActivity("Empty Script. Failed to run it", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Empty Script. Failed to run it", "DataBaseManager.RunDatabaseScript", EventLogEntryType.Information, False)
                 End If
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.RunDatabaseScript", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.RunDatabaseScript", EventLogEntryType.Error, False)
 
             End Try
 
@@ -599,7 +599,7 @@ Namespace Biosystems.Ax00.DAL
                 result = (sqlService.ServiceState = ServiceState.Running) AndAlso (sqlBrowser.ServiceState = ServiceState.Running) AndAlso _
                          (sc.Status = ServiceControllerStatus.Running)
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StartSQLService", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StartSQLService", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -661,7 +661,7 @@ Namespace Biosystems.Ax00.DAL
                 result = (sqlService.ServiceState = ServiceState.Stopped AndAlso sqlBrowser.ServiceState = ServiceState.Stopped AndAlso _
                           sc.Status = ServiceControllerStatus.Stopped)
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StopSQLService", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StopSQLService", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -700,7 +700,7 @@ Namespace Biosystems.Ax00.DAL
                 result = (SqlService.ServiceState = ServiceState.Running)
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "IsSQLServiceRunning.StartSQLService", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "IsSQLServiceRunning.StartSQLService", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -731,7 +731,7 @@ Namespace Biosystems.Ax00.DAL
                 End Using
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StartSQLService", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.StartSQLService", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -778,7 +778,7 @@ Namespace Biosystems.Ax00.DAL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseSingleUser", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseSingleUser", EventLogEntryType.Error, False)
 
             Finally
                 If Not MyServer Is Nothing Then
@@ -824,7 +824,7 @@ Namespace Biosystems.Ax00.DAL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseMultiUser", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseMultiUser", EventLogEntryType.Error, False)
 
             Finally
                 If Not MyServer Is Nothing Then
@@ -872,7 +872,7 @@ Namespace Biosystems.Ax00.DAL
                 End Using
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DataBaseExistsNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.DataBaseExistsNEW", EventLogEntryType.Error, False)
             Finally
                 'Close the DB Connection
                 If (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -904,7 +904,7 @@ Namespace Biosystems.Ax00.DAL
                 End Using
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.CreateDataBase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.CreateDataBase", EventLogEntryType.Error, False)
             Finally
                 'Close the DB Connection
                 If (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -945,7 +945,7 @@ Namespace Biosystems.Ax00.DAL
                 End Using
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.GetSQLServerVersion", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.GetSQLServerVersion", EventLogEntryType.Error, False)
             Finally
                 'Close the DB Connection
                 If (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1008,7 +1008,7 @@ Namespace Biosystems.Ax00.DAL
                 End Using
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseSingleUserNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseSingleUserNEW", EventLogEntryType.Error, False)
             Finally
                 'Close the DB Connection
                 If (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1059,7 +1059,7 @@ Namespace Biosystems.Ax00.DAL
                 End Using
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseMultiUserNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManager.SetDataBaseMultiUserNEW", EventLogEntryType.Error, False)
             Finally
                 'Close the DB Connection
                 If (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1105,7 +1105,7 @@ Namespace Biosystems.Ax00.DAL
                     dbConnection.Close()
 
                     result = True
-                    myLogAcciones.CreateLogActivity("Restore " & pBackUpFileName & " Database OK", "RestoreDataBaseNEW", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Restore " & pBackUpFileName & " Database OK", "RestoreDataBaseNEW", EventLogEntryType.Information, False)
                 Else
                     Throw New Exception("Unable to set DB to Single User.")
                 End If
@@ -1116,7 +1116,7 @@ Namespace Biosystems.Ax00.DAL
                 Else
                     Message = ex.Message
                 End If
-                myLogAcciones.CreateLogActivity(Message, "RestoreDataBaseNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(Message, "RestoreDataBaseNEW", EventLogEntryType.Error, False)
                 Throw
             Finally
                 'Put DB in Multi User Mode
@@ -1158,7 +1158,7 @@ Namespace Biosystems.Ax00.DAL
                     Catch ex As Exception
                         sqlExecResult = False
                         Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DBManager.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
+                        GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DBManager.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
                     Finally
                         If (connection.State = ConnectionState.Open) Then connection.Close()
                     End Try
@@ -1168,7 +1168,7 @@ Namespace Biosystems.Ax00.DAL
             Catch ex As Exception
                 sqlExecResult = False
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DBManager.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DBManager.AddThreadIDColToApplicationLogTable", EventLogEntryType.Error, False)
             End Try
             Return sqlExecResult
         End Function

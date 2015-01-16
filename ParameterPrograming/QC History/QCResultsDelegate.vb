@@ -52,7 +52,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -93,7 +93,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.CountNonCumulatedResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.CountNonCumulatedResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -135,7 +135,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.CountStatisticsResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.CountStatisticsResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -234,7 +234,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.CumulateControlResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.CumulateControlResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -295,7 +295,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -348,7 +348,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByCumResultsNum", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByCumResultsNum", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -408,7 +408,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByRunsGroupNum", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByRunsGroupNum", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -471,7 +471,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteStatisticResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteStatisticResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -526,7 +526,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetAllAlarmsDescriptions", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetAllAlarmsDescriptions", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -726,7 +726,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetByQCControlLotID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetByQCControlLotID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -765,7 +765,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlsToCumulate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlsToCumulate", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -877,7 +877,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetDataToCreateCumulate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetDataToCreateCumulate", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -916,7 +916,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxResultDateTime", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxResultDateTime", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -958,7 +958,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxRunNumber", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxRunNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -999,7 +999,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxRunNumberByTestSample", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxRunNumberByTestSample", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1037,7 +1037,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMinResultDateTime", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMinResultDateTime", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1286,7 +1286,7 @@ Namespace Biosystems.Ax00.BL
                                     'Get description of all Alarms in the current Language
                                     Dim currentSession As New GlobalBase
                                     myGlobalDataTO = GetAllAlarmsDescriptionsNEW(dbConnection, pQCTestSampleID, pAnalyzerID, pOpenQCResultsDS, _
-                                                                                 currentSession.GetSessionInfo().ApplicationLanguage)
+                                                                                 GlobalBase.GetSessionInfo().ApplicationLanguage)
 
                                     If (Not myGlobalDataTO.HasError) Then
                                         myQCResultAlarmsDS = DirectCast(myGlobalDataTO.SetDatos, QCResultAlarms)
@@ -1344,7 +1344,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetNonCumulateResultForAllControlLots", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetNonCumulateResultForAllControlLots", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1421,7 +1421,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetQCResultsToExport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetQCResultsToExport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1578,7 +1578,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForManualMode", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForManualMode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1778,7 +1778,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForStatisticsMode", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForStatisticsMode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1839,7 +1839,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.MoveStatisticResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.MoveStatisticResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1884,7 +1884,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByControl", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByControl", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1927,7 +1927,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByTestIDSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByTestIDSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2033,7 +2033,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.SetResultsForStatistics", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.SetResultsForStatistics", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2086,7 +2086,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.UnmarkStatisticResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.UnmarkStatisticResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2268,7 +2268,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateChangedValues", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateChangedValues", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2315,7 +2315,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateManualResult", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateManualResult", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2466,7 +2466,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyMultiRules", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyMultiRules", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2526,7 +2526,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_1x2s", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_1x2s", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -2596,7 +2596,7 @@ Namespace Biosystems.Ax00.BL
                 Return (myAlarmCtrl1 Or myAlarmCtrl2)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_1x3s", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_1x3s", EventLogEntryType.Error, False)
                 Return False
             End Try
         End Function
@@ -2717,7 +2717,7 @@ Namespace Biosystems.Ax00.BL
                 Return (myAlarmCtrl1 Or myAlarmCtrl2)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_2x2s", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_2x2s", EventLogEntryType.Error, False)
                 Return False
             End Try
         End Function
@@ -2847,7 +2847,7 @@ Namespace Biosystems.Ax00.BL
                 Return (myAlarmCtrl1 Or myAlarmCtrl2)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_Rx4s", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_Rx4s", EventLogEntryType.Error, False)
                 Return False
             End Try
         End Function
@@ -3008,7 +3008,7 @@ Namespace Biosystems.Ax00.BL
                 Return (myAlarmCtrl1 Or myAlarmCtrl2)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_4x1s", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_4x1s", EventLogEntryType.Error, False)
                 Return False
             End Try
         End Function
@@ -3091,108 +3091,108 @@ Namespace Biosystems.Ax00.BL
                             End If 'End If 'JV 18/12/2013 #1096
                         End If
 
-                            If (conditionOK) Then
-                                myAlarmCtrl1 = True
-                                myAlarmCtrl2 = True
-                            End If
+                        If (conditionOK) Then
+                            myAlarmCtrl1 = True
+                            myAlarmCtrl2 = True
+                        End If
+                    End If
+                End If
+
+                'Within Control/Across Runs --> Verify if the last ten Results of each Control are all below the Mean, or all upper the Mean
+                '                               This verification can be done only when none of the previous Results used have been rejected
+                If (Not myAlarmCtrl1 AndAlso Not myAlarmCtrl2) Then
+                    'Apply the rule for the first Control
+                    If (Not pAllResultsDS.tQCResultsForWestgard(i).IsRelError1Null) Then
+                        'Search the previous nine results for the same Control
+                        myFilterResults = (From a In pAllResultsDS.tQCResultsForWestgard _
+                                      Where Not a.IsRelError1Null _
+                                        AndAlso a.RowIndex < myRowIndex _
+                                       Order By a.RowIndex Descending _
+                                         Select a).ToList()
+
+                        If (myFilterResults.Count >= 9) Then
+                            belowMeanCtrl1 = (pAllResultsDS.tQCResultsForWestgard(i).RelError1 < 0)
+                            For j As Integer = 0 To 8
+                                myPreviousIndex = myFilterResults(j).RowIndex
+
+                                If (belowMeanCtrl1) Then
+                                    conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus1 <> "ERROR" AndAlso _
+                                                   pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError1 < 0)
+                                Else
+                                    conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus1 <> "ERROR" AndAlso _
+                                                   pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError1 > 0)
+                                End If
+                                If (Not conditionOK) Then Exit For
+                            Next
+
+                            If (conditionOK) Then myAlarmCtrl1 = True
                         End If
                     End If
 
-                    'Within Control/Across Runs --> Verify if the last ten Results of each Control are all below the Mean, or all upper the Mean
-                    '                               This verification can be done only when none of the previous Results used have been rejected
-                    If (Not myAlarmCtrl1 AndAlso Not myAlarmCtrl2) Then
-                        'Apply the rule for the first Control
-                        If (Not pAllResultsDS.tQCResultsForWestgard(i).IsRelError1Null) Then
-                            'Search the previous nine results for the same Control
-                            myFilterResults = (From a In pAllResultsDS.tQCResultsForWestgard _
-                                          Where Not a.IsRelError1Null _
-                                            AndAlso a.RowIndex < myRowIndex _
-                                           Order By a.RowIndex Descending _
-                                             Select a).ToList()
+                    'Apply the rule for the second Control
+                    If (Not pAllResultsDS.tQCResultsForWestgard(i).IsRelError2Null) Then
+                        'Search the previous nine results for the same Control
+                        myFilterResults = (From a In pAllResultsDS.tQCResultsForWestgard _
+                                       Where Not a.IsRelError2Null _
+                                         AndAlso a.RowIndex < myRowIndex _
+                                        Order By a.RowIndex Descending _
+                                          Select a).ToList()
 
-                            If (myFilterResults.Count >= 9) Then
-                                belowMeanCtrl1 = (pAllResultsDS.tQCResultsForWestgard(i).RelError1 < 0)
-                                For j As Integer = 0 To 8
-                                    myPreviousIndex = myFilterResults(j).RowIndex
+                        If (myFilterResults.Count >= 9) Then
+                            belowMeanCtrl2 = (pAllResultsDS.tQCResultsForWestgard(i).RelError2 < 0)
+                            For j As Integer = 0 To 8
+                                myPreviousIndex = myFilterResults(j).RowIndex
 
-                                    If (belowMeanCtrl1) Then
-                                        conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus1 <> "ERROR" AndAlso _
-                                                       pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError1 < 0)
-                                    Else
-                                        conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus1 <> "ERROR" AndAlso _
-                                                       pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError1 > 0)
-                                    End If
-                                    If (Not conditionOK) Then Exit For
-                                Next
+                                If (belowMeanCtrl2) Then
+                                    conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus2 <> "ERROR" AndAlso _
+                                                   pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError2 < 0)
+                                Else
+                                    conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus2 <> "ERROR" AndAlso _
+                                                   pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError2 > 0)
+                                End If
+                                If (Not conditionOK) Then Exit For
+                            Next
 
-                                If (conditionOK) Then myAlarmCtrl1 = True
-                            End If
-                        End If
-
-                        'Apply the rule for the second Control
-                        If (Not pAllResultsDS.tQCResultsForWestgard(i).IsRelError2Null) Then
-                            'Search the previous nine results for the same Control
-                            myFilterResults = (From a In pAllResultsDS.tQCResultsForWestgard _
-                                           Where Not a.IsRelError2Null _
-                                             AndAlso a.RowIndex < myRowIndex _
-                                            Order By a.RowIndex Descending _
-                                              Select a).ToList()
-
-                            If (myFilterResults.Count >= 9) Then
-                                belowMeanCtrl2 = (pAllResultsDS.tQCResultsForWestgard(i).RelError2 < 0)
-                                For j As Integer = 0 To 8
-                                    myPreviousIndex = myFilterResults(j).RowIndex
-
-                                    If (belowMeanCtrl2) Then
-                                        conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus2 <> "ERROR" AndAlso _
-                                                       pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError2 < 0)
-                                    Else
-                                        conditionOK = (pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).ValidationStatus2 <> "ERROR" AndAlso _
-                                                       pAllResultsDS.tQCResultsForWestgard(myPreviousIndex).RelError2 > 0)
-                                    End If
-                                    If (Not conditionOK) Then Exit For
-                                Next
-
-                                If (conditionOK) Then myAlarmCtrl2 = True
-                            End If
+                            If (conditionOK) Then myAlarmCtrl2 = True
                         End If
                     End If
+                End If
 
-                    If (myAlarmCtrl1) Then
-                        'Insert Alarm and set ValidationStatus = ERROR for the first Control
-                        InsertNewQcResultAlarmNEW(pQCResultAlarmsDS, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).QCControlLotID1, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).QCTestSampleID, _
-                                                  pAnalyzerID, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).RunsGroupNumber1, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).RunNumber, _
-                                                  "WESTGARD_10X")
+                If (myAlarmCtrl1) Then
+                    'Insert Alarm and set ValidationStatus = ERROR for the first Control
+                    InsertNewQcResultAlarmNEW(pQCResultAlarmsDS, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).QCControlLotID1, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).QCTestSampleID, _
+                                              pAnalyzerID, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).RunsGroupNumber1, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).RunNumber, _
+                                              "WESTGARD_10X")
 
-                        pAllResultsDS.tQCResultsForWestgard(i).BeginEdit()
-                        pAllResultsDS.tQCResultsForWestgard(i).ValidationStatus1 = "ERROR"
-                        pAllResultsDS.tQCResultsForWestgard(i).EndEdit()
-                    End If
+                    pAllResultsDS.tQCResultsForWestgard(i).BeginEdit()
+                    pAllResultsDS.tQCResultsForWestgard(i).ValidationStatus1 = "ERROR"
+                    pAllResultsDS.tQCResultsForWestgard(i).EndEdit()
+                End If
 
-                    If (myAlarmCtrl2) Then
-                        'Insert Alarm and set ValidationStatus = ERROR for the second Control
-                        InsertNewQcResultAlarmNEW(pQCResultAlarmsDS, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).QCControlLotID2, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).QCTestSampleID, _
-                                                  pAnalyzerID, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).RunsGroupNumber2, _
-                                                  pAllResultsDS.tQCResultsForWestgard(i).RunNumber, _
-                                                  "WESTGARD_10X")
+                If (myAlarmCtrl2) Then
+                    'Insert Alarm and set ValidationStatus = ERROR for the second Control
+                    InsertNewQcResultAlarmNEW(pQCResultAlarmsDS, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).QCControlLotID2, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).QCTestSampleID, _
+                                              pAnalyzerID, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).RunsGroupNumber2, _
+                                              pAllResultsDS.tQCResultsForWestgard(i).RunNumber, _
+                                              "WESTGARD_10X")
 
-                        pAllResultsDS.tQCResultsForWestgard(i).BeginEdit()
-                        pAllResultsDS.tQCResultsForWestgard(i).ValidationStatus2 = "ERROR"
-                        pAllResultsDS.tQCResultsForWestgard(i).EndEdit()
-                    End If
+                    pAllResultsDS.tQCResultsForWestgard(i).BeginEdit()
+                    pAllResultsDS.tQCResultsForWestgard(i).ValidationStatus2 = "ERROR"
+                    pAllResultsDS.tQCResultsForWestgard(i).EndEdit()
+                End If
 
-                    'Return TRUE if alarm for rule R-10X was raised for at least one of the Controls
-                    Return (myAlarmCtrl1 Or myAlarmCtrl2)
+                'Return TRUE if alarm for rule R-10X was raised for at least one of the Controls
+                Return (myAlarmCtrl1 Or myAlarmCtrl2)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_10X", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyRule_10X", EventLogEntryType.Error, False)
                 Return False
             End Try
         End Function
@@ -3223,7 +3223,7 @@ Namespace Biosystems.Ax00.BL
                 End If
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlList", EventLogEntryType.Error, False)
             End Try
             Return myIconName
         End Function
@@ -3265,7 +3265,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlList", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -3301,7 +3301,7 @@ Namespace Biosystems.Ax00.BL
                 pQCResultAlarmsDS.tqcResultAlarms.AddtqcResultAlarmsRow(myQCResultAlarmsRow)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.InsertNewQcResultAlarm", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.InsertNewQcResultAlarm", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -3329,7 +3329,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetFirstDateTimeForResultsCreation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetFirstDateTimeForResultsCreation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3370,7 +3370,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxCtrlsSendingGroup", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxCtrlsSendingGroup", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3412,7 +3412,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.CountNonCumulatedResults", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.CountNonCumulatedResults", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3458,7 +3458,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.Create", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.Create", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3555,7 +3555,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.CumulateControlResults", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.CumulateControlResults", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3615,7 +3615,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.Delete", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.Delete", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3666,7 +3666,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByCumResultsNum", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByCumResultsNum", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3724,7 +3724,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByRunsGroupNum", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteByRunsGroupNum", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3784,7 +3784,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteStatisticResults", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.DeleteStatisticResults", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -3975,7 +3975,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetByQCControlLotID", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetByQCControlLotID", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4012,7 +4012,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlsToCumulate", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetControlsToCumulate", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4087,7 +4087,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetDataToCreateCumulate", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetDataToCreateCumulate", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4123,7 +4123,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxResultDateTime", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxResultDateTime", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4163,7 +4163,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxRunNumber", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMaxRunNumber", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4199,7 +4199,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMinResultDateTime", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetMinResultDateTime", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4374,7 +4374,7 @@ Namespace Biosystems.Ax00.BL
         '                    If (Not myGlobalDataTO.HasError) Then
         '                        'Get description of all Alarms in the current Language
         '                        Dim currentSession As New GlobalBase
-        '                        myGlobalDataTO = GetAllAlarmsDescriptionsOLD(dbConnection, pQCTestSampleID, pOpenQCResultsDS, currentSession.GetSessionInfo().ApplicationLanguage)
+        '                        myGlobalDataTO = GetAllAlarmsDescriptionsOLD(dbConnection, pQCTestSampleID, pOpenQCResultsDS, GlobalBase.GetSessionInfo().ApplicationLanguage)
 
         '                        If (Not myGlobalDataTO.HasError) Then
         '                            myQCResultAlarmsDS = DirectCast(myGlobalDataTO.SetDatos, QCResultAlarms)
@@ -4431,7 +4431,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetNonCumulateResultForAllControlLots", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetNonCumulateResultForAllControlLots", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4506,7 +4506,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetQCResultsToExport", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetQCResultsToExport", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4656,7 +4656,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForManualMode", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForManualMode", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4848,7 +4848,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForStatisticsMode", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetResultsByControlLotForStatisticsMode", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4907,7 +4907,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.MoveStatisticResults", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.MoveStatisticResults", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4948,7 +4948,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByControl", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByControl", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -4987,7 +4987,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByTestIDSampleType", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.SearchPendingResultsByTestIDSampleType", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -5090,7 +5090,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.SetResultsForStatistics", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.SetResultsForStatistics", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -5141,7 +5141,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.UnmarkStatisticResults", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.UnmarkStatisticResults", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -5297,7 +5297,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateChangedValues", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateChangedValues", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -5344,7 +5344,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateManualResult", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.UpdateManualResult", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -5751,7 +5751,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyMultiRules", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.ApplyMultiRules", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -5802,7 +5802,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetAllAlarmsDescriptions", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetAllAlarmsDescriptions", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -5841,7 +5841,7 @@ Namespace Biosystems.Ax00.BL
         '        pQCResultAlarmsDS.tqcResultAlarms.AddtqcResultAlarmsRow(myQCResultAlarmsRow)
         '    Catch ex As Exception
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.InsertNewQcResultAlarm", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.InsertNewQcResultAlarm", EventLogEntryType.Error, False)
         '    End Try
         'End Sub
 
@@ -5866,7 +5866,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "QCResultsDelegate.GetFirstDateTimeForResultsCreation", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "QCResultsDelegate.GetFirstDateTimeForResultsCreation", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

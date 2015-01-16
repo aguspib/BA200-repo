@@ -51,7 +51,7 @@ Public Class IWSTestSelectionWarning
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             PrepareButtons()
 

@@ -1514,7 +1514,7 @@ Public Class ICycleCountScreen
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             'AnalyzerId
             MyClass.myScreenDelegate.AnalyzerId = MyBase.myServiceMDI.ActiveAnalyzer

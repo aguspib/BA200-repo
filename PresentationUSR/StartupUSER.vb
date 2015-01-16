@@ -28,15 +28,15 @@ Public NotInheritable Class StartupUSER
         'AG 21/02/2014 - #1516 at this point services can be stopped (move to the Load event)
         'IMPORTANT!!! Leave the call to x because otherwise some processes like load rsat fails
         If RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully Then
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
         Else
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupUSER.New", EventLogEntryType.Error, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupUSER.New", EventLogEntryType.Error, False)
         End If
         'end SGM 09/01/2012
 
         ''SGM 07/11/2012 - log Application Startup
         'Dim myLogAcciones As New ApplicationLogManager()
-        'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
+        'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
         ''end SGM 07/11/2012
 
     End Sub
@@ -111,7 +111,7 @@ Public NotInheritable Class StartupUSER
 
         'AG 21/02/2014 - #1516 at this point services are running. Do not use here the method RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully because fails
         Dim myLogAcciones As New ApplicationLogManager()
-        myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationUSR STARTUP", "Startup_Load (User)", EventLogEntryType.Information, False)
+        GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationUSR STARTUP", "Startup_Load (User)", EventLogEntryType.Information, False)
 
         If Not Ax00StartUp Is Nothing Then
             Ax00StartUp.Close()

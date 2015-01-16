@@ -79,7 +79,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "ISEInformationUpdateData.UpdateDataFormatv1Tov2", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISEInformationUpdateData.UpdateDataFormatv1Tov2", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -119,7 +119,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE Info Update Error.", "ISEInformationUpdateData.IsDateTime", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("ISE Info Update Error.", "ISEInformationUpdateData.IsDateTime", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -136,7 +136,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE Info Update Error.", "ISEInformationUpdateData.ExtractDateTime", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("ISE Info Update Error.", "ISEInformationUpdateData.ExtractDateTime", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message

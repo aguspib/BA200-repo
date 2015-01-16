@@ -491,7 +491,7 @@ Public Class IBarCodesConfig
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for Form Buttons
             PrepareButtons()
@@ -1085,7 +1085,7 @@ Public Class IBarCodesConfig
             myLeft = Me.Left
             'TR 20/04/2012 get the current user level
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             InitializeScreen()
             EditionMode = True

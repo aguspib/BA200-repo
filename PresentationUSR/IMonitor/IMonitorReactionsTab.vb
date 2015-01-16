@@ -158,7 +158,7 @@ Partial Public Class IMonitor
             RotorContentList = Nothing
             'TR 25/09/2013 END
 
-            myLogAcciones.CreateLogActivity("Refresh reactions rotor: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshReactionsRotor", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Refresh reactions rotor: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshReactionsRotor", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshReactionsRotor ", EventLogEntryType.Error, _

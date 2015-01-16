@@ -465,7 +465,7 @@ Public Class IISEUtilities
 
     '    Catch ex As Exception
     '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OnManageReceptionEvent", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OnManageReceptionEvent", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -876,7 +876,7 @@ Public Class IISEUtilities
                 'SGM 17/10/2012 - Log ISE Operation
                 If myScreenIseCmdTo.ISECommandID <> ISECommands.NONE Then
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("ISE UTILITIES: " & myScreenIseCmdTo.ISECommandID.ToString, Me.Name & ".SendISEInstruction ", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("ISE UTILITIES: " & myScreenIseCmdTo.ISECommandID.ToString, Me.Name & ".SendISEInstruction ", EventLogEntryType.Information, False)
                 End If
                 'end SGM 17/10/2012
 
@@ -1014,7 +1014,7 @@ Public Class IISEUtilities
 
                 'SGM 17/10/2012 - Log ISE Operation
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE UTILITIES: " & Me.CurrentOperation.ToString, Me.Name & ".SendISEAction ", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("ISE UTILITIES: " & Me.CurrentOperation.ToString, Me.Name & ".SendISEAction ", EventLogEntryType.Information, False)
 
             End If
 
@@ -1737,7 +1737,7 @@ Public Class IISEUtilities
             myResultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
         End Try
         Return myResultData
     End Function
@@ -4328,7 +4328,7 @@ Public Class IISEUtilities
     '        End If
     '    Catch ex As Exception
     '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "OnISEOperationFinished", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "OnISEOperationFinished", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -4346,10 +4346,10 @@ Public Class IISEUtilities
             End If
 
             'Get the current user level SGM 07/06/2012
-            MyBase.CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            MyBase.CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             Me.GetScreenLabels()
@@ -4514,8 +4514,8 @@ Public Class IISEUtilities
 
         Try
             'TRAZA DE CIERRE DE PANTALLA
-            Dim myApplicationLogMang As New ApplicationLogManager
-            myApplicationLogMang.CreateLogActivity(Me.Name & ".BsExitButton.Click ", "IISEUtilities", EventLogEntryType.Information, False)
+            'Dim myApplicationLogMang As New ApplicationLogManager
+            GlobalBase.CreateLogActivity(Me.Name & ".BsExitButton.Click ", "IISEUtilities", EventLogEntryType.Information, False)
             'TRAZA DE CIERRE DE PANTALLA
 
             MyClass.IsScreenCloseRequested = True 'SGM 13/06/2012
@@ -5078,7 +5078,7 @@ Public Class IISEUtilities
                     Dim myGlobalbase As New GlobalBase
 
                     If myDocRow.DocumentPath.Length > 0 Then
-                        myDocumentPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.DocumentPath
+                        myDocumentPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.DocumentPath
 
                         Dim isScrollable As Boolean = myDocRow.Expandable
 
@@ -5150,7 +5150,7 @@ Public Class IISEUtilities
 
                     'video NOT V1
                     'If myDocRow.VideoPath.Length > 0 Then
-                    '    myVideoPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.VideoPath
+                    '    myVideoPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.VideoPath
                     '    If File.Exists(myVideoPath) Then
 
                     '    Else

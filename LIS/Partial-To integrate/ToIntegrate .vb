@@ -122,7 +122,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetCreateChannelSTLServer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetCreateChannelSTLServer", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -241,7 +241,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESxmlTranslator.GetCreateChannelSTLClient", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESxmlTranslator.GetCreateChannelSTLClient", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

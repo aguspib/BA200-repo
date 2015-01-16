@@ -178,7 +178,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -229,7 +229,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -275,7 +275,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -325,7 +325,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -383,7 +383,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountForSTDTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountForSTDTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -443,7 +443,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.GetDataToExportFromHIST", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.GetDataToExportFromHIST", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -497,7 +497,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadByHistTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadByHistTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -550,7 +550,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateBLANKFields", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateBLANKFields", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -600,7 +600,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateCALIBFields", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.UpdateCALIBFields", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -646,7 +646,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -692,7 +692,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Delete", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.Delete", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function
@@ -746,7 +746,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountByAnalyzerWS", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisWSOrderTestsDAO.CountByAnalyzerWS", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

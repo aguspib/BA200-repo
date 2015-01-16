@@ -341,7 +341,7 @@ Public Class ISortingTestsAux
 
             'Get the current application Language
             Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Configure all screen controls (icons, texts in current language, ListView properties)
             PrepareButtons()

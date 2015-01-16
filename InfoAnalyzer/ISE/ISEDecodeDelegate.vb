@@ -50,7 +50,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
 '            End Try
 
 '        End Sub
@@ -105,7 +105,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetResultErrors", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetResultErrors", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -167,7 +167,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetCancelError", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetCancelError", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -201,7 +201,7 @@
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobalDataTO
@@ -355,7 +355,7 @@
 '        '        myGlobalDataTO.ErrorMessage = ex.Message
 
 '        '        Dim myLogAcciones As New ApplicationLogManager()
-'        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
+'        '        GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
 '        '    End Try
 
 '        '    Return myGlobalDataTO
@@ -470,7 +470,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -516,7 +516,7 @@
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobalDataTO
@@ -684,7 +684,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetLiNaKClValues", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetLiNaKClValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -766,7 +766,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetPumpCalibrationValues", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetPumpCalibrationValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -848,7 +848,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1013,7 +1013,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.FillISEResultValues", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.FillISEResultValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1048,7 +1048,7 @@
 '                End If
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetIoneValue", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetIoneValue", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return returnValue
@@ -1091,7 +1091,7 @@
 '                End If
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetPumpValue", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetPumpValue", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return returnValue
@@ -1124,7 +1124,7 @@
 '                End If
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetBubbleValue", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetBubbleValue", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return returnValue
@@ -1176,7 +1176,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasSNValues", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasSNValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1262,7 +1262,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage00Values", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage00Values", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1333,7 +1333,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage01Values", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage01Values", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1388,7 +1388,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetConsumptionVolume", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetConsumptionVolume", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function

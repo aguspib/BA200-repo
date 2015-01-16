@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.CreateReportTemplate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.CreateReportTemplate", EventLogEntryType.Error, False)
 
             Finally
 
@@ -180,7 +180,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateDefaultTemplateFieldByName", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateDefaultTemplateFieldByName", EventLogEntryType.Error, False)
 
             Finally
 
@@ -277,7 +277,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateRenamingTemplate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateRenamingTemplate", EventLogEntryType.Error, False)
 
             Finally
 
@@ -384,7 +384,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateComplete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.UpdateComplete", EventLogEntryType.Error, False)
 
             Finally
 
@@ -437,7 +437,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.SetFlaseDefaultTemplateByTempOrientation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.SetFlaseDefaultTemplateByTempOrientation", EventLogEntryType.Error, False)
 
             Finally
 
@@ -477,7 +477,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -548,7 +548,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -586,7 +586,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -621,7 +621,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.GetDefaultTemplate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReportTemplatesDelegate.GetDefaultTemplate", EventLogEntryType.Error, False)
 
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -708,7 +708,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReportTemplatesDelegate.DeleteNonExistingReportTemplates", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReportTemplatesDelegate.DeleteNonExistingReportTemplates", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -762,7 +762,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReportTemplatesDelegate.SetDefaultTemplateStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReportTemplatesDelegate.SetDefaultTemplateStatus", EventLogEntryType.Error, False)
 
             Finally
 

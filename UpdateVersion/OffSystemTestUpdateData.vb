@@ -86,7 +86,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.CREATENewOFFSTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.CREATENewOFFSTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -155,7 +155,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.DELETERemovedOFFSTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.DELETERemovedOFFSTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -258,7 +258,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.UPDATEModifiedOFFSTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.UPDATEModifiedOFFSTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -389,7 +389,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -486,7 +486,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.UpdateRenamedTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.UpdateRenamedTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -573,7 +573,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.RenameTestName", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("OFFS Test Update Error", "OffSystemTestUpdateData.RenameTestName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -608,7 +608,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("OFFS Test Update Error", "CalculatedTestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("OFFS Test Update Error", "CalculatedTestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
                 Throw
             End Try
         End Sub

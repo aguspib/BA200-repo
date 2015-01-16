@@ -63,7 +63,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -104,7 +104,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.ReadByConditioningTypes", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.ReadByConditioningTypes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -141,7 +141,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.ReadByCalibartionID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.ReadByCalibartionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -184,7 +184,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddNewCalibration", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddNewCalibration", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -245,7 +245,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddConditioning", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddConditioning", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -292,7 +292,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddElectrodeCalibration", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddElectrodeCalibration", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -329,7 +329,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddPumpCalibration", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddPumpCalibration", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -366,7 +366,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddBubbleCalibration", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddBubbleCalibration", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -401,7 +401,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddCleaning", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.AddCleaning", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -444,7 +444,7 @@ Namespace Biosystems.Ax00.InfoAnalyzer
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.DeleteCalibration", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ISECalibHistoryDelegate.DeleteCalibration", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

@@ -51,7 +51,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.CalculateDeathVolByBottleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.CalculateDeathVolByBottleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -91,7 +91,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetBottleInformationByRotorPosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwReagentTubeTypesDAO.GetBottleInformationByRotorPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -138,7 +138,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetBottleByVolume", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetBottleByVolume", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -184,7 +184,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetMaximumBottleSize", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetMaximumBottleSize", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -230,7 +230,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetMinimumBottleSize", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetMinimumBottleSize", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -282,7 +282,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetReagentBottles", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetReagentBottles", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -331,7 +331,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetVolumeByTubeSize", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ReagentTubeTypesDelegate.GetVolumeByTubeSize", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

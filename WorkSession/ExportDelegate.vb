@@ -135,7 +135,7 @@ Namespace Biosystems.Ax00.BL
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495 
                         Dim StartTime As DateTime = Now
                         Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("RESULTS NUMBER to EXPORT : " & myResultsData.vwksResults.Count.ToString(), _
+                        GlobalBase.CreateLogActivity("RESULTS NUMBER to EXPORT : " & myResultsData.vwksResults.Count.ToString(), _
                                  "ExportDelegate.ExportToLISManualNEW", EventLogEntryType.Information, False)
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
 
@@ -160,7 +160,7 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
-                            myLogAcciones.CreateLogActivity("UpdateExportStatus Method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("UpdateExportStatus Method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExportDelegate.ExportToLISManualNEW", EventLogEntryType.Information, False)
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495 
 
@@ -210,7 +210,7 @@ Namespace Biosystems.Ax00.BL
                                 diffRerunNumbers = Nothing
 
                                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
-                                myLogAcciones.CreateLogActivity("Get OrderTest for all exported Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                GlobalBase.CreateLogActivity("Get OrderTest for all exported Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                 "ExportDelegate.ExportToLISManualNEW", EventLogEntryType.Information, False)
                                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
 
@@ -227,7 +227,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ExportToLISManualNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExportToLISManualNEW", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -524,7 +524,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ExportToLISManualFromHIST", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExportToLISManualFromHIST", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
 
@@ -652,7 +652,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones1.CreateLogActivity("ManageLISExportation ExecuteExportation (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("ManageLISExportation ExecuteExportation (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                  "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Catch ex As Exception
@@ -661,7 +661,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -879,7 +879,7 @@ Namespace Biosystems.Ax00.BL
 
                     myResultsRow.ExportStatus = "SENT"
                     myResultsRow.ExportDateTime = DateTime.Now
-                    myResultsRow.TS_User = myGlobalBase.GetSessionInfo().UserName
+                    myResultsRow.TS_User = GlobalBase.GetSessionInfo().UserName
                     myResultsRow.TS_DateTime = DateTime.Now
 
                     'TR 28/08/2012 -Add the Control name and lotNumber columns.
@@ -902,7 +902,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.CreateExportFileNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.CreateExportFileNEW", EventLogEntryType.Error, False)
             Finally
                 'Close the file 
                 If (Not TextFileWriter Is Nothing) Then TextFileWriter.Close()
@@ -1048,7 +1048,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1247,7 +1247,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.GetDataToExport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.GetDataToExport", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1581,7 +1581,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.GetDataToExport", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.GetDataToExport", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1800,7 +1800,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.CreateExportFile", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.CreateExportFile", EventLogEntryType.Error, False)
         '    Finally
         '        'close the file 
         '        If Not TextFileWriter Is Nothing Then TextFileWriter.Close()
@@ -1997,7 +1997,7 @@ Namespace Biosystems.Ax00.BL
         '                            myResultRow = tempResultDS.twksResults.NewtwksResultsRow()
         '                            myResultRow.ExportStatus = "SENT"
         '                            myResultRow.ExportDateTime = DateTime.Now
-        '                            myResultRow.TS_User = myGlobalBase.GetSessionInfo().UserName
+        '                            myResultRow.TS_User = GlobalBase.GetSessionInfo().UserName
         '                            myResultRow.TS_DateTime = DateTime.Now
         '                            myResultRow.OrderTestID = Results(i).OrderTestID
         '                            myResultRow.MultiPointNumber = Results(i).MultiPointNumber
@@ -2043,7 +2043,7 @@ Namespace Biosystems.Ax00.BL
 
         '    Catch ex As Exception
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportToLIS", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportToLIS", EventLogEntryType.Error, False)
 
         '    End Try
 
@@ -2150,7 +2150,7 @@ Namespace Biosystems.Ax00.BL
         '                            End If
 
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                            myLogAcciones1.CreateLogActivity("ManageLISExportation END WS Export Type Automatic (Complete): " & _
+        '                            GlobalBase.CreateLogActivity("ManageLISExportation END WS Export Type Automatic (Complete): " & _
         '                                                            Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                            "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2185,7 +2185,7 @@ Namespace Biosystems.Ax00.BL
         '                            End If
 
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                            myLogAcciones1.CreateLogActivity("ManageLISExportation ORDER Export Type Automatic (Complete): " & _
+        '                            GlobalBase.CreateLogActivity("ManageLISExportation ORDER Export Type Automatic (Complete): " & _
         '                                                            Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                            "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2205,7 +2205,7 @@ Namespace Biosystems.Ax00.BL
         '                            End If
 
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                            myLogAcciones1.CreateLogActivity("ManageLISExportation ORDER TEST Export Type Automatic (Complete): " & _
+        '                            GlobalBase.CreateLogActivity("ManageLISExportation ORDER TEST Export Type Automatic (Complete): " & _
         '                                                            Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                            "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2228,7 +2228,7 @@ Namespace Biosystems.Ax00.BL
         '                                                           pOrderTestID, myExportType, pResetWSFlag)
 
         '                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                        myLogAcciones1.CreateLogActivity("ManageLISExportation ExecuteExportation (Complete): " & _
+        '                        GlobalBase.CreateLogActivity("ManageLISExportation ExecuteExportation (Complete): " & _
         '                                                        Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                        "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2257,7 +2257,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -2372,7 +2372,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportationNEW", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -2414,7 +2414,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function        'Public Function ExportToLISManual(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String) As GlobalDataTO
@@ -2606,7 +2606,7 @@ Namespace Biosystems.Ax00.BL
         '                            myResultRow = tempResultDS.twksResults.NewtwksResultsRow()
         '                            myResultRow.ExportStatus = "SENT"
         '                            myResultRow.ExportDateTime = DateTime.Now
-        '                            myResultRow.TS_User = myGlobalBase.GetSessionInfo().UserName
+        '                            myResultRow.TS_User = GlobalBase.GetSessionInfo().UserName
         '                            myResultRow.TS_DateTime = DateTime.Now
         '                            myResultRow.OrderTestID = Results(i).OrderTestID
         '                            myResultRow.MultiPointNumber = Results(i).MultiPointNumber
@@ -2652,7 +2652,7 @@ Namespace Biosystems.Ax00.BL
 
         '    Catch ex As Exception
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportToLIS", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportToLIS", EventLogEntryType.Error, False)
 
         '    End Try
 
@@ -2759,7 +2759,7 @@ Namespace Biosystems.Ax00.BL
         '                            End If
 
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                            myLogAcciones1.CreateLogActivity("ManageLISExportation END WS Export Type Automatic (Complete): " & _
+        '                            GlobalBase.CreateLogActivity("ManageLISExportation END WS Export Type Automatic (Complete): " & _
         '                                                            Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                            "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2794,7 +2794,7 @@ Namespace Biosystems.Ax00.BL
         '                            End If
 
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                            myLogAcciones1.CreateLogActivity("ManageLISExportation ORDER Export Type Automatic (Complete): " & _
+        '                            GlobalBase.CreateLogActivity("ManageLISExportation ORDER Export Type Automatic (Complete): " & _
         '                                                            Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                            "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2814,7 +2814,7 @@ Namespace Biosystems.Ax00.BL
         '                            End If
 
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                            myLogAcciones1.CreateLogActivity("ManageLISExportation ORDER TEST Export Type Automatic (Complete): " & _
+        '                            GlobalBase.CreateLogActivity("ManageLISExportation ORDER TEST Export Type Automatic (Complete): " & _
         '                                                            Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                            "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2837,7 +2837,7 @@ Namespace Biosystems.Ax00.BL
         '                                                           pOrderTestID, myExportType, pResetWSFlag)
 
         '                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '                        myLogAcciones1.CreateLogActivity("ManageLISExportation ExecuteExportation (Complete): " & _
+        '                        GlobalBase.CreateLogActivity("ManageLISExportation ExecuteExportation (Complete): " & _
         '                                                        Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                                        "ExportDelegate.ManageLISExportation", EventLogEntryType.Information, False)
         '                        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2866,7 +2866,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -2981,7 +2981,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportationNEW", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -3023,7 +3023,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -3090,7 +3090,7 @@ Namespace Biosystems.Ax00.BL
         '                            myResultRow = tempResultDS.twksResults.NewtwksResultsRow()
         '                            myResultRow.ExportStatus = "SENT"
         '                            myResultRow.ExportDateTime = DateTime.Now
-        '                            myResultRow.TS_User = myGlobalBase.GetSessionInfo().UserName
+        '                            myResultRow.TS_User = GlobalBase.GetSessionInfo().UserName
         '                            myResultRow.TS_DateTime = DateTime.Now
         '                            myResultRow.OrderTestID = MyLimsResultList(i).OrderTestID
         '                            myResultRow.MultiPointNumber = MyLimsResultList(i).MultiPointNumber
@@ -3149,7 +3149,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportation", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function

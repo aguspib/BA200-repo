@@ -62,7 +62,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.AddMessage", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.AddMessage", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -110,7 +110,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.DeleteAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.DeleteAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -193,7 +193,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -229,7 +229,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -266,7 +266,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ReadByStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ReadByStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -313,7 +313,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.DeleteByStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.DeleteByStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -361,7 +361,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.UpdateStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.UpdateStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -410,7 +410,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.UpdateStatusByMessageId", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.UpdateStatusByMessageId", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -462,7 +462,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ExtractSpecimensFromMessage", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ExtractSpecimensFromMessage", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -659,7 +659,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.CancelAWOSID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.CancelAWOSID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -829,7 +829,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessLISPatients", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessLISPatients", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -902,7 +902,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessLISOrders", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessLISOrders", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1301,7 +1301,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessLISOrderTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessLISOrderTests", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1404,7 +1404,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                         End If
 
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        myLogAcciones.CreateLogActivity("Process of MessageID " & M.MessageID & " = " & Now.Subtract(MessageStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                        GlobalBase.CreateLogActivity("Process of MessageID " & M.MessageID & " = " & Now.Subtract(MessageStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                         "XMLMessagesDelegate.ProcessXMLMessages", EventLogEntryType.Information, False)
                                         MessageStartTime = Now
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1480,7 +1480,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "XMLMessagesDelegate.ProcessXMLMessages", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Catch ex As Exception
@@ -1490,7 +1490,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessXmlMessages", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ProcessXmlMessages", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1534,7 +1534,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ApplyValidationsForAddOrderTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ApplyValidationsForAddOrderTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1655,7 +1655,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidationsForAddSTDorISEOrderTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidationsForAddSTDorISEOrderTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1726,7 +1726,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidationsForAddOFFSOrderTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidationsForAddOFFSOrderTests", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1921,7 +1921,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidationsForAddCALCOrderTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidationsForAddCALCOrderTests", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2010,7 +2010,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidateDuplicateRequest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidateDuplicateRequest", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2112,7 +2112,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidateXmlMessage", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidateXmlMessage", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

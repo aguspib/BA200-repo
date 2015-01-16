@@ -19,10 +19,7 @@ Namespace Biosystems.Ax00.Global
     ''' <remarks></remarks>
     Public Class ApplicationLogManager
         Inherits GlobalBase
-        <Obsolete("This class is going to be converted to a Module. Do not create new instances of it! All its members are shared.")>
-        Sub New()
 
-        End Sub
 
 #Region "Declarations"
         Private Const TEMP_FOLDER As String = "TEMP"

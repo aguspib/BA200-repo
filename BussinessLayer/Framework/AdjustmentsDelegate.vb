@@ -45,8 +45,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AdjustmentsDelegate.CreateMasterData", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AdjustmentsDelegate.CreateMasterData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -79,7 +78,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AdjustmentsDelegate.ReadAdjustmentsFromDB", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AdjustmentsDelegate.ReadAdjustmentsFromDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -119,7 +118,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AdjustmentsDelegate.UpdateAdjustmentsDB", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AdjustmentsDelegate.UpdateAdjustmentsDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -159,7 +158,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AdjustmentsDelegate.InsertAdjustmentsDB", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AdjustmentsDelegate.InsertAdjustmentsDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -199,7 +198,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AdjustmentsDelegate.DeleteAdjustmentsDB", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AdjustmentsDelegate.DeleteAdjustmentsDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -269,7 +268,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AdjustmentsDelegate.CopyCurrentAdjustments", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AdjustmentsDelegate.CopyCurrentAdjustments", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

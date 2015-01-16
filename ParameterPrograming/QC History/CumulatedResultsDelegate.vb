@@ -51,7 +51,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -152,7 +152,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -264,7 +264,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetControlsLotsWithCumulatedSeries", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetControlsLotsWithCumulatedSeries", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -327,7 +327,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetCumulatedSeries", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetCumulatedSeries", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -366,7 +366,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetMinCumDateTime", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetMinCumDateTime", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -402,7 +402,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetMaxCumDateTime", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetMaxCumDateTime", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -562,7 +562,7 @@ Namespace Biosystems.Ax00.BL
 
                                         'Get the current logged User and set the current DateTime in the audit fields
                                         Dim myGlobalBase As New GlobalBase
-                                        myCumulatedResultRow.TS_User = myGlobalBase.GetSessionInfo.UserName
+                                        myCumulatedResultRow.TS_User = GlobalBase.GetSessionInfo.UserName
                                         myCumulatedResultRow.TS_DateTime = DateTime.Now
 
                                         myCumulatedResultDS.tqcCumulatedResults.AddtqcCumulatedResultsRow(myCumulatedResultRow)
@@ -793,7 +793,7 @@ Namespace Biosystems.Ax00.BL
 
                 '                        'Get the current logged User and set the current DateTime in the audit fields
                 '                        Dim myGlobalBase As New GlobalBase
-                '                        myCumulatedResultRow.TS_User = myGlobalBase.GetSessionInfo.UserName
+                '                        myCumulatedResultRow.TS_User = GlobalBase.GetSessionInfo.UserName
                 '                        myCumulatedResultRow.TS_DateTime = DateTime.Now
 
                 '                        myCumulatedResultDS.tqcCumulatedResults.AddtqcCumulatedResultsRow(myCumulatedResultRow)
@@ -882,7 +882,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.SaveCumulateResult", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.SaveCumulateResult", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -976,7 +976,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.DeleteFirstCumulated", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.DeleteFirstCumulated", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1049,7 +1049,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.RecalculateLastCumulatedValues", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.RecalculateLastCumulatedValues", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1080,7 +1080,7 @@ Namespace Biosystems.Ax00.BL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.CalculateSD", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.CalculateSD", EventLogEntryType.Error, False)
                 Throw ex
             End Try
             Return myCalculateSD
@@ -1126,7 +1126,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Create", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Create", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1224,7 +1224,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Delete", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.Delete", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1332,7 +1332,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetControlsLotsWithCumulatedSeries", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetControlsLotsWithCumulatedSeries", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1392,7 +1392,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetCumulatedSeries", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetCumulatedSeries", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1427,7 +1427,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetMinCumDateTime", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.GetMinCumDateTime", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1577,7 +1577,7 @@ Namespace Biosystems.Ax00.BL
 
         '                                'Get the current logged User and set the current DateTime in the audit fields
         '                                Dim myGlobalBase As New GlobalBase
-        '                                myCumulatedResultRow.TS_User = myGlobalBase.GetSessionInfo.UserName
+        '                                myCumulatedResultRow.TS_User = GlobalBase.GetSessionInfo.UserName
         '                                myCumulatedResultRow.TS_DateTime = DateTime.Now
 
         '                                myCumulatedResultDS.tqcCumulatedResults.AddtqcCumulatedResultsRow(myCumulatedResultRow)
@@ -1662,7 +1662,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.SaveCumulateResult", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.SaveCumulateResult", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1697,7 +1697,7 @@ Namespace Biosystems.Ax00.BL
         '        End If
         '    Catch ex As Exception
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.CalculateSD", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.CalculateSD", EventLogEntryType.Error, False)
         '        Throw ex
         '    End Try
         '    Return myCalculateSD
@@ -1787,7 +1787,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.DeleteFirstCumulated", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.DeleteFirstCumulated", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1857,7 +1857,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.RecalculateLastCumulatedValues", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "CumulatedResultsDelegate.RecalculateLastCumulatedValues", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function

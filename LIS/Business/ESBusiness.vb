@@ -92,7 +92,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                             'AG 07/03/2014 - #1533
                                         ElseIf resultData.AffectedRecords > 0 Then
                                             pISUploadResultsNotificationFlag = True 'Inform notification belongs to a previous upload results message
-                                            myLogAcciones.CreateLogActivity("Delivered notification - message uploading results: " & ID, "ESBusiness.TreatXMLNotification", EventLogEntryType.Information, False) 'AG 25/03/2014
+                                            GlobalBase.CreateLogActivity("Delivered notification - message uploading results: " & ID, "ESBusiness.TreatXMLNotification", EventLogEntryType.Information, False) 'AG 25/03/2014
                                             'AG 07/03/2014 - #1533
                                         End If
                                     End If
@@ -121,7 +121,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                             'AG 07/03/2014 - #1533
                                         ElseIf resultData.AffectedRecords > 0 Then
                                             pISUploadResultsNotificationFlag = True 'Inform notification belongs to a previous upload results message
-                                            myLogAcciones.CreateLogActivity("Undelivered notification - message uploading results: " & ID, "ESBusiness.TreatXMLNotification", EventLogEntryType.Information, False) 'AG 25/03/2014
+                                            GlobalBase.CreateLogActivity("Undelivered notification - message uploading results: " & ID, "ESBusiness.TreatXMLNotification", EventLogEntryType.Information, False) 'AG 25/03/2014
                                             'AG 07/03/2014 - #1533
                                         End If
                                     End If
@@ -149,7 +149,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                             'AG 07/03/2014 - #1533
                                         ElseIf resultData.AffectedRecords > 0 Then
                                             pISUploadResultsNotificationFlag = True 'Inform notification belongs to a previous upload results message
-                                            myLogAcciones.CreateLogActivity("Unresponded notification - message uploading results: " & ID, "ESBusiness.TreatXMLNotification", EventLogEntryType.Information, False) 'AG 25/03/2014
+                                            GlobalBase.CreateLogActivity("Unresponded notification - message uploading results: " & ID, "ESBusiness.TreatXMLNotification", EventLogEntryType.Information, False) 'AG 25/03/2014
                                             'AG 07/03/2014 - #1533
                                         End If
                                     End If
@@ -222,7 +222,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.TreatXMLNotification", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.TreatXMLNotification", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -248,7 +248,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 End If
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageIDFromNotification", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageIDFromNotification", EventLogEntryType.Error, False)
             End Try
             Return myID
         End Function
@@ -270,7 +270,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 End If
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageFiledFromNotification, on Position " + position, EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageFiledFromNotification, on Position " + position, EventLogEntryType.Error, False)
             End Try
             Return myFiled
         End Function
@@ -321,7 +321,7 @@ Namespace Biosystems.Ax00.LISCommunications
             '    resultData.ErrorMessage = ex.Message
 
             '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.UpdateExportStatus", EventLogEntryType.Error, False)
+            '    GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.UpdateExportStatus", EventLogEntryType.Error, False)
 
             'Finally
             '    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -399,7 +399,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.UpdateExportStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.UpdateExportStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -519,7 +519,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                         logTrace = ""
                                         logTrace = "Prepare results to upload: PATIENT, PatientID = " & patient & " , " & testInfo
-                                        myLogAcciones.CreateLogActivity(logTrace, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity(logTrace, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Information, False)
                                         'AG 16/12/2013
                                     Next
                                     tempDS.twksWSExecutions.AcceptChanges()
@@ -544,7 +544,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                         logTrace = ""
                                         logTrace = "Prepare results to upload: PATIENT, SampleID = " & sample & " , " & testInfo
-                                        myLogAcciones.CreateLogActivity(logTrace, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity(logTrace, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Information, False)
                                         'AG 16/12/2013
                                     Next
                                     tempDS.twksWSExecutions.AcceptChanges()
@@ -569,7 +569,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                     logTrace = ""
                                     logTrace = "Prepare results to upload: CONTROL, " & testInfo
-                                    myLogAcciones.CreateLogActivity(logTrace, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity(logTrace, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Information, False)
                                     'AG 16/12/2013
                                 Next
 
@@ -597,7 +597,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -673,7 +673,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                         logTrace = ""
                                         logTrace = "Prepare results to reject: PATIENT, ESPatientID = " & patient & " , " & testInfo
-                                        myLogAcciones.CreateLogActivity(logTrace, "ESBusiness.DivideAwosToRejectIntoSeveralMessages", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity(logTrace, "ESBusiness.DivideAwosToRejectIntoSeveralMessages", EventLogEntryType.Information, False)
                                         'AG 16/12/2013
                                     Next
                                     tempDS.twksOrderTestsLISInfo.AcceptChanges()
@@ -698,7 +698,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                     logTrace = ""
                                     logTrace = "Prepare results to reject: CONTROL, " & testInfo
-                                    myLogAcciones.CreateLogActivity(logTrace, "ESBusiness.DivideAwosToRejectIntoSeveralMessages", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity(logTrace, "ESBusiness.DivideAwosToRejectIntoSeveralMessages", EventLogEntryType.Information, False)
                                     'AG 16/12/2013
                                 Next
                                 tempDS.twksOrderTestsLISInfo.AcceptChanges()
@@ -725,7 +725,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.DivideAwosToRejectIntoSeveralMessages", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.DivideAwosToRejectIntoSeveralMessages", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -817,7 +817,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                             value.Add(subList)
                             'AG 02/01/2014 - BT #1433 (v211 patch2)
-                            myLogAcciones.CreateLogActivity("HQ message with specimens: " & specimensInMessage, "ESBusiness.DivideIntoSeveralHostQueryMessages", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("HQ message with specimens: " & specimensInMessage, "ESBusiness.DivideIntoSeveralHostQueryMessages", EventLogEntryType.Information, False)
                             specimensInMessage = String.Empty
                             'AG 02/01/2014 - BT #1433
                         Next
@@ -834,7 +834,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.DivideIntoSeveralHostQueryMessages", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.DivideIntoSeveralHostQueryMessages", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1031,7 +1031,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.AllowLISAction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.AllowLISAction", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1120,7 +1120,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.ExcludeNotMappedResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExcludeNotMappedResults", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1173,7 +1173,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESBusiness.ValidateLISMapping", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ValidateLISMapping", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

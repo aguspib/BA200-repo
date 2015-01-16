@@ -49,7 +49,7 @@ Public Class IConfigLISMapping
             Dim res As Boolean = False
 
             Dim myGlobalbase As New GlobalBase
-            If myGlobalbase.GetSessionInfo.UserLevel = "OPERATOR" Then
+            If GlobalBase.GetSessionInfo.UserLevel = "OPERATOR" Then
                 res = True
             End If
 
@@ -358,7 +358,7 @@ Public Class IConfigLISMapping
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) ' Use the same AnalyzerManager as the MDI
@@ -1303,7 +1303,7 @@ Public Class IConfigLISMapping
             MyClass.InitialModeScreenStatus()
 
             Dim myGlobalbase As New GlobalBase
-            CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             ScreenStatusByUserLevel()
 
         Catch ex As Exception

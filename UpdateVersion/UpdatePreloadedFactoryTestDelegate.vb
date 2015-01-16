@@ -92,7 +92,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgramming", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgramming", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -139,7 +139,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryISETestsProgramming", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryISETestsProgramming", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -194,7 +194,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryCALCTestsProgramming", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryCALCTestsProgramming", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -259,7 +259,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryOFFSTestsProgramming", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryOFFSTestsProgramming", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -336,7 +336,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgrammingNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgrammingNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -510,7 +510,7 @@ End Namespace
 '        resultData.ErrorMessage = ex.Message
 
 '        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgramming", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity(ex.Message, "UpdatePreloadedFactoryTestDelegate.SetFactoryTestProgramming", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try

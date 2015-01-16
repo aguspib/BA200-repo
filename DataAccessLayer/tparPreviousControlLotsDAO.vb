@@ -57,7 +57,7 @@ Partial Public Class tparPreviousControlLotsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparPreviousControlLotsDAO.SavePreviousLot", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparPreviousControlLotsDAO.SavePreviousLot", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -104,7 +104,7 @@ Partial Public Class tparPreviousControlLotsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparPreviousControlLotsDAO.Read", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparPreviousControlLotsDAO.Read", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -144,7 +144,7 @@ Partial Public Class tparPreviousControlLotsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparPreviousControlLotsDAO.Delete", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparPreviousControlLotsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function

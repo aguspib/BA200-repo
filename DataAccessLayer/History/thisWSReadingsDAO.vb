@@ -58,7 +58,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisWSReadingsDAO.InsertNewReadings", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisWSReadingsDAO.InsertNewReadings", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -100,7 +100,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "thisWSReadingsDAO.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "thisWSReadingsDAO.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function

@@ -3318,7 +3318,7 @@ Public Class IPhotometryAdjustments
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -3330,7 +3330,7 @@ Public Class IPhotometryAdjustments
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -4384,7 +4384,7 @@ Public Class IPhotometryAdjustments
     '    Try
     '        ' Save BLDC Test
     '        Dim myGlobalbase As New GlobalBase
-    '        Dim myPathBLFile As String = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+    '        Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
     '        myGlobal = myScreenDelegate.SaveBLDCFile(myPathBLFile)
     '        If myGlobal.HasError Then
     '            PrepareErrorMode()

@@ -63,8 +63,8 @@ Public NotInheritable Class IAboutBox
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim LanguageIDGlobal As New GlobalBase
-            LanguageID = LanguageIDGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim LanguageIDGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()

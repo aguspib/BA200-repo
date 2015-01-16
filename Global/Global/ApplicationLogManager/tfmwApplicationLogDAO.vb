@@ -72,7 +72,7 @@ Namespace Biosystems.Ax00.Global.DAL
                                 myGlobalDataTO.ErrorMessage = ex.Message
 
                                 Dim myLogAcciones As New ApplicationLogManager()
-                                myLogAcciones.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Create", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Create", EventLogEntryType.Error, False)
                             End If
                         End Try
                         'DL 16/07/2012. End
@@ -251,7 +251,7 @@ Namespace Biosystems.Ax00.Global.DAL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Delete", EventLogEntryType.Error, False)
             Finally
                 'Close the open connection
                 myDBConnection.Close()
@@ -293,7 +293,7 @@ Namespace Biosystems.Ax00.Global.DAL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.DeleteByDate", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.DeleteByDate", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function

@@ -169,7 +169,7 @@ Public Class IBarCodeEdit
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase()
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for Screen Buttons
             PrepareButtons()

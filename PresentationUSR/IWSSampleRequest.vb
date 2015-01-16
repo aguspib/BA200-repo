@@ -274,7 +274,7 @@ Public Class IWSSampleRequest
             Cursor = Cursors.Default
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest Execute Import (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest Execute Import (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.ExecuteImportFromLIMSProcess", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -2767,7 +2767,7 @@ Public Class IWSSampleRequest
                 Cursor = Cursors.Default
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("IWSampleRequest Delete Patient Request(Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("IWSampleRequest Delete Patient Request(Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "IWSampleRequest.DeletePatients", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             End If
@@ -6186,7 +6186,7 @@ Public Class IWSSampleRequest
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
@@ -8446,7 +8446,7 @@ Public Class IWSSampleRequest
             SaveWSWithPositioning()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest Send to Position And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest Send to Position And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.bsOpenRotor_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
@@ -8475,7 +8475,7 @@ Public Class IWSSampleRequest
             SaveWSWithoutPositioning()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest Save Without POS WS And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest Save Without POS WS And Close (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.bsExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -8509,7 +8509,7 @@ Public Class IWSSampleRequest
             ScreenLoad()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IWSampleRequest.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IWSampleRequest.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IWSampleRequest.WS_Preparation_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
@@ -8813,7 +8813,7 @@ Public Class IWSSampleRequest
 
     '    'Get the current Language from the current Application Session
     '    Dim currentLanguageGlobal As New GlobalBase
-    '    Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+    '    Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
     '    'Get the list of Sample Tube Types (for the ComboBox column of TubeType in all the grids)
     '    Dim myGlobalDataTO As New GlobalDataTO

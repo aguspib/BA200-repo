@@ -24,8 +24,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim cmdText As String = ""
 
                         If (pLanguageID = "") Then
-                            Dim myLocalBase As New GlobalBase
-                            pLanguageID = myLocalBase.GetSessionInfo.ApplicationLanguage
+                            pLanguageID = GlobalBase.GetSessionInfo.ApplicationLanguage
                         End If
 
 
@@ -56,7 +55,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwInfoDocumentsDAO.ReadDocumentPath", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwInfoDocumentsDAO.ReadDocumentPath", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

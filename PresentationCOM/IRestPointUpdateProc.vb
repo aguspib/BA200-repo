@@ -639,7 +639,7 @@ Public Class IRestPointUpdateProc
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(CurrentLanguage)
@@ -992,7 +992,7 @@ Public Class IRestPointUpdateProc
                 Dim newLanguageID As String = myGlobalDataTO.SetDatos.ToString()
                 Dim currentSession As New GlobalBase
                 Dim myApplicationInfoSessionTO As New ApplicationInfoSessionTO
-                myApplicationInfoSessionTO = currentSession.GetSessionInfo()
+                myApplicationInfoSessionTO = GlobalBase.GetSessionInfo()
                 'Validate if language is diferent than the current use languae.
                 If Not myApplicationInfoSessionTO.ApplicationLanguage = newLanguageID Then
                     'Initialize session information.

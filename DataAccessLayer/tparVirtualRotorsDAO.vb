@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -118,7 +118,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorTypeAndVirtualRotorName", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.ReadByRotorTypeAndVirtualRotorName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                               " VALUES ('" & pRotorType & "', " & _
                                      " N'" & pVirtualRotorName.Replace("'", "''") & "', " & _
                                              Convert.ToInt32(IIf(pInternalRotor, 1, 0)) & ", " & _
-                                     " N'" & objGlobal.GetSessionInfo.UserName.Replace("'", "''") & "', " & _
+                                     " N'" & GlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', " & _
                                       " '" & Now.ToString("yyyyMMdd HH:mm:ss") & "') "
 
                     'Execute the SQL sentence 
@@ -188,7 +188,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -233,7 +233,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparVirtualRotorsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function

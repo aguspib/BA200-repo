@@ -41,7 +41,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.FindLastCurveID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.FindLastCurveID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -116,7 +116,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.InsertCurve", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.InsertCurve", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -179,7 +179,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.UpdateCurve", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.UpdateCurve", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -226,7 +226,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ExistsCurveResult", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ExistsCurveResult", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -279,7 +279,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ReadCurve", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ReadCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -326,7 +326,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteResultsByOrderTestId", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteResultsByOrderTestId", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -364,7 +364,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteCurve", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteCurve", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -408,7 +408,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteForNOTCALCCalibrators", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteForNOTCALCCalibrators", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

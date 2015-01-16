@@ -56,7 +56,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByStdOrderTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByStdOrderTest", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -110,7 +110,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByCalcOrderTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "vwksOrderCalculatedTestsDAO.ReadByCalcOrderTest", EventLogEntryType.Error, False)
             End Try
 
             Return resultData

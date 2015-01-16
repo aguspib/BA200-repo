@@ -125,7 +125,7 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculatePreloadedConcentrationCorrection", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculatePreloadedConcentrationCorrection", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -158,7 +158,7 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.GetSlopeValues", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationISEDelegate.GetSlopeValues", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -214,7 +214,7 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculateUserDefinedConcentrationCorrection", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculateUserDefinedConcentrationCorrection", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

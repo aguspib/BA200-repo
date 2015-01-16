@@ -636,7 +636,7 @@ Public Class IAx00Login
 
                     'SGM 07/11/2012 - log app ends
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
 
                     Close()
                 End If
@@ -1173,7 +1173,7 @@ Public Class IAx00Login
         Try
             Dim mydbmngDelegate As New DataBaseManagerDelegate()
 
-            'myLogAcciones.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
             myGlobalDataTO = mydbmngDelegate.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword)
 
         Catch ex As Exception

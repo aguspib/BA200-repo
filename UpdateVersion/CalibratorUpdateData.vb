@@ -75,7 +75,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALIBRATORS Update Version Error", "CalibratorUpdateData.ProcessForCALIBRATORS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("CALIBRATORS Update Version Error", "CalibratorUpdateData.ProcessForCALIBRATORS", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -136,7 +136,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALIBRATORS Update Version Error", "CalibratorUpdateData.UpdateRenamedCalibrator", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("CALIBRATORS Update Version Error", "CalibratorUpdateData.UpdateRenamedCalibrator", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -200,7 +200,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALIBRATORS Update Version Error", "CalibratorUpdateData.RenameCalibratorName", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("CALIBRATORS Update Version Error", "CalibratorUpdateData.RenameCalibratorName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -241,7 +241,7 @@ End Namespace
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Calibrator Update Error.", "CalibratorUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrator Update Error.", "CalibratorUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -275,7 +275,7 @@ End Namespace
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Calibrator Update Error.", "CalibratorUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrator Update Error.", "CalibratorUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -302,7 +302,7 @@ End Namespace
 
 '            'Catch ex As Exception
 '            'Dim myLogAcciones As New ApplicationLogManager()
-'            'myLogAcciones.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.IsFactoryDefinedItem", EventLogEntryType.Error, False)
+'            'GlobalBase.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.IsFactoryDefinedItem", EventLogEntryType.Error, False)
 '            'End Try
 
 '            Return False
@@ -327,7 +327,7 @@ End Namespace
 '                myGlobalDataTO = CalibratorUpdateDAO.GetCalibratorsDistinctInClient(pDBConnection)
 
 '            Catch ex As Exception
-'                myLogAcciones.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -373,7 +373,7 @@ End Namespace
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.DoCreateNewElement", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.DoCreateNewElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -473,7 +473,7 @@ End Namespace
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.DoUpdateUserDefinedElement", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.DoUpdateUserDefinedElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -501,7 +501,7 @@ End Namespace
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.GetAffectedItemsFromFactoryRemoves", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.GetAffectedItemsFromFactoryRemoves", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -526,7 +526,7 @@ End Namespace
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.DoRemoveFactoryElement", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.DoRemoveFactoryElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -553,7 +553,7 @@ End Namespace
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.IsDataEmpty", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity("Calibrators Update Error.", "CalibratorUpdateData.IsDataEmpty", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message

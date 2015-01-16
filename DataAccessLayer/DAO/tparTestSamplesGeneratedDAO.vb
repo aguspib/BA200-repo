@@ -38,15 +38,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestSamplesDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestSamplesDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestSamplesDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestSamplesDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestSamplesDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestSamplesDAO", EventLogEntryType.Error, False)
             Finally
                 conn.Close()
             End Try
@@ -95,7 +95,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesDAO.UpdateDefaultSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesDAO.UpdateDefaultSampleType", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
