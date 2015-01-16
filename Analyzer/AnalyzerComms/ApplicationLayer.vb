@@ -3,11 +3,14 @@ Option Strict On
 
 Imports Microsoft.Win32
 Imports System.IO.Ports
+Imports System.Management
+Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 'Imports System.Configuration
 Imports Biosystems.Ax00.Types 'AG 17/01/2011
-Imports Biosystems.Ax00.BL 'SGM 08/03/11
+Imports Biosystems.Ax00.BL
+Imports Timer = System.Timers.Timer 'SGM 08/03/11
 'Imports Biosystems.Ax00.DAL.DAO 'SGM 21/09/2011
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
@@ -26,7 +29,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private FlagRetry As Boolean
 
         ''// Timer para el Control de los tiempos previstos/máximos para el envío/ejecución de las Tramas
-        Private TimerControl As New System.Timers.Timer()
+        Private TimerControl As New Timer()
 
         '// flag para la identificación de errores en los tiempos/intentos de envío/ejecución de las Tramas
         Private ReadOnly FlagERROR As Boolean
@@ -694,7 +697,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         'Is needed in order the application continues working
-                        System.Windows.Forms.Application.DoEvents()
+                        Application.DoEvents()
                     Loop
                 End If
 
@@ -770,20 +773,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Dim qPort As New List(Of Management.ManagementObject)
                 'search the post modem and virtual ports
-                Dim InternalDev As Management.ManagementObjectSearcher = _
-                  New Management.ManagementObjectSearcher("SELECT * FROM Win32_POTSModem")
+                Dim InternalDev As ManagementObjectSearcher = _
+                  New ManagementObjectSearcher("SELECT * FROM Win32_POTSModem")
 
                 If InternalDev.Get.Count > 0 Then
                     'Go throught the list of devices.
-                    For Each myManagObj As Management.ManagementObject In InternalDev.Get
+                    For Each myManagObj As ManagementObject In InternalDev.Get
                         'add the device to the invalid ports name list.
                         InvalidPortsName &= "," & myManagObj.Properties.Item("DeviceType").Value.ToString()
                     Next
                 End If
-                InternalDev = New Management.ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity")
+                InternalDev = New ManagementObjectSearcher("SELECT * FROM Win32_PnPEntity")
                 If InternalDev.Get.Count > 0 Then
                     'go throught the list of devices.
-                    For Each myManagObj As Management.ManagementObject In InternalDev.Get
+                    For Each myManagObj As ManagementObject In InternalDev.Get
                         'validate the device with the list of ports.
                         For Each myPort As String In pPorts
 
@@ -1358,7 +1361,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         ' XBC 18/10/2011
                     Case GlobalEnumerates.AppLayerEventList.SOUND
-                        myGlobal = Me.SendSoundInstruction(True)
+                        myGlobal = Me.SendSOUNDInstruction(True)
                         Exit Select
 
                         ' XBC 18/10/2011
@@ -1418,7 +1421,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         ' XBC 20/09/2011
                         Exit Select
 
-                        
+
 
                         ' XBC 03/05/2011
                     Case GlobalEnumerates.AppLayerEventList.LOADADJ
@@ -1625,7 +1628,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
 
-                myGlobal.SetDatos = MyClass.myFwAdjustmentsDS
+                myGlobal.SetDatos = myFwAdjustmentsDS
 
             Catch ex As Exception
                 myGlobal.HasError = True
@@ -1646,7 +1649,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
                 If pAdjustmentsDS IsNot Nothing Then
-                    MyClass.myFwAdjustmentsDS = pAdjustmentsDS
+                    myFwAdjustmentsDS = pAdjustmentsDS
                     myGlobal.SetDatos = pAdjustmentsDS
                 End If
 
@@ -1669,7 +1672,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
 
-                myGlobal.SetDatos = MyClass.myISEInformationDS
+                myGlobal.SetDatos = myISEInformationDS
 
             Catch ex As Exception
                 myGlobal.HasError = True
@@ -1690,7 +1693,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
                 If pISEInfoDS IsNot Nothing Then
-                    MyClass.myISEInformationDS = pISEInfoDS
+                    myISEInformationDS = pISEInfoDS
                     myGlobal.SetDatos = pISEInfoDS
                 End If
 
@@ -1863,9 +1866,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal = myAdjustmentsDelegate.ReadAdjustmentsFromDB(Nothing, pAnalyzerID)
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
 
-                    MyClass.myFwAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
+                    myFwAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
 
-                    With MyClass.myFwAdjustmentsDS
+                    With myFwAdjustmentsDS
                         .AnalyzerModel = "Simulated Analyzer"
                         .FirmwareVersion = "Simulated Firmware"
                         .ReadedDatetime = Nothing
@@ -1889,7 +1892,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                         Dim myFileAdjustmentsDS As SRVAdjustmentsDS = Nothing
-                        Dim myFwAdjustmentsDelegate As New FwAdjustmentsDelegate(MyClass.myFwAdjustmentsDS)
+                        Dim myFwAdjustmentsDelegate As New FwAdjustmentsDelegate(myFwAdjustmentsDS)
                         myGlobal = myFwAdjustmentsDelegate.ConvertReceivedDataToDS(myData, "Simulated Analyzer", "Simulated Firmware")
 
                         If myGlobal.SetDatos IsNot Nothing And Not myGlobal.HasError Then
@@ -1898,28 +1901,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'if any of the adjustments in DB is empty fill with the existing in file
                         Dim isChanged As Boolean = False
-                        If MyClass.myFwAdjustmentsDS IsNot Nothing Then
+                        If myFwAdjustmentsDS IsNot Nothing Then
                             If myFileAdjustmentsDS IsNot Nothing Then
-                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
+                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
                                     If D.Value.Trim.Length = 0 Then
                                         For Each F As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myFileAdjustmentsDS.srv_tfmwAdjustments.Rows
                                             If String.Compare(F.CodeFw.ToUpper.Trim, D.CodeFw.ToUpper.Trim, False) = 0 Then
-                                                MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
+                                                myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
                                                 D.Value = F.Value.Trim
-                                                MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
-                                                MyClass.myFwAdjustmentsDS.AcceptChanges()
+                                                myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
+                                                myFwAdjustmentsDS.AcceptChanges()
                                                 isChanged = True
                                                 Exit For
                                             End If
                                         Next
                                     End If
                                 Next D
-                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
+                                For Each D As SRVAdjustmentsDS.srv_tfmwAdjustmentsRow In myFwAdjustmentsDS.srv_tfmwAdjustments.Rows
                                     If D.Value.Trim.Length = 0 Then
-                                        MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
+                                        myFwAdjustmentsDS.srv_tfmwAdjustments.BeginInit()
                                         D.Value = "0"
-                                        MyClass.myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
-                                        MyClass.myFwAdjustmentsDS.AcceptChanges()
+                                        myFwAdjustmentsDS.srv_tfmwAdjustments.EndInit()
+                                        myFwAdjustmentsDS.AcceptChanges()
                                         isChanged = True
                                     End If
                                 Next
@@ -2328,7 +2331,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'SGM Track 
-                MyClass.ResponseTrack = DateTime.Now 'SGM 03/07/2012 just for debugging timing improvement
+                ResponseTrack = DateTime.Now 'SGM 03/07/2012 just for debugging timing improvement
                 'end Track
 
                 Select Case myInstParameterTO.Parameter
@@ -2773,7 +2776,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'END instruction time
                     If myInstructionsList IsNot Nothing AndAlso myInstructionsList.Count > 0 Then
                         Dim myENDInstruction As InstructionTO = myInstructionsList(myInstructionsList.Count - 1)
-                        MyClass.EndInstructionTime = myENDInstruction.Timer
+                        EndInstructionTime = myENDInstruction.Timer
                     End If
 
                 Else
@@ -4435,7 +4438,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 End If
 
-               
+
 
             Catch ex As Exception
                 myGlobal.HasError = True

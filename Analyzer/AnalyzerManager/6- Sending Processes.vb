@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports System.Data
+Imports System.Data.SqlClient
 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
@@ -642,13 +643,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 12/07/2012 - add parameter (optional pLookForISEExecutionsFlag). This parameter is informed only when call this method from ManageSendAndSearchNext
         '''                 and the ise requests is FALSE (I:0)
         ''' </remarks>
-        Private Function SearchNextPreparation(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
+        Private Function SearchNextPreparation(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
 
             'Dim resultData As New GlobalDataTO
             'Dim dbConnection As New SqlClient.SqlConnection
 
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 Dim StartTimeTotal As DateTime = Now
@@ -657,7 +658,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         Dim nextPreparationDS As New AnalyzerManagerDS
@@ -885,14 +886,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pRejected " ></param>
         ''' <returns>GlobalDataTo with error or not. ByRef prejected updated</returns>
         ''' <remarks>AG 17/01/2011</remarks>
-        Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
+        Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         pRejected = False
@@ -944,16 +945,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/0/2011
         ''' AG 24/11/2011 - Priority 1st Contaminated well, 2on Rejected Well + change the business to prepare the contaminated well washing</remarks>
-        Private Function CheckRejectedContaminatedNextWell(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNextWell As Integer, _
+        Private Function CheckRejectedContaminatedNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, _
                                                     ByRef pRejectedWell As Boolean, ByRef pContaminatedWell As Boolean, _
                                                     ByRef pWashSol1 As String, ByRef pWashSol2 As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         pContaminatedWell = False 'Initialize return byref variables
@@ -1088,14 +1089,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pExecutionISEFound"></param>
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/01/2011</remarks>
-        Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
+        Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         If ISEModuleIsReadyAttribute Then '(3) 'Search ISE prep only when the ISE module is ready
@@ -1135,15 +1136,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by: RH 26/06/2012
         ''' AG 11/07/2012 - remove IseModuleIsReadyAttribute from IF (now Sw search next using the status accepted instruction and this instruction contains the field I:0)
         ''' </remarks>
-        Private Function SearchNextISEPreparationNEW(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function SearchNextISEPreparationNEW(ByVal pDBConnection As SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     'If (Not dbConnection Is Nothing) AndAlso ISEModuleIsReadyAttribute Then
                     If (Not dbConnection Is Nothing) Then
@@ -1186,16 +1187,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pSampleClassFound" ></param>
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/01/2011</remarks>
-        Private Function SearchNextSTDPreparation(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pExecutionSTDFound As Integer, _
+        Private Function SearchNextSTDPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionSTDFound As Integer, _
                                                   ByRef pReagentWashFlag As Boolean, ByRef pWashSol1 As String, _
                                                   ByRef pWashSol2 As String, ByRef pSampleClassFound As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         'Initialize byRef variables (parameters)
@@ -1342,15 +1343,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pNextWell"></param>
         ''' <returns></returns>
         ''' <remarks>Modified AG 10/01/2014</remarks>
-        Private Function AddNewSentPreparationsList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewPreparationSent As AnalyzerManagerDS, ByVal pNextWell As Integer) As GlobalDataTO
+        Private Function AddNewSentPreparationsList(ByVal pDBConnection As SqlConnection, ByVal pNewPreparationSent As AnalyzerManagerDS, ByVal pNextWell As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
 
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         If pNewPreparationSent.nextPreparation.Rows.Count > 0 Then '(3)
@@ -1522,7 +1523,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pHighContaminationPersitance"></param>
         ''' <returns>AnalyzerManager.searchNext inside a GlobalDataTo</returns>
         ''' <remarks>AG 25/01/2011 - Created</remarks>
-        Private Function GetNextExecution(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Private Function GetNextExecution(ByVal pDBConnection As SqlConnection, _
                                           ByRef pFound As Boolean, _
                                           ByVal pSTDExecutionList As ExecutionsDS, _
                                           ByVal pOrderID As String, _
@@ -1533,12 +1534,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                           ByVal pHighContaminationPersitance As Integer) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
 
@@ -2024,15 +2025,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by AG ?
         ''' Modified by AG 03/01/2011 - if pBaseLineWithAdjust = true (if ANSAL get current baselineid from twksWSBLines, else (FALSE) get from twksWSBLinesByWell
         ''' </remarks>
-        Private Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Private Function GetCurrentBaseLineID(ByVal pdbConnection As SqlConnection, ByVal pAnalyzerID As String, _
                                              ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pdbConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         If pBaseLineWithAdjust Then 'Base line with adjust (ANSAL instruction received)
@@ -2080,13 +2081,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by AG 20/05/2010
         ''' AG 03/01/2011 - new parameter pBaseLineWithAdjust if ANSAL then save into twksWSBLines, else save into twksWSBLinesByWell
         ''' </remarks>
-        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 myGlobal = DAOBase.GetOpenDBTransaction(pdbConnection)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(myGlobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         ' Method business
@@ -2175,15 +2176,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by AG 21/05/2010
         ''' AG 03/01/2011 - use twksWSBLines or twksWSBLinesByWell depending pBaseLineWithAdjust parameter value
         ''' </remarks>
-        Private Function GetNextBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Private Function GetNextBaseLineID(ByVal pdbConnection As SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pdbConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         Dim currBaseLineID As Integer = 0

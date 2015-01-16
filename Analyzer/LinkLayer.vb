@@ -1,6 +1,7 @@
 ﻿Imports System.Timers
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
+Imports CommunicationsAx00
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
     'Adapted from Enlace.vb (iPRO User Sw)
@@ -21,11 +22,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'Private cls_serialPort As New CommunicationsAx00.ChannelClass
         'RH 14/10/2010 Remove New
         'Private cls_serialPort As New CommunicationsAx00.Channel
-        Private cls_serialPort As CommunicationsAx00.Channel
-        Private cls_tmrReception As New System.Timers.Timer()
+        Private cls_serialPort As Channel
+        Private cls_tmrReception As New Timers.Timer()
         'RH 14/10/2010 Remove New
         'Private WithEvents cls_notifier As New CommunicationsAx00.ReceptionNotifier
-        Private WithEvents cls_notifier As CommunicationsAx00.ReceptionNotifier
+        Private WithEvents cls_notifier As ReceptionNotifier
 
 #End Region
 
@@ -79,7 +80,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Next
 
             'cls_serialPort = CreateObject("CommunicationsAx00.Channel") 'AG 21/04/2010
-            cls_serialPort = New CommunicationsAx00.Channel 'RH 14/10/2010
+            cls_serialPort = New Channel 'RH 14/10/2010
 
             If Not cls_serialPort.Init() Then
                 Throw New Exception("[Link][Start] --->> Exception: Not cls_serialPort.Init()") 'RH 07/03/2012
@@ -133,7 +134,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             'Try                
             Config = cls_serialPort.ChannelSettings(in_settings)
 
-            MyClass.CurrentSettings = in_settings
+            CurrentSettings = in_settings
 
             'RH 14/10/2010 It is a bad practice to catch an exception, do nothing with it and throw it again.
             'Catch an exception only if you want to do something with it
@@ -356,7 +357,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'Public Sub Terminar()
         Public Sub Terminate()
 
-            Try                
+            Try
                 'myLogAcciones.CreateLogActivity("[Link][Terminate] --->> Closing...", "Link.Terminate", EventLogEntryType.Information, False)
                 Me.StopComm()
 
@@ -407,7 +408,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
 
                 'result=cls_serialPort.Synchronize()
-                
+
             Catch ex As Exception
                 result = False
             End Try

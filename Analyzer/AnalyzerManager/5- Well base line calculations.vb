@@ -1,12 +1,14 @@
 ﻿Option Explicit On
 Option Strict On
 
+Imports System.ComponentModel
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Data
+Imports System.Data.SqlClient
 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
@@ -21,7 +23,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 12/06/2012 - Changed completely the worker now process the biochemical and well base line readings
         '''                 old method is commented, renamed as wellBaseLineWorker_DoWork_AG12062012 and moved to '9- Temporal Testing and Old Methods.vb'
         ''' </remarks>
-        Private Sub wellBaseLineWorker_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+        Private Sub wellBaseLineWorker_DoWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
             Dim resultData As New GlobalDataTO
 
             Try
@@ -83,7 +85,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub wellBaseLineWorker_RunWorkerCompleted(ByVal sender As System.Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
+        Private Sub wellBaseLineWorker_RunWorkerCompleted(ByVal sender As Object, ByVal e As RunWorkerCompletedEventArgs)
             Try
 
                 'AG 03/07/2012 - 
@@ -219,9 +221,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' AG 12/06/2012 - created (copied from wellBaseLineWorker_DoWork (v0.4.3)
         ''' </remarks>
-        Private Function ProcessWellBaseLineReadings(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
+        Private Function ProcessWellBaseLineReadings(ByVal pDBConnection As SqlConnection, ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 'AG 29/06/2012 - Running Cycles lost - Solution!
@@ -396,11 +398,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                              the insert in DAO)
         ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
         ''' </remarks>
-        Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlConnection, _
                                                        ByVal pInstructionReceived As List(Of InstructionParameterTO), _
                                                        ByRef pReadingCycleStatus As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
             Dim instructionSavedFlag As Boolean = False 'AG 21/05/2014 BT#1612, #1634 (update TR initial design)
 
             Try
@@ -673,7 +675,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Open a DB Transaction to UPDATE all affected Executions and INSERT the group of Readings
                     myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                        dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+                        dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
                         If (Not dbConnection Is Nothing) Then
                             'Update all affected Executions....and if not error, then insert the group of Readings
                             If (myToUpdateExecDS.twksWSExecutions.Rows.Count > 0) Then myGlobal = myExecutionDlg.UpdateReadingsFieldsNEW(dbConnection, myToUpdateExecDS)

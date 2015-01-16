@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports System.Xml
 Imports System.Data
+Imports System.Data.SqlClient
+Imports System.Windows.Forms
 'Imports System.Configuration
 Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -59,7 +61,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myISEParamXmlDS As New DataSet
 
                 Dim myISEParamXml As New XmlDocument
-                Dim myXmlPath As String = Windows.Forms.Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath
+                Dim myXmlPath As String = Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath
                 myISEParamXml.Load(myXmlPath)
                 myISEParamXmlDS.ReadXml(myXmlPath)
 
@@ -352,18 +354,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''              SA 01/12/2014 - Call to deprecated function UpdateStatusClosedNOK has been changed for the new version of that function (UpdateStatusClosedNOK_NEW)
         '''                              The old function was called by error and it has to be deleted
         ''' </remarks>
-        Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
+        Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
                                                  ByVal pISEMode As String, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 Dim myReturnValue As New ExecutionsDS
 
                 myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
                         Dim myDebugModeOn As Boolean
@@ -374,7 +376,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         'Decode the received ISE Result
-                        Dim myISECycle As GlobalEnumerates.ISECycles = GlobalEnumerates.ISECycles.NONE
+                        Dim myISECycle As ISECycles = ISECycles.NONE
                         Dim myISEResultStr As String = pISEResult.ReceivedResults
 
                         myGlobalDataTO = ConvertISETESTResultToISEResultTO(myISEResultStr, myDebugModeOn)
@@ -509,18 +511,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                             If (ISEError.IsCancelError) Then
                                                 Select Case (pISEResult.Errors(0).CancelErrorCode)
-                                                    Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_A
-                                                    Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_B
-                                                    Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_C
-                                                    Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_D
-                                                    Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_F
-                                                    Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_M
-                                                    Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_N
-                                                    Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_P
-                                                    Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_R
-                                                    Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_S
-                                                    Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_T
-                                                    Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = GlobalEnumerates.Alarms.ISE_ERROR_W
+                                                    Case ISEErrorTO.ISECancelErrorCodes.A : myAlarmID = Alarms.ISE_ERROR_A
+                                                    Case ISEErrorTO.ISECancelErrorCodes.B : myAlarmID = Alarms.ISE_ERROR_B
+                                                    Case ISEErrorTO.ISECancelErrorCodes.C : myAlarmID = Alarms.ISE_ERROR_C
+                                                    Case ISEErrorTO.ISECancelErrorCodes.D : myAlarmID = Alarms.ISE_ERROR_D
+                                                    Case ISEErrorTO.ISECancelErrorCodes.F : myAlarmID = Alarms.ISE_ERROR_F
+                                                    Case ISEErrorTO.ISECancelErrorCodes.M : myAlarmID = Alarms.ISE_ERROR_M
+                                                    Case ISEErrorTO.ISECancelErrorCodes.N : myAlarmID = Alarms.ISE_ERROR_N
+                                                    Case ISEErrorTO.ISECancelErrorCodes.P : myAlarmID = Alarms.ISE_ERROR_P
+                                                    Case ISEErrorTO.ISECancelErrorCodes.R : myAlarmID = Alarms.ISE_ERROR_R
+                                                    Case ISEErrorTO.ISECancelErrorCodes.S : myAlarmID = Alarms.ISE_ERROR_S
+                                                    Case ISEErrorTO.ISECancelErrorCodes.T : myAlarmID = Alarms.ISE_ERROR_T
+                                                    Case ISEErrorTO.ISECancelErrorCodes.W : myAlarmID = Alarms.ISE_ERROR_W
                                                 End Select
                                                 myExecutionAlarmsRow.AlarmID = myAlarmID.ToString
                                             Else
@@ -733,13 +735,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         'Validate the ISE Type to set the ISE Cycle
                                         Select Case pISEResult.ISEResultType
                                             Case ISEResultTO.ISEResultTypes.SER
-                                                myISECycle = GlobalEnumerates.ISECycles.SAMPLE
+                                                myISECycle = ISECycles.SAMPLE
                                                 Exit Select
                                             Case ISEResultTO.ISEResultTypes.URN
-                                                myISECycle = GlobalEnumerates.ISECycles.URINE1
+                                                myISECycle = ISECycles.URINE1
                                                 Exit Select
                                             Case ISEResultTO.ISEResultTypes.CAL
-                                                myISECycle = GlobalEnumerates.ISECycles.CALIBRATION
+                                                myISECycle = ISECycles.CALIBRATION
                                                 Exit Select
                                             Case Else
                                                 Exit Select
@@ -798,7 +800,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
-                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -1292,7 +1294,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myISEParamXml As New XmlDocument
                 'myISEParamXml.Load(Windows.Forms.Application.StartupPath.ToString() & ConfigurationManager.AppSettings("ISEParammetersFilePath").ToString())
                 'TR 25/01/2011 -Replace by corresponding value on global base.
-                myISEParamXml.Load(Windows.Forms.Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath)
+                myISEParamXml.Load(Application.StartupPath.ToString() & GlobalBase.ISEParammetersFilePath)
                 myResultDataSet.ReadXml(pXmlPath)
 
             Catch ex As Exception
@@ -1310,7 +1312,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 Dim myISEParamXmlDS As New DataSet
 
-                myISEParamXmlDS = MyClass.LoadISEModuleParammeters(Windows.Forms.Application.StartupPath.ToString() & _
+                myISEParamXmlDS = MyClass.LoadISEModuleParammeters(Application.StartupPath.ToString() & _
                                                                                 GlobalBase.ISEParammetersFilePath)
                 For Each iseRow As DataRow In myISEParamXmlDS.Tables("ResultErrorDescTable").Rows
                     myResultErrorDescHT.Add(iseRow("digit").ToString(), iseRow("ResultErrorDesc").ToString())
@@ -1335,7 +1337,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myISEParamXmlDS As New DataSet
 
                 'TR 25/01/2011
-                myISEParamXmlDS = LoadISEModuleParammeters(Windows.Forms.Application.StartupPath.ToString() & _
+                myISEParamXmlDS = LoadISEModuleParammeters(Application.StartupPath.ToString() & _
                                                                                 GlobalBase.ISEParammetersFilePath)
                 'TR 25/01/2011
                 For Each iseRow As DataRow In myISEParamXmlDS.Tables("AffectedElementTable").Rows
@@ -1356,7 +1358,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Sub FillISECancelErrorDescHT()
             Try
                 Dim myISEParamXmlDS As New DataSet
-                myISEParamXmlDS = LoadISEModuleParammeters(Windows.Forms.Application.StartupPath.ToString() & _
+                myISEParamXmlDS = LoadISEModuleParammeters(Application.StartupPath.ToString() & _
                                                                                 GlobalBase.ISEParammetersFilePath)
                 For Each iseRow As DataRow In myISEParamXmlDS.Tables("CancelErrorDescTable").Rows
                     myISEModuleErrorHT.Add(iseRow("code").ToString(), iseRow("CancelErrorDesc").ToString())
@@ -1623,20 +1625,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                     'it does not bring result errors
-                    If Not myIoneValuesStr.Contains(GlobalEnumerates.ISE_Electrodes.Cl.ToString & " ") Then
+                    If Not myIoneValuesStr.Contains(ISE_Electrodes.Cl.ToString & " ") Then
                         myIoneValuesStr = pISEResult.Substring(1, pISEResult.Length - 2).Trim()
                     End If
 
-                    Dim myLiPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.Li.ToString & " ")
-                    Dim myNaPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.Na.ToString & " ")
-                    Dim myKPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.K.ToString & " ")
-                    Dim myClPos As Integer = myIoneValuesStr.IndexOf(GlobalEnumerates.ISE_Electrodes.Cl.ToString & " ")
+                    Dim myLiPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.Li.ToString & " ")
+                    Dim myNaPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.Na.ToString & " ")
+                    Dim myKPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.K.ToString & " ")
+                    Dim myClPos As Integer = myIoneValuesStr.IndexOf(ISE_Electrodes.Cl.ToString & " ")
                     Dim myErrPos As Integer = myIoneValuesStr.LastIndexOf(" ")
 
                     'Lithium can be unused (urine tests)
                     If myLiPos >= 0 Then
                         Dim myLiStr As String = myIoneValuesStr.Substring(myLiPos, myNaPos - myLiPos).Trim
-                        Dim myLiValueStr As String = myLiStr.Substring(GlobalEnumerates.ISE_Electrodes.Li.ToString.Length + 1).Trim
+                        Dim myLiValueStr As String = myLiStr.Substring(ISE_Electrodes.Li.ToString.Length + 1).Trim
 
                         With myLiNaKClValues
                             If myLiValueStr.Contains("-") Then
@@ -1651,7 +1653,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Sodium
                     If myNaPos >= 0 Then
                         Dim myNaStr As String = myIoneValuesStr.Substring(myNaPos, myKPos - myNaPos).Trim
-                        Dim myNaValueStr As String = myNaStr.Substring(GlobalEnumerates.ISE_Electrodes.Na.ToString.Length + 1).Trim
+                        Dim myNaValueStr As String = myNaStr.Substring(ISE_Electrodes.Na.ToString.Length + 1).Trim
 
                         With myLiNaKClValues
                             If myNaValueStr.Contains("-") Then
@@ -1666,7 +1668,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Potassium 
                     If myKPos >= 0 Then
                         Dim myKStr As String = myIoneValuesStr.Substring(myKPos, myClPos - myKPos).Trim
-                        Dim myKValueStr As String = myKStr.Substring(GlobalEnumerates.ISE_Electrodes.K.ToString.Length + 1).Trim
+                        Dim myKValueStr As String = myKStr.Substring(ISE_Electrodes.K.ToString.Length + 1).Trim
 
                         With myLiNaKClValues
                             If myKValueStr.Contains("-") Then
@@ -1684,7 +1686,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         If myErrPos > myClPos + 3 Then
                             myClStr = myIoneValuesStr.Substring(myClPos, myErrPos - myClPos).Trim
                         End If
-                        Dim myClValueStr As String = myClStr.Substring(GlobalEnumerates.ISE_Electrodes.Cl.ToString.Length + 1).Trim
+                        Dim myClValueStr As String = myClStr.Substring(ISE_Electrodes.Cl.ToString.Length + 1).Trim
 
 
                         With myLiNaKClValues
@@ -1737,18 +1739,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     Dim myPumpValuesStr As String = pISEResult.Substring(1, pISEResult.Length - 2).Trim
 
-                    Dim myPumpAPos As Integer = myPumpValuesStr.IndexOf(GlobalEnumerates.ISE_Pumps.A.ToString & " ")
-                    Dim myPumpBPos As Integer = myPumpValuesStr.IndexOf(GlobalEnumerates.ISE_Pumps.B.ToString & " ")
-                    Dim myPumpWPos As Integer = myPumpValuesStr.IndexOf(GlobalEnumerates.ISE_Pumps.W.ToString & " ")
+                    Dim myPumpAPos As Integer = myPumpValuesStr.IndexOf(ISE_Pumps.A.ToString & " ")
+                    Dim myPumpBPos As Integer = myPumpValuesStr.IndexOf(ISE_Pumps.B.ToString & " ")
+                    Dim myPumpWPos As Integer = myPumpValuesStr.IndexOf(ISE_Pumps.W.ToString & " ")
 
 
                     If myPumpAPos >= 0 And myPumpBPos >= 0 And myPumpWPos >= 0 Then
                         Dim myPumpAStr As String = myPumpValuesStr.Substring(myPumpAPos, myPumpBPos - myPumpAPos).Trim
-                        Dim myPumpAValueStr As String = myPumpAStr.Substring(GlobalEnumerates.ISE_Pumps.A.ToString.Length + 1).Trim
+                        Dim myPumpAValueStr As String = myPumpAStr.Substring(ISE_Pumps.A.ToString.Length + 1).Trim
                         Dim myPumpBStr As String = myPumpValuesStr.Substring(myPumpBPos, myPumpWPos - myPumpBPos).Trim
-                        Dim myPumpBValueStr As String = myPumpBStr.Substring(GlobalEnumerates.ISE_Pumps.B.ToString.Length + 1).Trim
+                        Dim myPumpBValueStr As String = myPumpBStr.Substring(ISE_Pumps.B.ToString.Length + 1).Trim
                         Dim myPumpWStr As String = myPumpValuesStr.Substring(myPumpWPos).Trim
-                        Dim myPumpWValueStr As String = myPumpWStr.Substring(GlobalEnumerates.ISE_Pumps.W.ToString.Length + 1).Trim
+                        Dim myPumpWValueStr As String = myPumpWStr.Substring(ISE_Pumps.W.ToString.Length + 1).Trim
 
                         With myPumpValues
                             If myPumpAStr.Contains("-") Then
@@ -1815,18 +1817,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     Dim myBubbleValuesStr As String = pISEResult.Substring(1, pISEResult.Length - 2).Trim
 
-                    Dim myBubbleAPos As Integer = myBubbleValuesStr.IndexOf(GlobalEnumerates.ISE_Bubble_Detector.A.ToString & " ")
-                    Dim myBubbleMPos As Integer = myBubbleValuesStr.IndexOf(GlobalEnumerates.ISE_Bubble_Detector.M.ToString & " ")
-                    Dim myBubbleLPos As Integer = myBubbleValuesStr.IndexOf(GlobalEnumerates.ISE_Bubble_Detector.L.ToString & " ")
+                    Dim myBubbleAPos As Integer = myBubbleValuesStr.IndexOf(ISE_Bubble_Detector.A.ToString & " ")
+                    Dim myBubbleMPos As Integer = myBubbleValuesStr.IndexOf(ISE_Bubble_Detector.M.ToString & " ")
+                    Dim myBubbleLPos As Integer = myBubbleValuesStr.IndexOf(ISE_Bubble_Detector.L.ToString & " ")
 
 
                     If myBubbleAPos >= 0 And myBubbleMPos >= 0 And myBubbleLPos >= 0 Then
                         Dim myBubbleAStr As String = myBubbleValuesStr.Substring(myBubbleAPos, myBubbleMPos - myBubbleAPos).Trim
-                        Dim myBubbleAValueStr As String = myBubbleAStr.Substring(GlobalEnumerates.ISE_Bubble_Detector.A.ToString.Length + 1).Trim
+                        Dim myBubbleAValueStr As String = myBubbleAStr.Substring(ISE_Bubble_Detector.A.ToString.Length + 1).Trim
                         Dim myBubbleMStr As String = myBubbleValuesStr.Substring(myBubbleMPos, myBubbleLPos - myBubbleMPos).Trim
-                        Dim myBubbleMValueStr As String = myBubbleMStr.Substring(GlobalEnumerates.ISE_Bubble_Detector.M.ToString.Length + 1).Trim
+                        Dim myBubbleMValueStr As String = myBubbleMStr.Substring(ISE_Bubble_Detector.M.ToString.Length + 1).Trim
                         Dim myBubbleLStr As String = myBubbleValuesStr.Substring(myBubbleLPos).Trim
-                        Dim myBubbleLValueStr As String = myBubbleLStr.Substring(GlobalEnumerates.ISE_Bubble_Detector.L.ToString.Length + 1).Trim
+                        Dim myBubbleLValueStr As String = myBubbleLStr.Substring(ISE_Bubble_Detector.L.ToString.Length + 1).Trim
 
                         With myBubbleCalibValues
                             If myBubbleAValueStr.Contains("-") Then

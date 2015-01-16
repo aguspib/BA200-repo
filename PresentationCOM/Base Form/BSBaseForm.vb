@@ -78,29 +78,22 @@ Public Class BSBaseForm
 #End Region
 
 #Region "Constructor" 'SG 03/12/10
-
+    Private Shared skinsLoaded As Boolean = False
     Protected Friend Sub New()
+
+
+        'Set it BEFORE adding controls, so they're created with the appropriate skin settings, instead of creating them and modifying them later
+        If Not skinsLoaded Then
+            DevExpress.Skins.SkinManager.EnableFormSkins()
+            DevExpress.Skins.SkinManager.EnableMdiFormSkins()
+            skinsLoaded = True
+        End If
+
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
-        ' Add any initialization after the InitializeComponent() call.
 
-        'RH 06/05/2011 Enable Forms child and MDI Forms child skin feature in Title bar
-        DevExpress.Skins.SkinManager.EnableFormSkins()
-        DevExpress.Skins.SkinManager.EnableMdiFormSkins()
-
-        'MsgBoxLookAndFeel = New DevExpress.LookAndFeel.UserLookAndFeel(Me)
-        'MsgBoxLookAndFeel.SkinName = "DevExpress Style" '"iMaginary"
-        'MsgBoxLookAndFeel.Style = Me.LookAndFeel.Style
-        'MsgBoxLookAndFeel.UseDefaultLookAndFeel = Me.LookAndFeel.UseDefaultLookAndFeel
-        'MsgBoxLookAndFeel.UseWindowsXPTheme = Me.LookAndFeel.UseWindowsXPTheme
-
-        '#If DEBUG Then
-        '        Me.TopMost = False
-        '#Else
-        '        Me.TopMost =True 
-        '#End If
     End Sub
 
 #End Region
@@ -512,7 +505,7 @@ Public Class BSBaseForm
             End If 'AG 15/03/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+            CreateLogActivity(ex.Message, Me.Name & ".ShowMessage", EventLogEntryType.Error, False)
 
         End Try
 

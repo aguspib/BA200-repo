@@ -11,7 +11,7 @@ Imports Biosystems.Ax00.Global.TO
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
-    <Microsoft.VisualBasic.ComClass()> Public Class Instructions
+    <ComClass()> Public Class Instructions
 
 #Region "Declaration"
         Public ParameterList As New List(Of ParametersTO)
@@ -3177,7 +3177,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 qTestData = Nothing 'AG 02/08/2012 - free memory
                 qPositionData = Nothing 'AG 02/08/2012 - free memory
-                
+
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3631,7 +3631,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
                 qTestData = Nothing 'AG 02/08/2012 - free memory
                 qPositionData = Nothing 'AG 02/08/2012 - free memory
-                
+
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

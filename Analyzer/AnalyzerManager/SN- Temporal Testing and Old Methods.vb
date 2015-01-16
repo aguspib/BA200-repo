@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports System.Data
+Imports System.IO
 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
@@ -117,9 +118,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'SIMULATE
                 Dim myData As String = ""
                 'Dim myGlobalbase As New GlobalBase
-                Dim objReader As System.IO.StreamReader
+                Dim objReader As StreamReader
                 Dim path As String = pPath
-                objReader = New System.IO.StreamReader(path)
+                objReader = New StreamReader(path)
                 myData = objReader.ReadToEnd()
                 objReader.Close()
 

@@ -8,6 +8,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.InfoAnalyzer
 Imports System.Data
+Imports System.Data.SqlClient
 Imports System.Globalization
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
@@ -706,7 +707,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property IsLongTermDeactivation() As Boolean
             Get
                 Dim myGlobal As New GlobalDataTO
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LONG_TERM_DEACTIVATED)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LONG_TERM_DEACTIVATED)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     IsLongTermDeactivationAttr = (CInt(myGlobal.SetDatos) > 0)
                 Else
@@ -1146,7 +1147,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastElectrodesCalibrationResult1() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_RESULT1)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_RESULT1)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationResult1Attr = CType(myGlobal.SetDatos, String)
                     Return LastElectrodesCalibrationResult1Attr
@@ -1165,7 +1166,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastElectrodesCalibrationResult2() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_RESULT2)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_RESULT2)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationResult2Attr = CType(myGlobal.SetDatos, String)
                     Return LastElectrodesCalibrationResult2Attr
@@ -1185,7 +1186,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastElectrodesCalibrationError() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastElectrodesCalibrationErrorAttr
@@ -1205,7 +1206,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastPumpsCalibrationResult() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMPCAL_RESULT)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_PUMPCAL_RESULT)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastPumpsCalibrationResultAttr = CType(myGlobal.SetDatos, String)
                     Return LastPumpsCalibrationResultAttr
@@ -1225,7 +1226,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastPumpsCalibrationError() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMPCAL_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_PUMPCAL_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastPumpsCalibrationErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastPumpsCalibrationErrorAttr
@@ -1246,7 +1247,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastElectrodesCalibrationDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CALB_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastElectrodesCalibrationDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1266,7 +1267,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastPumpsCalibrationDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMP_CAL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_PUMP_CAL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastPumpsCalibrationDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1286,7 +1287,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastBubbleCalibrationResult() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLECAL_RESULT)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_BUBBLECAL_RESULT)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastBubbleCalibrationResultAttr = CType(myGlobal.SetDatos, String)
                     Return LastBubbleCalibrationResultAttr
@@ -1306,7 +1307,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastBubbleCalibrationError() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLECAL_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_BUBBLECAL_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastBubbleCalibrationErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastBubbleCalibrationErrorAttr
@@ -1327,7 +1328,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastBubbleCalibrationDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLE_CAL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_BUBBLE_CAL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastBubbleCalibrationDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1347,7 +1348,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastCleanDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CLEAN_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastCleanDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1367,7 +1368,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LastCleanError() As String
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_ERROR)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CLEAN_ERROR)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LastCleanErrorAttr = CType(myGlobal.SetDatos, String)
                     Return LastCleanErrorAttr
@@ -1427,7 +1428,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ReagentsPackExpirationDateAttr = MyClass.ISEDallasPage00Attr.ExpirationDate
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.REAGENTS_EXPIRE_DATE, True)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.REAGENTS_EXPIRE_DATE, True)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackExpirationDateAttr = CDate(myGlobal.SetDatos)
                     Else
@@ -1456,7 +1457,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ReagentsPackInstallationDateAttr = MyClass.ISEDallasPage01Attr.InstallationDate
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.REAGENTS_INSTALL_DATE, True)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.REAGENTS_INSTALL_DATE, True)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackInstallationDateAttr = CDate(myGlobal.SetDatos)
                     Else
@@ -1485,7 +1486,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     BiosystemsCodeAttr = MyClass.ISEDallasPage00Attr.DistributorCode
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.DISTRIBUTOR_CODE)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.DISTRIBUTOR_CODE)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         BiosystemsCodeAttr = CStr(myGlobal.SetDatos)
                     Else
@@ -1511,7 +1512,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ReagentsPackInitialVolCalAAttr = MyClass.ISEDallasPage00Attr.InitialCalibAVolume
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.INITIAL_VOL_CAL_A)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.INITIAL_VOL_CAL_A)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackInitialVolCalAAttr = CSng(myGlobal.SetDatos)
                     Else
@@ -1538,7 +1539,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ReagentsPackInitialVolCalBAttr = MyClass.ISEDallasPage00Attr.InitialCalibBVolume
                 Else
                     Dim myGlobal As New GlobalDataTO
-                    myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.INITIAL_VOL_CAL_B)
+                    myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.INITIAL_VOL_CAL_B)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         ReagentsPackInitialVolCalBAttr = CSng(myGlobal.SetDatos)
                     Else
@@ -1588,7 +1589,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property IsCleanPackInstalled() As Boolean
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.CLEANING_PACK_INSTALLED)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.CLEANING_PACK_INSTALLED)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     IsCleanPackInstalledAttr = (CInt(myGlobal.SetDatos) > 0)
                 Else
@@ -1761,7 +1762,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property LiInstallDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LI_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LI_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     LiInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1782,7 +1783,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property NaInstallDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.NA_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.NA_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     NaInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1803,7 +1804,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property KInstallDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.K_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.K_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     KInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1824,7 +1825,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property ClInstallDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.CL_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.CL_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     ClInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1845,7 +1846,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property RefInstallDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.REF_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.REF_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     RefInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -1955,7 +1956,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property IsLiEnabledByUser() As Boolean
             Get
                 Dim myGlobal As New GlobalDataTO
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LI_ENABLED)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LI_ENABLED)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     IsLiEnabledByUserAttr = (CInt(myGlobal.SetDatos) > 0)
                 Else
@@ -2243,7 +2244,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property PumpTubingInstallDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.PUMP_TUBING_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.PUMP_TUBING_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     PumpTubingInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -2273,7 +2274,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Property FluidicTubingInstallDate() As DateTime
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.FLUID_TUBING_INSTALL_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.FLUID_TUBING_INSTALL_DATE, True)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     FluidicTubingInstallDateAttr = CType(myGlobal.SetDatos, DateTime)
                 Else
@@ -2609,7 +2610,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 MyClass.AbortCurrentProcedureDueToException()
@@ -3384,7 +3385,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 MyClass.AbortCurrentProcedureDueToException()
@@ -3425,7 +3426,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -3491,13 +3492,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Dim mySWParametersDelegate As New SwParametersDelegate
 
                     'Get time needed for each Analyzer Cycle
-                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, True)
+                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, SwParameters.CYCLE_MACHINE.ToString, True)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myParametersDS = DirectCast(myGlobal.SetDatos, ParametersDS)
                         If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then cycleMachineTime = Convert.ToSingle(myParametersDS.tfmwSwParameters.First.ValueNumeric)
                     End If
 
-                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, GlobalEnumerates.SwParameters.ISE_EXECUTION_TIME_SER.ToString, True)
+                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, SwParameters.ISE_EXECUTION_TIME_SER.ToString, True)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myParametersDS = DirectCast(myGlobal.SetDatos, ParametersDS)
                         If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
@@ -3507,7 +3508,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         ISE_EXECUTION_TIME_SER = (ISE_EXECUTION_TIME_SER * cycleMachineTime) ' seconds
                     End If
 
-                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, GlobalEnumerates.SwParameters.ISE_EXECUTION_TIME_URI.ToString, True)
+                    myGlobal = mySWParametersDelegate.GetParameterByAnalyzer(Nothing, MyClass.AnalyzerIDAttr, SwParameters.ISE_EXECUTION_TIME_URI.ToString, True)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myParametersDS = DirectCast(myGlobal.SetDatos, ParametersDS)
                         If (myParametersDS.tfmwSwParameters.Rows.Count > 0) Then
@@ -3540,7 +3541,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -3763,7 +3764,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -3827,7 +3828,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -3862,7 +3863,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -3922,7 +3923,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -3940,7 +3941,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by  SG 16/02/2012
         ''' Modified by XB 04/02/2013 - Upper conversions must use Invariant Culture Info (Bugs tracking #1112)
         ''' </remarks>
-        Private Function GetISEParameterValue(ByVal pISEParameterName As GlobalEnumerates.SwParameters, Optional ByVal pIsTextValue As Boolean = False) As GlobalDataTO
+        Private Function GetISEParameterValue(ByVal pISEParameterName As SwParameters, Optional ByVal pIsTextValue As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.myISESwParametersDS IsNot Nothing Then
@@ -3973,7 +3974,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -3990,7 +3991,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pLimitEnum"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function GetISELimitValues(ByVal pLimitEnum As GlobalEnumerates.FieldLimitsEnum) As GlobalDataTO
+        Private Function GetISELimitValues(ByVal pLimitEnum As FieldLimitsEnum) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
 
@@ -4006,7 +4007,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4078,7 +4079,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Add parameter pIsDatetime. Datetime Format must be controled due ISE info may be loaded into systems with different culture info
         ''' Modified by SGM 29/01/2013 - DateTime to Invariant Format - Bug #1121
         ''' </remarks>
-        Public Function UpdateISEInfoSetting(ByVal pISESettingID As GlobalEnumerates.ISEModuleSettings, ByVal pValue As Object, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO
+        Public Function UpdateISEInfoSetting(ByVal pISESettingID As ISEModuleSettings, ByVal pValue As Object, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.AnalyzerIDAttr.Length > 0 AndAlso MyClass.myISEInfoDS IsNot Nothing Then
@@ -4111,7 +4112,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4132,7 +4133,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Add parameter pIsDatetime. Datetime Format must be controled due ISE info may be loaded into systems with different culture info
         ''' Modified by SGM 29/01/2013 - DateTime to Invariant Format - Bug #1121
         ''' </remarks>
-        Private Function GetISEInfoSettingValue(ByVal pISESettingID As GlobalEnumerates.ISEModuleSettings, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO
+        Private Function GetISEInfoSettingValue(ByVal pISESettingID As ISEModuleSettings, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.AnalyzerIDAttr.Length > 0 AndAlso MyClass.myISEInfoDS IsNot Nothing Then
@@ -4169,7 +4170,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4184,11 +4185,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pElectrode"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function GetElectrodeTestCount(ByVal pElectrode As GlobalEnumerates.ISE_Electrodes) As GlobalDataTO
+        Private Function GetElectrodeTestCount(ByVal pElectrode As ISE_Electrodes) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myConsumption As Integer = -1
-                Dim myISESetting As GlobalEnumerates.ISEModuleSettings = ISEModuleSettings.NONE
+                Dim myISESetting As ISEModuleSettings = ISEModuleSettings.NONE
 
                 Select Case pElectrode
                     Case ISE_Electrodes.Ref : myISESetting = ISEModuleSettings.REF_CONSUMPTION
@@ -4207,7 +4208,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4225,7 +4226,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pElectrode"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function CheckElectrodeExpired(ByVal pElectrode As GlobalEnumerates.ISE_Electrodes) As GlobalDataTO
+        Private Function CheckElectrodeExpired(ByVal pElectrode As ISE_Electrodes) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsExpired As Boolean = False
@@ -4256,7 +4257,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4271,7 +4272,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pElectrode"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 06/03/2012</remarks>
-        Private Function CheckElectrodeOverUsed(ByVal pElectrode As GlobalEnumerates.ISE_Electrodes) As GlobalDataTO
+        Private Function CheckElectrodeOverUsed(ByVal pElectrode As ISE_Electrodes) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsOverUsed As Boolean = False
@@ -4297,7 +4298,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4341,7 +4342,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (pForcedLiEnabledValue = TriState.UseDefault And MyClass.IsLiEnabledByUser) Or (pForcedLiEnabledValue = TriState.True) Then
                         'If MyClass.IsLiEnabledByUser Then
                         'Lithium
-                        myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_LI)
+                        myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_LI)
                         If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                             myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                             isLiOK = (myValues.Li > myLimits.MinValue And myValues.Li < myLimits.MaxValue)
@@ -4351,7 +4352,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Sodium
-                    myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_NA)
+                    myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_NA)
                     If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                         myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                         isNaOK = (myValues.Na > myLimits.MinValue And myValues.Na < myLimits.MaxValue)
@@ -4360,7 +4361,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Potassium
-                    myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_K)
+                    myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_K)
                     If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                         myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                         isKOK = (myValues.K > myLimits.MinValue And myValues.K < myLimits.MaxValue)
@@ -4369,7 +4370,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Chlorine
-                    myGlobal = MyClass.GetISELimitValues(GlobalEnumerates.FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_CL)
+                    myGlobal = MyClass.GetISELimitValues(FieldLimitsEnum.ISE_CALIB_ACCEPTABLE_CL)
                     If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                         myLimits = CType(myGlobal.SetDatos, FieldLimitsDS.tfmwFieldLimitsRow)
                         isClOK = (myValues.Cl > myLimits.MinValue And myValues.Cl < myLimits.MaxValue)
@@ -4411,7 +4412,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4439,7 +4440,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Dim myLimitList As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
 
                     myLimitList = (From a In MyClass.myISELimitsDS.tfmwFieldLimits _
-                                 Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.ISE_PUMPS_CALIBR_OK.ToString _
+                                 Where a.LimitID = FieldLimitsEnum.ISE_PUMPS_CALIBR_OK.ToString _
                                  Select a).ToList
 
                     If myLimitList.Count > 0 Then
@@ -4452,7 +4453,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4490,7 +4491,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4507,7 +4508,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pValue"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 16/02/2012</remarks>
-        Private Function ValidateDataLimits(ByVal pLimitsID As GlobalEnumerates.FieldLimitsEnum, ByVal pValue As Single) As GlobalDataTO
+        Private Function ValidateDataLimits(ByVal pLimitsID As FieldLimitsEnum, ByVal pValue As Single) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myResult As Boolean = False
@@ -4530,7 +4531,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4600,7 +4601,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4654,7 +4655,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4687,7 +4688,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4716,7 +4717,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4737,7 +4738,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4773,7 +4774,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4846,7 +4847,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4902,7 +4903,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4938,7 +4939,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -4988,7 +4989,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -5015,7 +5016,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'get Lst Clean flag
-                myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_DATE, True)
+                myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.LAST_CLEAN_DATE, True)
                 If Not myGlobal.HasError Then
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myLastCleanDate = CDate(myGlobal.SetDatos)
@@ -5029,7 +5030,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
                         Else
                             'get Maximum Test for requiring Sample
-                            myGlobal = MyClass.GetISEParameterValue(GlobalEnumerates.SwParameters.ISE_CLEAN_REQUIRED_SAMPLES)
+                            myGlobal = MyClass.GetISEParameterValue(SwParameters.ISE_CLEAN_REQUIRED_SAMPLES)
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 myMaximumTestsWithoutClean = CInt(myGlobal.SetDatos)
                                 If MyClass.TestsCountSinceLastClean >= myMaximumTestsWithoutClean Then
@@ -5072,7 +5073,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -5130,7 +5131,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Not MyClass.ISEDallasPage01.ValidationError Then
 
                                 'SGM 22/01/2013 - separate the algorithm
-                                myGlobal = ISEManager.BiosystemsValidationAlgorithm(MyClass.ISEDallasSN, MyClass.ISEDallasPage00)
+                                myGlobal = BiosystemsValidationAlgorithm(MyClass.ISEDallasSN, MyClass.ISEDallasPage00)
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                     result = CBool(myGlobal.SetDatos)
                                 End If
@@ -5147,7 +5148,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
@@ -5173,7 +5174,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -5322,7 +5323,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
@@ -5368,7 +5369,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myGlobal.SetDatos = False
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -5530,7 +5531,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -5550,7 +5551,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myParametersDS As New ParametersDS
             Try
                 ' Consumption of calibrator A by Serum Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SERUM_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SERUM_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbySerumAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5559,7 +5560,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Serum Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SERUM_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SERUM_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbySerumAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5568,7 +5569,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Urine (1st phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE1_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE1_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyUrine1Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5577,7 +5578,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Urine (1st phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE1_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE1_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyUrine1Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5586,7 +5587,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Urine (2nd phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE2_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE2_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyUrine2Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5595,7 +5596,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Urine (2nd phase) Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_URINE2_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_URINE2_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyUrine2Attr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5604,7 +5605,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Electrodes calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CALB_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CALB_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyElectrodesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5613,7 +5614,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Electrodes calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CALB_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CALB_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyElectrodesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5622,7 +5623,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Pumps calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PMCL_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PMCL_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPumpsCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5631,7 +5632,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Pumps calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PMCL_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PMCL_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPumpsCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5640,7 +5641,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Bubbles detector calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_BBCL_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_BBCL_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyBubblesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5649,7 +5650,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Bubbles detector calibration Test
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_BBCL_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_BBCL_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyBubblesCalAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5658,7 +5659,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Clean cycle Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CLEN_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CLEN_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyCleanCycleAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5667,7 +5668,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Clean cycle Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_CLEN_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_CLEN_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyCleanCycleAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5676,7 +5677,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PurgeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGA_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGA_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPurgeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5685,7 +5686,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PurgeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGA_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGA_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPurgeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5694,7 +5695,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PurgeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGB_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGB_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPurgeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5703,7 +5704,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PurgeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PUGB_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PUGB_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPurgeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5712,7 +5713,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PrimeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMA_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMA_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPrimeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5721,7 +5722,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PrimeA Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMA_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMA_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPrimeAAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5730,7 +5731,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by PrimeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMB_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMB_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbyPrimeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5739,7 +5740,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by PrimeB Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_PRMB_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_PRMB_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbyPrimeBAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5748,7 +5749,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator A by Sipping Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SIPPING_A.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SIPPING_A.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalAbySippingAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5757,7 +5758,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Consumption of calibrator B by Sipping Procedure
-                myGlobal = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.ISE_CONSUMPTION_SIPPING_B.ToString, Nothing)
+                myGlobal = myParams.ReadByParameterName(Nothing, SwParameters.ISE_CONSUMPTION_SIPPING_B.ToString, Nothing)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myParametersDS = CType(myGlobal.SetDatos, ParametersDS)
                     MyClass.ConsumptionCalBbySippingAttr = myParametersDS.tfmwSwParameters.Item(0).ValueNumeric
@@ -5769,7 +5770,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -5886,7 +5887,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6005,7 +6006,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6051,7 +6052,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6097,7 +6098,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6143,7 +6144,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6189,7 +6190,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6235,7 +6236,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6271,7 +6272,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6340,7 +6341,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6466,7 +6467,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6581,7 +6582,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 myglobal.SetDatos = False
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -6635,7 +6636,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                            (MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.RUNNING And MyClass.myAnalyzerManager.AllowScanInRunning) Then
                             ' XB 23/10/2013
 
-                            myGlobal = MyClass.myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, MyClass.CurrentCommandTO)
+                            myGlobal = MyClass.myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, MyClass.CurrentCommandTO)
                             If Not myGlobal.HasError Then
 
                                 ' XBC 05/09/2012 - Start Timeout must emplaced inside ManageAnalyzer
@@ -6653,7 +6654,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -7605,7 +7606,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
 
                             ' Ise Clean Pack wrong installed           
-                            If MyClass.CurrentProcedure = ISEManager.ISEProcedures.CheckCleanPackInstalled Then
+                            If MyClass.CurrentProcedure = ISEProcedures.CheckCleanPackInstalled Then
                                 Dim isFinished As Boolean = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                                 If isFinished And Not MyClass.IsCleanPackInstalled Then
 
@@ -8168,7 +8169,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by AG 11/01/2012
         ''' Updated by XBC 12/01/2012 - Add ISEModes Low_Level_Control functionalities
         ''' </remarks>
-        Public Function PrepareDataToSend(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pApplicationName As String, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Public Function PrepareDataToSend(ByVal pDBConnection As SqlConnection, ByVal pApplicationName As String, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                           ByVal pISEMode As ISEModes, ByVal pCmd As ISECommands, _
                                           Optional ByVal pParameter1 As String = "0", _
                                           Optional ByVal pParameter2 As String = "0", _
@@ -8176,14 +8177,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                           Optional ByVal pTubePosition As Integer = 1) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
 
                 'SGM 16/07/2012 Protection in case of null enter
                 If pISEMode = ISEModes.None Or pCmd = ISECommands.NONE Then
                     resultData.HasError = True
-                    resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                    resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                     Exit Try
                 End If
 
@@ -8192,7 +8193,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim myISECommand As New ISECommandTO
 
@@ -8223,11 +8224,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                         If .SampleVolume = -1 Then
                                             resultData.HasError = True
-                                            resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                            resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                             Exit Try
                                         End If
                                     Else
-                                        resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                        resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                         Exit Try
                                     End If
 
@@ -8295,11 +8296,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                         If .SampleVolume = -1 Then
                                             resultData.HasError = True
-                                            resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                            resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                             Exit Try
                                         End If
                                     Else
-                                        resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                        resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                         Exit Try
                                     End If
 
@@ -8369,7 +8370,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             Case Else
                                 resultData.HasError = True
-                                resultData.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                resultData.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
                                 Exit Try
                                 'With myISECommand
                                 '    .ISEMode = pISEMode
@@ -8394,7 +8395,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 MyClass.CurrentCommandTO = Nothing
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -9315,17 +9316,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pTubeType">ByRef</param>
         ''' <returns>Globaldata to with error or not</returns>
         ''' <remarks>AG 11/01/2012</remarks>
-        Private Function GetRequiredTubePositon(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
+        Private Function GetRequiredTubePositon(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, ByVal pWorkSessionID As String, _
                                      ByVal pTubeContent As String, ByVal pSolutionCode As String, _
                                      ByRef pFoundFlag As Boolean, ByRef pCellNumber As Integer, ByRef pTubeType As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim rcpDel As New WSRotorContentByPositionDelegate
                         Dim myRcpDS As New WSRotorContentByPositionDS
@@ -9387,7 +9388,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim paramsDlg As New SwParametersDelegate
                             Dim paramsDS As New ParametersDS
 
-                            resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, GlobalEnumerates.SwParameters.ISE_UTIL_WASHSOL_POSITION.ToString, True)
+                            resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.ISE_UTIL_WASHSOL_POSITION.ToString, True)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 paramsDS = CType(resultData.SetDatos, ParametersDS)
                                 If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
@@ -9405,7 +9406,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -9427,27 +9428,27 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pAnalyzerID"></param>
         ''' <returns>GlobalDataTo (integer)</returns>
         ''' <remarks>AG 11/01/2012</remarks>
-        Private Function GetRequiredTubeVolume(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
+        Private Function GetRequiredTubeVolume(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
                         Dim paramsDlg As New SwParametersDelegate
                         Dim paramsDS As New ParametersDS
 
-                        resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, GlobalEnumerates.SwParameters.ISE_UTIL_VOLUME.ToString, True)
+                        resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.ISE_UTIL_VOLUME.ToString, True)
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             paramsDS = CType(resultData.SetDatos, ParametersDS)
                             If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
                                 Dim volume As Single = paramsDS.tfmwSwParameters(0).ValueNumeric
 
-                                resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, GlobalEnumerates.SwParameters.SAMPLE_STEPS_UL.ToString, False)
+                                resultData = paramsDlg.GetParameterByAnalyzer(dbConnection, pAnalyzerID, SwParameters.SAMPLE_STEPS_UL.ToString, False)
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     paramsDS = CType(resultData.SetDatos, ParametersDS)
                                     If paramsDS.tfmwSwParameters.Rows.Count > 0 Then
@@ -9466,7 +9467,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
-                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()

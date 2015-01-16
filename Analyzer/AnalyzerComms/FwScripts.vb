@@ -4,6 +4,7 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports System.Windows.Forms
 Imports System.IO
+Imports System.Threading
 Imports System.Xml.Serialization
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
@@ -93,10 +94,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'end SGM 19/12/2011
                 End If
 
-                myGlobalDataTO = MyClass.GetFwScriptData()
+                myGlobalDataTO = GetFwScriptData()
 
                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO Is Nothing Then
-                    MyClass.FwScriptsData = CType(myGlobalDataTO.SetDatos, FwScriptsDataTO)
+                    FwScriptsData = CType(myGlobalDataTO.SetDatos, FwScriptsDataTO)
                 End If
 
                 If myGlobalDataTO.ErrorCode IsNot Nothing Then
@@ -130,12 +131,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myGlobalbase As New GlobalBase
                 Dim XMLFactoryFwScriptFileNamePath As String = Application.StartupPath & myGlobalbase.FactoryXmlFwScripts
 
-                resultData = MyClass.ImportFwScriptsDataFromXML(OriginalFwScriptsData.GetType, XMLFactoryFwScriptFileNamePath, True)
+                resultData = ImportFwScriptsDataFromXML(OriginalFwScriptsData.GetType, XMLFactoryFwScriptFileNamePath, True)
 
                 If Not resultData.HasError And Not resultData Is Nothing Then
                     Dim myFwScriptsData As New FwScriptsDataTO
                     myFwScriptsData = CType(resultData.SetDatos, FwScriptsDataTO)
-                    resultData = MyClass.CheckFwScriptData(myFwScriptsData)
+                    resultData = CheckFwScriptData(myFwScriptsData)
                     If Not resultData.HasError And Not resultData Is Nothing Then
                         resultData.SetDatos = myFwScriptsData
                     End If
@@ -174,7 +175,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'make a backup of the current Scripts data file
                     File.Copy(Application.StartupPath & GlobalBase.XmlFwScripts, Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting, True)
 
-                    System.Threading.Thread.Sleep(1)
+                    Thread.Sleep(1)
                     'import the file
                     File.Copy(pPath, Application.StartupPath & GlobalBase.XmlFwScripts, True)
                 End If
@@ -236,10 +237,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 'first make a safety copy
-                CopyOfFwScriptsData = MyClass.FwScriptsData.Clone
+                CopyOfFwScriptsData = FwScriptsData.Clone
 
                 'second update the Application's ScriptsData
-                MyClass.FwScriptsData = pNewFwScriptsData.Clone
+                FwScriptsData = pNewFwScriptsData.Clone
 
                 'third update the Scripts Data XML File
                 'make a safety copy of the file
@@ -602,7 +603,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pFwScriptID <> "" Then
                     Dim myFwScript As New List(Of FwScriptTO)
 
-                    myFwScript = (From s In MyClass.FwScriptsDataAttribute.FwScripts _
+                    myFwScript = (From s In FwScriptsDataAttribute.FwScripts _
                                                Where s.ActionID = pFwScriptID _
                                                Select s).ToList()
 
@@ -653,7 +654,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pFwScriptsData IsNot Nothing Then
                     myFwScriptsData = pFwScriptsData.Clone
                 Else
-                    myFwScriptsData = MyClass.FwScriptsDataAttribute.Clone
+                    myFwScriptsData = FwScriptsDataAttribute.Clone
                 End If
                 Dim FS As FileStream
 
