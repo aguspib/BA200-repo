@@ -28,8 +28,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Attributes"
-        Private AnalyzerIdAttr As String = ""
-
         Private FwCompatibleAttr As Boolean
 
         Private ReadFWDoneAttr As Boolean
@@ -71,16 +69,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Properties"
-
-        Public Property AnalyzerId() As String
-            Get
-                Return AnalyzerIdAttr
-            End Get
-            Set(ByVal value As String)
-                AnalyzerIdAttr = value
-            End Set
-        End Property
-
         Public Property FwCompatible() As Boolean
             Get
                 Return Me.FwCompatibleAttr

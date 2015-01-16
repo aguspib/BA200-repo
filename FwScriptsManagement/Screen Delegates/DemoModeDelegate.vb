@@ -40,7 +40,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Attributes"
-        Private AnalyzerIDAttr As String
         Private TimerStatusModeStressAttr As Long   ' time between each request of state to the analyzer
         Private NumCyclesAttr As Long               ' Number of demo cycles defined
         Private StatusStressModeAttr As STRESS_STATUS

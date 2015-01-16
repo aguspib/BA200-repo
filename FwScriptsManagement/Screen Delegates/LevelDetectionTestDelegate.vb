@@ -161,8 +161,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Private currentLanguageAttr As String
 
-        Private AnalyzerIDAttr As String
-
         Private HomesDoneAttr As Boolean = False
 
 

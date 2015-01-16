@@ -156,7 +156,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Private HeaterMaxActionsTemperAttr As Integer
         Private RotorSoundSecondsAttr As Integer = 10 'SGM 18/09/2012 - Seconds that takes the buzzer sound when Rotor conditioning has been finished 
 
-        Private AnalyzerIDAttr As String
         Private FinalResultAttr() As Integer
 
 
@@ -1322,7 +1321,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <param name="pResponse">response type</param>
         ''' <param name="pData">data received</param>
         ''' <remarks>Created by XBC 17/06/2011</remarks>
-        Private Sub ScreenReceptionLastFwScriptEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) Handles MyClass.ReceivedLastFwScriptEvent
+        Private Sub ScreenReceptionLastFwScriptEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) Handles Me.ReceivedLastFwScriptEvent
             Dim myGlobal As New GlobalDataTO
             Try
                 'manage special operations according to the screen characteristics

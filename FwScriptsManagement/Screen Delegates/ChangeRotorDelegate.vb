@@ -38,20 +38,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Attributes"
-        Private AnalyzerIDAttr As String
         Private IsWashingStationUpAttr As Boolean = False
 #End Region
 
 #Region "Properties"
-        Public Property AnalyzerId() As String
-            Get
-                Return MyClass.AnalyzerIDAttr
-            End Get
-            Set(ByVal value As String)
-                MyClass.AnalyzerIDAttr = value
-            End Set
-        End Property
-
         Public Property IsWashingStationUp() As Boolean
             Get
                 Return MyClass.IsWashingStationUpAttr

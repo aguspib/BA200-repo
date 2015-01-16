@@ -2102,7 +2102,7 @@ Public Class IWSTestSelectionAuxScreen
                             canBeUnselected = True
                         End If
 
-                            'Finally, the Test is unselected
+                        'Finally, the Test is unselected
                         If (canBeUnselected) Then
                             ' XB 02/12/2014 - BA-1867
                             'qSelectedTest.First.Selected = False

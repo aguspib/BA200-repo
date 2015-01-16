@@ -68,7 +68,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #End Region
 
 #Region "Attributes"
-        Private AnalyzerIdAttr As String = ""
 
         'HISTORY
         '***************************
