@@ -242,6 +242,7 @@ Partial Class IResults
     '''              AG 22/09/2014 - BA-1940 show specimen in the grid (test name column ... specimen (TEST NAME) )
     '''                              Same format as in the results by test (patients)
     '''              XB 28/11/2014 - Sort the CALC tests behind ISE anf OFFS too - BA-1867
+    '''              XB 16/01/2015 - Change on displaying CONC errors values derived from ISE error - BA-1064
     ''' </remarks>
     Private Sub UpdateExperimentalsDataGrid()
         Dim dgv As BSDataGridView = bsExperimentalsDataGridView
@@ -486,6 +487,16 @@ Partial Class IResults
                     End If
                     'END AG 15/09/2010
 
+                    ' XB 16/01/2015 - BA-1064 
+                    If Not resultRow.IsCONC_ErrorNull Then
+                        If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                            If resultRow.TestType = "ISE" Then
+                                dgv("Concentration", MaxRows).Value = GlobalConstants.CONC_ISE_ERROR
+                            End If
+                        End If
+                    End If
+                    ' XB 16/01/2015 - BA-1064 
+
                     Remark = GetResultAlarmDescription(resultRow.OrderTestID, resultRow.RerunNumber, resultRow.MultiPointNumber)
                     ' dl 27/06/2011
                     'dgv("SeeRems", i).Style.Font = SeeRemsFont
@@ -666,6 +677,16 @@ Partial Class IResults
                                 End If
                             End If
                             'END AG 15/09/2010
+
+                            ' XB 16/01/2015 - BA-1064 
+                            If Not resultRow.IsCONC_ErrorNull Then
+                                If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                                    If resultRow.TestType = "ISE" Then
+                                        dgv("Concentration", k).Value = GlobalConstants.CONC_ISE_ERROR
+                                    End If
+                                End If
+                            End If
+                            ' XB 16/01/2015 - BA-1064 
 
                             'RH 01/02/2011 Get alarms for OffSystem tests and the others. OffSystem test do not have valid ExecutionID
                             If Not String.Equals(resultRow.TestType, "OFFS") Then

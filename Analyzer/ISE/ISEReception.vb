@@ -351,6 +351,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by: XB 28/11/2014 - Recalculates calculated tests for ISE Tests - BA-1867
         '''              SA 01/12/2014 - Call to deprecated function UpdateStatusClosedNOK has been changed for the new version of that function (UpdateStatusClosedNOK_NEW)
         '''                              The old function was called by error and it has to be deleted
+        '''              XB 16/01/2015 - Returns errors on Concentration when ISE modules returns an error - BA-1064
         ''' </remarks>
         Public Function ProcessISETESTResultsNEW(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pPreparationID As Integer, ByRef pISEResult As ISEResultTO, _
                                                  ByVal pISEMode As String, ByVal pWorkSessionID As String, ByVal pAnalyzerID As String) As GlobalDataTO
@@ -496,6 +497,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         End If
                                         'AG 15/09/2014 - BA-1918
 
+                                        ' XB 16/01/2015 - BA-1064
+                                        If (pISEResult.IsCancelError) Then
+                                            execRow.CONC_Value = -1
+                                            execRow.CONC_Error = AbsorbanceErrors.INCORRECT_DATA.ToString
+                                        End If
+                                        ' XB 16/01/2015 - BA-1064
+
                                         'Get all received ISE Alarms and move them to a typed DataSet WSExecutionAlarmsDS
                                         qAlarmResult = (From a In pISEResult.Errors _
                                                        Where ((a.Affected.Contains(execRow.ISE_ResultID)) AndAlso (a.ResultErrorCode <> ISEErrorTO.ISEResultErrorCodes.None)) _
@@ -543,6 +551,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         myResultsRow.ExportStatus = "NOTSENT"
                                         myResultsRow.Printed = False
                                         myResultsRow.CONC_Value = execRow.CONC_Value
+                                        myResultsRow.CONC_Error = execRow.CONC_Error  ' XB 16/01/2015 - BA-1064
                                         myResultsRow.TestID = execRow.TestID
                                         myResultsRow.SampleType = execRow.SampleType
                                         myResultsRow.SampleClass = mySampleClass

@@ -461,7 +461,8 @@ Partial Class IResults
     ''' <remarks>
     ''' Created RH - v1.0.0
     ''' Modified AG + DL 14/06/2013 (show barcode when informed in v2.0.0)
-    ''' Modified AG 28/06/2013 - fix issue #1199 (show barcode if informed also for calculated and offsystem tests)
+    '''          AG 28/06/2013 - fix issue #1199 (show barcode if informed also for calculated and offsystem tests)
+    '''          XB 16/01/2015 - Change on displaying CONC errors values derived from ISE error - BA-1064
     ''' </remarks>
     Private Sub UpdateSamplesXtraGrid()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -640,6 +641,16 @@ Partial Class IResults
                     End If
                     'END AG 15/09/2010
 
+                    ' XB 16/01/2015 - BA-1064 
+                    If Not resultRow.IsCONC_ErrorNull Then
+                        If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                            If resultRow.TestType = "ISE" Then
+                                CurrentRow.Concentration = GlobalConstants.CONC_ISE_ERROR
+                            End If
+                        End If
+                    End If
+                    ' XB 16/01/2015 - BA-1064 
+
                     Remark = GetResultAlarmDescription(resultRow.OrderTestID, resultRow.RerunNumber, _
                                                                             resultRow.MultiPointNumber)
                     CurrentRow.Remarks = Remark
@@ -788,6 +799,16 @@ Partial Class IResults
                                 End If
                             End If
                             'END AG 15/09/2010
+
+                            ' XB 16/01/2015 - BA-1064 
+                            If Not resultRow.IsCONC_ErrorNull Then
+                                If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                                    If resultRow.TestType = "ISE" Then
+                                        CurrentRow.Concentration = GlobalConstants.CONC_ISE_ERROR
+                                    End If
+                                End If
+                            End If
+                            ' XB 16/01/2015 - BA-1064 
 
                             'RH 01/02/2011 Get alarms for OffSystem tests and the others. OffSystem test do not have valid ExecutionID
                             If Not String.Equals(resultRow.TestType, "OFFS") Then

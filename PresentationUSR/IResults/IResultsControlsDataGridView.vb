@@ -232,6 +232,7 @@ Partial Class IResults
     ''' Created by:  RH 21/07/2010
     ''' Modified by: SA 12/11/2010 - Show Date and Time using the format defined in the OS Culture Info
     '''              SA 26/04/2011 - Changed the implementation to process all Controls for the Test, not just the first one
+    '''              XB 16/01/2015 - Change on displaying CONC errors values derived from ISE error - BA-1064
     ''' </remarks>
     Private Sub UpdateControlsDataGrid()
         If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
@@ -393,6 +394,16 @@ Partial Class IResults
                         End If
                     End If
 
+                    ' XB 16/01/2015 - BA-1064 
+                    If Not resultRow.IsCONC_ErrorNull Then
+                        If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                            If resultRow.TestType = "ISE" Then
+                                dgv("Concentration", maxRows).Value = GlobalConstants.CONC_ISE_ERROR
+                            End If
+                        End If
+                    End If
+                    ' XB 16/01/2015 - BA-1064 
+
                     Remark = GetResultAlarmDescription(resultRow.OrderTestID, resultRow.RerunNumber, resultRow.MultiPointNumber)
                     'dgv("SeeRems", maxRows).Style.Font = SeeRemsFont
                     'If (Not String.IsNullOrEmpty(Remark)) Then
@@ -503,6 +514,16 @@ Partial Class IResults
                                     dgv("Concentration", k).Value = GlobalConstants.CONC_DUE_ABS_ERROR
                                 End If
                             End If
+
+                            ' XB 16/01/2015 - BA-1064 
+                            If Not resultRow.IsCONC_ErrorNull Then
+                                If Not String.IsNullOrEmpty(resultRow.CONC_Error) Then
+                                    If resultRow.TestType = "ISE" Then
+                                        dgv("Concentration", k).Value = GlobalConstants.CONC_ISE_ERROR
+                                    End If
+                                End If
+                            End If
+                            ' XB 16/01/2015 - BA-1064 
 
                             Remark = GetExecutionAlarmDescription(TestList(j).ExecutionID)
                             'dgv("SeeRems", k).Style.Font = SeeRemsFont
