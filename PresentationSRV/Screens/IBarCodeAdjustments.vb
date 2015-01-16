@@ -372,7 +372,7 @@ Public Class IBarCodeAdjustments
             With MyBase.myScreenLayout
 
                 .ButtonsPanel.SaveButton = Me.SaveButton
-                .ButtonsPanel.CancelButton = Me.CancelButton
+                .ButtonsPanel.CancelButton = Me.ButtonCancel
                 .ButtonsPanel.ExitButton = Me.BsExitButton
 
                 .MessagesPanel.Container = Me.BsMessagesPanel
@@ -419,7 +419,7 @@ Public Class IBarCodeAdjustments
             If MyBase.CurrentUserNumericalLevel = USER_LEVEL.lOPERATOR Then
                 Me.AdjustButton.Visible = False
                 Me.SaveButton.Visible = False
-                Me.CancelButton.Visible = False
+                Me.ButtonCancel.Visible = False
             End If
 
         Catch ex As Exception
@@ -472,7 +472,7 @@ Public Class IBarCodeAdjustments
 
             MyBase.bsScreenToolTips.SetToolTip(AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
             MyBase.bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
             MyBase.bsScreenToolTips.SetToolTip(StartReadingButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", currentLanguage))
             MyBase.bsScreenToolTips.SetToolTip(StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
@@ -499,7 +499,7 @@ Public Class IBarCodeAdjustments
 
             MyBase.SetButtonImage(AdjustButton, "ADJUSTMENT")
             MyBase.SetButtonImage(SaveButton, "SAVE")
-            MyBase.SetButtonImage(CancelButton, "UNDO")
+            MyBase.SetButtonImage(ButtonCancel, "UNDO")
             MyBase.SetButtonImage(StartReadingButton, "ADJUSTMENT")
             MyBase.SetButtonImage(StopButton, "STOP", 24, 24)
             MyBase.SetButtonImage(TestButton, "ADJUSTMENT")
@@ -972,7 +972,7 @@ Public Class IBarCodeAdjustments
             Me.BsAdjust.Enabled = False
             Me.AdjustButton.Enabled = True
             Me.SaveButton.Enabled = False
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
 
             ' READING AREA
             'Me.ReadingBCGroupBox.Enabled = True
@@ -1032,7 +1032,7 @@ Public Class IBarCodeAdjustments
 
             MyBase.ActivateMDIMenusButtons(True)
             Me.AdjustButton.Enabled = False
-            Me.CancelButton.Enabled = True
+            Me.ButtonCancel.Enabled = True
             MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READY.ToString)
 
         Catch ex As Exception
@@ -1077,7 +1077,7 @@ Public Class IBarCodeAdjustments
             Me.ChangedValue = True
 
             Me.SaveButton.Enabled = True
-            Me.CancelButton.Enabled = True
+            Me.ButtonCancel.Enabled = True
             Me.BsExitButton.Enabled = True
 
             Me.Enabled = True
@@ -2174,7 +2174,7 @@ Public Class IBarCodeAdjustments
         End Try
     End Sub
 
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         'Dim myGlobal As New GlobalDataTO
         Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.No
         Try

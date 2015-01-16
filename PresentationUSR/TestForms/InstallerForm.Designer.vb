@@ -29,7 +29,7 @@ Partial Class InstallerForm
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.EditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.Button3 = New System.Windows.Forms.Button()
         Me.Button4 = New System.Windows.Forms.Button()
@@ -98,13 +98,13 @@ Partial Class InstallerForm
         '
         'CancelButton
         '
-        Me.CancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.CancelButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CancelButton.Location = New System.Drawing.Point(1015, 569)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 177
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonCancel.Location = New System.Drawing.Point(1015, 569)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 177
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'EditButton
         '
@@ -219,7 +219,7 @@ Partial Class InstallerForm
         Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.SaveButton)
-        Me.Controls.Add(Me.CancelButton)
+        Me.Controls.Add(Me.ButtonCancel)
         Me.Controls.Add(Me.EditButton)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.DataGridView1)
@@ -241,7 +241,7 @@ Partial Class InstallerForm
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents Button2 As System.Windows.Forms.Button
     Friend WithEvents SaveButton As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents CancelButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents ButtonCancel As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents EditButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents Button3 As System.Windows.Forms.Button
     Friend WithEvents Button4 As System.Windows.Forms.Button

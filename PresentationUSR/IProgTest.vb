@@ -1860,7 +1860,7 @@ Public Class IProgTest
                                 isSortTestListAllowed = False
                                 SaveButton.Enabled = True
                                 'TR 08/11/2010
-                                CancelButton.Enabled = True
+                                ButtonCancel.Enabled = True
 
                                 'ExitButton1.Enabled = True
                                 ExitButton.Enabled = True
@@ -1882,7 +1882,7 @@ Public Class IProgTest
                                 SaveButton.Enabled = False
 
                                 'TR 08/11/2010
-                                CancelButton.Enabled = False
+                                ButtonCancel.Enabled = False
 
                                 'ExitButton1.Enabled = True
                                 ExitButton.Enabled = True
@@ -1904,7 +1904,7 @@ Public Class IProgTest
                             SaveButton.Enabled = False
 
                             'TR 08/11/2010
-                            CancelButton.Enabled = False
+                            ButtonCancel.Enabled = False
 
                             'ExitButton1.Enabled = True
                             ExitButton.Enabled = True
@@ -1928,7 +1928,7 @@ Public Class IProgTest
                         SaveButton.Enabled = True
 
                         'TR 08/11/2010
-                        CancelButton.Enabled = True
+                        ButtonCancel.Enabled = True
 
                         'ExitButton1.Enabled = True
                         ExitButton.Enabled = True
@@ -1953,7 +1953,7 @@ Public Class IProgTest
                 isSortTestListAllowed = False
                 SaveButton.Enabled = False
                 'TR 08/11/2010
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 DeleteSampleTypeButton.Enabled = False
                 isEditTestAllowed = False
                 EditButton.Enabled = False
@@ -1991,7 +1991,7 @@ Public Class IProgTest
             Else
                 SaveButton.Enabled = False
                 'TR 08/11/2010
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 DeleteSampleTypeButton.Enabled = False
             End If
 
@@ -8583,7 +8583,7 @@ Public Class IProgTest
                 DeleteButton.Enabled = False
                 SaveButton.Enabled = False
 
-                CancelButton.Enabled = False 'TR 08/11/2010
+                ButtonCancel.Enabled = False 'TR 08/11/2010
             End If
             'DL 15/07/2010. End
 
@@ -8918,7 +8918,7 @@ Public Class IProgTest
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
             End If
 
             'EXIT ExitButton
@@ -9518,7 +9518,7 @@ Public Class IProgTest
             'bsScreenToolTips.SetToolTip(BsButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CLIABV_Values", currentLanguage))
 
             bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenTooltips ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -10021,7 +10021,7 @@ Public Class IProgTest
             ShortNameLabel = Nothing
             TestNameTextBox = Nothing
             NameLabel = Nothing
-            CancelButton = Nothing
+            ButtonCancel = Nothing
             CalibratorLotTextBox = Nothing
             CalibratorNameTextBox = Nothing
             LBL_CalibratorName = Nothing
@@ -10838,8 +10838,8 @@ Public Class IProgTest
         Try
             If Not Me.DesignMode Then
                 If e.KeyCode = Keys.Escape Then
-                    If CancelButton.Enabled Then
-                        CancelButton.PerformClick()
+                    If ButtonCancel.Enabled Then
+                        ButtonCancel.PerformClick()
                     Else
                         'RH 17/12/2010
                         IAx00MainMDI.OpenMonitorForm(Me)
@@ -11374,7 +11374,7 @@ Public Class IProgTest
                 SaveButton.Enabled = True
 
                 'TR 08/11/2010
-                CancelButton.Enabled = True
+                ButtonCancel.Enabled = True
 
                 'focus on the testname textbox
                 TestNameTextBox.Select()
@@ -12513,7 +12513,7 @@ Public Class IProgTest
                         AddButton.Enabled = False
                         SaveButton.Enabled = False
                         'TR 08/11/2010 -Add new button cancel.
-                        CancelButton.Enabled = False
+                        ButtonCancel.Enabled = False
 
                         TestListView.MultiSelect = True
                     Else
@@ -12818,7 +12818,7 @@ Public Class IProgTest
         End Try
     End Sub
 
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         CancelEdition()
 
     End Sub
@@ -13587,7 +13587,7 @@ Public Class IProgTest
             Me.ShortNameTextBox.Text = ""
 
             Me.SaveButton.Enabled = True
-            Me.CancelButton.Enabled = True
+            Me.ButtonCancel.Enabled = True
             Me.TestNameTextBox.Enabled = True
             Me.CopyTestButton.Enabled = False 'disable the copy button
             Me.ShortNameTextBox.Enabled = True

@@ -13,7 +13,7 @@ Public Class IConfigLISMapping
     Private currentLanguage As String                      'To store the current application language  
 
 
-    Private LoadingScreen As Boolean = True 'flag for avoiding to handle events while screen is not loaded yet
+    Private ScreenIsLoading As Boolean = True 'flag for avoiding to handle events while screen is not loaded yet
 
     Private AllLISMappingDS As LISMappingsDS
     Private ConfigLISMappingDS As LISMappingsDS
@@ -84,7 +84,7 @@ Public Class IConfigLISMapping
                 If Not MyClass.IsReadOnly Then
                     IsEditionModeAttr = value
                     Me.EditButton.Enabled = Not value
-                    Me.CancelButton.Enabled = value
+                    Me.ButtonCancel.Enabled = value
                     Me.FilterComboBox.Enabled = Not value
                     Me.SaveButton.Enabled = value
 
@@ -354,7 +354,7 @@ Public Class IConfigLISMapping
     Private Sub ScreenLoad()
         Try
             Cursor = Cursors.WaitCursor
-            LoadingScreen = True
+            ScreenIsLoading = True
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
@@ -427,7 +427,7 @@ Public Class IConfigLISMapping
 
             ' Fot tooltips
             bsScreenToolTips.SetToolTip(CloseButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(EditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
             bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
 
@@ -478,7 +478,7 @@ Public Class IConfigLISMapping
             ' Undo Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -724,7 +724,7 @@ Public Class IConfigLISMapping
             ''DL 24/04/2013. END
             Me.EditButton.Enabled = Not MyClass.IsReadOnly
 
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
             Me.SaveButton.Enabled = False
             Me.FilterComboBox.Enabled = True
             Me.LISMappingDataGridView.Columns("LISValue").ReadOnly = True
@@ -733,7 +733,7 @@ Public Class IConfigLISMapping
                 Me.LISMappingDataGridView.Rows(i).Cells("LISValue").Style.BackColor = Color.WhiteSmoke
             Next i
 
-            LoadingScreen = False
+            ScreenIsLoading = False
 
 
 
@@ -1078,7 +1078,7 @@ Public Class IConfigLISMapping
 
                 Case "OPERATOR"
                     Me.EditButton.Enabled = False
-                    Me.CancelButton.Enabled = False
+                    Me.ButtonCancel.Enabled = False
                     'Me.FilterComboBox.Enabled = False
                     Me.SaveButton.Enabled = False
                     Me.LISMappingDataGridView.ReadOnly = True
@@ -1321,7 +1321,7 @@ Public Class IConfigLISMapping
     Private Sub LISMappingTypeComboBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FilterComboBox.SelectedIndexChanged
         Try
 
-            If Not LoadingScreen Then
+            If Not ScreenIsLoading Then
                 If Not MyClass.IsEditionMode Then
                     Me.LISMappingDataGridView.DataSource = Nothing
                     MyClass.FillLISMappingsGrid()
@@ -1353,13 +1353,13 @@ Public Class IConfigLISMapping
 
     Private Sub LISMappingDataGridView_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles LISMappingDataGridView.CellValueChanged
         Try
-            If Not LoadingScreen And MyClass.IsEditionMode Then
+            If Not ScreenIsLoading And IsEditionMode Then
                 Dim myDgv As DataGridView = TryCast(sender, DataGridView)
                 For Each dr As DataGridViewRow In myDgv.Rows
                     If dr.Cells("LISValue").ColumnIndex = e.ColumnIndex Then
                         If dr.Index = e.RowIndex Then
                             dr.Cells("Changed").Value = True
-                            MyClass.IsAnyChanged = True
+                            IsAnyChanged = True
                             Exit For
                         End If
                     End If
@@ -1374,9 +1374,9 @@ Public Class IConfigLISMapping
     Private Sub LISMappingDataGridView_RowValidating(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellCancelEventArgs) Handles LISMappingDataGridView.RowValidating
         Dim IsAllOK As Boolean
         Try
-            If Not LoadingScreen And MyClass.IsEditionMode Then
-                MyClass.ValidateGridRow(e.RowIndex)
-                IsAllOK = MyClass.IsAllValidatedOK
+            If Not ScreenIsLoading And IsEditionMode Then
+                ValidateGridRow(e.RowIndex)
+                IsAllOK = IsAllValidatedOK
             End If
 
         Catch ex As Exception
@@ -1432,8 +1432,8 @@ Public Class IConfigLISMapping
     Private Sub IConfigLISMapping_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         Try
             If (e.KeyCode = Keys.Escape) Then
-                If (CancelButton.Enabled) Then
-                    CancelButton.PerformClick()
+                If (ButtonCancel.Enabled) Then
+                    ButtonCancel.PerformClick()
                 Else
                     CloseButton.PerformClick()
                 End If
@@ -1490,7 +1490,7 @@ Public Class IConfigLISMapping
     ''' <remarks>
     ''' Created by XB 01/03/2013
     ''' </remarks>    
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Try
             CancelEdition()
 

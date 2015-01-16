@@ -18,7 +18,7 @@ Public Class BSRImage
     Implements IDisposable
 
     ' To detect redundant calls
-    Private disposed As Boolean = False
+    Private hasBeenDisposed As Boolean = False
     '' Implement IDisposable.
     'Public Overload Sub Dispose() Implements IDisposable.Dispose
     '    Dispose(True)
@@ -27,7 +27,7 @@ Public Class BSRImage
     'End Sub
 
     Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
-        If Me.disposed = False Then
+        If Me.hasBeenDisposed = False Then
             If disposing Then
                 ' Free other state (managed objects).
 
@@ -61,7 +61,7 @@ Public Class BSRImage
             ' Free your own state (unmanaged objects).
             ' Set large fields to null.
         End If
-        Me.disposed = True
+        Me.hasBeenDisposed = True
     End Sub
 
     Protected Overrides Sub Finalize()

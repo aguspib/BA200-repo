@@ -346,7 +346,7 @@ Public Class IHistoricalReports
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
@@ -471,7 +471,7 @@ Public Class IHistoricalReports
 
             ' For Tooltips...
             MyBase.bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             MyBase.bsScreenToolTips.SetToolTip(DeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", currentLanguage))
             MyBase.bsScreenToolTips.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
             MyBase.bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
@@ -485,7 +485,7 @@ Public Class IHistoricalReports
     Private Sub DisableAll()
         Me.SearchButton.Enabled = False
         Me.SaveButton.Enabled = False
-        Me.CancelButton.Enabled = False
+        Me.ButtonCancel.Enabled = False
         Me.DeleteButton.Enabled = False
         Me.PrintButton.Enabled = False
         Me.AnalyzerCombo.Enabled = False
@@ -501,7 +501,7 @@ Public Class IHistoricalReports
         Try
             Me.SearchButton.Enabled = True
             Me.SaveButton.Enabled = False
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
             Me.DeleteButton.Enabled = False
             Me.PrintButton.Enabled = False
             Me.ExitButton.Enabled = True
@@ -725,7 +725,7 @@ Public Class IHistoricalReports
                 Me.PrintButton.Enabled = True
             Else
                 Me.SaveButton.Enabled = False
-                Me.CancelButton.Enabled = False
+                Me.ButtonCancel.Enabled = False
                 Me.PrintButton.Enabled = False
             End If
 
@@ -765,7 +765,7 @@ Public Class IHistoricalReports
                 If dialogResultToReturn = Windows.Forms.DialogResult.Yes Then
                     MyClass.SaveButton.PerformClick()
                 Else
-                    MyClass.CancelButton.PerformClick()
+                    MyClass.ButtonCancel.PerformClick()
                 End If
             End If
 
@@ -949,7 +949,7 @@ Public Class IHistoricalReports
 
                 Me.ChangedValue = False
                 Me.SaveButton.Enabled = False
-                Me.CancelButton.Enabled = False
+                Me.ButtonCancel.Enabled = False
             End If
 
         Catch ex As Exception
@@ -1007,7 +1007,7 @@ Public Class IHistoricalReports
 
                 Me.ChangedValue = True
                 Me.SaveButton.Enabled = True
-                Me.CancelButton.Enabled = True
+                Me.ButtonCancel.Enabled = True
             End If
 
         Catch ex As Exception
@@ -1026,13 +1026,13 @@ Public Class IHistoricalReports
         End Try
     End Sub
 
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Try
             Me.SearchButton.PerformClick()
 
             Me.ChangedValue = False
             Me.SaveButton.Enabled = False
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".CancelButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

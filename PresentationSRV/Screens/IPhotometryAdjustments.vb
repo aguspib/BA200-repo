@@ -54,7 +54,7 @@ Public Class IPhotometryAdjustments
     Private UnableHandlers As Boolean
     Private RunningTest As Boolean
     Private FirstIteration As Boolean
-    Private ExitingScreen As Boolean
+    Private FlagExitingScreen As Boolean
     Private WarningLeds As String
 #End Region
 
@@ -280,7 +280,7 @@ Public Class IPhotometryAdjustments
         Return True
     End Function
 
-   
+
 
 #End Region
 
@@ -728,7 +728,7 @@ Public Class IPhotometryAdjustments
                 myWarningImage = Nothing
             End If
 
-            
+
             '' XBC 20/02/2012
             'auxIconName = GetIconName("UPDOWN") ' UPDOWNROW
             'If System.IO.File.Exists(iconPath & auxIconName) Then
@@ -1461,9 +1461,9 @@ Public Class IPhotometryAdjustments
     ''' <remarks>Created by XBC 15/03/2011</remarks>
     Private Sub PrepareTestExitedMode()
         Try
-            If Me.ExitingScreen Then
-                MyBase.ActivateMDIMenusButtons(True) 'SGM 27/09/2011
-                Me.Close()
+            If FlagExitingScreen Then
+                ActivateMDIMenusButtons(True) 'SGM 27/09/2011
+                Close()
             Else
                 PrepareLoadedMode()
                 MyBase.DisplayMessage(Messages.SRV_TEST_EXIT_COMPLETED.ToString)
