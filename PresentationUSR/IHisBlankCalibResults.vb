@@ -1004,7 +1004,7 @@ Public Class IHisBlankCalibResults
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels()
             PrepareButtons()
@@ -1557,7 +1557,7 @@ Public Class IHisBlankCalibResults
             End With
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Blanks and Calibrator Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Blanks and Calibrator Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IHisBlankCalibResults.PrintBlanksAndCalibratorsButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

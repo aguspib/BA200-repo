@@ -162,7 +162,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessConnection", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessConnection", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -262,7 +262,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -339,7 +339,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SKIP)
                                 actionAlreadySent = True
 
-                                myLogAcciones.CreateLogActivity("SKIP sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                GlobalBase.CreateLogActivity("SKIP sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                             End If
                         End If
 
@@ -352,7 +352,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 actionAlreadySent = True
                                 If Not myGlobal.HasError Then
                                     AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
-                                    myLogAcciones.CreateLogActivity("WRUN cuvette sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    GlobalBase.CreateLogActivity("WRUN cuvette sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 Else
                                     'AG 27/09/2012 - the instruction could not be sent because empty fields. The cuvette must continue marked as Contamianted, so nothing to do
                                     ' except remove the error flag and code
@@ -403,7 +403,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             'AG 27/09/2012
                                         End If
 
-                                        myLogAcciones.CreateLogActivity("ISETEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                        GlobalBase.CreateLogActivity("ISETEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                     End If 'If myAnManagerDS.nextPreparation(0).IsExecutionIDNull Then
                                 End If
 
@@ -420,7 +420,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 If Not myGlobal.HasError Then
                                     AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
-                                    myLogAcciones.CreateLogActivity("WRUN reagents sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    GlobalBase.CreateLogActivity("WRUN reagents sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 Else
                                     Dim sendWRUNErrorCode As String = myGlobal.ErrorCode 'AG 27/09/2012
 
@@ -542,7 +542,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                     'AG 31/05/2012
 
-                                    myLogAcciones.CreateLogActivity("TEST or PTEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    GlobalBase.CreateLogActivity("TEST or PTEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 End If 'If myAnManagerDS.nextPreparation(0).IsExecutionIDNull Then
                             End If 'If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull Then
                         End If 'If Not actionAlreadySent And Not endRunToSend Then
@@ -621,7 +621,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -697,7 +697,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         If Not rejectedWell Then '(2.0)
                             resultData = Me.CheckRejectedContaminatedNextWell(dbConnection, pNextWell, rejectedWell, contaminatedWell, WashSol1, WashSol2)
-                            myLogAcciones.CreateLogActivity("SearchNextPreparation (CheckRejectedContaminatedNextWell): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("SearchNextPreparation (CheckRejectedContaminatedNextWell): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(2.1)
@@ -756,7 +756,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         If Not rejectedWell AndAlso Not contaminatedWell AndAlso pLookForISEExecutionsFlag Then '(3.0)
                             resultData = Me.SearchNextISEPreparationNEW(dbConnection)
-                            myLogAcciones.CreateLogActivity("SearchNextPreparation (SearchNextISEPreparationNEW): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("SearchNextPreparation (SearchNextISEPreparationNEW): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(3.1)
@@ -796,7 +796,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim sampleClassFound As String = ""
 
                             resultData = Me.SearchNextSTDPreparation(dbConnection, executionFound, existContamination, WashSol1, WashSol2, sampleClassFound)
-                            myLogAcciones.CreateLogActivity("SearchNextPreparation (SearchNextSTDPreparation): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("SearchNextPreparation (SearchNextSTDPreparation): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(4.1)
@@ -857,7 +857,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If '(2)
                 End If '(1)
 
-                myLogAcciones.CreateLogActivity("SearchNextPreparation (Complete): " & Now.Subtract(StartTimeTotal).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("SearchNextPreparation (Complete): " & Now.Subtract(StartTimeTotal).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
 
 
             Catch ex As Exception
@@ -867,7 +867,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
             End Try
 
             'We have used Exit Try so we have to be sure the connection becomes properly closed here
@@ -924,7 +924,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1072,7 +1072,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CheckRejectedContaminatedNextWell", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckRejectedContaminatedNextWell", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1117,7 +1117,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1164,7 +1164,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparationNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparationNEW", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1326,7 +1326,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1494,7 +1494,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
                 'Finally
             End Try
@@ -1693,7 +1693,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                     If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
                                                         Exit For
                                                     ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
-                                                        myLogAcciones.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
+                                                        GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
                                                     End If
                                                     'AG 28/03/2014 - #1563 
                                                 Next
@@ -1854,7 +1854,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                     If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
                                                         Exit For
                                                     ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
-                                                        myLogAcciones.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
+                                                        GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
                                                     End If
                                                     'AG 28/03/2014 - #1563 
                                                 Next
@@ -1940,7 +1940,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message 'AG 19/06/2012
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2004,7 +2004,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SendAdjustLightInstruction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendAdjustLightInstruction", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2056,7 +2056,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2147,7 +2147,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SaveBaseLineResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SaveBaseLineResults", EventLogEntryType.Error, False)
 
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2246,7 +2246,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
             Finally
 
             End Try

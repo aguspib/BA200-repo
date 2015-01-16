@@ -70,7 +70,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GetDallasSNValues", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetDallasSNValues", EventLogEntryType.Error, False)
         End Try
 
         myGlobal.SetDatos = myDallasSNData
@@ -185,7 +185,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GetDallasPage00Values", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetDallasPage00Values", EventLogEntryType.Error, False)
         End Try
 
         myGlobal.SetDatos = myDallas00Data
@@ -308,7 +308,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
         End Try
         Return myGlobal
     End Function
@@ -393,7 +393,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
         End Try
         Return myGlobal
     End Function

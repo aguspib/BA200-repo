@@ -49,7 +49,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetNewFactoryTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetNewFactoryTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -102,7 +102,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -148,7 +148,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetFormulaInFactoryDB", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetFormulaInFactoryDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -195,7 +195,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetRefRangesInFactoryDB", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetRefRangesInFactoryDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -243,7 +243,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestUpdateDAO.GetDeletedPreloadedCALCTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestUpdateDAO.GetDeletedPreloadedCALCTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -291,7 +291,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestUpdateDAO.GetUpdatedFactoryTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestUpdateDAO.GetUpdatedFactoryTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -400,7 +400,7 @@ End Namespace
 '        resultData.ErrorMessage = ex.Message
 
 '        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetPreloadedCALCTestsDistinctInClient", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetPreloadedCALCTestsDistinctInClient", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -498,7 +498,7 @@ End Namespace
 '        resultData.ErrorMessage = ex.Message
 
 '        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetPreloadedCALCTestsDistinctInClient", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestsUpdateDAO.GetPreloadedCALCTestsDistinctInClient", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try

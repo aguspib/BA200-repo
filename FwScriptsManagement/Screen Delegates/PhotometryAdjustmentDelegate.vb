@@ -1385,7 +1385,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -1430,7 +1430,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1489,7 +1489,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ReadWaveLengths", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ReadWaveLengths", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1632,7 +1632,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1688,7 +1688,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1729,7 +1729,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.Initialize", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.Initialize", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1765,7 +1765,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SaveBLDCFile", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SaveBLDCFile", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1805,7 +1805,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.AcceptBLResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.AcceptBLResults", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1841,7 +1841,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetLastBLDCCompletedTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetLastBLDCCompletedTest", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1864,7 +1864,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1891,7 +1891,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1916,7 +1916,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1945,7 +1945,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'myResultData = MyClass.GetCultureInfo()
                 'If myResultData.HasError Then
                 '    Dim myLogAcciones As New ApplicationLogManager()
-                '    myLogAcciones.CreateLogActivity(myResultData.ErrorMessage, "PhotometryAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "PhotometryAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
                 '    Exit Try
                 'End If
 
@@ -2449,7 +2449,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2471,7 +2471,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -2768,7 +2768,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2828,7 +2828,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2894,7 +2894,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendREAD_COUNTS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.SendREAD_COUNTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2926,7 +2926,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ManageResultsBL", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ManageResultsBL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2961,7 +2961,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureRepeatabilityReadedCounts", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureRepeatabilityReadedCounts", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2996,7 +2996,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureStabilityReadedCounts", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureStabilityReadedCounts", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3027,7 +3027,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureCurrentLEDSReaded", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureCurrentLEDSReaded", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3051,7 +3051,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetControlsLimits", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetControlsLimits", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3084,7 +3084,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureCheckRotorReadedCounts", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.MeasureCheckRotorReadedCounts", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -3370,7 +3370,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ManageTestResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ManageTestResults", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3438,7 +3438,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ManageABSTestResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ManageABSTestResults", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3470,7 +3470,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetCultureInfo", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GetCultureInfo", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -3527,7 +3527,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3562,7 +3562,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'myResultData = MyClass.GetCultureInfo()
                 'If myResultData.HasError Then
                 '    Dim myLogAcciones As New ApplicationLogManager()
-                '    myLogAcciones.CreateLogActivity(myResultData.ErrorMessage, "PhotometryAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "PhotometryAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
                 '    Exit Try
                 'End If
 
@@ -3861,7 +3861,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function

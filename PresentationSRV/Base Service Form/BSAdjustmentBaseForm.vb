@@ -1429,7 +1429,7 @@ Public Class BSAdjustmentBaseForm
 
                     'obtain the current language
                     Dim myLocalBase As New GlobalBase
-                    Dim LanguageID As String = myLocalBase.GetSessionInfo.ApplicationLanguage
+                    Dim LanguageID As String = GlobalBase.GetSessionInfo.ApplicationLanguage
 
                     'Get type and multilanguage text for the informed Message
                     Dim msgText As String = ""
@@ -1616,7 +1616,7 @@ Public Class BSAdjustmentBaseForm
         Try
             'Get the current user level
             Dim CurrentUserLevel As String = ""
-            CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             Dim myUsersLevel As New UsersLevelDelegate
             If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
                 myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -1756,7 +1756,7 @@ Public Class BSAdjustmentBaseForm
     '        Dim myData As String = ""
     '        Dim myGlobalbase As New GlobalBase
     '        Dim objReader As System.IO.StreamReader
-    '        Dim path As String = Application.StartupPath & myGlobalbase.FwAdjustmentsFile
+    '        Dim path As String = Application.StartupPath & GlobalBase.FwAdjustmentsFile
     '        objReader = New System.IO.StreamReader(path)
     '        myData = objReader.ReadToEnd()
     '        objReader.Close()
@@ -2793,7 +2793,7 @@ Public Class BSAdjustmentBaseForm
                     Dim myGlobalbase As New GlobalBase
 
                     If myDocRow.DocumentPath.Length > 0 Then
-                        myDocumentPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.DocumentPath
+                        myDocumentPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.DocumentPath
 
                         Dim isScrollable As Boolean = myDocRow.Expandable
 
@@ -2865,7 +2865,7 @@ Public Class BSAdjustmentBaseForm
 
                     'video NOT V1
                     'If myDocRow.VideoPath.Length > 0 Then
-                    '    myVideoPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.VideoPath
+                    '    myVideoPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.VideoPath
                     '    If File.Exists(myVideoPath) Then
 
                     '    Else

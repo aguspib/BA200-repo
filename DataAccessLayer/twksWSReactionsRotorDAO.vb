@@ -107,7 +107,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -158,7 +158,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Read", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Read", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -264,7 +264,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -321,7 +321,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -376,7 +376,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.ReadAll", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.ReadAll", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
         'End Function
@@ -413,7 +413,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.DeleteAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.DeleteAll", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -477,7 +477,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.GetAllWellsLastTurn", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.GetAllWellsLastTurn", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -522,7 +522,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.UpdateRotorTurnAfterReset", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.UpdateRotorTurnAfterReset", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -574,7 +574,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.UpdateWellContentAndStatusAfterReset", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.UpdateWellContentAndStatusAfterReset", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -643,7 +643,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.ReadWellHistoricalUse", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.ReadWellHistoricalUse", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -758,7 +758,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 '' XBC 03/07/2012 - time estimation
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity("Update Reactions Rotor " & _
+                'GlobalBase.CreateLogActivity("Update Reactions Rotor " & _
                 '                                Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "twksWSReactionsRotorDAO.UpdateMAXRotorTurnRecord", EventLogEntryType.Information, False)
 
 
@@ -768,7 +768,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.UpdateMAXRotorTurnRecord", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.UpdateMAXRotorTurnRecord", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -811,7 +811,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.SetCurrentTurnFlagToFalse", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.SetCurrentTurnFlagToFalse", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -859,7 +859,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.SetValuesForWashingStationWells", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.SetValuesForWashingStationWells", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -912,7 +912,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.SetToEmptyTheWellsInWashStation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.SetToEmptyTheWellsInWashStation", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -992,7 +992,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.ReadReactionsDetails", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSReactionsRotorDAO.ReadReactionsDetails", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1038,7 +1038,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksWSAnalyzersDAO.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksWSAnalyzersDAO.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

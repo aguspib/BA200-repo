@@ -68,7 +68,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ExecutionsPartialResultsDelegate.SaveResults", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ExecutionsPartialResultsDelegate.SaveResults", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -126,7 +126,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExecutionsPartialResultsDelegate.ResetWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExecutionsPartialResultsDelegate.ResetWS", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

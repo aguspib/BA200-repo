@@ -42,7 +42,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingBySettingID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingBySettingID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -70,7 +70,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 End If
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingCurrentValueBySettingID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingCurrentValueBySettingID", EventLogEntryType.Error, False)
             End Try
             Return myCurrentValue
         End Function
@@ -104,7 +104,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 result = MyApplicationSettingDAO.Update(myApplicationSettingDS, Conn, Nothing)
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.UpdateCurrentValueBySettingID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.UpdateCurrentValueBySettingID", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function

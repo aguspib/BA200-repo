@@ -45,7 +45,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetWSContaminationsWithWASH", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetWSContaminationsWithWASH", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -113,7 +113,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.SaveContaminations", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.SaveContaminations", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -170,7 +170,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteCascadeContaminationByReagentID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteCascadeContaminationByReagentID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -206,7 +206,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -240,7 +240,7 @@ Namespace Biosystems.Ax00.BL
 
                             'Get the current aplication language
                             Dim currentLanguageGlobal As New GlobalBase
-                            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+                            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
                             'Get the multilanguage description of the needed Washing Solutions
                             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
@@ -262,7 +262,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestContaminatorsCuv", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestContaminatorsCuv", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -296,7 +296,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -333,7 +333,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestRNAsContaminator", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestRNAsContaminator", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -384,7 +384,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteAllByTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteAllByTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -431,7 +431,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsBetweenTests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsBetweenTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -478,7 +478,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -513,7 +513,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsForReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsForReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -563,7 +563,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByReagentsName", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByReagentsName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -611,7 +611,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.ReadByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -649,7 +649,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.VerifyWashingSolutionR2", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.VerifyWashingSolutionR2", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -683,7 +683,7 @@ Namespace Biosystems.Ax00.BL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetResourceID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetResourceID", EventLogEntryType.Error, False)
             End Try
             Return myResourceId
         End Function
@@ -729,7 +729,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -775,7 +775,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteAllPreloadedR1Contaminations", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteAllPreloadedR1Contaminations", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -821,7 +821,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteAllPreloadedCuvettesContaminations", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteAllPreloadedCuvettesContaminations", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -882,7 +882,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteContaminations", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteContaminations", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -923,7 +923,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByReagentID", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationsByReagentID", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -980,7 +980,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteContaminations", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.DeleteContaminations", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1014,7 +1014,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationByTestContaminaCuvette", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationByTestContaminaCuvette", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1049,7 +1049,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetAllContaminations", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetAllContaminations", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1086,7 +1086,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationByContaminatorIDContaminatedID", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetContaminationByContaminatorIDContaminatedID", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1122,7 +1122,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestRNAsContaminated", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.GetTestRNAsContaminated", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

@@ -159,7 +159,7 @@ Public Class ILISUtilities
             MainMDI = CType(Me.MdiParent, IAx00MainMDI)
 
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             FillLogLevels()
@@ -217,7 +217,7 @@ Public Class ILISUtilities
 
             'If user level operator read only.
             Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = myGlobalBase.GetSessionInfo.UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             If CurrentUserLevel = "OPERATOR" Then
                 MainGroupBox.Enabled = False
                 ExecuteActionButton.Enabled = False

@@ -55,7 +55,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadValue", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadValue", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -106,7 +106,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadByAnalyzerID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadByAnalyzerID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -163,7 +163,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -216,7 +216,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -270,7 +270,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.UpdateFlag", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.UpdateFlag", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -316,7 +316,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ResetFlags", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ResetFlags", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -385,7 +385,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadByStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.ReadByStatus", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -429,7 +429,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzerManagerFlagsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

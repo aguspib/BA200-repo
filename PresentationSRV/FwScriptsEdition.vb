@@ -3243,7 +3243,7 @@ Public Class FwScriptsEdition
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             Me.Location = New Point(0, 0)
 

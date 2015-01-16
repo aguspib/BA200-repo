@@ -38,7 +38,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.Write", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Write", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -93,7 +93,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Read", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -193,7 +193,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadWithAdditionalBusiness", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadWithAdditionalBusiness", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -228,7 +228,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.WriteFwScript", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.WriteFwScript", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -308,7 +308,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadFwScript", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadFwScript", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function

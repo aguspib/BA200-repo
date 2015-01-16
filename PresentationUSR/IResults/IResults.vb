@@ -318,11 +318,11 @@ Public Class IResults
 
             'TR 16/05/2012 -Get the current level
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 16/05/2012 -END
 
             'TR 11/07/2012 -Get the current Language from the current Application Session
-            LanguageID = MyGlobalBase.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
 
             WorkSessionIDField = IAx00MainMDI.ActiveWorkSession
@@ -353,7 +353,7 @@ Public Class IResults
             CollapseAll(bsExperimentalsDataGridView) 'dl 23/07/2013 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ResultForm_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1034,7 +1034,7 @@ Public Class IResults
             XRManager.ShowPatientsFinalReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1061,7 +1061,7 @@ Public Class IResults
             XRManager.PrintCompactPatientsReport(ActiveAnalyzer, ActiveWorkSession, Nothing, False)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintCompactReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1087,7 +1087,7 @@ Public Class IResults
             XRManager.ShowResultsByTestReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1112,7 +1112,7 @@ Public Class IResults
             'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestBlankButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1138,7 +1138,7 @@ Public Class IResults
             XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False) 'IT 01/10/2014 - #BA-1864
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Ctrl Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Ctrl Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestCtrlButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1225,7 +1225,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1482,7 +1482,7 @@ Public Class IResults
         '    'TR 04/08/2011 -END.
 
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '    myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        '    GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                    "IResults.ExportButton_Click", EventLogEntryType.Information, False)
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1593,7 +1593,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.SendmanRepButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -2814,7 +2814,7 @@ Public Class IResults
 
         End Try
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+        GlobalBase.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                         " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                         "IResults.PrepareButtons", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -3354,7 +3354,7 @@ Public Class IResults
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
 #End Region
@@ -5219,7 +5219,7 @@ Public Class IResults
 
                     If resultData.HasError Then
                         Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
+                        GlobalBase.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
 
                         'DL 15/05/2013
                         'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me)
@@ -5603,7 +5603,7 @@ Public Class IResults
             ActivateDeactivateAllButtons(True)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ExportResultsToLIS", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -5676,7 +5676,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                             " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                             "IResults.TestDetailsTabSelectedEvent", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -5713,7 +5713,7 @@ Public Class IResults
             UpdateCurrentResultsGrid()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
                                             & " OPEN TAB: " & bsResultsTabControl.SelectedTab.Name, _
                                             "IResults.ResultsTabControlSelectedEvent", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

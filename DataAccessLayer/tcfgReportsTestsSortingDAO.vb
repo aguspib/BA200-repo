@@ -70,7 +70,7 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetDefaultSortedTestList", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetDefaultSortedTestList", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -129,7 +129,7 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetSortedTestList", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetSortedTestList", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -179,7 +179,7 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTestPosition", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTestPosition", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO
     End Function

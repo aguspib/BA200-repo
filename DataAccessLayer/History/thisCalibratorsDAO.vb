@@ -45,7 +45,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalibratorsDAO.CloseCalibrator", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalibratorsDAO.CloseCalibrator", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -99,7 +99,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalibratorsDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalibratorsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -136,7 +136,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalibratorsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalibratorsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -183,7 +183,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalibratorsDAO.ReadByCalibratorID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalibratorsDAO.ReadByCalibratorID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -229,7 +229,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisCalibratorsDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisCalibratorsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

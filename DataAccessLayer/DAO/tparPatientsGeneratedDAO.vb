@@ -136,19 +136,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -192,15 +192,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
             Finally
                 conn.Close()
             End Try
@@ -354,19 +354,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 'always call Close when done with conn.
@@ -409,15 +409,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 'always call Close when done with conn.
@@ -453,15 +453,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -491,15 +491,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -529,15 +529,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -567,15 +567,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -605,15 +605,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -643,15 +643,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -681,15 +681,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -719,15 +719,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -757,15 +757,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -795,15 +795,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -833,15 +833,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -871,15 +871,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
             Catch ex As ArgumentException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TparPatientsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.

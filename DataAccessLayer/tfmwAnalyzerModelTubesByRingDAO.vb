@@ -49,7 +49,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   " WHERE    TBR.AnalyzerModel = '" & pAnalyzerModel.Trim & "' " & _
                                   " AND      RTT.Status = 1 " & _
                                   " AND      RTT.MultiLanguageFlag = 1 " & _
-                                  " AND      MR.LanguageID = '" & myGlobalBase.GetSessionInfo.ApplicationLanguage & "' " & _
+                                  " AND      MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & _
                                   " ORDER BY TBR.RotorType, TBR.RingNumber, RTT.TubeVolume  "
 
                         Dim dbCmd As New SqlClient.SqlCommand
@@ -70,7 +70,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAnalyzerModelTubesByRingDAO.GetAllRotorRingBottles", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelTubesByRingDAO.GetAllRotorRingBottles", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -109,7 +109,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   " WHERE    TBR.AnalyzerModel = '" & pAnalyzerModel.Trim & "' " & _
                                   " AND      PMD.SubTableID = '" & PreloadedMasterDataEnum.TUBE_TYPES_SAMPLES.ToString() & "' " & _
                                   " AND      PMD.Status = 1 " & _
-                                  " AND      MR.LanguageID = '" & myGlobalBase.GetSessionInfo.ApplicationLanguage & "'" & _
+                                  " AND      MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "'" & _
                                   " ORDER BY TBR.RotorType, TBR.RingNumber, PMD.Position "
 
                         Dim dbCmd As New SqlClient.SqlCommand
@@ -130,7 +130,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAnalyzerModelTubesByRingDAO.GetAllRotorRingTubes", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelTubesByRingDAO.GetAllRotorRingTubes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

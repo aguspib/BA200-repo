@@ -116,7 +116,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -147,7 +147,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -189,7 +189,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.GetParameters", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -222,7 +222,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.SendDEMO_TEST", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.SendDEMO_TEST", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -244,7 +244,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.SendSDPOLL", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.SendSDPOLL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -279,7 +279,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.SendDEMO_STOP", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.SendDEMO_STOP", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -318,7 +318,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -348,7 +348,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.ManageResultsStress", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.ManageResultsStress", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -397,7 +397,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.InsertReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -422,7 +422,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function

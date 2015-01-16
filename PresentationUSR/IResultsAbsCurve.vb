@@ -1005,7 +1005,7 @@ Public Class IResultsAbsCurve
 
             'RH 29/02/2012 Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'RH 29/02/2012 Initialize myMultiLangResourcesDelegate
             myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate()
@@ -1365,7 +1365,7 @@ Public Class IResultsAbsCurve
 
             End If
 
-            myLogAcciones.CreateLogActivity("Refresh Abs(t) Graph screen: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "IResultsAbsCurve.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Refresh Abs(t) Graph screen: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "IResultsAbsCurve.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
             Cursor = Cursors.Default

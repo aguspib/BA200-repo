@@ -812,7 +812,7 @@ Public Class IProgTestProfiles
                 Dim currentSession As New GlobalBase()
 
                 testProfileRow.SetTestProfilePositionNull() 'Set to null, to get the value from the database.
-                testProfileRow.TS_User = currentSession.GetSessionInfo().UserName
+                testProfileRow.TS_User = GlobalBase.GetSessionInfo().UserName
                 testProfileRow.TS_DateTime = Now
             Else
                 'When editing or deleting an existing Test Profile, to concurrence control, the informed Username and Datetime
@@ -1491,7 +1491,7 @@ Public Class IProgTestProfiles
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the list of available Sample Types and Test Types
             LoadSampleTypesList()
@@ -1663,7 +1663,7 @@ Public Class IProgTestProfiles
         Try
             'TR 20/04/2012 get the current user level
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             ScreenLoad()
 

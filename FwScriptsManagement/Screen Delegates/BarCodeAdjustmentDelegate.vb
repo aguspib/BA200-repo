@@ -337,7 +337,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -385,7 +385,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -421,7 +421,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -443,7 +443,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -465,7 +465,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendBARCODE_REQUEST", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendBARCODE_REQUEST", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -505,7 +505,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -526,7 +526,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.BcResultsAdd", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.BcResultsAdd", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -550,7 +550,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'myResultData = MyClass.GetCultureInfo()
                 'If myResultData.HasError Then
                 '    Dim myLogAcciones As New ApplicationLogManager()
-                '    myLogAcciones.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
                 '    Exit Try
                 'End If
 
@@ -660,7 +660,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -708,7 +708,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForLOADING", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForLOADING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -751,7 +751,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -898,7 +898,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -989,7 +989,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUSTING", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUSTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1108,7 +1108,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1133,7 +1133,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ManageSavingBC", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ManageSavingBC", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1164,7 +1164,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetCultureInfo", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetCultureInfo", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -1219,7 +1219,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1250,7 +1250,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'myResultData = MyClass.GetCultureInfo()
                 'If myResultData.HasError Then
                 '    Dim myLogAcciones As New ApplicationLogManager()
-                '    myLogAcciones.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
                 '    Exit Try
                 'End If
 
@@ -1307,7 +1307,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function

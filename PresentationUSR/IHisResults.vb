@@ -106,7 +106,7 @@ Public Class IHisResults
 
         'Get the current Language from the current Application Session
         Dim currentLanguageGlobal As New GlobalBase
-        currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+        currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
     End Sub
 #End Region
 
@@ -992,7 +992,7 @@ Public Class IHisResults
 
             'Get Level of the connected User and set the screen status according the Level of the current User
             Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = myGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ScreenStatusByUserLevel()
 
             'Set declared variables to Nothing 
@@ -1857,7 +1857,7 @@ Public Class IHisResults
             End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "IHisResults.PrintReport", EventLogEntryType.Information, False)
                 StartTime = Now
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

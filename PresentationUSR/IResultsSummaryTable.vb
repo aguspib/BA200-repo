@@ -97,7 +97,7 @@ Public Class IResultsSummaryTable
             InitializeScreen()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Table Resume LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Table Resume LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResultsSummaryTable.SummaryResultForm_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -118,7 +118,7 @@ Public Class IResultsSummaryTable
             XRManager.ShowSummaryResultsReport(ActiveAnalyzer, ActiveWorkSession, bsVerticalRadioButton.Checked)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -163,7 +163,7 @@ Public Class IResultsSummaryTable
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()

@@ -48,7 +48,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                  " INNER JOIN tfmwMultiLanguageResources MR ON MD.ResourceID = MR.ResourceID " & vbCrLf & _
                          " WHERE MD.SubTableID = 'SAMPLE_TYPES' " & vbCrLf & _
                          " AND   MD.Status = 1 " & vbCrLf & _
-                         " AND   MR.LanguageID = '" & var.GetSessionInfo.ApplicationLanguage & "' "
+                         " AND   MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' "
 
                         cmdText &= " UNION " & vbCrLf
 
@@ -80,7 +80,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgBarCodeSampleTypesMappingDAO.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgBarCodeSampleTypesMappingDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -130,7 +130,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgBarCodeSampleTypesMappingDAO.ReadByExternalSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgBarCodeSampleTypesMappingDAO.ReadByExternalSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -183,7 +183,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgBarCodeSampleTypesMappingDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgBarCodeSampleTypesMappingDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

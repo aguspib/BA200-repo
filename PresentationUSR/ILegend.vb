@@ -185,7 +185,7 @@ Public Class ILegend
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             Dim currentLanguageGlobal As New GlobalBase
 
-            myLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            myLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_LEGEND", myLanguage)
 

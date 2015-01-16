@@ -148,7 +148,7 @@ Public Class IWSLoadSaveAuxScreen
                     End If
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen Save WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen Save WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "IWSLoadSaveAuxScreen.AcceptSelection", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -160,7 +160,7 @@ Public Class IWSLoadSaveAuxScreen
                         LoadWorkSession()
                     End If
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen LOAD WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen LOAD WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "IWSLoadSaveAuxScreen.AcceptSelection", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -242,7 +242,7 @@ Public Class IWSLoadSaveAuxScreen
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for Screen Buttons
             PrepareButtons()
@@ -637,7 +637,7 @@ Public Class IWSLoadSaveAuxScreen
         InitializeScreen()
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen Load\Save WS Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen Load\Save WS Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                         "IWSLoadSaveAuxScreen.IWSLoadSaveAuxScreen_Load", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 

@@ -99,7 +99,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -138,7 +138,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.DeleteEmptySavedWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.DeleteEmptySavedWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -179,7 +179,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.GetAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.GetAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -215,7 +215,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.ReadLISSavedWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.ReadLISSavedWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -257,7 +257,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.ExistsSavedWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.ExistsSavedWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -534,7 +534,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.Save", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.Save", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -605,7 +605,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SavedWSDelegate.SaveFromLIS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SavedWSDelegate.SaveFromLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

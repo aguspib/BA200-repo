@@ -2990,11 +2990,11 @@ Public Class AnalyzerInfo
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)

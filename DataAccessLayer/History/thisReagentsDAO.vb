@@ -48,7 +48,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.CloseReagent", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.CloseReagent", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -96,7 +96,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -133,7 +133,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.DeleteClosedNotInUse", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -179,7 +179,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thisReagentsDAO.ReadByReagentID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thisReagentsDAO.ReadByReagentID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

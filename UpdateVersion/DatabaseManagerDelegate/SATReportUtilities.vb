@@ -279,11 +279,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     'Error creating the DB Backup
                     Dim myLogAcciones As New ApplicationLogManager()
                     Dim Message As String = "Unable to create a backup copy of the data base"
-                    myLogAcciones.CreateLogActivity(Message, "Utilities.CreateSATReport", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity(Message, "Utilities.CreateSATReport", EventLogEntryType.Error, False)
 
                     Dim myDataBaseManager As New DataBaseManagerDelegate
                     Dim IsSQLServer2005 As Boolean = myDataBaseManager.IsSQLServer2005(DAOBase.DBServer, DAOBase.DBLogin, DAOBase.DBPassword)
-                    myLogAcciones.CreateLogActivity("IsSQLServer2005 = " & IsSQLServer2005.ToString(), "Utilities.CreateSATReport", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity("IsSQLServer2005 = " & IsSQLServer2005.ToString(), "Utilities.CreateSATReport", EventLogEntryType.Error, False)
                 End If
 
                 '2.3 - Add the file with PC and OS Info 
@@ -420,7 +420,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.CreateSATReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CreateSATReport", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -465,7 +465,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.GetLastWrittenFile", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.GetLastWrittenFile", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -514,7 +514,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.GetSATReportVersion", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.GetSATReportVersion", EventLogEntryType.Error, False)
 
             End Try
 
@@ -581,7 +581,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -614,7 +614,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
 
             End Try
 

@@ -56,7 +56,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadBySettingID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadBySettingID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -103,7 +103,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadBySettingIDAndStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadBySettingIDAndStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -136,7 +136,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     'Get the connected Username from the current Application Session
                     Dim currentSession As New GlobalBase
-                    Dim currentUser As String = currentSession.GetSessionInfo().UserName.Trim.ToString
+                    Dim currentUser As String = GlobalBase.GetSessionInfo().UserName.Trim.ToString
                     pCurrentValue = pCurrentValue.Replace("'", "''") 'SGM 26/06/2013 - avoid sql syntax error
                     Dim cmdText As String = " UPDATE tcfgUserSettings " & vbCrLf & _
                                             " SET    CurrentValue = N'" & pCurrentValue & "', " & vbCrLf & _
@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -205,7 +205,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadBarcodeSettings", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadBarcodeSettings", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -251,7 +251,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -297,7 +297,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgUserSettingsDAO.ReadAll", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

@@ -51,7 +51,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -91,7 +91,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -148,7 +148,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -199,7 +199,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -242,7 +242,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.DeleteByTestIDSampleType", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -300,7 +300,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesMultirulesDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

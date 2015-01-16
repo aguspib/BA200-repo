@@ -57,7 +57,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ScreenBlockStatusDelegate.GetBlockStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ScreenBlockStatusDelegate.GetBlockStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -102,7 +102,7 @@ Namespace Biosystems.Ax00.BL
                             If (result.tfmwScreenBlockStatus.Rows.Count > 0) Then
                                 'Get the User Level of the connected User
                                 Dim myGlobalBase As New GlobalBase
-                                Dim currentUserLevel As String = myGlobalBase.GetSessionInfo.UserLevel
+                                Dim currentUserLevel As String = GlobalBase.GetSessionInfo.UserLevel
 
                                 If (currentUserLevel.Trim <> String.Empty) Then
                                     'Get the numeric value for the User Level
@@ -138,7 +138,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ScreenBlockStatusDelegate.GetUserLevelBlockStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ScreenBlockStatusDelegate.GetUserLevelBlockStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -178,7 +178,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ScreenBlockStatusDelegate.ReadByScreenAndAppStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ScreenBlockStatusDelegate.ReadByScreenAndAppStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

@@ -348,7 +348,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.CreateChannel", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.CreateChannel", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -378,7 +378,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.Connect", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.Connect", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -403,7 +403,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.Disconnect", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.Disconnect", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -431,7 +431,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.ReleaseAllChannels", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.ReleaseAllChannels", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -478,7 +478,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.GetPendingMessages", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.GetPendingMessages", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -535,7 +535,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.DeleteAllMessages", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DeleteAllMessages", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -591,7 +591,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.DeleteMessage", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DeleteMessage", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -644,7 +644,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.DeleteIncomingMessages", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DeleteIncomingMessages", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -703,7 +703,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.QueryAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.QueryAll", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -760,7 +760,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                 'AG 02/01/2014 - BT #1433 add new log traces (v211 patch2)
                                 Dim myLogAcciones As New ApplicationLogManager()
-                                myLogAcciones.CreateLogActivity("Send host query message: " & msgId, "ESWrapper.HostQuery", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Send host query message: " & msgId, "ESWrapper.HostQuery", EventLogEntryType.Information, False)
 
                                 'Send command to ES library
                                 Me.driverManager.SendCommand(myCommand)
@@ -782,7 +782,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.HostQuery", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.HostQuery", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -841,7 +841,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.AcceptAwos", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.AcceptAwos", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -904,7 +904,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.AcceptAwos", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.AcceptAwos", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -964,7 +964,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.RejectAwos", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.RejectAwos", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1011,7 +1011,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                 'AG 02/01/2014 - BT #1433 add new log traces (v211 patch2)
                                 Dim myLogAcciones As New ApplicationLogManager()
-                                myLogAcciones.CreateLogActivity("Send message rejecting awos: " & msgId, "ESWrapper.RejectAwosDelayed", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Send message rejecting awos: " & msgId, "ESWrapper.RejectAwosDelayed", EventLogEntryType.Information, False)
 
                                 'Send command to ES library
                                 Me.driverManager.SendCommand(myCommand)
@@ -1028,7 +1028,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.RejectAwosDelayed", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.RejectAwosDelayed", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1117,7 +1117,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                                 'AG 02/01/2014 - BT #1433 add new log traces (v211 patch2)
                                 'Dim myLogAcciones As New ApplicationLogManager()    ' XB 12/02/2014 - Task #1495
-                                myLogAcciones.CreateLogActivity("Send message uploading results: " & msgId, "ESWrapper.UploadOrdersResults", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Send message uploading results: " & msgId, "ESWrapper.UploadOrdersResults", EventLogEntryType.Information, False)
 
                                 'Send command to ES library
                                 Me.driverManager.SendCommand(myCommand)
@@ -1226,7 +1226,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 'End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495 
-                myLogAcciones.CreateLogActivity("UploadOrdersResults Method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("UploadOrdersResults Method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "ESWrapper.UploadOrdersResults", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495 
 
@@ -1237,7 +1237,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.UploadOrdersResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.UploadOrdersResults", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1266,7 +1266,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.ClearQueueOfSpecimenNotResponded", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.ClearQueueOfSpecimenNotResponded", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1305,7 +1305,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.UpdateSpecimensNotResponded", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.UpdateSpecimensNotResponded", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1328,7 +1328,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 End SyncLock
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.DecrementUploadMessagesWithOutNotification", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DecrementUploadMessagesWithOutNotification", EventLogEntryType.Error, False)
             End Try
             Return value
         End Function
@@ -1346,7 +1346,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 End SyncLock
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.ResetUploadMessagesWithOutNotification", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.ResetUploadMessagesWithOutNotification", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1418,7 +1418,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.SetMessageStorage", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.SetMessageStorage", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1445,7 +1445,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 Dim StartTime As DateTime = Now
                 Dim myLogAcciones As New ApplicationLogManager()
                 '' pending to comment ! only for test !!!
-                'myLogAcciones.CreateLogActivity("LIS reception event - ", "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("LIS reception event - ", "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Information, False)
                 '' pending to comment ! only for test !!!
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1489,19 +1489,19 @@ Namespace Biosystems.Ax00.LISCommunications
                 If isNotificationFlag Then
                     ' XB 06/03/2014 - i better catch the notification fired on IAx00MainMDI.SetLISLedStatusColor
                     ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    'myLogAcciones.CreateLogActivity("LIS reception event - notification fired: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Information, False)
+                    'GlobalBase.CreateLogActivity("LIS reception event - notification fired: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Information, False)
                     ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                     ' XB 06/03/2014
                 Else
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("LIS reception event - message fired: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("LIS reception event - message fired: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 End If
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -1524,7 +1524,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
             '' pending to comment ! only for test !!!
             'Dim myLogAcciones As New ApplicationLogManager()
-            'myLogAcciones.CreateLogActivity("LIS reception event - message fired: ", "ESWrapper.FireMessage", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity("LIS reception event - message fired: ", "ESWrapper.FireMessage", EventLogEntryType.Information, False)
             '' pending to comment ! only for test !!!
 
             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
@@ -1533,7 +1533,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData = xmlMessageDgt.AddMessage(Nothing, myMsgId, xmlMessage, "PENDING")
 
                 '' pending to comment ! only for test !!!
-                'myLogAcciones.CreateLogActivity("LIS reception event - message saved: ", "ESWrapper.FireMessage", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("LIS reception event - message saved: ", "ESWrapper.FireMessage", EventLogEntryType.Information, False)
                 '' pending to comment ! only for test !!!
 
                 'AG 08/03/2013 - send the complete order acceptance message
@@ -1541,7 +1541,7 @@ Namespace Biosystems.Ax00.LISCommunications
                     resultData = AcceptCompleteOrder(Nothing)
 
                     '' pending to comment ! only for test !!!
-                    'myLogAcciones.CreateLogActivity("LIS reception event - message answered: ", "ESWrapper.FireMessage", EventLogEntryType.Information, False)
+                    'GlobalBase.CreateLogActivity("LIS reception event - message answered: ", "ESWrapper.FireMessage", EventLogEntryType.Information, False)
                     '' pending to comment ! only for test !!!
                 End If
                 'AG 08/03/2013

@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -120,7 +120,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByControlID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByControlID", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -175,7 +175,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByCalibratorID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.DeleteByCalibratorID", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -215,7 +215,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.ExistVRotor", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.ExistVRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -258,7 +258,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.GetVRotorsByRotorType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.GetVRotorsByRotorType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -350,7 +350,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Save", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "VirtualRotorsDelegate.Save", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

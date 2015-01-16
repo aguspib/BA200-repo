@@ -497,7 +497,7 @@ Namespace Biosystems.Ax00.Global
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PCInfoReader.GetSystemInfo", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PCInfoReader.GetSystemInfo", EventLogEntryType.Error, False)
                 Return ""
             End Try
 
@@ -529,7 +529,7 @@ Namespace Biosystems.Ax00.Global
                 'validate if connection string is empty to send an error
                 If String.IsNullOrEmpty(myConnectionString) Then
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Error Reading the Connection String.", "PCInfoReader.GetCurrentServer()", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity("Error Reading the Connection String.", "PCInfoReader.GetCurrentServer()", EventLogEntryType.Error, False)
                 Else
                     Using connection As New System.Data.SqlClient.SqlConnection(myConnectionString)
                         CurrentServer = connection.DataSource
@@ -538,7 +538,7 @@ Namespace Biosystems.Ax00.Global
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PCInfoReader.GetCurrentServer()", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PCInfoReader.GetCurrentServer()", EventLogEntryType.Error, False)
 
             End Try
 
@@ -760,7 +760,7 @@ Namespace Biosystems.Ax00.Global
                 'NOTE it can be added much more info
             Catch ex As Exception
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
                 Return ""
             End Try
 
@@ -818,7 +818,7 @@ Namespace Biosystems.Ax00.Global
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PCInfoReader.ExportFile", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "PCInfoReader.ExportFile", EventLogEntryType.Error, False)
             Finally
                 'close the file 
                 TextFileWriter.Close()
@@ -969,7 +969,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse
@@ -1043,7 +1043,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse
@@ -1089,7 +1089,7 @@ Namespace Biosystems.Ax00.Global
         '        myResponse.ErrorCode = "SYSTEM_ERROR"
         '        myResponse.ErrorMessage = ex.Message
         '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+        '        'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myResponse
@@ -1158,7 +1158,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse
@@ -1230,7 +1230,7 @@ Namespace Biosystems.Ax00.Global
                 Next
             Catch ex As Exception
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return False
@@ -1328,7 +1328,7 @@ Namespace Biosystems.Ax00.Global
                 Throw
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return False
@@ -1386,7 +1386,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse
@@ -1442,7 +1442,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse
@@ -1531,7 +1531,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse
@@ -1625,7 +1625,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse
@@ -1741,7 +1741,7 @@ Namespace Biosystems.Ax00.Global
                 myResponse.ErrorCode = "SYSTEM_ERROR"
                 myResponse.ErrorMessage = ex.Message
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "ApplicationLayer.SearchValidPorts", EventLogEntryType.Error, False)
             End Try
 
             Return myResponse

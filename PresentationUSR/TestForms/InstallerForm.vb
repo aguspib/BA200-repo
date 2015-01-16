@@ -27,7 +27,7 @@ Public Class InstallerForm
         'testLims()
 
         Dim MyGlobalBase As New GlobalBase
-        CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+        CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
         ScreenAccessControl()
     End Sub
 
@@ -287,16 +287,16 @@ Public Class InstallerForm
 
     '    Try
     '        Dim mydbmngDelegate As New DataBaseManagerDelegate()
-    '        myLogAcciones.CreateLogActivity("ANTES DE VALIDAR SI EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
+    '        GlobalBase.CreateLogActivity("ANTES DE VALIDAR SI EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
 
     '        If mydbmngDelegate.DataBaseExist(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) Then
-    '            myLogAcciones.CreateLogActivity("EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
+    '            GlobalBase.CreateLogActivity("EXISTE LA BD", "InstallerForm", EventLogEntryType.Information, False)
     '            Dim myDBUpdateManager As New DataBaseUpdateManagerDelegate
     '            'If myDBUpdateManager.UpdateDatabase(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword) Then
     '            '    MessageBox.Show("Actalizacion de base de datos correcta")
     '            'End If
     '        Else
-    '            myLogAcciones.CreateLogActivity("ANTES DE INSTALAR LA BD", "InstallerForm", EventLogEntryType.Information, False)
+    '            GlobalBase.CreateLogActivity("ANTES DE INSTALAR LA BD", "InstallerForm", EventLogEntryType.Information, False)
     '            Dim myDBInstallerDelegate As New DataBaseInstallerManagerDelegate()
     '            'If myDBInstallerDelegate.InstallApplicationDataBase(DAOBase.DBServer, DAOBase.CurrentDB, _
     '            '                                                    DAOBase.DBLogin, DAOBase.DBPassword) Then

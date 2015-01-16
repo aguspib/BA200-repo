@@ -210,7 +210,7 @@
 
 '                                                'Get the current application user.
 '                                                Dim currentSession As New GlobalBase
-'                                                myResultsRow.TS_User = currentSession.GetSessionInfo.UserName
+'                                                myResultsRow.TS_User = GlobalBase.GetSessionInfo.UserName
 
 '                                                'Add the new result row.
 '                                                myResultDS.twksResults.AddtwksResultsRow(myResultsRow)
@@ -446,7 +446,7 @@
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobalDataTO
@@ -515,7 +515,7 @@
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.IsValidISERefRanges", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobalDataTO
 '        End Function
@@ -685,7 +685,7 @@
 '                resultData.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.RecalculateAverageValue", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.RecalculateAverageValue", EventLogEntryType.Error, False)
 
 '            Finally
 '                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -746,7 +746,7 @@
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.GetAverageConcentrationValue", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.GetAverageConcentrationValue", EventLogEntryType.Error, False)
 
 '            Finally
 '                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1084,7 +1084,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1163,7 +1163,7 @@
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.SaveDebugModeResultData", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.SaveDebugModeResultData", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobalDataTO
@@ -1189,7 +1189,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.GetAffectedElements", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.GetAffectedElements", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myResult
@@ -1213,7 +1213,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.GetISEModuleError", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.GetISEModuleError", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myResult
@@ -1239,7 +1239,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.LoadISEModuleParammeters", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.LoadISEModuleParammeters", EventLogEntryType.Error, False)
 '            End Try
 '            Return myResultDataSet
 '        End Function
@@ -1265,7 +1265,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.FillAffectedElementHT", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.FillAffectedElementHT", EventLogEntryType.Error, False)
 '            End Try
 
 '        End Sub
@@ -1285,7 +1285,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.FillISEModuleErrorHT", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.FillISEModuleErrorHT", EventLogEntryType.Error, False)
 '            End Try
 
 '        End Sub
@@ -1340,7 +1340,7 @@
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISETESTErrors", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISETESTErrors", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobalDataTO
@@ -1365,7 +1365,7 @@
 
 '            Catch ex As Exception
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.CheckChecksum", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.CheckChecksum", EventLogEntryType.Error, False)
 '            End Try
 '            Return isOK
 '        End Function
@@ -1387,7 +1387,7 @@
 '                myGlobal.ErrorMessage = ex.Message
 
 '                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.CalculateCRC", EventLogEntryType.Error, False)
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.CalculateCRC", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function

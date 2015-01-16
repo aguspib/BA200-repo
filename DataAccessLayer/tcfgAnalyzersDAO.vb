@@ -49,7 +49,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -96,7 +96,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadByAnalyzerID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadByAnalyzerID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -138,7 +138,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
                     Dim myLogAccionesAux As New ApplicationLogManager()
-                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Create Analyzer - AffectedRecords [" & resultData.AffectedRecords & " ]", "tcfgAnalyzersDAO.Create", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("(Analyzer Change) Create Analyzer - AffectedRecords [" & resultData.AffectedRecords & " ]", "tcfgAnalyzersDAO.Create", EventLogEntryType.Information, False)
 
                     'If (resultData.AffectedRecords > 0) Then
                     '    Dim myAnalyzersDS As New AnalyzersDS
@@ -167,7 +167,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -212,7 +212,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadByAnalyzerGeneric", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadByAnalyzerGeneric", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -258,7 +258,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadByAnalyzerActive", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.ReadByAnalyzerActive", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -293,7 +293,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
 
                     Dim myLogAccionesAux As New ApplicationLogManager()
-                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Delete Analyzer - AffectedRecords [" & resultData.AffectedRecords & " ]", "tcfgAnalyzersDAO.DeleteConnectedAnalyzersNotActive", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("(Analyzer Change) Delete Analyzer - AffectedRecords [" & resultData.AffectedRecords & " ]", "tcfgAnalyzersDAO.DeleteConnectedAnalyzersNotActive", EventLogEntryType.Information, False)
                 End If
 
             Catch ex As Exception
@@ -302,7 +302,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.DeleteConnectedAnalyzers", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgAnalyzersDAO.DeleteConnectedAnalyzers", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -346,7 +346,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myAffectedRecords += dbCmd.ExecuteNonQuery()
 
                     Dim myLogAccionesAux As New ApplicationLogManager()
-                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Update Analyzer - AffectedRecords [" & myAffectedRecords & " ]", "tcfgAnalyzersDAO.UpdateAnalyzerActive", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("(Analyzer Change) Update Analyzer - AffectedRecords [" & myAffectedRecords & " ]", "tcfgAnalyzersDAO.UpdateAnalyzerActive", EventLogEntryType.Information, False)
                 End If
 
             Catch ex As Exception
@@ -355,7 +355,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.UpdateAnalyzerActive", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.UpdateAnalyzerActive", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

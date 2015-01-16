@@ -1650,7 +1650,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1665,7 +1665,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1718,7 +1718,7 @@ Public Class IProgOffSystemTest
         Try
             'Gets from the Session the Username of the connected User
             Dim currentSession As New ApplicationSessionManager
-            Dim currentUser As String = currentSession.GetSessionInfo().UserName
+            Dim currentUser As String = GlobalBase.GetSessionInfo().UserName
 
             'Fill OffSystem Test basic data
             Dim offSystemTestData As New OffSystemTestsDS
@@ -1816,7 +1816,7 @@ Public Class IProgOffSystemTest
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -2075,7 +2075,7 @@ Public Class IProgOffSystemTest
         Try
             'TR 20/04/2012 - Get the Level of the Current User
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             ScreenLoad()
         Catch ex As Exception

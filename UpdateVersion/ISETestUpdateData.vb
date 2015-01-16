@@ -45,7 +45,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UPDATEModifiedISETestSamples", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UPDATEModifiedISETestSamples", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UpdateISETests", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UpdateISETests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -304,7 +304,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UpdateISETestSamples", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UpdateISETestSamples", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -338,7 +338,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
                 Throw
             End Try
         End Sub
@@ -409,7 +409,7 @@ End Namespace
 
 '        Catch ex As Exception
 '            Dim myLogAcciones As New ApplicationLogManager()
-'            myLogAcciones.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchISETestById", EventLogEntryType.Error, False)
+'            GlobalBase.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchISETestById", EventLogEntryType.Error, False)
 '        Finally
 '            If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '        End Try
@@ -453,7 +453,7 @@ End Namespace
 
 '        Catch ex As Exception
 '            Dim myLogAcciones As New ApplicationLogManager()
-'            myLogAcciones.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchRefRangesByISETestId", EventLogEntryType.Error, False)
+'            GlobalBase.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchRefRangesByISETestId", EventLogEntryType.Error, False)
 '        Finally
 '            If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '        End Try
@@ -517,7 +517,7 @@ End Namespace
 
 '    Catch ex As Exception
 '        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("ISE Test Update Error.", "ISETestUpdateData.GetDataInDB", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity("ISE Test Update Error.", "ISETestUpdateData.GetDataInDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -647,7 +647,7 @@ End Namespace
 
 '    Catch ex As Exception
 '        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -690,7 +690,7 @@ End Namespace
 '        myGlobalDataTO = ISETestUpdateDAO.GetISETestDistinctInClient(pDBConnection)
 
 '    Catch ex As Exception
-'        myLogAcciones.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -715,7 +715,7 @@ End Namespace
 
 '    Catch ex As Exception
 '        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -740,7 +740,7 @@ End Namespace
 
 '    Catch ex As Exception
 '        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("ISE Test Update Error.", "ISETestUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
+'        GlobalBase.CreateLogActivity("ISE Test Update Error.", "ISETestUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message

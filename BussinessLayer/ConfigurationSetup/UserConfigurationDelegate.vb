@@ -43,7 +43,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserConfigurationDelegate.GetAllList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserConfigurationDelegate.GetAllList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -82,7 +82,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserConfigurationDelegate.GetNotInternalList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserConfigurationDelegate.GetNotInternalList", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -154,7 +154,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserConfigurationDelegate.Add", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserConfigurationDelegate.Add", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -201,7 +201,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserConfigurationDelegate.Modify", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserConfigurationDelegate.Modify", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -252,7 +252,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserConfigurationDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserConfigurationDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -377,7 +377,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.SetDatos = False
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserConfigurationDelegate.UserValidation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserConfigurationDelegate.UserValidation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -425,7 +425,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserConfigurationDelegate.ChangePassword", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserConfigurationDelegate.ChangePassword", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

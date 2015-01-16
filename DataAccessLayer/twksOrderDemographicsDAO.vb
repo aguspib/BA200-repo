@@ -71,7 +71,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
         End Function
@@ -116,7 +116,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.ResetWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
 
             Return resultData

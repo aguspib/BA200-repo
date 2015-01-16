@@ -18,15 +18,15 @@ Public NotInheritable Class StartupSRV
         'IMPORTANT!!! Leave the call to x because otherwise some processes like load rsat fails
         'Dim myLogAcciones As New ApplicationLogManager()
         If RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully Then
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
         Else
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupSRV.New", EventLogEntryType.Error, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupSRV.New", EventLogEntryType.Error, False)
         End If
         'end SGM 09/01/2012
 
         ''SGM 07/11/2012 - log Application Startup
         'Dim myLogAcciones As New ApplicationLogManager()
-        'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
+        'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
         ''end SGM 07/11/2012
 
     End Sub
@@ -75,7 +75,7 @@ Public NotInheritable Class StartupSRV
 
         'AG 21/02/2014 - #1516 at this point services are running. Do not use here the method RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully because fails
         Dim myLogAcciones As New ApplicationLogManager()
-        myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationSRV STARTUP", "Startup_Load (service)", EventLogEntryType.Information, False)
+        GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationSRV STARTUP", "Startup_Load (service)", EventLogEntryType.Information, False)
 
         Me.Close()
     End Sub

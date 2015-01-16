@@ -55,7 +55,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.CloseRunsGroup", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.CloseRunsGroup", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -101,7 +101,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Create", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Create", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -150,7 +150,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.DecrementCumResultsNum", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.DecrementCumResultsNum", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -201,7 +201,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Delete", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Delete", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -238,7 +238,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.ReadByQCTestSampleIDAndQCControlLotID", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.ReadByQCTestSampleIDAndQCControlLotID", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -294,7 +294,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.CloseRunsGroup", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.CloseRunsGroup", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -341,7 +341,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -393,7 +393,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.DecrementCumResultsNum", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.DecrementCumResultsNum", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -484,7 +484,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -525,7 +525,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RunsGroupsDelegate.ReadByQCTestSampleIDAndQCControlLotID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "RunsGroupsDelegate.ReadByQCTestSampleIDAndQCControlLotID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

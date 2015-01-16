@@ -1051,7 +1051,7 @@ Public Class IInstrumentUpdateUtil
 
     '        With Me.BackupFileDialog
     '            .Title = "Backup Adjustments"
-    '            .InitialDirectory = Directory.GetDirectoryRoot(Application.StartupPath & myGlobalbase.FwAdjustmentsPath)
+    '            .InitialDirectory = Directory.GetDirectoryRoot(Application.StartupPath & GlobalBase.FwAdjustmentsPath)
     '            .Filter = "Text files|*.txt|All files|*.*"
     '            .CheckPathExists = True
     '            .OverwritePrompt = True
@@ -3024,7 +3024,7 @@ Public Class IInstrumentUpdateUtil
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'user permissions
             MyBase.GetUserNumericalLevel()

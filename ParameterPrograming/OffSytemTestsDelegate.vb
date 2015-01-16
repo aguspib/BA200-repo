@@ -104,7 +104,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -215,7 +215,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -261,7 +261,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ExistsOffSystemTest", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ExistsOffSystemTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -300,7 +300,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetBySampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -339,7 +339,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetByTestIDAndSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetByTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -374,7 +374,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.GetList", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -537,7 +537,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Modify", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Modify", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -577,7 +577,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -613,7 +613,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadWithUnitDesc", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadWithUnitDesc", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -666,7 +666,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -713,7 +713,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateInUseByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -789,7 +789,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateTestNames", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateTestNames", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -981,7 +981,7 @@ Namespace Biosystems.Ax00.BL
                 myResult.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ValidatedDependencies", EventLogEntryType.Error, False)
             End Try
             Return myResult
         End Function
@@ -1027,7 +1027,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdatepdateLISValueByTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdatepdateLISValueByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1064,7 +1064,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OffSystemTestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OffSystemTestsDelegate.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1129,7 +1129,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1194,7 +1194,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_CloseOFFSTestSample", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_CloseOFFSTestSample", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1270,7 +1270,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_UpdateByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.HIST_UpdateByOFFSTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1314,7 +1314,7 @@ Namespace Biosystems.Ax00.BL
 
                         For i As Integer = 0 To myTestRefRanges.Count - 1
                             myTestRefRanges(0).BeginEdit()
-                            myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                            myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                             myTestRefRanges(0).TS_DateTime = Now
                             myTestRefRanges(0).EndEdit()
 
@@ -1329,7 +1329,7 @@ Namespace Biosystems.Ax00.BL
 
                         For i As Integer = 0 To myTestRefRanges.Count - 1
                             myTestRefRanges(0).BeginEdit()
-                            myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                            myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                             myTestRefRanges(0).TS_DateTime = Now
                             myTestRefRanges(0).EndEdit()
 
@@ -1366,7 +1366,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveReferenceRanges", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveReferenceRanges", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1436,7 +1436,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveTestRefRanges", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveTestRefRanges", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1497,7 +1497,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Create", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Create", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1567,7 +1567,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveOffSystemRefRanges", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveOffSystemRefRanges", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1670,7 +1670,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.Add", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1734,7 +1734,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveNewOffSystemTest", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.SaveNewOffSystemTest", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1770,7 +1770,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadByShortName", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "OffSystemTestsDelegate.ReadByShortName", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

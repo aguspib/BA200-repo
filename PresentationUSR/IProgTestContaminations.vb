@@ -122,8 +122,8 @@ Public Class IProgTestContaminations
         Try
             'Get the current Language from the current Application Session
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
-            Dim currentLanguage As String = MyGlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
 
             'RH 27/09/2011 Initialize ExistsExecutions
@@ -161,7 +161,7 @@ Public Class IProgTestContaminations
             'If pcurrentLanguage = "" Then
             '    'Get the current Language from the current Application Session
             '    Dim currentLanguageGlobal As New GlobalBase
-            '    pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            '    pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             'End If
 
             ''Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -180,7 +180,7 @@ Public Class IProgTestContaminations
             If String.IsNullOrEmpty(pCurrentLanguage) Then
                 'Get the current Language from the current Application Session
                 Dim currentLanguageGlobal As New GlobalBase
-                pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
             End If
 
             'Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -1713,7 +1713,7 @@ Public Class IProgTestContaminations
         Try
             ''TR 23/04/2012 get the current user level
             'Dim MyGlobalBase As New GlobalBase
-            'CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ''TR 23/04/2012 -END.
 
             ScreenLoad()

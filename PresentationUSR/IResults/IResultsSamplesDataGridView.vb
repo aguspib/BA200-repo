@@ -868,7 +868,7 @@ Partial Class IResults
 
         End Try
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IResults UpdateSamplesXtraGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+        GlobalBase.CreateLogActivity("IResults UpdateSamplesXtraGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                         " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                         "IResults.UpdateSamplesXtraGrid", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

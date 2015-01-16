@@ -492,7 +492,7 @@ Public Class IProgControls
             If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 'Get the current User from the Application Session
                 Dim currentSession As New ApplicationSessionManager
-                Dim loggedUser As String = currentSession.GetSessionInfo().UserName
+                Dim loggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                 'Load all selected Controls in a typed DataSet controlDS
                 Dim myControlsDS As New ControlsDS
@@ -967,7 +967,7 @@ Public Class IProgControls
 
             'Gets from the Session the Username of the connected User; get also the current datetime
             Dim currentSession As New ApplicationSessionManager
-            controlRow.TS_User = currentSession.GetSessionInfo().UserName
+            controlRow.TS_User = GlobalBase.GetSessionInfo().UserName
             controlRow.TS_DateTime = Now
 
             controlData.tparControls.Rows.Add(controlRow)
@@ -1717,7 +1717,7 @@ Public Class IProgControls
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels()
@@ -2424,7 +2424,7 @@ Public Class IProgControls
         Try
             'TR 20/04/2012 get the current user level
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
 
             ScreenLoad()

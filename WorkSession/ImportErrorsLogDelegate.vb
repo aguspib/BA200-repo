@@ -38,7 +38,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ImportErrorsLogDelegate.GetAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ImportErrorsLogDelegate.GetAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -88,7 +88,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ImportErrorsLogDelegate.Add", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ImportErrorsLogDelegate.Add", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -133,7 +133,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ImportErrorsLogDelegate.DeleteAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ImportErrorsLogDelegate.DeleteAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

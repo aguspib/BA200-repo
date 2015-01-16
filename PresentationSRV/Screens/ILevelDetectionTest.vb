@@ -1163,7 +1163,7 @@ Public Class ILevelDetectionTest
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            MyClass.currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            MyClass.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             MyClass.GetScreenLabels()

@@ -36,7 +36,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Dim myDBUpdateManager As New DataBaseUpdateManagerDelegate
             Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
             Try
-                'myLogAcciones.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
 
                 If DataBaseExist(pServerName, pDataBaseName, DBLogin, DBPassword) Then
                     'BT #1632 - Before start the update process, execute temporary scripts used to change the structure of tables that have to 
@@ -45,13 +45,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                     initialTimeUpdate = Now 'Set the start time 
                     Debug.Print("INICIO-->" & initialTimeUpdate.TimeOfDay.ToString()) 'Print the time
-                    myLogAcciones.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
+                    GlobalBase.CreateLogActivity("InstallUpdateProcess" & ".Updateprocess - Database found", "Installation validation", _
                                                                                                         EventLogEntryType.Information, False)
                     'Call the Update Database delegate.
                     myGlobalDataTO = myDBUpdateManager.UpdateDatabase(pServerName, pDataBaseName, DBLogin, DBPassword, pLoadingRSAT)
 
                 Else
-                    'myLogAcciones.CreateLogActivity("Before installing the DB", "Update process", EventLogEntryType.Information, False)
+                    'GlobalBase.CreateLogActivity("Before installing the DB", "Update process", EventLogEntryType.Information, False)
                     'Call the Install database delegate.
                     Dim myDBInstallerDelegate As New DataBaseInstallerManagerDelegate()
                     'TR 22/01/2013 v1.0.1 -Change to recive a globalTO instead of boolean.
@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                'myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.RestoreDatabase", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.RestoreDatabase", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorMessage = ex.Message
             Finally
@@ -102,13 +102,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         result = DBManager.RestoreDataBase(ServerName, DataBaseName, DBLogin, DBPassword, _
                                                            BackUpFileName)
                     Else
-                        myLogAcciones.CreateLogActivity(BackUpFileName & " file not found.", _
+                        GlobalBase.CreateLogActivity(BackUpFileName & " file not found.", _
                                                         "DataBaseManagerDelegate.RestoreDatabase", EventLogEntryType.Error, False)
                     End If
                 End If
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.RestoreDatabase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.RestoreDatabase", EventLogEntryType.Error, False)
 
                 'Throw ex  'Commented line RH 10/11/2010
                 'Do prefer using an empty throw when catching and re-throwing an exception.
@@ -139,13 +139,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     If DataBaseExist(ServerName, DataBaseName, DBLogin, DBPassword) Then
                         result = DBManager.BackUpDataBase(ServerName, DataBaseName, DBLogin, DBPassword, pInstalationProcess)
                     Else
-                        myLogAcciones.CreateLogActivity(DataBaseName & " database not found in server " & ServerName, _
+                        GlobalBase.CreateLogActivity(DataBaseName & " database not found in server " & ServerName, _
                                                         "DataBaseManagerDelegate.BackUpDataBase", EventLogEntryType.Error, False)
                     End If
                 End If
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.BackUpDataBase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.BackUpDataBase", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -170,13 +170,13 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     If DataBaseExist(ServerName, DataBaseName, DBLogin, DBPassword) Then
                         result = DBManager.BackUpDataBaseAndMoveBkFile(ServerName, DataBaseName, DBLogin, DBPassword, DirectoryTo)
                     Else
-                        myLogAcciones.CreateLogActivity(DataBaseName & " database not found in server " & ServerName, _
+                        GlobalBase.CreateLogActivity(DataBaseName & " database not found in server " & ServerName, _
                                                         "DataBaseManagerDelegate.BackUpDataBase", EventLogEntryType.Error, False)
                     End If
                 End If
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.BackUpDataBaseAndMoveBkFile", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.BackUpDataBaseAndMoveBkFile", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -200,7 +200,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.IsSQLServer2005", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.IsSQLServer2005", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -225,7 +225,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.DataBaseExist", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.DataBaseExist", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -246,7 +246,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.DeleteDatabase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.DeleteDatabase", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -267,7 +267,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.UpdateDatabaseStructureAndData", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.UpdateDatabaseStructureAndData", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -384,7 +384,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Catch ex As Exception
                 ClosedConnections = False
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.CloseAllOpenConnection", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.CloseAllOpenConnection", EventLogEntryType.Error, False)
             End Try
             Return ClosedConnections
         End Function
@@ -413,11 +413,11 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                         'Delete the BackUp file
                         System.IO.File.Delete(pBackUpFileName)
                     Else
-                        myLogAcciones.CreateLogActivity(pBackUpFileName & " file not found.", "DataBaseManagerDelegate.RestoreDatabaseNEW", EventLogEntryType.Error, False)
+                        GlobalBase.CreateLogActivity(pBackUpFileName & " file not found.", "DataBaseManagerDelegate.RestoreDatabaseNEW", EventLogEntryType.Error, False)
                     End If
                 End If
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.RestoreDatabaseNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.RestoreDatabaseNEW", EventLogEntryType.Error, False)
                 Throw
             End Try
             Return result
@@ -464,7 +464,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.GetAnalyzerAndWorksessionInfo", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.GetAnalyzerAndWorksessionInfo", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
@@ -493,7 +493,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Catch ex As Exception
                 sqlExecResult = False
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManagerDelegate.ExecuteScriptsBeforeUpdate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManagerDelegate.ExecuteScriptsBeforeUpdate", EventLogEntryType.Error, False)
             End Try
             Return sqlExecResult
         End Function

@@ -666,7 +666,7 @@ Public Class ISATReportLoad
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(CurrentLanguage)
@@ -891,10 +891,10 @@ Public Class ISATReportLoad
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myGlobal = myLogAcciones.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
+                    myGlobal = ApplicationLogManager.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
-                        myGlobal = myLogAcciones.DeleteAll()
+                        myGlobal = ApplicationLogManager.DeleteAll()
                     Else
                         'DL 31/05/2013
                         'The Reset process will continue even if errors in ExportLogToXML
@@ -1061,7 +1061,7 @@ Public Class ISATReportLoad
                 Dim newLanguageID As String = myGlobalDataTO.SetDatos.ToString()
                 Dim currentSession As New GlobalBase
                 Dim myApplicationInfoSessionTO As New ApplicationInfoSessionTO
-                myApplicationInfoSessionTO = currentSession.GetSessionInfo()
+                myApplicationInfoSessionTO = GlobalBase.GetSessionInfo()
                 'Validate if language is diferent than the current use languae.
                 If Not myApplicationInfoSessionTO.ApplicationLanguage = newLanguageID Then
                     'Initialize session information.

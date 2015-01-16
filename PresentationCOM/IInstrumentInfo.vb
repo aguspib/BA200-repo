@@ -53,7 +53,7 @@ Public NotInheritable Class IInstrumentInfo
 
             'Get the current Language from the current Application Session
             Dim LanguageIDGlobal As New GlobalBase
-            LanguageID = LanguageIDGlobal.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()

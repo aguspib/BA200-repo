@@ -124,7 +124,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.AddElementsForAlternativeCalibrators", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.AddElementsForAlternativeCalibrators", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -203,7 +203,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.AddElementsForSpecialTestsCalibrators", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.AddElementsForSpecialTestsCalibrators", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -282,7 +282,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.AddOrderTestsElementsNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.AddOrderTestsElementsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -319,7 +319,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.ReadOrderTestByElementID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.ReadOrderTestByElementID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -357,7 +357,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.ReadOrderTestByElementIDAndSampleClass", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.ReadOrderTestByElementIDAndSampleClass", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -403,7 +403,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.ResetWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "WSRequiredElemByOrderTestDelegate.ResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

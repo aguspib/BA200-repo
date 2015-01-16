@@ -61,7 +61,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -109,7 +109,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.Delete", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -159,7 +159,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.DeleteByTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.DeleteByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -198,7 +198,7 @@ Namespace Biosystems.Ax00.BL
 
                             'Get the current application language
                             Dim myGlobalBase As New GlobalBase
-                            Dim currentLang As String = myGlobalBase.GetSessionInfo.ApplicationLanguage
+                            Dim currentLang As String = GlobalBase.GetSessionInfo.ApplicationLanguage
 
                             'Get gender descriptions in the current application language
                             Dim lstDetailedByGender As List(Of TestRefRangesDS.tparTestRefRangesRow)
@@ -281,7 +281,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.ReadByTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.ReadByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -337,7 +337,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.Update", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -379,7 +379,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.GetDetailedByGender", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.GetDetailedByGender", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -419,7 +419,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.GetDetailedByAge", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.GetDetailedByAge", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -460,7 +460,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "TestRefRangesDelegate.GetDetailedByAge", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "TestRefRangesDelegate.GetDetailedByAge", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

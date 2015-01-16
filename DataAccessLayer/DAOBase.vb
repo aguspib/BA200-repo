@@ -75,7 +75,7 @@ Namespace Biosystems.Ax00.DAL
                 'validate if connection string is empty to send an error
                 If String.IsNullOrEmpty(ConnectionString) Then
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Error Reading the Connection String .", "DAOBase", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity("Error Reading the Connection String .", "DAOBase", EventLogEntryType.Error, False)
                 Else
                     Dim ConnBuilder As New System.Data.SqlClient.SqlConnectionStringBuilder(ConnectionString)
                     DBServerField = ConnBuilder.DataSource
@@ -94,7 +94,7 @@ Namespace Biosystems.Ax00.DAL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.GetConnectionString", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetConnectionString", EventLogEntryType.Error, False)
 
             End Try
 
@@ -127,7 +127,7 @@ Namespace Biosystems.Ax00.DAL
                 'dbCmd.CommandText = cmdText
                 'dbCmd.ExecuteNonQuery()
 
-                myLogAcciones.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
 
                 Using dbCmd As New SqlClient.SqlCommand()
                     dbCmd.Connection = pDBConnection
@@ -139,7 +139,7 @@ Namespace Biosystems.Ax00.DAL
                 End Using
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -166,10 +166,10 @@ Namespace Biosystems.Ax00.DAL
                     dbCmd.ExecuteNonQuery()
                 End Using
 
-                myLogAcciones.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.CommitTransaction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.CommitTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -196,10 +196,10 @@ Namespace Biosystems.Ax00.DAL
                     dbCmd.ExecuteNonQuery()
                 End Using
 
-                myLogAcciones.CreateLogActivity("", System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("", System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
 
             Catch ex As Exception
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.RollbackTransaction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.RollbackTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -238,7 +238,7 @@ Namespace Biosystems.Ax00.DAL
                 openConnection.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
 
             End Try
 
@@ -289,7 +289,7 @@ Namespace Biosystems.Ax00.DAL
                     dbConnection.Close()
                 End If
 
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBTransaction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBTransaction", EventLogEntryType.Error, False)
             End Try
             Return openTransaction
         End Function
@@ -307,7 +307,7 @@ Namespace Biosystems.Ax00.DAL
                 resultData = pValue.ToString("G20").Replace(",", ".")
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -325,7 +325,7 @@ Namespace Biosystems.Ax00.DAL
                 resultData = pValue.ToString("G20").Replace(",", ".")
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

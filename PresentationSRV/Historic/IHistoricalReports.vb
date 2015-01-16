@@ -814,14 +814,14 @@ Public Class IHistoricalReports
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             myScreenDelegate.currentLanguage = Me.currentLanguage
 
             'Get the current user level
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             InitializeGridControl1()
 

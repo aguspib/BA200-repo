@@ -52,7 +52,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -81,7 +81,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     For Each row As GridColsConfigDS.tcfgGridColsConfigurationRow In pGridColsConfigDS.tcfgGridColsConfiguration
                         cmdText &= " UPDATE tcfgGridColsConfiguration " & vbCrLf & _
                                    " SET    SavedWidth  = " & row.SavedWidth.ToString & ", " & vbCrLf & _
-                                          " TS_User     = N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', " & vbCrLf & _
+                                          " TS_User     = N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', " & vbCrLf & _
                                           " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf & _
                                    " WHERE  ScreenID = '" & row.ScreenID & "' " & vbCrLf & _
                                    " AND    GridName = '" & row.GridName & "' " & vbCrLf & _
@@ -99,7 +99,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

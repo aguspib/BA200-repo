@@ -902,7 +902,7 @@ Public Class IMonitor
             Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
 
-            myLogAcciones.CreateLogActivity("Refresh monitor screen (init) ", "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Refresh monitor screen (init) ", "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
             'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS) OrElse _
@@ -1005,7 +1005,7 @@ Public Class IMonitor
 
             End If
 
-            myLogAcciones.CreateLogActivity("Refresh monitor screen (complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Refresh monitor screen (complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
             'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             ''AG 12/04/2012 - If WS aborted then show message in the app status bar
@@ -1427,7 +1427,7 @@ Public Class IMonitor
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1734,7 +1734,7 @@ Public Class IMonitor
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateLeds", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateLeds", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1933,7 +1933,7 @@ Public Class IMonitor
 
                 ShownScreen() 'AG 22/04/2014 - #1598 before enable buttons be sure the shown screen atribute has been activated
                 If resultFlagOK Then
-                    myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: Process near to finish successfully. Go to Running", "IMonitor.AutoCreateWSLastStep", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("AutoCreate WS with LIS: Process near to finish successfully. Go to Running", "IMonitor.AutoCreateWSLastStep", EventLogEntryType.Information, False)
                     IAx00MainMDI.FinishAutomaticWSWithLIS()
                 Else
                     IAx00MainMDI.EnableButtonAndMenus(True, True) 'Enable buttons before update attribute!! (required for PLAY/PAUSE button)
@@ -1968,7 +1968,7 @@ Public Class IMonitor
 
         'Get the current Language from the current Application Session
         Dim currentLanguageGlobal As New GlobalBase
-        LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
         'RH 18/10/2011 Initialize myMultiLangResourcesDelegate
         myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate()
@@ -2038,7 +2038,7 @@ Public Class IMonitor
         BsISELongTermDeactivated.Visible = (MyClass.mdiAnalyzerCopy.ISE_Manager.IsISEModuleInstalled AndAlso MyClass.mdiAnalyzerCopy.ISE_Manager.IsLongTermDeactivation)
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IMonitor LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        GlobalBase.CreateLogActivity("IMonitor LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                         "IMonitor.Monitor_Load", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 

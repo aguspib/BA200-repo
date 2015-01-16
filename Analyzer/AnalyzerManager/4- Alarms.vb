@@ -767,7 +767,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             'Debug print to leave developent traces
                             Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Instruction rejected (out of time)", "AnalyzerManager.ManageAlarms", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("Instruction rejected (out of time)", "AnalyzerManager.ManageAlarms", EventLogEntryType.Information, False)
                             Debug.Print(Now.ToString & " .Instruction rejected (out of time)")
 
                             ''''''''''''
@@ -1126,7 +1126,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms", EventLogEntryType.Error, False)
 
                 'Finally
                 '    If (pdbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1214,7 +1214,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SoundActivation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SoundActivation", EventLogEntryType.Error, False)
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1259,7 +1259,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.IsAlarmSoundEnable", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IsAlarmSoundEnable", EventLogEntryType.Error, False)
 
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1348,7 +1348,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'Generate UI_Refresh event ALARMS_RECEIVED
                             If i > pAlarmIDList.Count - 1 Then
                                 ' Error - Firmare has sent and identifier that not exist into masterdata database
-                                myLogAcciones2.CreateLogActivity("Firmware Alarm Code received not specified on Masterdata [" & pErrorCodeList(i) & "]", "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity("Firmware Alarm Code received not specified on Masterdata [" & pErrorCodeList(i) & "]", "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Error, False)
                                 Exit Try
                             End If
 
@@ -1382,7 +1382,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                 AddErrCode = False
                                                 InformAlarm = False
                                                 MyClass.IsInstructionAborted = (AlarmID = GlobalEnumerates.Alarms.INST_ABORTED_ERR.ToString)
-                                                myLogAcciones2.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
+                                                GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
                                             Else
                                                 myManageAlarmTypeTemp = ManagementAlarmTypes.RECOVER_ERROR
                                                 AddErrCode = True
@@ -1411,13 +1411,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.REQUEST_INFO
                                             AddErrCode = False
                                             InformAlarm = False
-                                            myLogAcciones2.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
+                                            GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
 
                                         Case "6_OMMIT_ERROR"
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.OMMIT_ERROR
                                             AddErrCode = False
                                             'InformAlarm = False
-                                            myLogAcciones2.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
+                                            GlobalBase.CreateLogActivity("Alarm error codes received [" & pErrorCodeList(i) & "] - Priority Management : " & myManageAlarmTypeTemp.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
 
                                         Case Else
                                             myManageAlarmTypeTemp = ManagementAlarmTypes.NONE
@@ -1485,7 +1485,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     ' Update Alarm sensors to inform to Presentation layer what kind of management is need to display
                                     PrepareUIRefreshEvent(Nothing, UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, alarmItem.ToString, True)
                                     UpdateSensorValuesAttribute(AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE, ManagementAlarmTypes.SIMPLE_ERROR, True)
-                                    myLogAcciones2.CreateLogActivity("Deposits Alarm received [" & alarmItem.ToString & "] - Priority Management : " & ManagementAlarmTypes.SIMPLE_ERROR.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("Deposits Alarm received [" & alarmItem.ToString & "] - Priority Management : " & ManagementAlarmTypes.SIMPLE_ERROR.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
                                     IsServiceAlarmInformedAttr = True
                             End Select
                         Next
@@ -1493,7 +1493,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If myErrorCodesAttribute.Count > 0 Then
-                    myLogAcciones2.CreateLogActivity("Alarm error codes received [" & ErrorCodes & "] - Priority Management : " & myManageAlarmType.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Alarm error codes received [" & ErrorCodes & "] - Priority Management : " & myManageAlarmType.ToString, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Information, False)
                 End If
 
             Catch ex As Exception
@@ -1502,7 +1502,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageAlarms_SRV", EventLogEntryType.Error, False)
 
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1977,7 +1977,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 tempSetPoint = myUtil.FormatToSingle(adjustValue)
                             Else
                                 Dim myLogAcciones2 As New ApplicationLogManager()
-                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
                             End If
 
                             'Verify the Reactions Rotor Temperature is inside the allowed limits: 
@@ -2018,7 +2018,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 tempSetPoint = myUtil.FormatToSingle(adjustValue)
                             Else
                                 Dim myLogAcciones2 As New ApplicationLogManager()
-                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
                             End If
 
                             'Verify the Fridge Temperature is inside the allowed limits: 
@@ -2059,7 +2059,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 tempSetPoint = myUtil.FormatToSingle(adjustValue)
                             Else
                                 Dim myLogAcciones2 As New ApplicationLogManager()
-                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
                             End If
 
                             'Verify the Washing Station Temperature is inside the allowed limits: 
@@ -2096,7 +2096,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     tempSetPoint = myUtil.FormatToSingle(adjustValue)
                                 Else
                                     Dim myLogAcciones2 As New ApplicationLogManager()
-                                    myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                    GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
                                 End If
 
                                 'Verify the R1 Arm Temperature is inside the allowed limits: 
@@ -2131,7 +2131,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     tempSetPoint = myUtil.FormatToSingle(adjustValue)
                                 Else
                                     Dim myLogAcciones2 As New ApplicationLogManager()
-                                    myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                    GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
                                 End If
 
                                 'Verify the R2 Arm Temperature is inside the allowed limits: 
@@ -2181,7 +2181,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CheckTemperaturesAlarms", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckTemperaturesAlarms", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2384,7 +2384,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CheckContainerAlarms", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckContainerAlarms", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2508,11 +2508,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
                     'If alarmStatus AndAlso Not waterDepositTimer.Enabled Then
                     If alarmStatus AndAlso Not waterDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) Then
-                        myLogAcciones.CreateLogActivity("Water deposit empty!! Enable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("Water deposit empty!! Enable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
                     ElseIf Not alarmStatus AndAlso waterDepositTimer.Enabled Then
-                        myLogAcciones.CreateLogActivity("Water deposit OK!! Disable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("Water deposit OK!! Disable timer waterDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         waterDepositTimer.Enabled = False  'Deactivate timer
                     End If
                     'AG 01/12/2011
@@ -2551,11 +2551,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'AG 29/05/2014 - #1630 - Do not activate timer is alarm is already active!!
                     'If alarmStatus AndAlso Not wasteDepositTimer.Enabled Then
                     If alarmStatus AndAlso Not wasteDepositTimer.Enabled AndAlso Not myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) Then
-                        myLogAcciones.CreateLogActivity("Waste deposit full!! Enable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("Waste deposit full!! Enable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = True 'Activate timer (but NOT ACTIVATE ALARM!!!)
 
                     ElseIf Not alarmStatus AndAlso wasteDepositTimer.Enabled Then
-                        myLogAcciones.CreateLogActivity("Waste deposit OK!! Disable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("Waste deposit OK!! Disable timer wasteDepositTimer. Sensor value: " & myIntValue, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         wasteDepositTimer.Enabled = False  'Deactivate timer
                     End If
                     'AG 01/12/2011
@@ -2656,7 +2656,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     If ((myAlarmList.Count = 1 AndAlso Not myAlarmList.Contains(GlobalEnumerates.Alarms.ISE_OFF_ERR)) OrElse myAlarmList.Count > 1) Then 'AG + XB 08/04/2014 - #1118 (do not save always ANSINF in log due to ISE_OFF_ERR)
                         'Dim myLogAcciones As New ApplicationLogManager() 'AG 29/05/2014 - #1630 declare at the beginning
-                        myLogAcciones.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Information, False)
                         instrAddedToLogFlag = True
                     End If
                     'End If
@@ -2735,7 +2735,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UserSwANSINFTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -3275,7 +3275,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 If isLogActivity Then
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Received Instruction [" & AppLayer.InstructionReceived & "]", "ApplicationLayer.ActivateProtocol (case RECEIVE)", EventLogEntryType.Information, False)
                 End If
 
             Catch ex As Exception
@@ -3284,7 +3284,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwAnsInfTreatment", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwAnsInfTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -3346,7 +3346,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceFWInfoTreatment", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceFWInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -3500,7 +3500,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal
@@ -3623,7 +3623,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwManifoldInfoTreatment", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal
@@ -3656,7 +3656,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobal.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwPhotometricsInfoTreatment", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwPhotometricsInfoTreatment", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return myGlobal
@@ -3710,7 +3710,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwArmsInfoTreatment", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwArmsInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -3763,7 +3763,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwProbesInfoTreatment", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwProbesInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -3828,7 +3828,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwRotorsInfoTreatment", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ServiceSwRotorsInfoTreatment", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -3922,7 +3922,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateSensorValuesAttribute", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateSensorValuesAttribute", EventLogEntryType.Error, False)
             End Try
 
             Return False
@@ -4138,7 +4138,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetBottlePercentage", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetBottlePercentage", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
 
@@ -4166,7 +4166,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'DL 31/07/2012. End
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.IsFridgeStatusDamaged", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IsFridgeStatusDamaged", EventLogEntryType.Error, False)
             End Try
             Return myReturn
         End Function
@@ -4234,7 +4234,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SolveErrorCodesToDisplay", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SolveErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -4276,7 +4276,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.AddErrorCodesToDisplay", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.AddErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -4296,7 +4296,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodesToDisplay", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodesToDisplay", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -4487,7 +4487,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CheckIfProcessCanContinue", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckIfProcessCanContinue", EventLogEntryType.Error, False)
             End Try
             Return readyToSentInstruction
         End Function
@@ -4629,7 +4629,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 toReturnAlarmList.Clear() 'Clear the alarm list to return
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.TranslateErrorCodeToAlarmID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.TranslateErrorCodeToAlarmID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -4964,7 +4964,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodeAlarms", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RemoveErrorCodeAlarms", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5015,7 +5015,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ExistFreezeAlarms", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExistFreezeAlarms", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -5168,7 +5168,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreErrorCodes", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreErrorCodes", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
         End Function
@@ -5212,7 +5212,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileWarmUp", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileWarmUp", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
         End Function
@@ -5249,7 +5249,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileCommError", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileCommError", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
         End Function
@@ -5276,7 +5276,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileShutDown", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.IgnoreAlarmWhileShutDown", EventLogEntryType.Error, False)
             End Try
             Return ignoreFlag
         End Function
@@ -5323,7 +5323,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoReactionsRotorError_Timer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoReactionsRotorError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -5365,7 +5365,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoFridgeError_Timer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ThermoFridgeError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -5395,7 +5395,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If myAlarmList.Count > 0 Then
                     'AG 29/05/2014 - #1630
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Waste deposit full too much time!! Generate alarm WASTE_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Waste deposit full too much time!! Generate alarm WASTE_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
 
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -5409,7 +5409,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.WasteDepositError_Timer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.WasteDepositError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -5439,7 +5439,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If myAlarmList.Count > 0 Then
                     'AG 29/05/2014 - #1630
                     Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Water deposit empty too much time!! Generate alarm WATER_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Water deposit empty too much time!! Generate alarm WATER_DEPOSIT_ERR", "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Information, False)
 
                     'resultData = ManageAlarms(Nothing, myAlarmList, myAlarmStatusList)
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -5453,7 +5453,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.WaterDepositError_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -5492,7 +5492,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR1ArmWarningTimer_Timer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR1ArmWarningTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -5531,7 +5531,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR2ArmWarningTimer_Timer", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.thermoR2ArmWarningTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 

@@ -35,7 +35,7 @@ Public Class QCIndividualResultsByTestControlReport
 
         'Get all Multilanguage texts for the report
         Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         XrLabelControlName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Control_Name", mCurrentLanguage)
@@ -176,7 +176,7 @@ Public Class QCIndividualResultsByTestControlReport
 
         'Get all multilanguage labels
         Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         mLabelSD = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", mCurrentLanguage)

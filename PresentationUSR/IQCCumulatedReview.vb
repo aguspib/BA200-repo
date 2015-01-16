@@ -360,7 +360,7 @@ Public Class IQCCumulatedReview
                             Dim currentLanguageGlobal As New GlobalBase
                             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+                            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
                             Dim myButtonText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CumReview_SaveAsTarget", currentLanguage)
 
                             'For each Control/Lot, verify if Button for Save values as Target has to be enabled or disabled
@@ -527,7 +527,7 @@ Public Class IQCCumulatedReview
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             GetLegendsLabels(currentLanguage)
@@ -1262,7 +1262,7 @@ Public Class IQCCumulatedReview
     Private Sub IQCCumulatedReview_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             InitializeScreen()
             FillTestSampleListView()

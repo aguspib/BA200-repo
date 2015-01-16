@@ -40,7 +40,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdStringBuilder.Append(", '" & ReportTemplateRow.DefaultTemplate & "'" & Environment.NewLine)
 
                         If ReportTemplateRow.IsTS_UserNull Then
-                            cmdStringBuilder.Append(", N'" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "' ")
+                            cmdStringBuilder.Append(", N'" & GlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "' ")
                         Else
                             cmdStringBuilder.Append(", '" & ReportTemplateRow.TS_User & "'" & Environment.NewLine)
                         End If
@@ -68,7 +68,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -113,7 +113,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -149,7 +149,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= "     , TemplateOrientation = '" & pReportTemplateRow.TemplateOrientation & "'" & Environment.NewLine
                     cmdText &= "     , TemplateFileName =  N'" & pReportTemplateRow.TemplateFileName.Replace("'", "''") & "'" & Environment.NewLine
                     cmdText &= "     , DefaultTemplate = '" & pReportTemplateRow.DefaultTemplate & "'" & Environment.NewLine
-                    cmdText &= "     , TS_User = '" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "' " & Environment.NewLine
+                    cmdText &= "     , TS_User = '" & GlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "' " & Environment.NewLine
                     cmdText &= "     , TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & Environment.NewLine
                     cmdText &= " WHERE TemplateName = '" & pReportTemplateRow.TemplateName & "' " & Environment.NewLine
 
@@ -168,7 +168,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateComplete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateComplete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -218,7 +218,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTemplateName", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTemplateName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -247,7 +247,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     cmdText &= " UPDATE tcfgReportTemplates " & Environment.NewLine
                     cmdText &= " SET DefaultTemplate = '" & pDefaultTemplate & "', " & Environment.NewLine
-                    cmdText &= " TS_User = '" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', " & Environment.NewLine
+                    cmdText &= " TS_User = '" & GlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', " & Environment.NewLine
                     cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & Environment.NewLine
                     cmdText &= " WHERE TemplateName = N'" & pTemplateName.Replace("'", "''") & "'" & Environment.NewLine
 
@@ -265,7 +265,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultTemplateFieldByName", _
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultTemplateFieldByName", _
                                                 EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -294,7 +294,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     cmdText &= " UPDATE tcfgReportTemplates " & Environment.NewLine
                     cmdText &= " SET DefaultTemplate = 'False', " & Environment.NewLine
-                    cmdText &= " TS_User = '" & myGlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', " & Environment.NewLine
+                    cmdText &= " TS_User = '" & GlobalBase.GetSessionInfo.UserName.Replace("'", "''") & "', " & Environment.NewLine
                     cmdText &= " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & Environment.NewLine
                     cmdText &= " WHERE TemplateOrientation = '" & pTemplateOrientation & "' " & Environment.NewLine
                     cmdText &= " AND DefaultTemplate = 'True' " & Environment.NewLine
@@ -313,7 +313,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.SetFlaseDefaultValueByTempOrientation", _
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.SetFlaseDefaultValueByTempOrientation", _
                                                 EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -354,7 +354,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -397,7 +397,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -451,7 +451,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.ReadByTemplateOrientation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.ReadByTemplateOrientation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -498,7 +498,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.GetDefaultMasterTemplate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.GetDefaultMasterTemplate", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -555,7 +555,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.SetDefaultTemplateStatus", _
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.SetDefaultTemplateStatus", _
                                                 EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO

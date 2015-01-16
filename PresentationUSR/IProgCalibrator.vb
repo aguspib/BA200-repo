@@ -202,7 +202,7 @@ Public Class IProgCalibrator
         Try
             'Get the current Language from the current Application Session
             Dim myGlobalBase As New GlobalBase
-            currentLanguage = myGlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'LocalCurLanguage = currentLanguage
 
@@ -2848,7 +2848,7 @@ Public Class IProgCalibrator
         Try
             'TR 23/04/2012 -Get the current level
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 23/04/2012 -END
 
             ''DL 28/07/2011

@@ -102,8 +102,7 @@ Namespace Biosystems.Ax00.BL
 
                                         'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
                                         If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                                            Dim myLogAcciones As New ApplicationLogManager()
-                                            myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
+                                            GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
                                         End If
                                     End If
                                 End If
@@ -373,7 +372,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -477,7 +476,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.EntryManualBarcode", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.EntryManualBarcode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -525,7 +524,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ExistBarcodeCriticalWarnings", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ExistBarcodeCriticalWarnings", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -589,7 +588,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.BarcodeConfigChangeActions", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.BarcodeConfigChangeActions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -661,7 +660,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageSinglePosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageSinglePosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -764,7 +763,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveNOREADPosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveNOREADPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -882,7 +881,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveERRORPosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveERRORPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1178,7 +1177,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveOKReadReagentsRotorPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1420,7 +1419,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveOKReadSamplesRotorPosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveOKReadSamplesRotorPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1699,7 +1698,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.DecodeSamplesBarCode", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.DecodeSamplesBarCode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2126,7 +2125,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.DecodeReagentsBarCode", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.DecodeReagentsBarCode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2192,7 +2191,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ValidateCheckDigit", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ValidateCheckDigit", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2405,7 +2404,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.DecodeSamplesBarCode", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.DecodeSamplesBarCode", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2613,7 +2612,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveOKReadSamplesRotorPosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.SaveOKReadSamplesRotorPosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2724,7 +2723,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.VerifyPatientExistsInActiveWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.VerifyPatientExistsInActiveWS", EventLogEntryType.Error, False)
             Finally
                 'resultData.SetDatos = elementID
                 If myReqElementsDS.twksWSRequiredElements.Rows.Count = 0 Then
@@ -2799,7 +2798,7 @@ Namespace Biosystems.Ax00.BL
                                         'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
                                         If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
                                             Dim myLogAcciones As New ApplicationLogManager()
-                                            myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "BarcodeWSDelegate.ManageBarcodeInstructionOLD", EventLogEntryType.Error, False)
+                                            GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "BarcodeWSDelegate.ManageBarcodeInstructionOLD", EventLogEntryType.Error, False)
                                         End If
                                     End If
                                 End If
@@ -3040,7 +3039,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageBarcodeInstruction", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3110,7 +3109,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageSinglePosition", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BarcodeWSDelegate.ManageSinglePosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

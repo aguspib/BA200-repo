@@ -612,7 +612,7 @@ Public Class IWSRotorPositions
 
         Catch ex As Exception
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -2439,7 +2439,7 @@ Public Class IWSRotorPositions
 
                         '' XB 19/12/2013 - add log traces
                         'Dim myLogAcciones As New ApplicationLogManager()
-                        'myLogAcciones.CreateLogActivity("Not expected Case [" & pStatus & "] to paint on Rotor", Me.Name & ".SetPosControlBackGroundForSAMPLESRotor", EventLogEntryType.Information, False)
+                        'GlobalBase.CreateLogActivity("Not expected Case [" & pStatus & "] to paint on Rotor", Me.Name & ".SetPosControlBackGroundForSAMPLESRotor", EventLogEntryType.Information, False)
 
                 End Select
             Else
@@ -6446,12 +6446,12 @@ Public Class IWSRotorPositions
 
             'AG 18/02/2014 - #1505 (change text)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            'myLogAcciones.CreateLogActivity("IWRotorPositions - Create WS Executions: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            'GlobalBase.CreateLogActivity("IWRotorPositions - Create WS Executions: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
             '                                "IWSampleRequest.CreateWSExecutions ", EventLogEntryType.Information, False)
             If finalTime = "" Then
                 finalTime = Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)
             End If
-            myLogAcciones.CreateLogActivity("IWRotorPositions - Create WS Executions: " & finalTime, _
+            GlobalBase.CreateLogActivity("IWRotorPositions - Create WS Executions: " & finalTime, _
                                             "IWRotorPositions.CreateWSExecutions ", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             'AG 18/02/2014 - #1505 (change text)
@@ -6977,7 +6977,7 @@ Public Class IWSRotorPositions
         Try
             'XB 19/12/2013 - Add log traces
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity("Initiate Create Executions Process Function", Me.Name & ".CreateExecutionsProcess", _
+            GlobalBase.CreateLogActivity("Initiate Create Executions Process Function", Me.Name & ".CreateExecutionsProcess", _
                                             EventLogEntryType.Information, False)
 
             'SA 11/06/2013 - Verify if the status of the active WS has changed
@@ -6990,7 +6990,7 @@ Public Class IWSRotorPositions
             End If
 
             'XB 19/12/2013 - Add log traces
-            myLogAcciones.CreateLogActivity("WorkSessionStatusAttribute value : [" & WorkSessionStatusAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
+            GlobalBase.CreateLogActivity("WorkSessionStatusAttribute value : [" & WorkSessionStatusAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
                                             EventLogEntryType.Information, False)
 
             If (WorkSessionStatusAttribute <> "EMPTY" AndAlso WorkSessionStatusAttribute <> "OPEN" AndAlso _
@@ -6998,9 +6998,9 @@ Public Class IWSRotorPositions
                 Cursor = Cursors.WaitCursor
 
                 'XB 19/12/2013 - Add log traces
-                myLogAcciones.CreateLogActivity("AutoWSCreationWithLISModeAttribute value : [" & AutoWSCreationWithLISModeAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
+                GlobalBase.CreateLogActivity("AutoWSCreationWithLISModeAttribute value : [" & AutoWSCreationWithLISModeAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
                                                 EventLogEntryType.Information, False)
-                myLogAcciones.CreateLogActivity("OpenByAutomaticProcessAttribute value : [" & OpenByAutomaticProcessAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
+                GlobalBase.CreateLogActivity("OpenByAutomaticProcessAttribute value : [" & OpenByAutomaticProcessAttribute & "]", Me.Name & ".CreateExecutionsProcess", _
                                                 EventLogEntryType.Information, False)
 
                 'BT #1481 - Process of Automatic WS Creation with LIS should not stop when some of the required Elements are not positioned 
@@ -7081,7 +7081,7 @@ Public Class IWSRotorPositions
                     If (Not RotorsTabs Is Nothing) Then RotorsTabs.Enabled = False
 
                     'XB 19/12/2013 - Add log traces
-                    myLogAcciones.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".CreateExecutionsProcess", _
+                    GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", Me.Name & ".CreateExecutionsProcess", _
                                                     EventLogEntryType.Information, False)
 
 
@@ -7648,7 +7648,7 @@ Public Class IWSRotorPositions
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
                 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
@@ -7714,7 +7714,7 @@ Public Class IWSRotorPositions
                 'AG 21/03/2012
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("IWSROTORPositions.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("IWSROTORPositions.LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "IWSROTORPositions.ReagentSamplePositioning_Load", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -8820,7 +8820,7 @@ Public Class IWSRotorPositions
             bsAcceptButton.Enabled = False 'AG 18/06/2014 #1669 - Disable button when this process starts
 
             'AG 28/05/2014 - New trace
-            myLogAcciones.CreateLogActivity("Start Closing IWSROTORPositions", "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("Start Closing IWSROTORPositions", "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
 
             'BT #1520 - Use parameters MAX_APP_MEMORYUSAGE and MAX_SQL_MEMORYUSAGE into performance counters (a warning message is NOT shown 
             '           if at least one of them has been exceeded)
@@ -8833,7 +8833,7 @@ Public Class IWSRotorPositions
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             'AG 28/05/2014 - change text  'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
+            GlobalBase.CreateLogActivity("IWSROTORPositions.CreateExecutionsProcess (Complete1): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -8879,7 +8879,7 @@ Public Class IWSRotorPositions
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             'AG 28/05/2014 - change text 'AG 18/02/2014 - #1505 - Change text!!!
-            myLogAcciones.CreateLogActivity("IWSROTORPositions CLOSED (final): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
+            GlobalBase.CreateLogActivity("IWSROTORPositions CLOSED (final): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & " - NOTE: High values could mean screen with element NOPOS opened (search for 'Time with NOSPOS warning screen opened')!!", _
                                             "IWSROTORPositions.bsCreateExecutionsButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         End Try

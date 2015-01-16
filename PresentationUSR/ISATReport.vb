@@ -61,7 +61,7 @@ Public Class ISATReport
 
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
             GetScreenLabels(currentLanguage)
@@ -94,7 +94,7 @@ Public Class ISATReport
 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("ISATReport LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("ISATReport LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "ISATReport.SATReportData_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -166,7 +166,7 @@ Public Class ISATReport
             'TR 14/02/2012 -END.
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("ISATReport Exit Button (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("ISATReport Exit Button (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "ISATReport.ExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -237,7 +237,7 @@ Public Class ISATReport
                         Application.DoEvents()
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        myLogAcciones.CreateLogActivity("Before Email -> ReportSAT Generated (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Before Email -> ReportSAT Generated (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "ISATReport.bsSaveSATRepButton_Click", EventLogEntryType.Information, False)
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -323,7 +323,7 @@ Public Class ISATReport
                     Next
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("ISATReport Delete WS Files (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("ISATReport Delete WS Files (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "ISATReport.bsDeleteButton_Click", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 

@@ -60,7 +60,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.CloseOLDBlankCalibResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.CloseOLDBlankCalibResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -107,7 +107,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -214,7 +214,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.ClearIdentifiersForLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -312,7 +312,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgResultsForCalibCurve", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgResultsForCalibCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -390,7 +390,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForCalibCurve", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForCalibCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -451,7 +451,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalResults", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalResults", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -495,7 +495,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetHistoricalBlankCalibResultsByFilter", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -573,7 +573,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForScreens", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetAvgAlarmsForScreens", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -663,7 +663,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsForReports", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsForReports", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -694,7 +694,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         'Get labels for Header Report in the active language
                         Dim currentLanguageGlobal As New GlobalBase
-                        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                        Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
                         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
                         Dim literalPatientID As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
@@ -915,7 +915,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -953,7 +953,7 @@ Namespace Biosystems.Ax00.BL
         '                'Get Literal for heaader report
         '                'begin
         '                Dim currentLanguageGlobal As New GlobalBase
-        '                Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        '                Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         '                Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
         '                Dim literalPatientID As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_PatientID", CurrentLanguage)
         '                Dim literalFullName As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Summary_PatientName", CurrentLanguage)
@@ -1230,7 +1230,7 @@ Namespace Biosystems.Ax00.BL
         '    resultData.ErrorMessage = ex.Message
 
         '    Dim myLogAcciones As New ApplicationLogManager()
-        '    myLogAcciones.CreateLogActivity(ex.Message, "ResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
+        '    GlobalBase.CreateLogActivity(ex.Message, "ResultsDelegate.GetResultsByPatientSampleForReport", EventLogEntryType.Error, False)
         'Finally
         '    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         'End Try
@@ -1274,7 +1274,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsCalibCurveForReport", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsCalibCurveForReport", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1313,7 +1313,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsToExportFromHIST", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetResultsToExportFromHIST", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1360,7 +1360,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1408,7 +1408,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISExportStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISExportStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1465,7 +1465,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISMessageID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateLISMessageID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1524,7 +1524,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.UpdateExportStatusByMessageID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1573,7 +1573,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetSpecimentIdList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.GetSpecimentIdList", EventLogEntryType.Error, False)
             Finally
             End Try
             Return resultData
@@ -1623,7 +1623,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteResults", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1673,7 +1673,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "HisWSResultsDelegate.DeleteByHistOrderTestID", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

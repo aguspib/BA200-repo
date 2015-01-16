@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -95,7 +95,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "INNER JOIN tfmwMultiLanguageResources MR " & vbCrLf
                         cmdText &= "       ON R.ResourceID = MR.ResourceID " & vbCrLf
                         cmdText &= "WHERE  RS.ResultServiceID = " & pResultServiceID.ToString() & vbCrLf
-                        cmdText &= "  AND  MR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
+                        cmdText &= "  AND  MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf
 
                         Dim myDataSet As New SRVRecommendationsServiceDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -115,7 +115,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.ReadByResultServiceID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.ReadByResultServiceID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -155,7 +155,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Delete", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO

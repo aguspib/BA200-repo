@@ -56,7 +56,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UsersLevelDelegate.GetUserNumericLevel", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UsersLevelDelegate.GetUserNumericLevel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -106,7 +106,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UsersLevelDelegate.GetLevelsByInternalUseFlag", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UsersLevelDelegate.GetLevelsByInternalUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -133,7 +133,7 @@ Namespace Biosystems.Ax00.BL
 
                         Dim MyGlobalBase As New GlobalBase
                         Dim CurrentUserLevel As String
-                        CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+                        CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
 
                         Dim myUsersLevel As New UsersLevelDelegate
                         Dim myTemporal As New GlobalDataTO
@@ -157,7 +157,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "UserLevelDelegate.GetCurrentUserNumericalLevel", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UserLevelDelegate.GetCurrentUserNumericalLevel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

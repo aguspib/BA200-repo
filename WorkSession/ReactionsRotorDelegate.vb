@@ -53,7 +53,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -90,7 +90,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.Read", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.Read", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -146,7 +146,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.Update", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -188,7 +188,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ReadAll", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ReadAll", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -264,7 +264,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ResetWS", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -311,7 +311,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.DeleteAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.DeleteAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -356,7 +356,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ReadWellHistoricalUse", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ReadWellHistoricalUse", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -409,7 +409,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetNextRotorTurn", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetNextRotorTurn", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -439,7 +439,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetAllWellsLastTurn", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetAllWellsLastTurn", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -599,7 +599,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.UpdateWellByArmStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.UpdateWellByArmStatus", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -736,7 +736,7 @@ Namespace Biosystems.Ax00.BL
             '    resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
             '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.UpdateWellByArmStatus", EventLogEntryType.Error, False)
+            '    GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.UpdateWellByArmStatus", EventLogEntryType.Error, False)
             'Finally
             '    If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             'End Try
@@ -980,7 +980,7 @@ Namespace Biosystems.Ax00.BL
 
                 '' XBC 03/07/2012 - time estimation
                 'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity("Inserting new wells (discarded) " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "ReactionsRotorDelegate.InitializeNewRotorTurnWellStatus", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("Inserting new wells (discarded) " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "ReactionsRotorDelegate.InitializeNewRotorTurnWellStatus", EventLogEntryType.Information, False)
 
             Catch ex As Exception
                 'When the Database Connection was opened locally, then the Rollback is executed
@@ -991,7 +991,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.InitializeNewRotorTurnWellStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.InitializeNewRotorTurnWellStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1092,7 +1092,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.CreateWSReactionsRotor", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.CreateWSReactionsRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1161,7 +1161,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ChangeRotor", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.ChangeRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1209,7 +1209,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.SetToEmptyTheWellsInWashStation", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.SetToEmptyTheWellsInWashStation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1295,7 +1295,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.AsignFinalValuesAfterLeavingRunning", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.AsignFinalValuesAfterLeavingRunning", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1337,7 +1337,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetPositionReactionsInfo", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetPositionReactionsInfo", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1388,7 +1388,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1421,7 +1421,7 @@ Namespace Biosystems.Ax00.BL
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetRealWellNumber", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.GetRealWellNumber", EventLogEntryType.Error, False)
             End Try
             Return myValue
         End Function
@@ -1558,7 +1558,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.InitializeNewRotorTurnWellStatus", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ReactionsRotorDelegate.InitializeNewRotorTurnWellStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

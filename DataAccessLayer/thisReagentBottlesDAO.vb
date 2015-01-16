@@ -97,7 +97,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -150,7 +150,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.Read", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -224,7 +224,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -271,7 +271,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.ReadByBarCode", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparHistoryReagentBottlesDAO.ReadByBarCode", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

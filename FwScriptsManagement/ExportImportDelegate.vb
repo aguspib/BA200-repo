@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportTextInstructions", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportTextInstructions", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -119,7 +119,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportInstructions", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportInstructions", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportFwScript", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportFwScript", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -235,7 +235,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ImportFwScript", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ImportFwScript", EventLogEntryType.Error, False)
 
             Finally
                 If TextFileReader IsNot Nothing Then

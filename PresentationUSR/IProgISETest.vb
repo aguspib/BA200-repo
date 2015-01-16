@@ -1767,7 +1767,7 @@ Public Class IProgISETest
 
                 For i As Integer = 0 To myTestRefRanges.Count - 1
                     myTestRefRanges(0).BeginEdit()
-                    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                     myTestRefRanges(0).TS_DateTime = Now
                     myTestRefRanges(0).EndEdit()
 
@@ -1782,7 +1782,7 @@ Public Class IProgISETest
 
                 For i As Integer = 0 To myTestRefRanges.Count - 1
                     myTestRefRanges(0).BeginEdit()
-                    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                     myTestRefRanges(0).TS_DateTime = Now
                     myTestRefRanges(0).EndEdit()
 
@@ -1839,7 +1839,7 @@ Public Class IProgISETest
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -4203,7 +4203,7 @@ Public Class IProgISETest
         Try
             'TR 20/04/2012 get the current user level
             Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             ScreenLoad()
             ScreenStatusByUserLevel() 'TR 23/04/2012

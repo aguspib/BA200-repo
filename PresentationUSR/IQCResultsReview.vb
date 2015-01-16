@@ -1058,7 +1058,7 @@ Public Class IQCResultsReview
         Try
             'Get the current Language from the current Application Session
             Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             PrepareButtons(currentLanguage)
@@ -1152,7 +1152,7 @@ Public Class IQCResultsReview
             If (pInitialScreenLoad) Then
                 'TR 20/04/2012 - Get level of the connected User
                 Dim myGlobalBase As New GlobalBase
-                CurrentUserLevel = myGlobalBase.GetSessionInfo().UserLevel
+                CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             End If
 
             If (bsTestSampleListView.Items.Count = 0) Then

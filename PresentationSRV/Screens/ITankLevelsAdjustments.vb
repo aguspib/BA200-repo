@@ -927,7 +927,7 @@ Public Class ITankLevelsAdjustments
             End If
 
             ' Another Initializations
-            Me.SCALESDINAMICRANGE = myGlobalbase.ScalesDinamicRange
+            Me.SCALESDINAMICRANGE = GlobalBase.ScalesDinamicRange
 
         Catch ex As Exception
             myGlobalDataTO.HasError = True
@@ -4527,7 +4527,7 @@ Public Class ITankLevelsAdjustments
             'End With
 
             'Get the current Language from the current Application Session
-            MyClass.LanguageId = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            MyClass.LanguageId = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             MyClass.GetScreenLabels(MyClass.LanguageId)
 

@@ -302,7 +302,7 @@ Public Class TestISEMonitor
             myGlobal.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "ISEManager.SimulateMonitorData", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "ISEManager.SimulateMonitorData", EventLogEntryType.Error, False)
         End Try
         Return myGlobal
     End Function

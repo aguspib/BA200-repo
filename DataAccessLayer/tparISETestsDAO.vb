@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (pISETestRow.IsTS_UserNull) Then
                         'Get the logged User
                         Dim currentSession As New GlobalBase
-                        cmdText &= "           ,N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "'" & vbCrLf
+                        cmdText &= "           ,N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "'" & vbCrLf
                     Else
                         cmdText &= "           ,N'" & pISETestRow.TS_User.Trim.Replace("'", "''") & "'" & vbCrLf
                     End If
@@ -103,7 +103,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.Create", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -140,7 +140,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (pISETestsRow.IsTS_UserNull) Then
                         'Get the logged User
                         Dim currentSession As New GlobalBase
-                        cmdText &= " TS_User = N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                        cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     Else
                         cmdText &= " TS_User = N'" & pISETestsRow.TS_User.Trim.Replace("'", "''") & "', "
                     End If
@@ -175,7 +175,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -221,7 +221,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.Delete", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -265,7 +265,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -328,7 +328,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.Read", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -389,7 +389,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadBySampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadBySampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -473,7 +473,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadName", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadName", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -527,7 +527,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByTestIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -557,7 +557,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText = " UPDATE tparISETests " & _
                               " SET    LISValue = N'" & pLISValue & "', "
                     'Get the logged User
-                    cmdText &= " TS_User = N'" & currentSession.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
+                    cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                     'Get current date time
                     cmdText &= " TS_DateTime = '" & DateTime.Now.ToString("yyyyMMdd HH:mm:ss") & "' "
 
@@ -583,7 +583,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.Update", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -639,7 +639,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.GetAllByControl", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.GetAllByControl", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -707,7 +707,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.GetAllWithQCActive", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.GetAllWithQCActive", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -771,7 +771,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -810,7 +810,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.UpdateInUseByTestID", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.UpdateInUseByTestID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -857,7 +857,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "tparISETestsDAO.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "tparISETestsDAO.GetCustomizedSortedTestSelectionList", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -922,7 +922,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.UpdateCustomPositionAndAvailable", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -987,7 +987,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByName", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByName", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -1041,7 +1041,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByShortName", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "tparISETestsDAO.ReadByShortName", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

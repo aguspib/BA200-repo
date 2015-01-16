@@ -64,7 +64,7 @@ Partial Public Class tparContaminationsDAO
                 Else
                     'If TS_User is not informed, then get value of the Current User
                     Dim myGlobalBase As New GlobalBase
-                    cmdText &= " N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
+                    cmdText &= " N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
                 End If
 
                 If (Not pContaminationRow.IsTS_DateTimeNull) Then
@@ -85,7 +85,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.Create", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -135,7 +135,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.Delete", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -184,7 +184,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteCuvettes", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteCuvettes", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -230,7 +230,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByContaminationType", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByContaminationType", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -283,7 +283,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllByTest", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllByTest", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -328,7 +328,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteByReagentContaminatorOrContaminated", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteByReagentContaminatorOrContaminated", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -405,7 +405,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetWSContaminationsWithWASH", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetWSContaminationsWithWASH", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -467,7 +467,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadAllContaminationsByReagentID", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadAllContaminationsByReagentID", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -521,7 +521,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadContaminationsBetweenTests", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadContaminationsBetweenTests", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -559,9 +559,9 @@ Partial Public Class tparContaminationsDAO
                     '                                                  " INNER JOIN tfmwMultiLanguageResources MLR2 ON MLR2.ResourceID = PMD2.ResourceID " & vbCrLf & _
                     '                        " WHERE C.ContaminationType = 'CUVETTES' " & vbCrLf & _
                     '                        " AND   PMD1.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                    '                        " AND   MLR1.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
+                    '                        " AND   MLR1.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
                     '                        " AND   PMD2.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                    '                        " AND   MLR2.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' "
+                    '                        " AND   MLR2.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' "
                     'TR 14/12/2011 
                     cmdText.Append(" SELECT DISTINCT T.Testname as Contaminators, C.WashingSolutionR1 as Step1,  C.WashingSolutionR2 as Step2 ")
                     cmdText.Append(" FROM tparContaminations C INNER JOIN tparTests T ON C.TestContaminaCuvetteID  = T.TestID ")
@@ -586,7 +586,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsCuv", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsCuv", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -631,7 +631,7 @@ Partial Public Class tparContaminationsDAO
                                             " WHERE C.ContaminationType = 'R1' " & vbCrLf & _
                                             " AND   C.WashingSolutionR1 IS NOT NULL " & vbCrLf & _
                                             " AND   PMD.SubTableID = '" & GlobalEnumerates.PreloadedMasterDataEnum.WASHING_SOLUTIONS.ToString & "' " & vbCrLf & _
-                                            " AND   MLR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
+                                            " AND   MLR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
                                             " ORDER BY Contaminator, Contaminated "
 
                     Dim contaminationsDataDS As New ContaminationsAuxR1DS
@@ -652,7 +652,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsR1", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestContaminatorsR1", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -720,7 +720,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestRNAsContaminator", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadTestRNAsContaminator", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -785,7 +785,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestID", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestID", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -853,7 +853,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByReagentsName", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByReagentsName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -916,7 +916,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestName", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.ReadByTestName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1006,7 +1006,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetContaminationsForReport", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.GetContaminationsForReport", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1056,7 +1056,7 @@ Partial Public Class tparContaminationsDAO
             myGlobalDataTO.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.VerifyWashingSolutionR2", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.VerifyWashingSolutionR2", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1100,7 +1100,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllPreloadedR1Contaminations", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllPreloadedR1Contaminations", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -1138,7 +1138,7 @@ Partial Public Class tparContaminationsDAO
             resultData.ErrorMessage = ex.Message
 
             Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllPreloadedCuvettesContaminations", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "tparContaminationsDAO.DeleteAllPreloadedCuvettesContaminations", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function

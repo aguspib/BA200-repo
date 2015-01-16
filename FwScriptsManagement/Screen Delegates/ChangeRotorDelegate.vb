@@ -111,7 +111,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -132,7 +132,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -155,7 +155,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DemoModeDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DemoModeDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -177,7 +177,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -212,7 +212,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         '    Catch ex As Exception
         '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ChangeRotorDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
+        '        GlobalBase.CreateLogActivity(ex.Message, "ChangeRotorDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
         '    End Try
         'End Sub
 

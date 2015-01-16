@@ -237,7 +237,7 @@ Public Class BSBaseForm
                                  ByVal InformSystem As Boolean)
         Try
             Dim myGlobalBase As New GlobalBase
-            myGlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
+            GlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -254,7 +254,7 @@ Public Class BSBaseForm
     Public Sub ShowExceptionDetails(ByVal pException As Exception)
         Try
             Dim myGlobalBase As New GlobalBase
-            myGlobalBase.ShowExceptionDetails(pException)
+            GlobalBase.ShowExceptionDetails(pException)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -764,7 +764,7 @@ Public Class BSBaseForm
         myApplicationInfoSession = Nothing
         Try
             Dim myApplicationSessionManager As New ApplicationSessionManager
-            myApplicationInfoSession = myApplicationSessionManager.GetSessionInfo()
+            myApplicationInfoSession = GlobalBase.GetSessionInfo()
         Catch ex As Exception
             CreateLogActivity(ex.Message, "BSBaseForm.GetApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
@@ -1144,7 +1144,7 @@ Public Class BSBaseForm
             Dim formType As Type = sender.GetType()
             Dim form As IPermissionLevel = CType(sender, IPermissionLevel)
             Dim myGlobalBase As New GlobalBase
-            form.ValidatePermissionLevel(myGlobalBase.GetSessionInfo.UserLevelEnum)
+            form.ValidatePermissionLevel(GlobalBase.GetSessionInfo.UserLevelEnum)
 
         End If
 
