@@ -416,7 +416,7 @@ Public Class FwScriptsEdition
     ''' <param name="pWidth"></param>
     ''' <param name="pHeight"></param>
     ''' <remarks></remarks>
-    Private Sub SetButtonImage(ByVal pButton As Button, ByVal pImageName As String, _
+    Private Overloads Sub SetButtonImage(ByVal pButton As Button, ByVal pImageName As String, _
                               Optional ByVal pWidth As Integer = 28, _
                               Optional ByVal pHeight As Integer = 28)
 

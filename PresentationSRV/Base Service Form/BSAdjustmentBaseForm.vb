@@ -2984,5 +2984,8 @@ Public Class BSAdjustmentBaseForm
     End Sub
 #End Region
 
+
+    'Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
+
 End Class
 
