@@ -1,7 +1,8 @@
 ﻿Namespace Biosystems.Ax00.Controls.UserControls
     <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
     Partial Class BSMonitorPercentBar
-        Inherits BSMonitorControlbase
+        Inherits BSMonitorControlBase
+
 
         'UserControl overrides dispose to clean up the component list.
         <System.Diagnostics.DebuggerNonUserCode()> _
@@ -68,5 +69,8 @@
         Friend WithEvents IndicatorWidget1 As PerpetuumSoft.Instrumentation.Windows.Forms.IndicatorWidget
         Friend WithEvents InstrumentPanel As System.Windows.Forms.Panel
 
+        Protected Friend Overrides Sub RefreshControl()
+            UpdateContentsSize(InstrumentPanel)
+        End Sub
     End Class
 End Namespace

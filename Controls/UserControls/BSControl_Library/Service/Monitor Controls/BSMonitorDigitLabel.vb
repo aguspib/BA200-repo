@@ -20,7 +20,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             InitializeComponent()
 
             ' Add any initialization after the InitializeComponent() call.
-            MyBase.InstrumentPanel = MyClass.InstrumentPanel
+            'MyBase.InstrumentPanel = MyClass.InstrumentPanel
 
         End Sub
 
