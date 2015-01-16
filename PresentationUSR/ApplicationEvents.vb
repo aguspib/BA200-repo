@@ -29,7 +29,6 @@ Namespace My
 
         Private Sub MyApplication_UnhandledException(sender As Object, e As ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
             ' Write into Log
-            Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
             GlobalBase.CreateLogActivity("An Unhandled Exception has been occurred ", "MyApplication.ApplicationEvents", EventLogEntryType.Error, False)
             ' Display message to user and then exit.
             MessageBox.Show(Biosystems.Ax00.Global.GlobalConstants.UNHANDLED_EXCEPTION_ERR.ToString, My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Question)

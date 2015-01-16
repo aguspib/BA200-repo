@@ -37,7 +37,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Write", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -92,7 +92,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Read", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -192,7 +192,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadWithAdditionalBusiness", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -227,7 +227,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.WriteFwScript", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -307,7 +307,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadFwScript", EventLogEntryType.Error, False)
             End Try
             Return myGlobal

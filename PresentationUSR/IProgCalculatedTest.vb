@@ -1946,7 +1946,7 @@ Public Class IProgCalculatedTest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for graphical buttons
@@ -2372,7 +2372,7 @@ Public Class IProgCalculatedTest
     ''' </remarks>
     Private Sub IProgCalculatedTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             ScreenLoad()

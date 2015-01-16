@@ -203,7 +203,7 @@ Public Class bsReception
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -213,7 +213,7 @@ Public Class bsReception
             BsReceivedTextBox.Text += pInstructionSent & vbCrLf
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub

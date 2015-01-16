@@ -68,7 +68,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.InsertResult", EventLogEntryType.Error, False)
         '    End Try
 
@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.UpdateResults", EventLogEntryType.Error, False)
         '    End Try
 
@@ -177,7 +177,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.ExistsResult", EventLogEntryType.Error, False)
 
         '    Finally
@@ -228,7 +228,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
 

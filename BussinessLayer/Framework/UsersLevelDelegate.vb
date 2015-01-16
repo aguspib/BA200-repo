@@ -55,7 +55,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "UsersLevelDelegate.GetUserNumericLevel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -105,7 +105,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "UsersLevelDelegate.GetLevelsByInternalUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -131,7 +131,7 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
-                        Dim MyGlobalBase As New GlobalBase
+                        'Dim myGlobalbase As New GlobalBase
                         Dim CurrentUserLevel As String
                         CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
 
@@ -156,7 +156,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "UserLevelDelegate.GetCurrentUserNumericalLevel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

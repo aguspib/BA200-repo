@@ -146,7 +146,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CREATENewSTDTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -208,7 +208,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.SetTempReagentID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -261,7 +261,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.SetTempTestCalibratorID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -412,7 +412,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateRenamedTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -508,7 +508,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.GetOtherTestDataInfoFromFactory", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -597,7 +597,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.RenameTestName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -674,7 +674,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.DELETERemovedSTDTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -753,7 +753,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.DELETERemovedSTDTestSamples", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -921,7 +921,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -1067,7 +1067,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateCustomerTestReagents", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -1175,7 +1175,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UPDATEModifiedSTDTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -1294,7 +1294,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.CREATENewSamplesForSTDTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -1766,7 +1766,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -1800,7 +1800,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
                 Throw
             End Try
@@ -1864,7 +1864,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateCustomerReagentVolumes", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -2084,7 +2084,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UpdateModifiedReagentVols", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -2226,7 +2226,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("SDT Test Update Error", "TestParametersUpdateData.UPDATEModifiedSTDTestSamples", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -2260,7 +2260,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.UpdateTestSortByTestName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -2291,7 +2291,7 @@ End Namespace
 '            Try
 '                myGlobalDataTO = UpdateTestSortByTestName(pDBConnection)
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.DoFinalActions", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -2416,7 +2416,7 @@ End Namespace
 '                myGlobalDataTO.SetDatos = myLocalTestDS
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.UpdateLocalTestDS", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -2680,7 +2680,7 @@ End Namespace
 '                myGlobalDataTO.SetDatos = myLocalTestSamplesDS
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.UpdateLocalTestSamplesDS", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -2794,7 +2794,7 @@ End Namespace
 
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.UpdateLocalTestReagentsVolDS", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -2901,7 +2901,7 @@ End Namespace
 
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetOtherDataInfoFromLocal", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3056,7 +3056,7 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetOtherDataInfoFromLocal", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3123,7 +3123,7 @@ End Namespace
 '                myGlobalDataTO.SetDatos = myTestStructure
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.FillWithLocalData", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3148,7 +3148,7 @@ End Namespace
 '                Dim myCalibratorDelegate As New CalibratorsDelegate
 '                myGlobalDataTO = myCalibratorDelegate.ReadByCalibratorName(pDBConnection, pCalibratorName)
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetCalibratotOnClient", EventLogEntryType.Information, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3292,7 +3292,7 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetOtherDataInfoFromLocal", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3342,7 +3342,7 @@ End Namespace
 '                    End If
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.DoCreateNewElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3390,7 +3390,7 @@ End Namespace
 '                                                                  New TestSamplesMultirulesDS, New TestControlsDS, Nothing)
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.DoRemoveFactoryElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3432,7 +3432,7 @@ End Namespace
 '                                                                  New TestSamplesMultirulesDS, New TestControlsDS, Nothing)
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.DoRemoveFactoryElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3564,7 +3564,7 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3610,7 +3610,7 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.DoUpdateUserDefinedElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3661,7 +3661,7 @@ End Namespace
 
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetAffectedItemsFromFactoryRemoves", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3709,7 +3709,7 @@ End Namespace
 '                    End If
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3741,7 +3741,7 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3781,7 +3781,7 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -3855,7 +3855,7 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity("Test Update Error.", "TestParametersUpdateData.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

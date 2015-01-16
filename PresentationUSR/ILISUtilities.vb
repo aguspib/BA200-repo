@@ -158,7 +158,7 @@ Public Class ILISUtilities
         Try
             MainMDI = CType(Me.MdiParent, IAx00MainMDI)
 
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
@@ -216,7 +216,7 @@ Public Class ILISUtilities
             MyClass.RefreshElementsEnabled() 'SG 15/05/2013
 
             'If user level operator read only.
-            Dim myGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             If CurrentUserLevel = "OPERATOR" Then
                 MainGroupBox.Enabled = False

@@ -34,7 +34,7 @@ Public Class QCIndividualResultsByTestControlReport
         If (Me.DesignMode) Then Exit Sub
 
         'Get all Multilanguage texts for the report
-        Dim currentLanguageGlobal As New GlobalBase
+        'Dim currentLanguageGlobal As New GlobalBase
         Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
@@ -175,7 +175,7 @@ Public Class QCIndividualResultsByTestControlReport
     Private Sub PrepareLJGraph()
 
         'Get all multilanguage labels
-        Dim currentLanguageGlobal As New GlobalBase
+        'Dim currentLanguageGlobal As New GlobalBase
         Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 

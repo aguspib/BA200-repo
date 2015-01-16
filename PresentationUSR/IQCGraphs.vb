@@ -221,7 +221,7 @@ Public Class IQCGraphs
             isLoading = True
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim
 
             GetScreenLabels(currentLanguage)

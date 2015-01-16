@@ -899,7 +899,7 @@ Public Class IMonitor
 
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
 
             GlobalBase.CreateLogActivity("Refresh monitor screen (init) ", "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
@@ -1426,7 +1426,7 @@ Public Class IMonitor
             'GC.Collect()
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -1733,7 +1733,7 @@ Public Class IMonitor
 
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateLeds", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -1916,7 +1916,7 @@ Public Class IMonitor
             Dim myEnableButtonsAlreadyLaunch As Boolean = False     ' XB 25/11/2013
             If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
                 Me.SetWorkSessionTab()
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 Dim autoProcessUserAnswer As DialogResult = DialogResult.Yes
                 autoProcessUserAnswer = IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(6)
                 Dim resultFlagOK As Boolean = True
@@ -1961,13 +1961,13 @@ Public Class IMonitor
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
 
 
         'Get the current Language from the current Application Session
-        Dim currentLanguageGlobal As New GlobalBase
+        'Dim currentLanguageGlobal As New GlobalBase
         LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
         'RH 18/10/2011 Initialize myMultiLangResourcesDelegate

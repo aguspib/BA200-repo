@@ -1245,7 +1245,7 @@ Public Class IStressModeTest
             MyClass.myScreenDelegate = New StressModeTestDelegate(MyBase.myServiceMDI.ActiveAnalyzer, myFwScriptDelegate)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             myScreenDelegate.currentLanguage = Me.currentLanguage
 

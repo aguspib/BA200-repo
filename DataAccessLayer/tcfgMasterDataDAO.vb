@@ -33,7 +33,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim var As New GlobalBase
+                        'Dim var As New GlobalBase
                         Dim cmdText As String = " SELECT MD.SubTableID, MD.ItemID, MR.ResourceText AS FixedItemDesc, MD.Position, MD.Status " & vbCrLf & _
                                                 " FROM   tcfgMasterData MD INNER JOIN tfmwMultiLanguageResources MR ON MD.ResourceID = MR.ResourceID " & vbCrLf & _
                                                                                 " AND MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & vbCrLf & _
@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgMasterDataDAO.ReadBySubTableID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -93,7 +93,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String = ""
-                    Dim currentSession As New GlobalBase
+                    'Dim currentSession As New GlobalBase
 
                     cmdText &= "UPDATE tcfgMasterData " & vbCrLf
                     cmdText &= "   SET LISValue = N'" & pLISValue & "'" & vbCrLf
@@ -116,7 +116,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tparOffSystemTestsDAO.UpdatepdateLISValueByTestID", EventLogEntryType.Error, False)
             End Try
             Return resultData

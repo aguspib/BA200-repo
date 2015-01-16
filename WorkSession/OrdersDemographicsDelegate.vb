@@ -48,7 +48,7 @@ Namespace Biosystems.Ax00.BL
                 result.ErrorCode = "DB_CONNECTION_ERROR"
                 result.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "OrdersDemographicsDelegate.Create", EventLogEntryType.Error, False)
             End Try
 
@@ -71,7 +71,7 @@ Namespace Biosystems.Ax00.BL
                 result.ErrorCode = "SYSTEM_ERROR"
                 result.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "OrdersDemographicsDelegate.Create", EventLogEntryType.Error, False)
             Finally
                 'If a Database Connection was locally opened, then it is closed
@@ -124,7 +124,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "OrdersDemographicsDelegate.ResetWS", EventLogEntryType.Error, False)
 
             Finally

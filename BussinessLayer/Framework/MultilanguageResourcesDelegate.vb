@@ -59,7 +59,7 @@ Namespace Biosystems.Ax00.BL
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                         Else
-                            Dim myLogAcciones As New ApplicationLogManager()
+                            'Dim myLogAcciones As New ApplicationLogManager()
                             GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                             Return String.Empty
                         End If
@@ -84,7 +84,7 @@ Namespace Biosystems.Ax00.BL
                             Return String.Empty
                         End If
                     Else
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                         Return String.Empty
                     End If
@@ -92,7 +92,7 @@ Namespace Biosystems.Ax00.BL
                 Resource = Nothing 'AG 18/02/2014 -#1505 - release linq memory
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                 Throw
 
@@ -131,15 +131,15 @@ Namespace Biosystems.Ax00.BL
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             MultiLanguageResources = DirectCast(myGlobalDataTO.SetDatos, MultiLanguageDS)
                         Else
-                            Dim myLogAcciones As New ApplicationLogManager()
+                            'Dim myLogAcciones As New ApplicationLogManager()
                             GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                         End If
                     Else
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                     End If
                 Else
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                 End If
             End If
@@ -161,7 +161,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "MultilanguageResourcesDelegate.SetCurrentLanguage", EventLogEntryType.Error, False)
                 Throw
 
@@ -214,17 +214,17 @@ Namespace Biosystems.Ax00.BL
                             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                                 MultiLanguageResources = DirectCast(myGlobalDataTO.SetDatos, MultiLanguageDS)
                             Else
-                                Dim myLogAcciones As New ApplicationLogManager()
+                                'Dim myLogAcciones As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                                 Return String.Empty
                             End If
                         Else
-                            Dim myLogAcciones As New ApplicationLogManager()
+                            'Dim myLogAcciones As New ApplicationLogManager()
                             GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                             Return String.Empty
                         End If
                     Else
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                         Return String.Empty
                     End If
@@ -251,14 +251,14 @@ Namespace Biosystems.Ax00.BL
                         If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                             dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                         Else
-                            Dim myLogAcciones As New ApplicationLogManager()
+                            'Dim myLogAcciones As New ApplicationLogManager()
                             GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                             Return String.Empty
                         End If
                     End If
 
                     'If dbConnection Is Nothing Then
-                    '    Dim myLogAcciones As New ApplicationLogManager()
+                    '    'Dim myLogAcciones As New ApplicationLogManager()
                     '    GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                     '    Return String.Empty
                     'End If
@@ -282,14 +282,14 @@ Namespace Biosystems.Ax00.BL
                             Return String.Empty
                         End If
                     Else
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                         Return String.Empty
                     End If
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
                 Throw
 
@@ -330,7 +330,7 @@ Namespace Biosystems.Ax00.BL
         '                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
         '                        MultiLanguageResources = DirectCast(myGlobalDataTO.SetDatos, MultiLanguageDS)
         '                    Else
-        '                        Dim myLogAcciones As New ApplicationLogManager()
+        '                        'Dim myLogAcciones As New ApplicationLogManager()
         '                        GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
         '                        Return String.Empty
         '                    End If
@@ -357,20 +357,20 @@ Namespace Biosystems.Ax00.BL
         '                            Return String.Empty
         '                        End If
         '                    Else
-        '                        Dim myLogAcciones As New ApplicationLogManager()
+        '                        'Dim myLogAcciones As New ApplicationLogManager()
         '                        GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
         '                        Return String.Empty
         '                    End If
         '                End If
         '            End If
         '        Else
-        '            Dim myLogAcciones As New ApplicationLogManager()
+        '            'Dim myLogAcciones As New ApplicationLogManager()
         '            GlobalBase.CreateLogActivity(myGlobalDataTO.ErrorMessage, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
         '            Return String.Empty
         '        End If
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
         '        Throw
 
@@ -431,7 +431,7 @@ Namespace Biosystems.Ax00.BL
         '        End If
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "MultilanguageResourcesDelegate.GetResourceText", EventLogEntryType.Error, False)
 
         '        'Send the exception to the method that called this (due to in this case it does not return a GlobalDataTO)

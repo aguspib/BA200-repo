@@ -32,7 +32,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                              ByVal DBPassword As String, Optional pLoadingRSAT As Boolean = False) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDBUpdateManager As New DataBaseUpdateManagerDelegate
             Dim initialTimeUpdate As New DateTime 'TR Variable used to validate the time 
             Try
@@ -92,7 +92,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         Public Function RestoreDatabase(ByVal ServerName As String, ByVal DataBaseName As String, _
                                         ByVal DBLogin As String, ByVal DBPassword As String, ByVal BackUpFileName As String) As Boolean
             Dim result As Boolean = False
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 If Not String.IsNullOrEmpty(ServerName) AndAlso _
@@ -132,7 +132,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         Public Function BackUpDataBase(ByVal ServerName As String, ByVal DataBaseName As String, ByVal DBLogin As String, _
                                        ByVal DBPassword As String, Optional ByVal pInstalationProcess As Boolean = False) As Boolean
             Dim result As Boolean = False
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Try
                 If Not String.IsNullOrEmpty(ServerName) AndAlso _
                    Not String.IsNullOrEmpty(DataBaseName) Then 'validate do not send empty values.
@@ -162,7 +162,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         Public Function BackUpDataBaseAndMoveBkFile(ByVal ServerName As String, ByVal DataBaseName As String, ByVal DBLogin As String, _
                                                     ByVal DBPassword As String, ByVal DirectoryTo As String) As Boolean
             Dim result As Boolean = False
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 If Not String.IsNullOrEmpty(ServerName) AndAlso _
@@ -199,7 +199,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 result = DBManager.IsSQLServer2005(ServerName, DBLogin, DBPassword)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.IsSQLServer2005", EventLogEntryType.Error, False)
             End Try
             Return result
@@ -224,7 +224,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.DataBaseExist", EventLogEntryType.Error, False)
             End Try
             Return result
@@ -245,7 +245,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 result = DBManager.DropDatabaseFromServer(ServerName, DataBaseName, DBLogin, DBPassword) 'drop database from server
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.DeleteDatabase", EventLogEntryType.Error, False)
             End Try
             Return result
@@ -266,7 +266,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 result = DBManager.RunDatabaseScript(pServer, DataBaseName, DatabaseScript)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.UpdateDatabaseStructureAndData", EventLogEntryType.Error, False)
             End Try
             Return result
@@ -383,7 +383,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 ClosedConnections = False
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.CloseAllOpenConnection", EventLogEntryType.Error, False)
             End Try
             Return ClosedConnections
@@ -402,7 +402,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' </remarks>
         Public Function RestoreDatabaseNEW(ByVal pDataBaseName As String, ByVal pBackUpFileName As String) As Boolean
             Dim result As Boolean = False
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 If (Not String.IsNullOrEmpty(pDataBaseName) AndAlso Not String.IsNullOrEmpty(pBackUpFileName)) Then
@@ -463,7 +463,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.GetAnalyzerAndWorksessionInfo", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -492,7 +492,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
             Catch ex As Exception
                 sqlExecResult = False
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message & " ----- " & ex.InnerException.ToString(), "DataBaseManagerDelegate.ExecuteScriptsBeforeUpdate", EventLogEntryType.Error, False)
             End Try
             Return sqlExecResult

@@ -65,7 +65,7 @@ Namespace Biosystems.Ax00.Global
 
             Dim value As Single = 0
             Dim myOthers As New List(Of SystemCounter)
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 Dim location As String = Environment.GetCommandLineArgs()(0)

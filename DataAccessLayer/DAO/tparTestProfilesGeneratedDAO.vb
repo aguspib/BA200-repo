@@ -99,19 +99,19 @@ Namespace Biosystems.Ax00.DAL.DAO
             Catch ex As ArgumentException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TparTestProfilesDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TparTestProfilesDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TparTestProfilesDAO", EventLogEntryType.Error, False)
 
             Finally

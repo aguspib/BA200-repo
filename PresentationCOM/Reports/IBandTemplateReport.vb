@@ -1590,7 +1590,7 @@ Public Class IBandTemplateReport
             Cursor = Cursors.WaitCursor 'RH 15/12/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels

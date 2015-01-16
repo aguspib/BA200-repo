@@ -121,7 +121,7 @@ Public Class IProgTestContaminations
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
@@ -160,7 +160,7 @@ Public Class IProgTestContaminations
         Try
             'If pcurrentLanguage = "" Then
             '    'Get the current Language from the current Application Session
-            '    Dim currentLanguageGlobal As New GlobalBase
+            '    'Dim currentLanguageGlobal As New GlobalBase
             '    pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             'End If
 
@@ -179,7 +179,7 @@ Public Class IProgTestContaminations
 
             If String.IsNullOrEmpty(pCurrentLanguage) Then
                 'Get the current Language from the current Application Session
-                Dim currentLanguageGlobal As New GlobalBase
+                'Dim currentLanguageGlobal As New GlobalBase
                 pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
             End If
 
@@ -1712,7 +1712,7 @@ Public Class IProgTestContaminations
     Private Sub ProgTestContaminations_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             ''TR 23/04/2012 get the current user level
-            'Dim MyGlobalBase As New GlobalBase
+            ''Dim myGlobalbase As New GlobalBase
             'CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ''TR 23/04/2012 -END.
 

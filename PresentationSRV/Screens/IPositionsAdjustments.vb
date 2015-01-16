@@ -2183,7 +2183,7 @@ Public Class IPositionsAdjustments
     ''' <remarks>Created by XBC 14/01/2011</remarks>
     Private Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
+        ''Dim myGlobalbase As New GlobalBase
         Try
             ' Initializations
             'me.LEDCurrent = GlobalBase.OpticalCenteringCurrentLed
@@ -7848,7 +7848,7 @@ Public Class IPositionsAdjustments
 
     Private Sub PositionsAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
 
             'Get the current user level

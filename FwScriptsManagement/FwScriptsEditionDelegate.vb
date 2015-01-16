@@ -104,7 +104,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.GetScreensByAnalyzerID", EventLogEntryType.Error, False)
             End Try
 
@@ -139,7 +139,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.GetFwScriptByActionID", EventLogEntryType.Error, False)
             End Try
 
@@ -170,7 +170,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.GetFwScriptByID", EventLogEntryType.Error, False)
 
             End Try
@@ -195,7 +195,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.GetAnalyzers", EventLogEntryType.Error, False)
             End Try
 
@@ -223,7 +223,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.GetInstructionsByFwScriptID", EventLogEntryType.Error, False)
 
             End Try
@@ -266,7 +266,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.ModifyFwScript", EventLogEntryType.Error, False)
 
 
@@ -328,7 +328,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -354,7 +354,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.UpdateAppFwScriptsData", EventLogEntryType.Error, False)
 
             End Try
@@ -387,7 +387,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.UpdateAppFwScriptsDataToFactory", EventLogEntryType.Error, False)
 
             End Try
@@ -419,7 +419,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.SetAppFwScriptsData", EventLogEntryType.Error, False)
 
             End Try
@@ -450,7 +450,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.ExportFwScriptsData", EventLogEntryType.Error, False)
 
             End Try
@@ -477,7 +477,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.CheckFwScriptInstruction", EventLogEntryType.Error, False)
 
             End Try
@@ -504,7 +504,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.CheckFwScriptSequence", EventLogEntryType.Error, False)
 
             End Try
@@ -531,7 +531,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "FwScriptsEditionDelegate.CheckTextFwScript", EventLogEntryType.Error, False)
 
             End Try
@@ -581,7 +581,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.GetScriptsByScreenID", EventLogEntryType.Error, False)
 
         '    End Try
@@ -626,7 +626,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.GetScriptOwnerScreens", EventLogEntryType.Error, False)
         '    End Try
 
@@ -672,7 +672,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myGlobal.ErrorCode = "SYSTEM_ERROR"
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.GetScreenOwnerAnalyzers", EventLogEntryType.Error, False)
         '    End Try
 
@@ -702,7 +702,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.GetInstruction", EventLogEntryType.Error, False)
 
         '    End Try
@@ -731,7 +731,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.AddScript", EventLogEntryType.Error, False)
 
         '    End Try
@@ -758,7 +758,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.ModifyAllScriptData", EventLogEntryType.Error, False)
 
         '    End Try
@@ -785,7 +785,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.DeleteScript", EventLogEntryType.Error, False)
 
         '    End Try
@@ -813,7 +813,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.AddInstruction", EventLogEntryType.Error, False)
 
         '    End Try
@@ -840,7 +840,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.ModifyInstruction", EventLogEntryType.Error, False)
 
 
@@ -868,7 +868,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.DeleteInstruction", EventLogEntryType.Error, False)
 
         '    End Try
@@ -896,7 +896,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ScriptsEditionDelegate.DeletebyScriptID", EventLogEntryType.Error, False)
 
 

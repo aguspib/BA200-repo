@@ -91,7 +91,7 @@ Public Class IResultsSummaryTable
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             InitializeScreen()
@@ -112,7 +112,7 @@ Public Class IResultsSummaryTable
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowSummaryResultsReport(ActiveAnalyzer, ActiveWorkSession, bsVerticalRadioButton.Checked)
@@ -162,7 +162,7 @@ Public Class IResultsSummaryTable
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()

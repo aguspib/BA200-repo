@@ -48,7 +48,7 @@ Public Class IConfigLISMapping
         Get
             Dim res As Boolean = False
 
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             If GlobalBase.GetSessionInfo.UserLevel = "OPERATOR" Then
                 res = True
             End If
@@ -357,7 +357,7 @@ Public Class IConfigLISMapping
             ScreenIsLoading = True
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -1302,7 +1302,7 @@ Public Class IConfigLISMapping
 
             MyClass.InitialModeScreenStatus()
 
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             ScreenStatusByUserLevel()
 

@@ -47,7 +47,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -96,7 +96,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetCalibratorsDistinctInClient", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -151,7 +151,7 @@ End Namespace
 '            End If
 
 '            If (pCalibratorsDS.tparCalibrators(0).IsTS_UserNull) Then
-'                Dim myGlobalBase As New GlobalBase
+'                'Dim myGlobalbase As New GlobalBase
 '                cmdText &= "           ,N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "'" & vbCrLf
 '            Else
 '                cmdText &= "           ,N'" & pCalibratorsDS.tparCalibrators(0).TS_User.Trim.Replace("'", "''") & "'" & vbCrLf
@@ -184,7 +184,7 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.Create", EventLogEntryType.Error, False)
 '    End Try
 '    Return resultData
@@ -240,7 +240,7 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetPreloadedCALCTestsDistinctInClient", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -308,7 +308,7 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetTestsCalibratorsDistinctInFactory", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -374,7 +374,7 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetTestsCalibratorsDistinctInClient", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -436,7 +436,7 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetTestsCalibratorsValuesDistinctInFactory", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -496,7 +496,7 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetTestsCalibratorsDistinctInClient", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -559,7 +559,7 @@ End Namespace
 '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        dataToReturn.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity(ex.Message, "CalibratorUpdateDAO.GetTestCalibratorsDistinctInClient", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

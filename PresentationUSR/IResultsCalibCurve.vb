@@ -800,7 +800,7 @@ Public Class IResultsCalibCurve
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -2378,7 +2378,7 @@ Public Class IResultsCalibCurve
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChangesNEW", EventLogEntryType.Error, False)
         Finally
             Me.Cursor = Cursors.Default

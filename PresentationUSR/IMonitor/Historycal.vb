@@ -288,7 +288,7 @@ Public Class Historycal
 
     Private Sub Monitor_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         'Get the current Language from the current Application Session
-        Dim currentLanguageGlobal As New GlobalBase
+        'Dim currentLanguageGlobal As New GlobalBase
         LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
         InitializeAlarmsTab()

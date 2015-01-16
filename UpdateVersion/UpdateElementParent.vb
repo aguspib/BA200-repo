@@ -88,7 +88,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Public Overridable Function UpdateFromFactoryUpdates(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -153,7 +153,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Public Overridable Function UpdateFromFactoryRemoves(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -235,7 +235,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Protected Overridable Function DoItemActionFromFactoryUpdates(ByVal pDBConnection As SqlClient.SqlConnection, pItemRow As DataRow) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -307,7 +307,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Protected Overridable Function DoItemActionFromFactoryRemoves(ByVal pDBConnection As SqlClient.SqlConnection, pItemRow As DataRow) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -394,7 +394,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("Elememt Update Error.", "UpdateElementParent.GetActionFromFactoryUpdates", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -430,7 +430,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("CALC Test Update Error.", "UpdateElementParent.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

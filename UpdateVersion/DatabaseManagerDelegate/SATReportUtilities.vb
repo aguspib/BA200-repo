@@ -277,7 +277,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myDatabaseAdmin As New DataBaseManagerDelegate()
                 If (Not myDatabaseAdmin.BackUpDataBaseAndMoveBkFile(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword, ReportFolderPath)) Then
                     'Error creating the DB Backup
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     Dim Message As String = "Unable to create a backup copy of the data base"
                     GlobalBase.CreateLogActivity(Message, "Utilities.CreateSATReport", EventLogEntryType.Error, False)
 
@@ -419,7 +419,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CreateSATReport", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -464,7 +464,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.GetLastWrittenFile", EventLogEntryType.Error, False)
             End Try
 
@@ -513,7 +513,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.GetSATReportVersion", EventLogEntryType.Error, False)
 
             End Try
@@ -580,7 +580,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -613,7 +613,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SATReportUtilities.CompareSATandAPPversions", EventLogEntryType.Error, False)
 
             End Try

@@ -13,7 +13,7 @@ Namespace Biosystems.Ax00.Global
     ''' GlobalBase Clase, to add all the general funtionality create here.
     ''' </summary>
     ''' <remarks></remarks>
-    Public Class GlobalBase
+    Public MustInherit Class GlobalBase
 
         Private SynapseNumberOfDaysAttribute As Integer
 
@@ -584,7 +584,7 @@ Namespace Biosystems.Ax00.Global
         Public Shared Sub CreateLogActivity(ByVal Message As String, ByVal LogModule As String, ByVal LogType As EventLogEntryType, ByVal InformSystem As Boolean)
 
             Dim MyApplicationLogTO As New ApplicationLogTO
-            Dim MyApplicationLogManager As New ApplicationLogManager
+            'Dim MyApplicationLogManager As New ApplicationLogManager
 
             Try
                 'Fill the ApplicationLogTO with the information to insert in the Log'

@@ -371,7 +371,7 @@ Public Class IWSDeleteAuxScreen
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             PrepareButtons()

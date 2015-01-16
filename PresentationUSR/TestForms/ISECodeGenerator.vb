@@ -69,7 +69,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetDallasSNValues", EventLogEntryType.Error, False)
         End Try
 
@@ -184,7 +184,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetDallasPage00Values", EventLogEntryType.Error, False)
         End Try
 
@@ -307,7 +307,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
         End Try
         Return myGlobal
@@ -392,7 +392,7 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
         End Try
         Return myGlobal

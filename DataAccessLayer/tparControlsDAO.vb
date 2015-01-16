@@ -41,7 +41,7 @@ Partial Public Class tparControlsDAO
 
                 If (String.IsNullOrEmpty(pControlDS.tparControls(0).TS_User.ToString)) Then
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
+                    'Dim currentSession As New GlobalBase
                     cmdText &= "N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "', " & vbCrLf
                 Else
                     cmdText &= "N'" & pControlDS.tparControls(0).TS_User.Trim.Replace("'", "''") & "', " & vbCrLf
@@ -82,7 +82,7 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return resultData
@@ -119,7 +119,7 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return resultData
@@ -163,7 +163,7 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Read", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -208,7 +208,7 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.ReadAll", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -263,7 +263,7 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.ReadByControlName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -312,7 +312,7 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.ReadByOrderTestID", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -348,7 +348,7 @@ Partial Public Class tparControlsDAO
 
                 If (pControlDS.tparControls(0).IsTS_UserNull) Then
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
+                    'Dim currentSession As New GlobalBase
                     cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo().UserName.Trim.Replace("'", "''") & "', " & vbCrLf
                 Else
                     cmdText &= " TS_User = N'" & pControlDS.tparControls(0).TS_User.Replace("'", "''") & "', " & vbCrLf
@@ -374,7 +374,7 @@ Partial Public Class tparControlsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.Update", EventLogEntryType.Error, False)
         End Try
         Return resultData
@@ -443,7 +443,7 @@ Partial Public Class tparControlsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparControlsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO

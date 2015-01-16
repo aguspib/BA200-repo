@@ -357,7 +357,7 @@ Public Class IQCCumulatedReview
                             bsResultControlLotGridView.DataSource = LocalQCCumulateResultsDS.QCCumulatedSummaryTable.DefaultView
 
                             'Get the current Language from the current Application Session and get the text for the Button in the DataGridView
-                            Dim currentLanguageGlobal As New GlobalBase
+                            'Dim currentLanguageGlobal As New GlobalBase
                             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
                             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
@@ -526,7 +526,7 @@ Public Class IQCCumulatedReview
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
@@ -1261,7 +1261,7 @@ Public Class IQCCumulatedReview
     ''' </remarks>
     Private Sub IQCCumulatedReview_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             InitializeScreen()

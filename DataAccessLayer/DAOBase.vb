@@ -74,7 +74,7 @@ Namespace Biosystems.Ax00.DAL
 
                 'validate if connection string is empty to send an error
                 If String.IsNullOrEmpty(ConnectionString) Then
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Error Reading the Connection String .", "DAOBase", EventLogEntryType.Error, False)
                 Else
                     Dim ConnBuilder As New System.Data.SqlClient.SqlConnectionStringBuilder(ConnectionString)
@@ -93,7 +93,7 @@ Namespace Biosystems.Ax00.DAL
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetConnectionString", EventLogEntryType.Error, False)
 
             End Try
@@ -111,7 +111,7 @@ Namespace Biosystems.Ax00.DAL
         ''' </remarks>
         Public Shared Sub BeginTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 'Dim cmdText As String = ""
@@ -153,7 +153,7 @@ Namespace Biosystems.Ax00.DAL
         ''' </remarks>
         Public Shared Sub CommitTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 Dim cmdText As String = " COMMIT TRANSACTION "
@@ -182,7 +182,7 @@ Namespace Biosystems.Ax00.DAL
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
         Public Shared Sub RollbackTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 Dim cmdText As String = " ROLLBACK TRANSACTION "
@@ -237,7 +237,7 @@ Namespace Biosystems.Ax00.DAL
                 openConnection.ErrorCode = "DB_CONNECTION_ERROR"
                 openConnection.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
 
             End Try
@@ -260,7 +260,7 @@ Namespace Biosystems.Ax00.DAL
             Dim openTransaction As New GlobalDataTO
             'Dim dbConnection As New SqlClient.SqlConnection
             Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 If (pDBConnection Is Nothing) Then
@@ -306,7 +306,7 @@ Namespace Biosystems.Ax00.DAL
             Try
                 resultData = pValue.ToString("G20").Replace(",", ".")
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -324,7 +324,7 @@ Namespace Biosystems.Ax00.DAL
             Try
                 resultData = pValue.ToString("G20").Replace(",", ".")
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
             End Try
             Return resultData

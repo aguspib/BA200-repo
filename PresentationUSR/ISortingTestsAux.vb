@@ -340,7 +340,7 @@ Public Class ISortingTestsAux
             Me.Location = NewScreenLocation
 
             'Get the current application Language
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Configure all screen controls (icons, texts in current language, ListView properties)

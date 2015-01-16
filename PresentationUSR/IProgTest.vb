@@ -1964,7 +1964,7 @@ Public Class IProgTest
 
                 If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                     Dim myCreatedTest As Integer = DirectCast(myGlobalDataTO.SetDatos, TestsDS).tparTests.Count
-                    Dim MyGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     If myCreatedTest >= GlobalBase.GetSessionInfo.MaxTestsNumber Then
                         'disable add button and copy button 
                         CopyTestButton.Enabled = False
@@ -3259,7 +3259,7 @@ Public Class IProgTest
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             GetScreenLabels()
@@ -10855,7 +10855,7 @@ Public Class IProgTest
                 'END AG 10/03/10
 
                 'TR 29/03/2012 -Get the current level
-                Dim MyGlobalBase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
                 CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
                 'TR 29/03/2012 -END
 

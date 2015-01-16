@@ -41,7 +41,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingBySettingID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -69,7 +69,7 @@ Namespace Biosystems.Ax00.BL.Framework
                     myCurrentValue = myApplicationSettingDS.ApplicationSetting.Rows(0)(myApplicationSettingDS.ApplicationSetting.CurrentValueColumn).ToString()
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingCurrentValueBySettingID", EventLogEntryType.Error, False)
             End Try
             Return myCurrentValue
@@ -103,7 +103,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 ' Update the database value. and assigned the value to the result
                 result = MyApplicationSettingDAO.Update(myApplicationSettingDS, Conn, Nothing)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.UpdateCurrentValueBySettingID", EventLogEntryType.Error, False)
             End Try
             Return result

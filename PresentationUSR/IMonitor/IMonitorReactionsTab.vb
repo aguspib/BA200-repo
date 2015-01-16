@@ -100,7 +100,7 @@ Partial Public Class IMonitor
 
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
 
             'Call the Method incharge to update Rotor (Sample/Reagent)

@@ -77,7 +77,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
             End Try
 
@@ -226,7 +226,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetResultErrors", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -320,7 +320,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetCancelError", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -428,7 +428,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim myAverage As Single = 0
                             Dim myControlID As Integer = -1
                             Dim alarmExists As Boolean = False
-                            Dim currentSession As New GlobalBase
+                            'Dim currentSession As New GlobalBase
                             Dim mySampleClass As String = String.Empty
 
                             'Get all ISE Executions for the informed PreparationID
@@ -803,7 +803,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResultsNEW", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -852,7 +852,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         myISEResultTO.Errors.Add(myError)
 
                         'SGM 04/09/2012
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity("ISE - Wrong or uncomplete data received", "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
 
                     ElseIf myResultStr.StartsWith("<ERC ") Then
@@ -1185,7 +1185,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.ProcessISEResults", EventLogEntryType.Error, False)
             End Try
 
@@ -1271,7 +1271,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.SaveDebugModeResultData", EventLogEntryType.Error, False)
         '    End Try
 
@@ -1298,7 +1298,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myResultDataSet.ReadXml(pXmlPath)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEResultsDelegate.LoadISEModuleParammeters", EventLogEntryType.Error, False)
             End Try
             Return myResultDataSet
@@ -1319,7 +1319,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Next
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillISEResultErrorDescHT", EventLogEntryType.Error, False)
             End Try
 
@@ -1345,7 +1345,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Next
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillAffectedElementHT", EventLogEntryType.Error, False)
             End Try
 
@@ -1365,7 +1365,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Next
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillISECancelErrorDescHT", EventLogEntryType.Error, False)
             End Try
 
@@ -1408,7 +1408,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
             End Try
 
@@ -1538,7 +1538,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
             End Try
 
@@ -1584,7 +1584,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
             End Try
 
@@ -1710,7 +1710,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetLiNaKClValues", EventLogEntryType.Error, False)
             End Try
 
@@ -1788,7 +1788,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetPumpCalibrationValues", EventLogEntryType.Error, False)
             End Try
 
@@ -1866,7 +1866,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
             End Try
 
@@ -2055,7 +2055,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.FillISEResultValues", EventLogEntryType.Error, False)
             End Try
 
@@ -2104,7 +2104,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasSNValues", EventLogEntryType.Error, False)
             End Try
 
@@ -2204,7 +2204,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.SetDatos = myDallas00Data
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage00Values", EventLogEntryType.Error, False)
             End Try
 
@@ -2289,7 +2289,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.SetDatos = myDallas01Data
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage01Values", EventLogEntryType.Error, False)
             End Try
 
@@ -2414,7 +2414,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage00Values", EventLogEntryType.Error, False)
             End Try
 
@@ -2513,7 +2513,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetDallasPage01Values", EventLogEntryType.Error, False)
             End Try
 
@@ -2570,7 +2570,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.GetConsumptionVolume", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -2677,7 +2677,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ISEReception.SetISEErrorDescription", EventLogEntryType.Error, False)
             End Try
 

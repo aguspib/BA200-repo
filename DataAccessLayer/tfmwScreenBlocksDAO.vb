@@ -54,7 +54,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwScreenBlocksDAO.ReadByScreen", EventLogEntryType.Error, False)                
             Finally
                 'When Database Connection was opened locally, it has to be closed 

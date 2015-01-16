@@ -70,7 +70,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = "SYSTEM_ERROR"
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return dataToReturn
@@ -115,7 +115,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksOrderDemographicsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
 

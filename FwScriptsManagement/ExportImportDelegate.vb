@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/10/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportTextInstructions", EventLogEntryType.Error, False)
             End Try
 
@@ -118,7 +118,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/10/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportInstructions", EventLogEntryType.Error, False)
             End Try
 
@@ -155,7 +155,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/11/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportFwScript", EventLogEntryType.Error, False)
             End Try
 
@@ -234,7 +234,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/11/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ImportFwScript", EventLogEntryType.Error, False)
 
             Finally

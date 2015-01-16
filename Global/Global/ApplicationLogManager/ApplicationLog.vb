@@ -17,7 +17,7 @@ Namespace Biosystems.Ax00.Global
     ''' into an XML File Document, And/Or System Log.
     ''' </summary>
     ''' <remarks></remarks>
-    Public Class ApplicationLogManager
+    Public MustInherit Class ApplicationLogManager
         Inherits GlobalBase
 
 

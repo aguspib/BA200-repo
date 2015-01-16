@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     Dim cmdStringBuilder As New Text.StringBuilder
                     For Each ReportTemplateRow As ReportTemplatesDS.tcfgReportTemplatesRow In pReportTemplatesDS.tcfgReportTemplates.Rows
                         cmdStringBuilder.Append(" INSERT INTO tcfgReportTemplates (" & Environment.NewLine)
@@ -67,7 +67,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -112,7 +112,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -140,7 +140,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     Dim cmdText As String = String.Empty
 
                     cmdText &= "UPDATE tcfgReportTemplates " & Environment.NewLine
@@ -167,7 +167,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateComplete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -217,7 +217,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTemplateName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -242,7 +242,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     Dim cmdText As String = String.Empty
 
                     cmdText &= " UPDATE tcfgReportTemplates " & Environment.NewLine
@@ -264,7 +264,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateDefaultTemplateFieldByName", _
                                                 EventLogEntryType.Error, False)
             End Try
@@ -289,7 +289,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     Dim cmdText As String = String.Empty
 
                     cmdText &= " UPDATE tcfgReportTemplates " & Environment.NewLine
@@ -312,7 +312,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.SetFlaseDefaultValueByTempOrientation", _
                                                 EventLogEntryType.Error, False)
             End Try
@@ -353,7 +353,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -396,7 +396,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -450,7 +450,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.ReadByTemplateOrientation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -497,7 +497,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.GetDefaultMasterTemplate", EventLogEntryType.Error, False)
 
             Finally
@@ -527,7 +527,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    'Dim myGlobalBase As New GlobalBase
+                    ''Dim myGlobalbase As New GlobalBase
                     Dim cmdText As String = String.Empty
 
                     cmdText &= " UPDATE tcfgReportTemplates " & Environment.NewLine
@@ -554,7 +554,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.SetDefaultTemplateStatus", _
                                                 EventLogEntryType.Error, False)
             End Try

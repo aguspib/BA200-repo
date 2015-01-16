@@ -531,7 +531,7 @@ Public Class IConfigUsers
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get screen Icons and Labels
@@ -1170,7 +1170,7 @@ Public Class IConfigUsers
     Private Sub ConfigUsers_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
 

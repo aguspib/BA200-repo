@@ -55,7 +55,7 @@ Partial Public Class IAx00MainMDI
                                          ByVal pTreated As Boolean, _
                                          ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), _
                                          ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) As Boolean
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         'RH Save UIRefreshDS for recording generated UIRefreshDS data and reproduce bugs in Debug sessions
         'pRefreshDS.WriteXml(String.Format("UIRefreshDS{0}.xml", DSNumber))
 
@@ -638,7 +638,7 @@ Partial Public Class IAx00MainMDI
                         ' XB 30/08/2013
                         GlobalBase.CreateLogActivity("(Analyzer Change) ANSFCP received (manage it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
-                        Dim myLogAccionesAux As New ApplicationLogManager()
+                        'Dim myLogAccionesAux As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity("(Analyzer Change) calling function ManageAnalyzerConnected ... ", Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
                         ManageAnalyzerConnected(True, False)
@@ -827,7 +827,7 @@ Partial Public Class IAx00MainMDI
             'AG 04/12/2013
 
         Catch ex As Exception
-            'Dim myLogAcciones As New ApplicationLogManager()
+            ''Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))" & ". SOURCE --> " & ex.Source, "ManageReceptionEvent", _
                                             EventLogEntryType.Error, False)
 
@@ -844,7 +844,7 @@ Partial Public Class IAx00MainMDI
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myLogAccionesAux As New ApplicationLogManager()
+            'Dim myLogAccionesAux As New ApplicationLogManager()
             GlobalBase.CreateLogActivity("(Analyzer Change) Manage Analyzer Connection... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
 
             If (pisReportSATLoading) Then Exit Sub
@@ -958,13 +958,13 @@ Partial Public Class IAx00MainMDI
                     End If
 
                 Else
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Analyzer ID checking", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
                     ShowMessage("Error", GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString)
                 End If
             End If
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -1082,7 +1082,7 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageSentEvent", EventLogEntryType.Error, False)
         End Try
         Return True
@@ -1187,7 +1187,7 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageWatchDogEvent", EventLogEntryType.Error, False)
         End Try
         Return True

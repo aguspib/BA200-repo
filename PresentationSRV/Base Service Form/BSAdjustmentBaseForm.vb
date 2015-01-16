@@ -327,7 +327,7 @@ Public Class BSAdjustmentBaseForm
     '        End If
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
+    '        'Dim myLogAcciones As New ApplicationLogManager()
     '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".OnDataReceivedFromAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '    End Try
     'End Sub
@@ -1428,7 +1428,7 @@ Public Class BSAdjustmentBaseForm
                 If dbConnection IsNot Nothing Then
 
                     'obtain the current language
-                    Dim myLocalBase As New GlobalBase
+                    'Dim myLocalBase As New GlobalBase
                     Dim LanguageID As String = GlobalBase.GetSessionInfo.ApplicationLanguage
 
                     'Get type and multilanguage text for the informed Message
@@ -1610,7 +1610,7 @@ Public Class BSAdjustmentBaseForm
     Protected Friend Sub GetUserNumericalLevel()
 
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim res As Integer = -1
 
         Try
@@ -1754,7 +1754,7 @@ Public Class BSAdjustmentBaseForm
     '        'REQUEST ADJUSTMENTS TO ANALYZER BY CORRESPONDING SCRIPT
     '        'A - SIMULATE 
     '        Dim myData As String = ""
-    '        Dim myGlobalbase As New GlobalBase
+    '        'Dim myGlobalbase As New GlobalBase
     '        Dim objReader As System.IO.StreamReader
     '        Dim path As String = Application.StartupPath & GlobalBase.FwAdjustmentsFile
     '        objReader = New System.IO.StreamReader(path)
@@ -2790,7 +2790,7 @@ Public Class BSAdjustmentBaseForm
                 If myDocs IsNot Nothing Then
                     Dim myDocRow As SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow = CType(myDocs.srv_tfmwInfoDocuments.Rows(0), SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow)
 
-                    Dim myGlobalbase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
 
                     If myDocRow.DocumentPath.Length > 0 Then
                         myDocumentPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.DocumentPath

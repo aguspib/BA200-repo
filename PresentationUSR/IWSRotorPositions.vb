@@ -611,7 +611,7 @@ Public Class IWSRotorPositions
             'GC.Collect()
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -2438,7 +2438,7 @@ Public Class IWSRotorPositions
                         pPositionControl.BackgroundImage = Nothing
 
                         '' XB 19/12/2013 - add log traces
-                        'Dim myLogAcciones As New ApplicationLogManager()
+                        ''Dim myLogAcciones As New ApplicationLogManager()
                         'GlobalBase.CreateLogActivity("Not expected Case [" & pStatus & "] to paint on Rotor", Me.Name & ".SetPosControlBackGroundForSAMPLESRotor", EventLogEntryType.Information, False)
 
                 End Select
@@ -6291,7 +6291,7 @@ Public Class IWSRotorPositions
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'AG 30/05/2014 #1644 - Redesing correction #1584 for avoid DeadLocks
@@ -6976,7 +6976,7 @@ Public Class IWSRotorPositions
 
         Try
             'XB 19/12/2013 - Add log traces
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity("Initiate Create Executions Process Function", Me.Name & ".CreateExecutionsProcess", _
                                             EventLogEntryType.Information, False)
 
@@ -7633,7 +7633,7 @@ Public Class IWSRotorPositions
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'DL 16/04/2013. BEGIN
@@ -7647,7 +7647,7 @@ Public Class IWSRotorPositions
             'AG 02/01/2014 - BT #1433
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
@@ -8814,7 +8814,7 @@ Public Class IWSRotorPositions
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             bsAcceptButton.Enabled = False 'AG 18/06/2014 #1669 - Disable button when this process starts

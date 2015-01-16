@@ -3242,7 +3242,7 @@ Public Class FwScriptsEdition
     Private Sub FormScriptsManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             Me.Location = New Point(0, 0)

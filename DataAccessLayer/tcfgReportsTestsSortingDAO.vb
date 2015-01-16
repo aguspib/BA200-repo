@@ -69,7 +69,7 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetDefaultSortedTestList", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -128,7 +128,7 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tcfgReportsTestsSortingDAO.GetSortedTestList", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -154,7 +154,7 @@ Public Class tcfgReportsTestsSortingDAO
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
-                'Dim myGlobalBase As New GlobalBase
+                ''Dim myGlobalbase As New GlobalBase
                 Dim cmdText As New StringBuilder
 
                 For Each testRow As ReportsTestsSortingDS.tcfgReportsTestsSortingRow In pReportsTestsSortingDS.tcfgReportsTestsSorting.Rows
@@ -178,7 +178,7 @@ Public Class tcfgReportsTestsSortingDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tcfgReportTemplatesDAO.UpdateTestPosition", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO

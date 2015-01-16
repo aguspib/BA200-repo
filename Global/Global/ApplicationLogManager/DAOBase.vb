@@ -74,7 +74,7 @@ Namespace Biosystems.Ax00.Global.DAL
 
                 'validate if connection string is empty to send an error
                 If String.IsNullOrEmpty(ConnectionString) Then
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("Error Reading the Connection String .", "DAOBase", EventLogEntryType.Error, False)
                 Else
                     Dim ConnBuilder As New System.Data.SqlClient.SqlConnectionStringBuilder(ConnectionString)
@@ -93,7 +93,7 @@ Namespace Biosystems.Ax00.Global.DAL
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetConnectionString", EventLogEntryType.Error, False)
 
             End Try
@@ -134,7 +134,7 @@ Namespace Biosystems.Ax00.Global.DAL
                 End Using
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -161,7 +161,7 @@ Namespace Biosystems.Ax00.Global.DAL
                 End Using
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.CommitTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -188,7 +188,7 @@ Namespace Biosystems.Ax00.Global.DAL
                 End Using
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.RollbackTransaction", EventLogEntryType.Error, False)
 
             End Try
@@ -228,7 +228,7 @@ Namespace Biosystems.Ax00.Global.DAL
                 openConnection.ErrorCode = "DB_CONNECTION_ERROR"
                 openConnection.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
 
             End Try
@@ -279,7 +279,7 @@ Namespace Biosystems.Ax00.Global.DAL
                     dbConnection.Close()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBTransaction", EventLogEntryType.Error, False)
             End Try
             Return openTransaction
@@ -297,7 +297,7 @@ Namespace Biosystems.Ax00.Global.DAL
             Try
                 resultData = pValue.ToString("G20").Replace(",", ".")
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -315,7 +315,7 @@ Namespace Biosystems.Ax00.Global.DAL
             Try
                 resultData = pValue.ToString("G20").Replace(",", ".")
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.ReplaceNumericString", EventLogEntryType.Error, False)
             End Try
             Return resultData

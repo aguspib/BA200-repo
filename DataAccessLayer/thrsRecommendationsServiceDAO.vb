@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -86,7 +86,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         cmdText &= "SELECT MR.ResourceText AS FixedItemDesc " & vbCrLf
                         cmdText &= "FROM srv_thrsRecommendationsService RS " & vbCrLf
@@ -114,7 +114,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.ReadByResultServiceID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -154,7 +154,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "thrsRecommendationsServiceDAO.Delete", EventLogEntryType.Error, False)
             End Try
 

@@ -281,7 +281,7 @@ Public Class Ax00MainForm
                     'resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField)
                     resultData = xlsResults.ExportTestXLS("2013101701", pathname, "Test.xls", "834000134")
                     If resultData.HasError Then
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
 
                         'DL 15/05/2013

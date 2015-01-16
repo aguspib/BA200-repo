@@ -105,7 +105,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
 
                         If twksWSRotorContentByPositionDR("TS_USER") Is DBNull.Value Then
-                            Dim myGlobalBase As New GlobalBase
+                            'Dim myGlobalbase As New GlobalBase
                             values &= " N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', "
                         Else
                             values &= " N'" & twksWSRotorContentByPositionDR("TS_User").ToString().Replace("'", "''") & "', "
@@ -121,7 +121,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                             If twksWSRotorContentByPositionDR("RotorType").ToString() = "REAGENTS" Then
                                 If Not twksWSRotorContentByPositionDR("Status") Is DBNull.Value Then
                                     If Not twksWSRotorContentByPositionDR("Status").ToString() = "FREE" Then
-                                        Dim myLogAccionesAux As New ApplicationLogManager()
+                                        'Dim myLogAccionesAux As New ApplicationLogManager()
                                         GlobalBase.CreateLogActivity("A not allowed NULL value it is performed on Real Volume field !", "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Error, False)
                                     End If
                                 End If
@@ -137,7 +137,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -187,7 +187,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -247,7 +247,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Read", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -302,7 +302,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDAndWorkSessionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -356,7 +356,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDList", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -413,7 +413,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -518,7 +518,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                         values &= "TS_User = "
                         If twksWSRotorContentByPositionDR.IsTS_UserNull Then
-                            Dim myGlobalBase As New GlobalBase
+                            'Dim myGlobalbase As New GlobalBase
                             values &= " N'" & GlobalBase.GetSessionInfo().UserName & "', "
                         Else
                             values &= " N'" & twksWSRotorContentByPositionDR.TS_User.ToString().Replace("'", "''") & "',"
@@ -553,7 +553,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -593,7 +593,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateWSAnalyzerID", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -649,7 +649,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.CountPositionByStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -708,7 +708,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.CountPositionedReagentsBottlesByElementID", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -767,7 +767,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ExistBarcodeInfo", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -824,7 +824,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ExistOtherPosition", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -919,7 +919,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetAllPatientTubesForHQ", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -975,7 +975,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetAllPositionedElements", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1031,7 +1031,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMinFreeCellByRing", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1084,7 +1084,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMaxFreeCellByRing", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1142,7 +1142,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetMultiPointCalibratorPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1194,7 +1194,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetPlacedTubesByElement", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1261,7 +1261,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetPositionedReagentVolume", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1349,7 +1349,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetReagentsRotorPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1444,7 +1444,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorContentPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1528,7 +1528,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorContentPositionsResetDone", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1589,7 +1589,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorPositionsByOrderTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1665,7 +1665,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetRotorTypeContentPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1742,7 +1742,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.GetSamplesRotorPositions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -1796,7 +1796,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByElementIDAndWorkSessionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1949,7 +1949,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadByCellNumber", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -2015,7 +2015,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ResetRotor", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -2057,7 +2057,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -2110,7 +2110,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.SetScannedPositionToFREE", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -2253,7 +2253,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateBarCodeFields", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -2320,7 +2320,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "twksWSRotorContentByPositionDAO.UpdateByRotorTypeAndCellNumber", EventLogEntryType.Error, False)
             End Try
 
@@ -2381,7 +2381,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRequiredElementsDAO.UpdateCalibStatusAndTubeType", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -2431,7 +2431,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.UpdateNotInUseRotorPosition", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -2487,7 +2487,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.VerifyTubesByElement", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed 
@@ -2553,7 +2553,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "twksWSRotorContentByPositionDAO.ReadReactions", EventLogEntryType.Error, False)
         '    Finally
         '        'When Database Connection was opened locally, it has to be closed 

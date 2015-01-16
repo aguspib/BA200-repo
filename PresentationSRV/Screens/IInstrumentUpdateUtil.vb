@@ -830,7 +830,7 @@ Public Class IInstrumentUpdateUtil
 
         Dim resultData As New GlobalDataTO
 
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
 
         Try
             'delete if previously exists
@@ -1046,7 +1046,7 @@ Public Class IInstrumentUpdateUtil
     '    Dim myGlobal As New GlobalDataTO
 
     '    Try
-    '        Dim myGlobalbase As New GlobalBase
+    '        'Dim myGlobalbase As New GlobalBase
 
 
     '        With Me.BackupFileDialog
@@ -1507,7 +1507,7 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             With Me.OpenFwFileDialog
                 .Title = Me.BsTabPagesControl.TabPages(1).Text ' "Update Firmware"
@@ -3023,7 +3023,7 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'user permissions

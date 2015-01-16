@@ -809,7 +809,7 @@ Public Class IProgTestProfiles
             If (selectedTestProfileID = 0) Then
                 'When adding a new Test Profile, gets from the Session the Username of the connected User
                 'and the current datetime
-                Dim currentSession As New GlobalBase()
+                'Dim currentSession As New GlobalBase()
 
                 testProfileRow.SetTestProfilePositionNull() 'Set to null, to get the value from the database.
                 testProfileRow.TS_User = GlobalBase.GetSessionInfo().UserName
@@ -1490,7 +1490,7 @@ Public Class IProgTestProfiles
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the list of available Sample Types and Test Types
@@ -1662,7 +1662,7 @@ Public Class IProgTestProfiles
     Private Sub TestProfilesManagement_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             ScreenLoad()

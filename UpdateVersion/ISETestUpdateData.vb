@@ -44,7 +44,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UPDATEModifiedISETestSamples", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -155,7 +155,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UpdateISETests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -303,7 +303,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.UpdateISETestSamples", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -337,7 +337,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("ISE Test Update Error", "ISETestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
                 Throw
             End Try
@@ -408,7 +408,7 @@ End Namespace
 '            Return True
 
 '        Catch ex As Exception
-'            Dim myLogAcciones As New ApplicationLogManager()
+'            'Dim myLogAcciones As New ApplicationLogManager()
 '            GlobalBase.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchISETestById", EventLogEntryType.Error, False)
 '        Finally
 '            If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -452,7 +452,7 @@ End Namespace
 '            Return True
 
 '        Catch ex As Exception
-'            Dim myLogAcciones As New ApplicationLogManager()
+'            'Dim myLogAcciones As New ApplicationLogManager()
 '            GlobalBase.CreateLogActivity(ex.Message, "ISETestUpdateData.SearchRefRangesByISETestId", EventLogEntryType.Error, False)
 '        Finally
 '            If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -516,7 +516,7 @@ End Namespace
 '        myGlobalDataTO.SetDatos = dataDB
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity("ISE Test Update Error.", "ISETestUpdateData.GetDataInDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -646,7 +646,7 @@ End Namespace
 
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -682,7 +682,7 @@ End Namespace
 ' ''' <returns></returns>
 ' ''' <remarks></remarks>
 'Protected Overrides Function GetAffectedItemsFromFactoryUpdates(pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-'    Dim myLogAcciones As New ApplicationLogManager()
+'    'Dim myLogAcciones As New ApplicationLogManager()
 '    Dim myGlobalDataTO As New GlobalDataTO
 
 '    Try
@@ -714,7 +714,7 @@ End Namespace
 '        Return GetDataInDB(pDBConnection, pItemRow, True)
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity("ISE Tests Update Error.", "ISETestUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
@@ -739,7 +739,7 @@ End Namespace
 '        Return GetDataInDB(pDBConnection, pItemRow, False)
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
+'        'Dim myLogAcciones As New ApplicationLogManager()
 '        GlobalBase.CreateLogActivity("ISE Test Update Error.", "ISETestUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

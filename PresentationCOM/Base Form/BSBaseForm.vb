@@ -236,7 +236,7 @@ Public Class BSBaseForm
     Public Sub CreateLogActivity(ByVal Message As String, ByVal LogModule As String, ByVal LogType As EventLogEntryType, _
                                  ByVal InformSystem As Boolean)
         Try
-            Dim myGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             GlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -253,7 +253,7 @@ Public Class BSBaseForm
     ''' </remarks>
     Public Sub ShowExceptionDetails(ByVal pException As Exception)
         Try
-            Dim myGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             GlobalBase.ShowExceptionDetails(pException)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -1143,7 +1143,7 @@ Public Class BSBaseForm
 
             Dim formType As Type = sender.GetType()
             Dim form As IPermissionLevel = CType(sender, IPermissionLevel)
-            Dim myGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             form.ValidatePermissionLevel(GlobalBase.GetSessionInfo.UserLevelEnum)
 
         End If

@@ -68,7 +68,7 @@ Public Class IConditioning
         Try
             'Get the current Language from the current Application Session
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CONDITIONING_TITLE", currentLanguage)

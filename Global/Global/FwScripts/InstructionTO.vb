@@ -145,7 +145,7 @@ Public Class InstructionTO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "InstructionTO.getFwScriptParams", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO

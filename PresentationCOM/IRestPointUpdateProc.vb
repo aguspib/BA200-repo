@@ -638,7 +638,7 @@ Public Class IRestPointUpdateProc
             PrepareButtons()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
@@ -827,7 +827,7 @@ Public Class IRestPointUpdateProc
 
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     myGlobal = ApplicationLogManager.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
@@ -990,7 +990,7 @@ Public Class IRestPointUpdateProc
 
             If Not myGlobalDataTO.HasError Then
                 Dim newLanguageID As String = myGlobalDataTO.SetDatos.ToString()
-                Dim currentSession As New GlobalBase
+                'Dim currentSession As New GlobalBase
                 Dim myApplicationInfoSessionTO As New ApplicationInfoSessionTO
                 myApplicationInfoSessionTO = GlobalBase.GetSessionInfo()
                 'Validate if language is diferent than the current use languae.

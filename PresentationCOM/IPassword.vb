@@ -106,7 +106,7 @@ Public Class IPassword
     Private Sub ChangePasswordLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             Dim dataSessionTO As ApplicationInfoSessionTO

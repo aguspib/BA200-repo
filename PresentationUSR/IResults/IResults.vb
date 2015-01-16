@@ -313,11 +313,11 @@ Public Class IResults
             'startTime = Now 'AG 04/06/2012
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 16/05/2012 -Get the current level
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 16/05/2012 -END
 
@@ -1028,7 +1028,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowPatientsFinalReport(ActiveAnalyzer, ActiveWorkSession)
@@ -1054,7 +1054,7 @@ Public Class IResults
     Private Sub PrintCompactReportButton_Click(sender As Object, e As EventArgs) Handles PrintCompactReportButton.Click
         Try
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Stub
@@ -1081,7 +1081,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowResultsByTestReport(ActiveAnalyzer, ActiveWorkSession)
@@ -1106,7 +1106,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
@@ -1132,7 +1132,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False) 'IT 01/10/2014 - #BA-1864
@@ -1184,7 +1184,7 @@ Public Class IResults
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'SGM 17/04/2013
@@ -1334,7 +1334,7 @@ Public Class IResults
 
         ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         'Dim StartTime As DateTime = Now
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
         ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         'Try
 
@@ -1517,7 +1517,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Dim mySendManRepButton As BSButton = TryCast(sender, BSButton)
@@ -2469,7 +2469,7 @@ Public Class IResults
     Private Sub PrepareButtons()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             Dim preloadedDataConfig As New PreloadedMasterDataDelegate
@@ -3440,7 +3440,7 @@ Public Class IResults
             'GC.Collect() 
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -5305,7 +5305,7 @@ Public Class IResults
                     resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField)
 
                     If resultData.HasError Then
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
 
                         'DL 15/05/2013
@@ -5583,7 +5583,7 @@ Public Class IResults
     Private Sub ExportResultsToLIS()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Try
@@ -5711,7 +5711,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Select Case (bsTestDetailsTabControl.SelectedTab.Name)
@@ -5785,7 +5785,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'BA-1927: The ExportButton will be visible if the Selected Tab is Controls or Patients

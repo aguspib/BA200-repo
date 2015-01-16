@@ -1155,7 +1155,7 @@ Public Class ILevelDetectionTest
 
     Private Sub IlevelDetectionTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
 
             MyBase.MyBase_Load(sender, e)

@@ -41,7 +41,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'Dim cmdText As String = ""
 
                         If (pLanguageID = "") Then
-                            Dim myLocalBase As New GlobalBase
+                            'Dim myLocalBase As New GlobalBase
                             pLanguageID = GlobalBase.GetSessionInfo.ApplicationLanguage
                         End If
 
@@ -77,7 +77,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 '    resultData.ErrorMessage = ex.Message
 
-                '    Dim myLogAcciones As New ApplicationLogManager()
+                '    'Dim myLogAcciones As New ApplicationLogManager()
                 '    GlobalBase.CreateLogActivity(ex.Message, "tfmwMessagesDAO.Read", EventLogEntryType.Error, False)
 
             Catch ex As SqlException
@@ -103,7 +103,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                     resultData.ErrorMessage = ex.Message
 
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity(ex.Message, "tfmwMessagesDAO.Read", EventLogEntryType.Error, False)
                 End If
                 'DL 03/09/2012. End
@@ -132,7 +132,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         'AG 08/10/2010
                         'cmdText = " SELECT MessageID, MessageType, FixedItemDesc AS MessageText " & _
@@ -161,7 +161,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwMessagesDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

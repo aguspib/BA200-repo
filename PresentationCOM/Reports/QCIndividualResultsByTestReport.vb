@@ -101,7 +101,7 @@ Public Class QCIndividualResultsByTestReport
         If Me.DesignMode Then Exit Sub
 
         'Multilanguage support
-        Dim currentLanguageGlobal As New GlobalBase
+        'Dim currentLanguageGlobal As New GlobalBase
         Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
@@ -463,7 +463,7 @@ Public Class QCIndividualResultsByTestReport
     ''' </remarks>
     Private Sub PrepareYoudenGraph()
         'Multilanguage support
-        Dim currentLanguageGlobal As New GlobalBase
+        'Dim currentLanguageGlobal As New GlobalBase
         Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 

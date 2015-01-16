@@ -46,7 +46,7 @@ Public Class IWSNotPosWarning
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load images for graphical buttons and picture boxes

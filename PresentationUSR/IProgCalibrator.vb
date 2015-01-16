@@ -201,7 +201,7 @@ Public Class IProgCalibrator
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim myGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'LocalCurLanguage = currentLanguage
@@ -2847,7 +2847,7 @@ Public Class IProgCalibrator
 
         Try
             'TR 23/04/2012 -Get the current level
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 23/04/2012 -END
 

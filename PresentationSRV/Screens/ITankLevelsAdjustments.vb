@@ -885,7 +885,7 @@ Public Class ITankLevelsAdjustments
     ''' <remarks>Created by XBC 05/01/2011</remarks>
     Private Function GetLimitValues() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             ' Get Value limit ranges
             Dim myFieldLimitsDS As New FieldLimitsDS
@@ -4517,7 +4517,7 @@ Public Class ITankLevelsAdjustments
     'End Sub
     Private Sub TankLevelsAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             ''sensors
             'With MyBase.SensorsTimer

@@ -35,7 +35,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 28/06/2012 - old code
                 'Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                'Dim myLogAcciones As New ApplicationLogManager()
+                ''Dim myLogAcciones As New ApplicationLogManager()
 
                 ''1) Get the argument
                 'Dim InstructionReceived As New List(Of InstructionParameterTO)
@@ -75,7 +75,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Error, False)
             End Try
 
@@ -110,7 +110,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     processingLastANSPHRInstructionFlag = False 'Inform NO readings received are in process
                 End SyncLock
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.wellBaseLineWorker_RunWorkerCompleted", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim resultData As New GlobalDataTO
             Try
                 Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 Dim myReadingCycleStatus As Boolean = False
 
                 'AG 02/06/2014 #1644 - Set the semaphore to busy value (before process ANSPHR)
@@ -196,7 +196,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Error, False)
             End Try
 
@@ -332,7 +332,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Else
                                     Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
                                     resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                    Dim myLogAcciones As New ApplicationLogManager()
+                                    'Dim myLogAcciones As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 End If
                             Else
@@ -366,7 +366,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Error, False)
                 'Finally
                 'If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 29/06/2012 - Running Cycles lost - Solution!
@@ -409,7 +409,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
                 Dim StartTimeAux As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 Dim calculationsPerformedFlag As Boolean
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -997,7 +997,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1006,7 +1006,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If Not instructionSavedFlag Then
                     myGlobal.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString()
                     myGlobal.HasError = True
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("There was an error and the ANSPHR instruction had not been saved. Set error code = READING_NOT_SAVED! ", _
                                 "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                 End If

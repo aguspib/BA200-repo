@@ -464,7 +464,7 @@ Public Class IISEUtilities
     '        End If
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
+    '        'Dim myLogAcciones As New ApplicationLogManager()
     '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OnManageReceptionEvent", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
@@ -875,7 +875,7 @@ Public Class IISEUtilities
 
                 'SGM 17/10/2012 - Log ISE Operation
                 If myScreenIseCmdTo.ISECommandID <> ISECommands.NONE Then
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity("ISE UTILITIES: " & myScreenIseCmdTo.ISECommandID.ToString, Me.Name & ".SendISEInstruction ", EventLogEntryType.Information, False)
                 End If
                 'end SGM 17/10/2012
@@ -1013,7 +1013,7 @@ Public Class IISEUtilities
                 Me.BsStopButton.Enabled = True
 
                 'SGM 17/10/2012 - Log ISE Operation
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("ISE UTILITIES: " & Me.CurrentOperation.ToString, Me.Name & ".SendISEAction ", EventLogEntryType.Information, False)
 
             End If
@@ -1736,7 +1736,7 @@ Public Class IISEUtilities
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
         End Try
         Return myResultData
@@ -1756,7 +1756,7 @@ Public Class IISEUtilities
     ''' </remarks>
     Public Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
+        ''Dim myGlobalbase As New GlobalBase
         Try
             Me.DisableAll()
 
@@ -4327,7 +4327,7 @@ Public Class IISEUtilities
     '            PrepareTestedMode()
     '        End If
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
+    '        'Dim myLogAcciones As New ApplicationLogManager()
     '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "OnISEOperationFinished", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
@@ -4336,7 +4336,7 @@ Public Class IISEUtilities
         Try
 
             'Dim myGlobal As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             'Get an instance of the ISE manager class
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -5075,7 +5075,7 @@ Public Class IISEUtilities
                 If myDocs IsNot Nothing Then
                     Dim myDocRow As SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow = CType(myDocs.srv_tfmwInfoDocuments.Rows(0), SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow)
 
-                    Dim myGlobalbase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
 
                     If myDocRow.DocumentPath.Length > 0 Then
                         myDocumentPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.DocumentPath

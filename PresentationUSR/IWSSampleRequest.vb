@@ -250,7 +250,7 @@ Public Class IWSSampleRequest
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Cursor = Cursors.WaitCursor
@@ -2694,7 +2694,7 @@ Public Class IWSSampleRequest
             If (ShowMessage(bsPrepareWSLabel.Text, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString, , Me) = Windows.Forms.DialogResult.Yes) Then
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 Cursor = Cursors.WaitCursor
@@ -6185,7 +6185,7 @@ Public Class IWSSampleRequest
         Dim myGlobalDataTO As GlobalDataTO
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
@@ -8439,7 +8439,7 @@ Public Class IWSSampleRequest
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             IsOpenRotor = True
@@ -8469,7 +8469,7 @@ Public Class IWSSampleRequest
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             SaveWSWithoutPositioning()
@@ -8503,7 +8503,7 @@ Public Class IWSSampleRequest
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             ScreenLoad()
@@ -8812,7 +8812,7 @@ Public Class IWSSampleRequest
     '    bsBlkCalibDataGridView.DataSource = Nothing
 
     '    'Get the current Language from the current Application Session
-    '    Dim currentLanguageGlobal As New GlobalBase
+    '    'Dim currentLanguageGlobal As New GlobalBase
     '    Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
     '    'Get the list of Sample Tube Types (for the ComboBox column of TubeType in all the grids)

@@ -62,7 +62,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (pUserDetails.tcfgUserData(0).IsTS_UserNull) Then
                         'Get the connected Username from the current Application Session
-                        Dim currentSession As New GlobalBase
+                        'Dim currentSession As New GlobalBase
                         cmdText &= " N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "', "
                     Else
                         cmdText &= " N'" & pUserDetails.tcfgUserData(0).TS_User.Replace("'", "''") & "', "
@@ -96,7 +96,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.Create", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -159,7 +159,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.ReadAll", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -192,7 +192,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = String.Empty
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         cmdText = " SELECT U.*, MR.ResourceText AS UserLevelDesc " & _
                                   " FROM   tcfgUsers U INNER JOIN tfmwUsersLevel UL ON U.UserLevel = UL.UserLevel " & _
@@ -228,7 +228,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.ReadByInternalUser", EventLogEntryType.Error, False)
 
             Finally
@@ -308,7 +308,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.ReadUserIDPassword", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -364,7 +364,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     If (pUserDetails.tcfgUserData(0).IsTS_UserNull) Then
                         'Get the connected Username from the current Application Session
-                        Dim currentSession As New GlobalBase
+                        'Dim currentSession As New GlobalBase
                         cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo().UserName.Replace("'", "''") & "', "
                     Else
                         cmdText &= " TS_User = N'" & pUserDetails.tcfgUserData(0).TS_User.Trim.Replace("'", "''") & "', "
@@ -399,7 +399,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -449,7 +449,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -512,7 +512,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.ExistsUser", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -544,7 +544,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
+                    'Dim currentSession As New GlobalBase
                     Dim currentUser As String = GlobalBase.GetSessionInfo().UserName.Trim.ToString
 
                     Dim cmdText As String = ""
@@ -574,7 +574,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tcfgUserDataDAO.UpdatePassword", EventLogEntryType.Error, False)
             End Try
             Return resultData

@@ -32,7 +32,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         'AG 08/10/2010
                         'cmdText = " SELECT UserLevel, FixedUserLevelDesc,  NumericLevel, InternalUseFlag " & _
@@ -64,7 +64,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwUsersLevelDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -97,7 +97,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
                         Dim internalUse As Integer = CType(IIf(pInternalUse, 1, 0), Integer)
 
                         'AG 08/10/2010
@@ -132,7 +132,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwUsersLevelDAO.ReadByInternalUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

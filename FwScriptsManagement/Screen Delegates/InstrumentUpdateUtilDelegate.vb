@@ -144,7 +144,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESET_ANALYZER", EventLogEntryType.Error, False)
             End Try
 
@@ -257,7 +257,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
             End Try
 
@@ -494,7 +494,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeDataReport", EventLogEntryType.Error, False)
 
             Finally
@@ -525,7 +525,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GenerateResultData", EventLogEntryType.Error, False)
             End Try
 
@@ -551,7 +551,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
             End Try
 
@@ -585,7 +585,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
@@ -631,7 +631,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.DecodeHistoryNOKReasons", EventLogEntryType.Error, False)
             End Try
 
@@ -669,7 +669,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 End Select
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
             End Try
 
@@ -698,7 +698,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.RecommendationsList.Add(pRecommendationID)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -746,7 +746,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -784,7 +784,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESTORE_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             MyClass.RestoringAdjustmentsTextAttr = ""
@@ -810,7 +810,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendRESTORE_FACTORY_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
 
@@ -953,7 +953,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.StartUPDATE_FIRMWARE", EventLogEntryType.Error, False)
         '    End Try
         '    MyClass.RestoringAdjustmentsTextAttr = ""
@@ -1018,7 +1018,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SendFWUTIL", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -1104,7 +1104,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.OpenFwFile", EventLogEntryType.Error, False)
             Finally
                 If File.Exists(myTempFilePath) Then
@@ -1149,7 +1149,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.SplitFwFile", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -1203,7 +1203,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.GetFWFileHeaderInfo", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -1235,7 +1235,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "InstrumentUpdateUtilDelegate.ValidateFwFileVersion", EventLogEntryType.Error, False)
             End Try
             Return myGlobal

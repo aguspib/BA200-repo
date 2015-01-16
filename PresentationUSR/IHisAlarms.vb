@@ -886,12 +886,12 @@ Public Class IHisAlarms
             mAnalyzers = New List(Of String)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
 
             'SGM 31/05/2013 - Get Level of the connected User
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ScreenStatusByUserLevel()
 

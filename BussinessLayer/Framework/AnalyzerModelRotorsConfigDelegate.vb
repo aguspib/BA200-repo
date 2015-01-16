@@ -39,7 +39,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerModelRotorsConfigDelegate.GetMaxRingNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) Then dbConnection.Close()
@@ -78,7 +78,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerModelRotorsConfigDelegate.GetAnalyzerRotorsConfiguration", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) Then dbConnection.Close()
@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerModelRotorsConfigDelegate.GetRotorMaxCellNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) Then dbConnection.Close()
@@ -167,7 +167,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerModelRotorsConfigDelegate.GetAnalyzerRotorTypes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) Then dbConnection.Close()
@@ -205,7 +205,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerModelRotorsConfigDelegate.GetAnalyzerModel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) Then dbConnection.Close()

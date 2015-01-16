@@ -420,7 +420,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -477,7 +477,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -500,7 +500,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -523,7 +523,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendTANKSTEST_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -621,7 +621,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForHOMING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -671,7 +671,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForEMPTY_LOW_CONTAMINATION", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -721,7 +721,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForFILL_DISTILLED_WATER", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -771,7 +771,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForTRANSFER_DW_LC", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -821,7 +821,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForTESTEXITING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -866,7 +866,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForSAVING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -968,7 +968,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.HasError = True
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
             End Try
 
@@ -1285,7 +1285,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
 
             Finally
@@ -1353,7 +1353,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.GenerateResultData", EventLogEntryType.Error, False)
             End Try
 
@@ -1379,7 +1379,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
             End Try
 
@@ -1405,7 +1405,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.EncodeHistoryValue", EventLogEntryType.Error, False)
                 res = "xxxxx"
             End Try
@@ -1472,7 +1472,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
@@ -1528,7 +1528,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
@@ -1565,7 +1565,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 End Select
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
             End Try
 
@@ -1594,7 +1594,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.RecommendationsList.Add(pRecommendationID)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1671,7 +1671,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -1698,7 +1698,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForADJUSTING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -1750,7 +1750,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForADJUST_EXITING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -1799,7 +1799,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -1832,7 +1832,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -1905,7 +1905,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '    '        myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '    '    End If
 
-        '    '    Dim myLogAcciones As New ApplicationLogManager()
+        '    '    'Dim myLogAcciones As New ApplicationLogManager()
         '    '    GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForLOADING", EventLogEntryType.Error, False)
         '    'End Try
         '    'Return myResultData
@@ -1976,7 +1976,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForTEST_BEGINING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -2047,7 +2047,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.SendQueueForCLOSING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData

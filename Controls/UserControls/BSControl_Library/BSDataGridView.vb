@@ -50,7 +50,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
+
                 GlobalBase.CreateLogActivity(ex.Message, "BSDataGridView.OnPaint", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try

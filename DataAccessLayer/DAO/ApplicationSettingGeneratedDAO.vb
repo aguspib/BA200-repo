@@ -55,7 +55,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -84,7 +84,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
             End Try
 
@@ -104,15 +104,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Next
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
 
             Finally

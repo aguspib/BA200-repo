@@ -205,7 +205,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 CurrentFwScriptsQueueAttribute.Clear()
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.AddToFwScriptQueue", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -226,7 +226,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     End If
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.SetQueueItemAsFirst", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -242,7 +242,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' </remarks>
         Public Function StartFwScriptQueue(Optional ByVal pFwScriptQueueItem As FwScriptQueueItem = Nothing) As GlobalDataTO
             Dim myResultData As New GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Try
                 If myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then   ' XBC 19/10/2012
                     If Not IsWaitingForResponse Then
@@ -312,7 +312,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.SendFwScript", EventLogEntryType.Error, False)
             End Try
 
@@ -348,7 +348,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.SendFwScriptTest", EventLogEntryType.Error, False)
             End Try
 
@@ -380,7 +380,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.SendSensorsFwScript", EventLogEntryType.Error, False)
             End Try
 
@@ -411,7 +411,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.SEND_INFO_START", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -440,7 +440,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.SEND_INFO_STOP", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -463,7 +463,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.StartMonitorFwScriptQueue", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -476,7 +476,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' Created by XBC 22/10/2012
         ''' </remarks>
         Public Sub StopFwScriptQueue()
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Try
                 OmmitScriptResponseByAlarmAttr = True 'SGM 24/10/2012 
                 If Not CurrentFwScriptsQueueAttribute Is Nothing Then
@@ -545,7 +545,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.ManageFwScriptsQueueSending", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -649,7 +649,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.ManageFwScriptsQueueReceiving", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -753,7 +753,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorMessage = ex.Message
                 myResultData.SetDatos = GlobalEnumerates.RESPONSE_TYPES.EXCEPTION
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.EvaluateCurrentFwScriptResponse", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -797,7 +797,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     'If pRefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED) Then
                                     '    RaiseEvent DataReceivedEvent(RESPONSE_TYPES.EXCEPTION, Nothing)
                                     'Else
-                                    '    'Dim myLogAcciones As New ApplicationLogManager()
+                                    '    ''Dim myLogAcciones As New ApplicationLogManager()
                                     '    'GlobalBase.CreateLogActivity("AnalyzerManagerAx00Actions.COMMAND_END [myAnalyzer.ReceptionEvent]", "SendFwScriptsDelegate.OnManageReceptionEvent", EventLogEntryType.Information, False)
 
                                     RaiseEvent DataReceivedEvent(RESPONSE_TYPES.OK, Nothing)
@@ -914,7 +914,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.OnManageReceptionEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -935,7 +935,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.OnManageReceptionEvent", EventLogEntryType.Error, False)
             Finally
                 If myResultData.HasError Then
@@ -971,7 +971,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             myResultData = MyClass.ManageFwScriptsQueueReceiving(pResponseValue)
 
                             'If Not myResultData.HasError And Not myResultData Is Nothing Then
-                            '    Dim myLogAcciones As New ApplicationLogManager()
+                            '    'Dim myLogAcciones As New ApplicationLogManager()
                             '    GlobalBase.CreateLogActivity("Instruction received : " & pResponseData.ToString, _
                             '                                    "SendFwScriptsDelegate.OnManageReceptionEvent", EventLogEntryType.Information, False)
                             'End If
@@ -989,7 +989,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.OnManageReceptionEvent", EventLogEntryType.Error, False)
             Finally
                 If myResultData.HasError Then
@@ -1019,11 +1019,11 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 'RaiseEvent FwScriptResponseEvent(sender, e) SGM 24/10/2012
 
-                'Dim myLogAcciones As New ApplicationLogManager()
+                ''Dim myLogAcciones As New ApplicationLogManager()
                 'GlobalBase.CreateLogActivity("FwScript Response Handling [Handles CurrentFwScriptQueueItem.ResponseEvent]", "SendFwScriptsDelegate.OnFwScriptResponse", EventLogEntryType.Information, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.FwScriptResponseOK", EventLogEntryType.Error, False)
             End Try
         End Sub

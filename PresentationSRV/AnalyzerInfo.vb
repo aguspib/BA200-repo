@@ -1814,7 +1814,7 @@ Public Class AnalyzerInfo
 
     Private Sub CreateAnalyzerInfoFileOutput()
         Dim myPath As String
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myFWInfo As UIRefreshDS.FirmwareValueChangedRow
         Dim myArmInfo As UIRefreshDS.ArmValueChangedRow
         Dim myProbeInfo As UIRefreshDS.ProbeValueChangedRow
@@ -2982,14 +2982,14 @@ Public Class AnalyzerInfo
 
     Private Sub Startup_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
+        ''Dim myGlobalbase As New GlobalBase
         Try
             Ax00ServiceMainMDI.ActivateMenus(False)
             Me.Cursor = Cursors.WaitCursor
 
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get the current user level

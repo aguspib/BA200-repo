@@ -7116,7 +7116,7 @@ Public Class IMotorsPumpsValvesTest
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons

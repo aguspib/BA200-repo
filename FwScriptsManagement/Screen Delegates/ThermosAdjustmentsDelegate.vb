@@ -1776,7 +1776,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1850,7 +1850,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentsDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2002,7 +2002,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2024,7 +2024,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -2045,7 +2045,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2072,7 +2072,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2099,7 +2099,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendWASH_STATION_CTRL2", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2124,7 +2124,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2225,7 +2225,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForNeedleToParking", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -2329,7 +2329,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForNeedleToWashing", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -2348,7 +2348,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.CalculateThermoCorrection", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2366,7 +2366,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.CalculateThermoSetPoint", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -2942,7 +2942,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3204,7 +3204,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForCONDIGIONING_SYSTEM", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -3306,7 +3306,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForMEASURE_TEMPERATURE", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -3405,7 +3405,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForTEST_ADJUSTMENT", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3492,7 +3492,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForPRIME", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3619,7 +3619,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForDISPENSE_NEEDLE", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3692,7 +3692,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForWS_HEATER_TEST", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3761,7 +3761,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForROTATE_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4070,7 +4070,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForCONDITIONING_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4106,7 +4106,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendSOUND", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4134,7 +4134,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendENDSOUND", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4146,7 +4146,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.SendENDSOUND()
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.waitingTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -4196,7 +4196,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -4613,7 +4613,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue

@@ -161,7 +161,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessConnection", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -261,7 +261,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -291,7 +291,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
 
                 Dim iseStatusOK As Boolean = False
                 Dim iseInstalledFlag As Boolean = False
@@ -620,7 +620,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -654,7 +654,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 Dim StartTimeTotal As DateTime = Now
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
@@ -866,7 +866,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
             End Try
 
@@ -923,7 +923,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
 
             Finally
@@ -1071,7 +1071,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckRejectedContaminatedNextWell", EventLogEntryType.Error, False)
 
             Finally
@@ -1116,7 +1116,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
 
             Finally
@@ -1163,7 +1163,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparationNEW", EventLogEntryType.Error, False)
 
             Finally
@@ -1325,7 +1325,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
             Finally
@@ -1493,7 +1493,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
                 'Finally
@@ -1623,7 +1623,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
                             Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
                             Dim contaminationFound As Boolean = False
-                            Dim myLogAcciones As New ApplicationLogManager() 'Add temporal traces 'AG 28/03/2014 - #1563
+                            'Dim myLogAcciones As New ApplicationLogManager() 'Add temporal traces 'AG 28/03/2014 - #1563
 
                             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
@@ -1939,7 +1939,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = "SYSTEM_ERROR" 'AG 19/06/2012
                 resultData.ErrorMessage = ex.Message 'AG 19/06/2012
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -2003,7 +2003,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendAdjustLightInstruction", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -2055,7 +2055,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2146,7 +2146,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SaveBaseLineResults", EventLogEntryType.Error, False)
 
             Finally
@@ -2245,7 +2245,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
             Finally
 

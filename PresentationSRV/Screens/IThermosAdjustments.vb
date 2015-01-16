@@ -3253,7 +3253,7 @@ Public Class IThermosAdjustments
 
     Private Sub ThermosAdjustments2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""

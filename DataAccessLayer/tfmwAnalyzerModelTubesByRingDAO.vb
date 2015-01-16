@@ -33,7 +33,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String
-                        Dim myGlobalBase As New GlobalBase
+                        'Dim myGlobalbase As New GlobalBase
 
                         cmdText = " SELECT   TBR.AnalyzerModel, TBR.RotorType, TBR.RingNumber, RTT.ManualUseFlag, " & _
                                            " RTT.TubeCode, RTT.FixedTubeName AS TubeName, RTT.TubeVolume " & _
@@ -69,7 +69,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelTubesByRingDAO.GetAllRotorRingBottles", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -100,7 +100,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myGlobalBase As New GlobalBase
+                        'Dim myGlobalbase As New GlobalBase
 
                         cmdText = " SELECT   TBR.AnalyzerModel, TBR.RotorType, TBR.RingNumber, PMD.ItemID AS TubeCode, " & _
                                            " MR.ResourceText AS TubeName, PMD.Position " & _
@@ -129,7 +129,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAnalyzerModelTubesByRingDAO.GetAllRotorRingTubes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()

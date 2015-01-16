@@ -33,7 +33,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #Region "Declarations"
 
         Private bytgAjustesByte() As Byte  '// trama de Ajustes en formato byte
-        Private myLogAcciones As New ApplicationLogManager()
+        'Private myLogAcciones As New ApplicationLogManager()
 
         Private Enum InstructionTypes
             'iPRO definitions (dont use them in Ax00)

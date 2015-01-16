@@ -74,7 +74,7 @@ Public Class IChangeRotor
     Private Sub GetScreenLabels()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate

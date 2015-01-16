@@ -1756,7 +1756,7 @@ Public Class IProgISETest
                 'SelectedTestRefRangesDS.Clear()
                 SelectedTestRefRangesDS = DirectCast(bsTestRefRanges.DefinedTestRangesDS, TestRefRangesDS) 'bsTestRefRanges.DefinedTestRangesDS
 
-                Dim myGlobalBase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
                 'Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
                 Dim myTestRefRanges As List(Of TestRefRangesDS.tparTestRefRangesRow)
 
@@ -1838,7 +1838,7 @@ Public Class IProgISETest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for graphical buttons
@@ -4202,7 +4202,7 @@ Public Class IProgISETest
     Private Sub ProgISETest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             ScreenLoad()

@@ -1027,7 +1027,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1098,7 +1098,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1120,7 +1120,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.ReadPositionsValues", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1142,7 +1142,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.ReadMovementsValues", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1158,7 +1158,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
             Dim myParametersDS As New ParametersDS
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             Try
                 ' Offet Washing Station for Z aproximation
                 myResultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.SRV_WASHING_STATION_OFFSET.ToString, pAnalyzerModel)
@@ -1475,7 +1475,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1532,7 +1532,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.ManageArmsParkingStatus", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1553,7 +1553,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1691,7 +1691,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.CreateFwAdjustmentsData", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -1718,7 +1718,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1743,7 +1743,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -1766,7 +1766,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1828,7 +1828,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Return returnValue
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.GetArmsParkingStatus", EventLogEntryType.Error, False)
             End Try
         End Function
@@ -2761,7 +2761,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3215,7 +3215,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForADJUSTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3344,7 +3344,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForADJUST_EXITING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3472,7 +3472,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForSAVING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3819,7 +3819,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -3932,7 +3932,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4008,7 +4008,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForABSORBANCESCAN", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4066,7 +4066,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForABSORBANCE_PREPARE", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4092,7 +4092,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.LoadPositionsValuesTO", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -4118,7 +4118,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.LoadMovementsValuesTO", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -4193,7 +4193,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForMIXER_ON", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4268,7 +4268,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForMIXER_OFF", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4328,7 +4328,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForFINE_OPTICAL_CENTERING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4360,7 +4360,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.ManageCountsMeasured", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4387,7 +4387,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.InvertCountsMeasured", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -4537,7 +4537,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.HasError = True
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
             End Try
 
@@ -5730,7 +5730,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
 
             Finally
@@ -5892,7 +5892,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 PositionValues.Add(myZText)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.DecodeHistoryPositionValues", EventLogEntryType.Error, False)
             End Try
 
@@ -5943,7 +5943,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.HasError = True
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.ReportExitWithOutFinishAdjustment", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -6159,7 +6159,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.GenerateResultData", EventLogEntryType.Error, False)
             End Try
 
@@ -6185,7 +6185,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
             End Try
 
@@ -6216,7 +6216,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.EncodeHistoryValue", EventLogEntryType.Error, False)
                 res = "xxxx"
             End Try
@@ -6304,7 +6304,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 res = myPolar & myZ & myRotor
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.EncodeHistoryArmAxesValues", EventLogEntryType.Error, False)
                 res = "xxxxxxxxxxxxxxx"
             End Try
@@ -6512,7 +6512,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
@@ -6541,7 +6541,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.EncodeHistoryArmName", EventLogEntryType.Error, False)
                 res = "x"
             End Try
@@ -6563,7 +6563,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 res = CInt(pPos).ToString("00")
                
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.EncodeHistoryArmPos", EventLogEntryType.Error, False)
                 res = "xx"
             End Try
@@ -6651,7 +6651,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
@@ -6736,7 +6736,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.DecodeHistoryArmValues", EventLogEntryType.Error, False)
             End Try
 
@@ -6807,7 +6807,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.DecodeHistoryArmName", EventLogEntryType.Error, False)
             End Try
 
@@ -6883,7 +6883,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.DecodeHistoryPosName", EventLogEntryType.Error, False)
             End Try
 
@@ -6928,7 +6928,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 End Select
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
             End Try
 
@@ -6959,7 +6959,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.RecommendationsList.Add(pRecommendationID)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -7052,7 +7052,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.HasError = True
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.DecodeHistoryAction", EventLogEntryType.Error, False)
         '    End Try
 
@@ -7083,7 +7083,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.HasError = True
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "TankLevelsAdjustmentDelegate.GetHistoryActionDataText", EventLogEntryType.Error, False)
         '    End Try
 
@@ -7156,7 +7156,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '    '        myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '    '    End If
 
-        '    '    Dim myLogAcciones As New ApplicationLogManager()
+        '    '    'Dim myLogAcciones As New ApplicationLogManager()
         '    '    GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForLOADING", EventLogEntryType.Error, False)
         '    'End Try
         '    'Return myResultData
@@ -7225,7 +7225,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForTEST_BEGINING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -7294,7 +7294,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "PositionsAdjustmentDelegate.SendQueueForCLOSING", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData

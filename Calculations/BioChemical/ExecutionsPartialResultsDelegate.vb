@@ -67,7 +67,7 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExecutionsPartialResultsDelegate.SaveResults", EventLogEntryType.Error, False)
 
         '    Finally
@@ -125,7 +125,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExecutionsPartialResultsDelegate.ResetWS", EventLogEntryType.Error, False)
 
             Finally

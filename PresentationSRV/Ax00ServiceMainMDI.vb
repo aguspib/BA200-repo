@@ -311,7 +311,7 @@ Public Class Ax00ServiceMainMDI
                 myVersion = .FileMajorPart & "." & .FileMinorPart & "." & .FileBuildPart & "." & .FilePrivatePart
             End With
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "Utilities.GetApplicationVersion", EventLogEntryType.Error, False)
         End Try
         Return myVersion
@@ -2121,7 +2121,7 @@ Public Class Ax00ServiceMainMDI
             MyClass.isWaitingForSleep = False
             MyClass.isWaitingForCloseApp = False
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
 
@@ -2203,13 +2203,13 @@ Public Class Ax00ServiceMainMDI
             '    If mySWParametersDS.tfmwSwParameters.Count > 0 Then
             '        myParameterValue = mySWParametersDS.tfmwSwParameters(0).ValueNumeric
 
-            '        Dim myLogAcciones As New ApplicationLogManager()
+            '        'Dim myLogAcciones As New ApplicationLogManager()
             '        myGlobalDataTO = myLogAcciones.DeleteByDate(Nothing, myParameterValue.ToString)
 
             '        If Not myGlobalDataTO.HasError Then
             '            Dim myAffectedRecords As Integer = myGlobalDataTO.AffectedRecords
             '            If myAffectedRecords > 0 Then
-            '                Dim myLogAcciones2 As New ApplicationLogManager()
+            '                'Dim myLogAcciones2 As New ApplicationLogManager()
             '                GlobalBase.CreateLogActivity("Trace Log Records deleted [" & myAffectedRecords.ToString & "]", Name & ".CleanApplicationLog ", EventLogEntryType.Information, False)
             '            End If
             '        End If
@@ -2218,7 +2218,7 @@ Public Class Ax00ServiceMainMDI
 
             ' XB 04/12/2013 - Use the same functionality to Export Logs to XML that is used by User Sw - BT #171 SERVICE
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myLogMaxDays As Integer = 30
             Dim myParams As New SwParametersDelegate
 
@@ -2427,7 +2427,7 @@ Public Class Ax00ServiceMainMDI
             ' XB 05/11/2014 - BA-1872
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & "ManageSentEvent", EventLogEntryType.Error, False)
         End Try
     End Function
@@ -2523,7 +2523,7 @@ Public Class Ax00ServiceMainMDI
     '        'End If
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
+    '        'Dim myLogAcciones As New ApplicationLogManager()
     '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & "OnManageSentEvent", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
@@ -3039,7 +3039,7 @@ Public Class Ax00ServiceMainMDI
             End With
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetMonitorScreenLabels", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -3087,7 +3087,7 @@ Public Class Ax00ServiceMainMDI
             End With
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SetMonitorScreenLimits", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -3397,7 +3397,7 @@ Public Class Ax00ServiceMainMDI
             End If
             'Me.BsMonitor.Enabled = True
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshMonitorPanel", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -3423,7 +3423,7 @@ Public Class Ax00ServiceMainMDI
     '        Me.BsMonitor.Enabled = True
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
+    '        'Dim myLogAcciones As New ApplicationLogManager()
     '        GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.OnSensorValuesChanged", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
@@ -6164,14 +6164,14 @@ Public Class Ax00ServiceMainMDI
             Static isLogged As Boolean
 
             If Not isLogged Then
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Information, False)
                 isLogged = True
             End If
 
             'end SGM 07/11/2012
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Error, False)
         End Try
     End Sub
@@ -6256,7 +6256,7 @@ Public Class Ax00ServiceMainMDI
     ''' </remarks>
     Private Sub Ax00ServiceMainMDI_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             Me.Text = My.Application.Info.ProductName 'SGM 22/02/2012
 
@@ -6313,7 +6313,7 @@ Public Class Ax00ServiceMainMDI
             'PrepareButtons()
 
             'Get the current application Language to set the correspondent attribute and prepare all menu options
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             CurrentLanguageAttribute = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareMenuOptions()    'AG 17/06/2010
@@ -7431,7 +7431,7 @@ Public Class Ax00ServiceMainMDI
     Private Sub Login_Closed() Handles myLogin.FormClosed
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             Dim myUsersLevel As New UsersLevelDelegate
             MyClass.CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)

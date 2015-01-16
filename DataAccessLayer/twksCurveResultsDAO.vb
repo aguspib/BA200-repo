@@ -40,7 +40,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataReturn.ErrorCode = "SYSTEM_ERROR"
                 dataReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.FindLastCurveID", EventLogEntryType.Error, False)
 
             Finally
@@ -115,7 +115,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.InsertCurve", EventLogEntryType.Error, False)
             End Try
 
@@ -178,7 +178,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.UpdateCurve", EventLogEntryType.Error, False)
             End Try
 
@@ -225,7 +225,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ExistsCurveResult", EventLogEntryType.Error, False)
 
             Finally
@@ -278,7 +278,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.ReadCurve", EventLogEntryType.Error, False)
 
             Finally
@@ -325,7 +325,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteResultsByOrderTestId", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -363,7 +363,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteCurve", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -407,7 +407,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "twksCurveResultsDAO.DeleteForNOTCALCCalibrators", EventLogEntryType.Error, False)
             End Try
             Return resultData

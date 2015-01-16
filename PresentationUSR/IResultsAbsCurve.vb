@@ -1004,7 +1004,7 @@ Public Class IResultsAbsCurve
             bsRerunTextLocation = bsRerunText.Location
 
             'RH 29/02/2012 Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'RH 29/02/2012 Initialize myMultiLangResourcesDelegate
@@ -1238,7 +1238,7 @@ Public Class IResultsAbsCurve
         Try
             If isClosingFlag Then Return 'AG 03/08/2012
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 13/06/2012 - time estimation
             Dim qUIRefresh As List(Of vwksWSAbsorbanceDS.vwksWSAbsorbanceRow)
             Dim workingThread As New Threading.Thread(AddressOf GetDataForAbsCurve)

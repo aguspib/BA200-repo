@@ -58,7 +58,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -115,7 +115,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.ReadAll", EventLogEntryType.Error, False)
 
             Finally
@@ -148,7 +148,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     ''Get the connected Username from the current Application Session
-                    'Dim currentSession As New GlobalBase
+                    ''Dim currentSession As New GlobalBase
                     'Dim currentUser As String = GlobalBase.GetSessionInfo().UserName.Trim.ToString
                     'Dim currentDateTime As Date = Now
 
@@ -241,7 +241,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.UpdateLanguageResource", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -298,7 +298,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.ReadManagementAlarm", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -389,7 +389,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.Create", EventLogEntryType.Error, False)
             End Try
 
@@ -417,7 +417,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = "DB_CONNECTION_ERROR"
                 Else
                     'Get the connected Username from the current Application Session
-                    Dim currentSession As New GlobalBase
+                    'Dim currentSession As New GlobalBase
                     Dim currentUser As String = GlobalBase.GetSessionInfo().UserName.Trim.ToString
                     Dim currentDateTime As Date = Now
 
@@ -478,7 +478,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -523,7 +523,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwAlarmsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData

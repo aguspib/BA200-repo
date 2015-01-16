@@ -396,7 +396,7 @@ Public Class IISECalibHistory
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
         End Try
         Return myResultData
@@ -568,7 +568,7 @@ Public Class IISECalibHistory
         Try
 
             'Dim myGlobal As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             'Get an instance of the ISE manager class
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then

@@ -48,7 +48,7 @@ Public Class IConfigLanguage
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
@@ -281,7 +281,7 @@ Public Class IConfigLanguage
     Private Sub SetApplicationSessionInfo(ByVal pNewLanguageID As String)
         Try
             'Get current Session Values before reset the Session
-            Dim currentSession As New GlobalBase
+            'Dim currentSession As New GlobalBase
             Dim currentUserID As String = GlobalBase.GetSessionInfo().UserName.Trim.ToString
             Dim currentUserLevel As String = GlobalBase.GetSessionInfo().UserLevel.Trim.ToString
 
@@ -335,7 +335,7 @@ Public Class IConfigLanguage
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             ScreenLoad()
@@ -374,7 +374,7 @@ Public Class IConfigLanguage
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Save the selected Language as the current one and refresh opened screens

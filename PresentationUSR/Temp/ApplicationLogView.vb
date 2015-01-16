@@ -59,7 +59,7 @@ Public Class ApplicationLogView
     Private Sub GenerateLogXml()
         Try
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myApplicationLogManager As New ApplicationLogManager
+            'Dim MyApplicationLogManager As New ApplicationLogManager
 
             myGlobalDataTO = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, 90)
 

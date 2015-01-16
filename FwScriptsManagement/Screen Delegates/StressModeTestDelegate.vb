@@ -238,7 +238,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     End If
                 Catch ex As Exception
                     returnValue = Nothing
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.Property CodeErrorsStressToDS", EventLogEntryType.Error, False)
                 End Try
                 Return returnValue
@@ -299,7 +299,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -336,7 +336,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -386,7 +386,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -412,7 +412,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.ReadPartialElements", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -442,7 +442,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.SendSDMODE", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -464,7 +464,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.SendSDPOLL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -501,7 +501,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.SendSTRESS_STOP", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -529,7 +529,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 'myResultData = MyClass.GetCultureInfo()
                 'If myResultData.HasError Then
-                '    Dim myLogAcciones As New ApplicationLogManager()
+                '    'Dim myLogAcciones As New ApplicationLogManager()
                 '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "PhotometryAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
                 '    Exit Try
                 'End If
@@ -642,7 +642,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -684,7 +684,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.ManageResultsStress", EventLogEntryType.Error, False)
             End Try
             Return myResultData
@@ -712,7 +712,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.GetCultureInfo", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
@@ -763,7 +763,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -862,7 +862,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "StressModeTestDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue

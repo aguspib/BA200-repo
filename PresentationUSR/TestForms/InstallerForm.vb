@@ -26,7 +26,7 @@ Public Class InstallerForm
         'dbVerNumberlbl.Text = GlobalBase.DataBaseVersion
         'testLims()
 
-        Dim MyGlobalBase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
         ScreenAccessControl()
     End Sub
@@ -283,7 +283,7 @@ Public Class InstallerForm
 #Region "OLD"
 
     'Private Sub Updateprocess()
-    '    Dim myLogAcciones As New ApplicationLogManager()
+    '    'Dim myLogAcciones As New ApplicationLogManager()
 
     '    Try
     '        Dim mydbmngDelegate As New DataBaseManagerDelegate()

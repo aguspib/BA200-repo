@@ -134,7 +134,7 @@ Namespace Biosystems.Ax00.BL
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495 
                         Dim StartTime As DateTime = Now
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         GlobalBase.CreateLogActivity("RESULTS NUMBER to EXPORT : " & myResultsData.vwksResults.Count.ToString(), _
                                  "ExportDelegate.ExportToLISManualNEW", EventLogEntryType.Information, False)
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
@@ -226,7 +226,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExportToLISManualNEW", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -523,7 +523,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExportToLISManualFromHIST", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -558,7 +558,7 @@ Namespace Biosystems.Ax00.BL
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones1 As New ApplicationLogManager()
+            'Dim myLogAcciones1 As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Try
@@ -660,7 +660,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -847,7 +847,7 @@ Namespace Biosystems.Ax00.BL
                     End If
                 End If
 
-                Dim myGlobalBase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
 
                 'Finally, write all Results in the TXT file
                 Dim myTubeType As String
@@ -901,7 +901,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.CreateExportFileNEW", EventLogEntryType.Error, False)
             Finally
                 'Close the file 
@@ -1047,7 +1047,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorCode = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -1246,7 +1246,7 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.GetDataToExport", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
@@ -1580,7 +1580,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.GetDataToExport", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1799,7 +1799,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.CreateExportFile", EventLogEntryType.Error, False)
         '    Finally
         '        'close the file 
@@ -1935,7 +1935,7 @@ Namespace Biosystems.Ax00.BL
         '                        Dim myOrderTestDS As New OrderTestsDS
         '                        Dim tempResultDS As New ResultsDS
         '                        Dim myExecutionsRow As ExecutionsDS.twksWSExecutionsRow
-        '                        Dim myGlobalBase As New GlobalBase
+        '                        'Dim myGlobalbase As New GlobalBase
         '                        Dim myExecutionsDS As New ExecutionsDS
         '                        Dim myExecutionDelegate As New ExecutionsDelegate
 
@@ -2042,7 +2042,7 @@ Namespace Biosystems.Ax00.BL
         '        End If
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportToLIS", EventLogEntryType.Error, False)
 
         '    End Try
@@ -2089,7 +2089,7 @@ Namespace Biosystems.Ax00.BL
 
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         '    Dim StartTime As DateTime = Now
-        '    Dim myLogAcciones1 As New ApplicationLogManager()
+        '    'Dim myLogAcciones1 As New ApplicationLogManager()
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         '    Try
@@ -2256,7 +2256,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.HasError = True
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
@@ -2371,7 +2371,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
@@ -2413,7 +2413,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
@@ -2544,7 +2544,7 @@ Namespace Biosystems.Ax00.BL
         '                        Dim myOrderTestDS As New OrderTestsDS
         '                        Dim tempResultDS As New ResultsDS
         '                        Dim myExecutionsRow As ExecutionsDS.twksWSExecutionsRow
-        '                        Dim myGlobalBase As New GlobalBase
+        '                        'Dim myGlobalbase As New GlobalBase
         '                        Dim myExecutionsDS As New ExecutionsDS
         '                        Dim myExecutionDelegate As New ExecutionsDelegate
 
@@ -2651,7 +2651,7 @@ Namespace Biosystems.Ax00.BL
         '        End If
 
         '    Catch ex As Exception
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportToLIS", EventLogEntryType.Error, False)
 
         '    End Try
@@ -2698,7 +2698,7 @@ Namespace Biosystems.Ax00.BL
 
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         '    Dim StartTime As DateTime = Now
-        '    Dim myLogAcciones1 As New ApplicationLogManager()
+        '    'Dim myLogAcciones1 As New ApplicationLogManager()
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         '    Try
@@ -2865,7 +2865,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.HasError = True
         '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
@@ -2980,7 +2980,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ManageLISExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
@@ -3022,7 +3022,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportationNEW", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO
@@ -3074,7 +3074,7 @@ Namespace Biosystems.Ax00.BL
         '                    myGlobalDataTO = CreateExportFile(dbConnection, pReseWSFlag, MyLimsResultList, pWorkSessionID)
 
         '                    If Not myGlobalDataTO.HasError Then
-        '                        Dim myGlobalBase As New GlobalBase
+        '                        'Dim myGlobalbase As New GlobalBase
         '                        Dim tempResultDS As New ResultsDS
 
         '                        'TR 04/10/2011 -Create new Row
@@ -3148,7 +3148,7 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.HasError = True
         '        myGlobalDataTO.ErrorCode = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "ExportDelegate.ExecuteExportation", EventLogEntryType.Error, False)
         '    End Try
         '    Return myGlobalDataTO

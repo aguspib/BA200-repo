@@ -59,7 +59,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             resultData = New GlobalDataTO
 
                             Dim notificationValues As New List(Of String)
-                            Dim myLogAcciones As New ApplicationLogManager()
+                            'Dim myLogAcciones As New ApplicationLogManager()
 
                             '1) CONTROL INFORMATION
                             '======================
@@ -221,7 +221,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.TreatXMLNotification", EventLogEntryType.Error, False)
 
             Finally
@@ -247,7 +247,7 @@ Namespace Biosystems.Ax00.LISCommunications
                     myID = myValues(0)
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageIDFromNotification", EventLogEntryType.Error, False)
             End Try
             Return myID
@@ -269,7 +269,7 @@ Namespace Biosystems.Ax00.LISCommunications
                     myFiled = myValues(position)
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageFiledFromNotification, on Position " + position, EventLogEntryType.Error, False)
             End Try
             Return myFiled
@@ -320,7 +320,7 @@ Namespace Biosystems.Ax00.LISCommunications
             '    resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             '    resultData.ErrorMessage = ex.Message
 
-            '    Dim myLogAcciones As New ApplicationLogManager()
+            '    'Dim myLogAcciones As New ApplicationLogManager()
             '    GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.UpdateExportStatus", EventLogEntryType.Error, False)
 
             'Finally
@@ -398,7 +398,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.UpdateExportStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -458,7 +458,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                         Dim toReturn As New List(Of ExecutionsDS)
 
-                        Dim myLogAcciones As New ApplicationLogManager() 'AG 02/01/2014 - BT #1433 (v211 patch2)
+                        'Dim myLogAcciones As New ApplicationLogManager() 'AG 02/01/2014 - BT #1433 (v211 patch2)
                         Dim logTrace As String = String.Empty 'AG 02/01/2014 - BT #1433 (v211 patch2)
                         Dim testInfo As String = String.Empty 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
@@ -596,7 +596,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.DivideResultsToUploadIntoSeveralMessages", EventLogEntryType.Error, False)
 
             Finally
@@ -644,7 +644,7 @@ Namespace Biosystems.Ax00.LISCommunications
                         'Temporal for create xml
                         Dim linqResForXml As List(Of OrderTestsLISInfoDS.twksOrderTestsLISInfoRow)
 
-                        Dim myLogAcciones As New ApplicationLogManager() 'AG 02/01/2014 - BT #1433 (v211 patch2)
+                        'Dim myLogAcciones As New ApplicationLogManager() 'AG 02/01/2014 - BT #1433 (v211 patch2)
                         Dim logTrace As String = String.Empty 'AG 02/01/2014 - BT #1433 (v211 patch2)
                         Dim testInfo As String = String.Empty 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
@@ -724,7 +724,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.DivideAwosToRejectIntoSeveralMessages", EventLogEntryType.Error, False)
 
             Finally
@@ -796,7 +796,7 @@ Namespace Biosystems.Ax00.LISCommunications
                             N += 1
                         End If
 
-                        Dim myLogAcciones As New ApplicationLogManager() 'AG 02/01/2014 - BT #1433 (v211 patch2)
+                        'Dim myLogAcciones As New ApplicationLogManager() 'AG 02/01/2014 - BT #1433 (v211 patch2)
                         Dim specimensInMessage As String = String.Empty 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
                         'Divide the entry specimen list into several specimens list
@@ -833,7 +833,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.DivideIntoSeveralHostQueryMessages", EventLogEntryType.Error, False)
 
             Finally
@@ -1030,7 +1030,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.AllowLISAction", EventLogEntryType.Error, False)
 
             Finally
@@ -1119,7 +1119,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExcludeNotMappedResults", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -1172,7 +1172,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ValidateLISMapping", EventLogEntryType.Error, False)
             End Try
             Return resultData

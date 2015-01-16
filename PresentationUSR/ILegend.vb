@@ -183,7 +183,7 @@ Public Class ILegend
         Try
             'Get the current Language from the current Application Session
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
 
             myLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 

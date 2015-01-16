@@ -49,7 +49,7 @@
 
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
 '            End Try
 
@@ -104,7 +104,7 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetResultErrors", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
@@ -166,7 +166,7 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetCancelError", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
@@ -200,7 +200,7 @@
 '                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
 '            End Try
 
@@ -354,7 +354,7 @@
 '        '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 '        '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        '        Dim myLogAcciones As New ApplicationLogManager()
+'        '        'Dim myLogAcciones As New ApplicationLogManager()
 '        '        GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
 '        '    End Try
 
@@ -469,7 +469,7 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
 '            End Try
 
@@ -515,7 +515,7 @@
 '                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
 '            End Try
 
@@ -683,7 +683,7 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetLiNaKClValues", EventLogEntryType.Error, False)
 '            End Try
 
@@ -765,7 +765,7 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetPumpCalibrationValues", EventLogEntryType.Error, False)
 '            End Try
 
@@ -847,7 +847,7 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1012,7 +1012,7 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.FillISEResultValues", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1047,7 +1047,7 @@
 
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetIoneValue", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1090,7 +1090,7 @@
 '                    End If
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetPumpValue", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1123,7 +1123,7 @@
 '                    End If
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetBubbleValue", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1175,7 +1175,7 @@
 '                myGlobal.SetDatos = myDallasSNData
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasSNValues", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1261,7 +1261,7 @@
 '                myGlobal.SetDatos = myDallas00Data
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage00Values", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1332,7 +1332,7 @@
 '                myGlobal.SetDatos = myDallas01Data
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage01Values", EventLogEntryType.Error, False)
 '            End Try
 
@@ -1387,7 +1387,7 @@
 '                myGlobal.SetDatos = myConsumption
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
+'                'Dim myLogAcciones As New ApplicationLogManager()
 '                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetConsumptionVolume", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal

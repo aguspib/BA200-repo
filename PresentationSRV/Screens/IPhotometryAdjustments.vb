@@ -879,7 +879,7 @@ Public Class IPhotometryAdjustments
     ''' <remarks>Created by XBC 23/02/2011</remarks>
     Private Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPhotometryDataTO As PhotometryDataTO
         Try
             DisableAll()
@@ -1068,7 +1068,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareTestedMode()
         Dim myResultData As New GlobalDataTO
         'Dim myPhotometryDataTO As PhotometryDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPath As String
         Try
             Select Case Me.SelectedPage
@@ -3314,7 +3314,7 @@ Public Class IPhotometryAdjustments
 
     Private Sub PhotometryAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
@@ -4383,7 +4383,7 @@ Public Class IPhotometryAdjustments
     '    Dim myGlobal As New GlobalDataTO
     '    Try
     '        ' Save BLDC Test
-    '        Dim myGlobalbase As New GlobalBase
+    '        'Dim myGlobalbase As New GlobalBase
     '        Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
     '        myGlobal = myScreenDelegate.SaveBLDCFile(myPathBLFile)
     '        If myGlobal.HasError Then

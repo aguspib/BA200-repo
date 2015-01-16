@@ -71,7 +71,7 @@ Namespace Biosystems.Ax00.Global.DAL
                                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                                Dim myLogAcciones As New ApplicationLogManager()
+                                'Dim myLogAcciones As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Create", EventLogEntryType.Error, False)
                             End If
                         End Try
@@ -250,7 +250,7 @@ Namespace Biosystems.Ax00.Global.DAL
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Delete", EventLogEntryType.Error, False)
             Finally
                 'Close the open connection
@@ -292,7 +292,7 @@ Namespace Biosystems.Ax00.Global.DAL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.DeleteByDate", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData

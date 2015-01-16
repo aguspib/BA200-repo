@@ -70,7 +70,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadNyDemographicID", EventLogEntryType.Error, False)
 
         '    Finally
@@ -127,7 +127,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadByTypeAndStatus", EventLogEntryType.Error, False)
 
         '    Finally
@@ -187,7 +187,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         ''        resultData.ErrorCode = "SYSTEM_ERROR"
         ''        resultData.ErrorMessage = ex.Message
 
-        ''        Dim myLogAcciones As New ApplicationLogManager()
+        ''        'Dim myLogAcciones As New ApplicationLogManager()
         ''        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.ReadByTypeAndStatus", EventLogEntryType.Error, False)
 
         ''    Finally
@@ -240,7 +240,7 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        'Dim myLogAcciones As New ApplicationLogManager()
         '        GlobalBase.CreateLogActivity(ex.Message, "tcfgCustomDemographicsDAO.MiddleNameStatus", EventLogEntryType.Error, False)
 
         '    Finally

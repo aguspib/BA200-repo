@@ -64,7 +64,7 @@ Partial Public Class tparCalibratorsDAO
                 End If
 
                 If (pCalibratorsDS.tparCalibrators(0).IsTS_UserNull) Then
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     cmdText &= "           ,N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "'" & vbCrLf
                 Else
                     cmdText &= "           ,N'" & pCalibratorsDS.tparCalibrators(0).TS_User.Trim.Replace("'", "''") & "'" & vbCrLf
@@ -92,7 +92,7 @@ Partial Public Class tparCalibratorsDAO
                 'End If
 
                 'If (pCalibratorsDS.tparCalibrators(0).IsTS_UserNull) Then
-                '    Dim myGlobalBase As New GlobalBase
+                '    'Dim myGlobalbase As New GlobalBase
                 '    cmdText &= " N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                 'Else
                 '    cmdText &= " N'" & pCalibratorsDS.tparCalibrators(0).TS_User.Trim.Replace("'", "''") & "', "
@@ -124,7 +124,7 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Create", EventLogEntryType.Error, False)
         End Try
         Return resultData
@@ -162,7 +162,7 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Delete", EventLogEntryType.Error, False)
         End Try
         Return resultData
@@ -224,7 +224,7 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Read", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -269,7 +269,7 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.ReadAll", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -334,7 +334,7 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.ReadByCalibratorName", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -378,7 +378,7 @@ Partial Public Class tparCalibratorsDAO
                 End If
 
                 If (pCalibratorsDS.tparCalibrators(0).IsTS_UserNull) Then
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     cmdText &= " TS_User = N'" & GlobalBase.GetSessionInfo.UserName.Trim.Replace("'", "''") & "', "
                 Else
                     cmdText &= " TS_User = N'" & pCalibratorsDS.tparCalibrators(0).TS_User.Trim.Replace("'", "''") & "', "
@@ -404,7 +404,7 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.Update", EventLogEntryType.Error, False)
         End Try
         Return resultData
@@ -503,7 +503,7 @@ Partial Public Class tparCalibratorsDAO
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.GetCalibratorsForReport", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -572,7 +572,7 @@ Partial Public Class tparCalibratorsDAO
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.UpdateInUseFlag", EventLogEntryType.Error, False)
         End Try
         Return myGlobalDataTO

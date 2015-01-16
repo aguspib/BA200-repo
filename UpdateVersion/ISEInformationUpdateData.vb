@@ -17,7 +17,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' Created by: XB - 10/05/2013
         ''' </remarks>
         Public Function UpdateDataFormatv1Tov2(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -118,7 +118,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("ISE Info Update Error.", "ISEInformationUpdateData.IsDateTime", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -135,7 +135,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.SetDatos = myDateTimeValue
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity("ISE Info Update Error.", "ISEInformationUpdateData.ExtractDateTime", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString

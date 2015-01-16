@@ -56,11 +56,11 @@ Public Class ISATReport
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
@@ -137,7 +137,7 @@ Public Class ISATReport
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 14/02/2012
@@ -190,7 +190,7 @@ Public Class ISATReport
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 22/12/2011 - Validate if file name exists on the selected folder before starting the ReportSAT creation
@@ -311,7 +311,7 @@ Public Class ISATReport
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                     Dim StartTime As DateTime = Now
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                     Dim CheckedIndicesCount As Integer = bsSATDirListBox.CheckedIndices.Count

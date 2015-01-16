@@ -468,7 +468,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'AG 30/10/2013 - Task #1342 - If user STOPS worksession in paused mode Sw sends 1st START and then add END instruction into queue
                         If stopRequestedByUserInPauseModeFlag Then
-                            Dim myLogAcciones As New ApplicationLogManager()
+                            'Dim myLogAcciones As New ApplicationLogManager()
                             GlobalBase.CreateLogActivity("Once START instruction has been sent add the END instruction into queue", "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Information, False)
 
                             ContinueAlreadySentFlagAttribute = True 'Inform here this attribute to make easier the presentation button actions refresh
@@ -563,7 +563,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (Not myGlobal.HasError) Then myGlobal = SendEndInstructionIfRequired()
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageRunningStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -994,7 +994,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageStandByStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -1089,7 +1089,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'AG 20/06/2012 - 'AG 17/10/2011
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageSleepStatus", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -1113,7 +1113,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageFwCommandAnswer", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -1299,7 +1299,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ExecuteSpecialBusinessOnAnalyzerStatusChanges", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1341,7 +1341,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.TreatQueueExceptions", EventLogEntryType.Error, False)
             End Try
             Return actionToReturn
@@ -1390,7 +1390,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendEndInstruction", EventLogEntryType.Error, False)
             End Try
 
@@ -1441,7 +1441,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'AG 10/12/2013
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SetAllowScanInRunningValue", EventLogEntryType.Error, False)
             End Try
 
@@ -1661,7 +1661,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeAnalyzerFlags", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1731,7 +1731,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeAnalyzerSettings", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1800,7 +1800,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeAnalyzerLedPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1873,7 +1873,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeISEInformation", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1943,7 +1943,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeFWAdjustments", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1983,7 +1983,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateSessionFlags", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -2007,7 +2007,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SetSessionFlags", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -2021,7 +2021,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CreateNewFlag", EventLogEntryType.Error, False)
 
             End Try
@@ -2103,7 +2103,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeAnalyzerSettings", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2390,7 +2390,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.RecoverStableSetup", EventLogEntryType.Error, False)
 
             Finally
@@ -2450,7 +2450,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'AnalyzerIsReady = Not waitingTimer.Enabled  'AG 19/05/2010
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerControl", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -2473,7 +2473,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFirstFromQueue", EventLogEntryType.Error, False)
                 myInstructionsQueue.Clear()
                 myParamsQueue.Clear() 'AG 19/07/2011
@@ -2499,7 +2499,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFirstParametersFromQueue", EventLogEntryType.Error, False)
                 myParamsQueue.Clear()
             End Try
@@ -2541,7 +2541,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerStartTaskControl", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -2565,7 +2565,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 MyClass.myStartTaskFwScriptParamsQueue.Add(pParams)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.StoreStartTaskinQueue", EventLogEntryType.Error, False)
                 MyClass.ClearStartTaskQueueToSend()
             End Try
@@ -2589,7 +2589,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ClearStartTaskQueueToSend", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
@@ -2647,7 +2647,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendStartTaskinQueue", EventLogEntryType.Error, False)
                 MyClass.ClearStartTaskQueueToSend()
             End Try
@@ -2680,7 +2680,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.InitializeTimerSTATEControl", EventLogEntryType.Error, False)
             End Try
         End Sub

@@ -635,7 +635,7 @@ Public Class IAx00Login
                     Me.DialogResult = DialogResult.Cancel
 
                     'SGM 07/11/2012 - log app ends
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
 
                     Close()
@@ -1168,7 +1168,7 @@ Public Class IAx00Login
     ''' </summary>
     Private Shared Function InstallUpdateProcess() As GlobalDataTO
         'Private Shared Sub InstallUpdateProcess()
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
         Dim myGlobalDataTO As New GlobalDataTO
         Try
             Dim mydbmngDelegate As New DataBaseManagerDelegate()

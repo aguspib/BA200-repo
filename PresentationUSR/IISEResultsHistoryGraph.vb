@@ -258,7 +258,7 @@ Public Class IISEResultsHistoryGraph
             mTextDict = New Dictionary(Of String, String)()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
+            'Dim currentLanguageGlobal As New GlobalBase
             currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels()

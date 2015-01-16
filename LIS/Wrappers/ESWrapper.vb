@@ -347,7 +347,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.CreateChannel", EventLogEntryType.Error, False)
 
             Finally
@@ -377,7 +377,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.Connect", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -402,7 +402,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.Disconnect", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -430,7 +430,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.ReleaseAllChannels", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -477,7 +477,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.GetPendingMessages", EventLogEntryType.Error, False)
 
             Finally
@@ -534,7 +534,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DeleteAllMessages", EventLogEntryType.Error, False)
 
             Finally
@@ -590,7 +590,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DeleteMessage", EventLogEntryType.Error, False)
 
             Finally
@@ -643,7 +643,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DeleteIncomingMessages", EventLogEntryType.Error, False)
 
             Finally
@@ -702,7 +702,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.QueryAll", EventLogEntryType.Error, False)
 
             Finally
@@ -759,7 +759,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 'AG 22/07/2013
 
                                 'AG 02/01/2014 - BT #1433 add new log traces (v211 patch2)
-                                Dim myLogAcciones As New ApplicationLogManager()
+                                'Dim myLogAcciones As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Send host query message: " & msgId, "ESWrapper.HostQuery", EventLogEntryType.Information, False)
 
                                 'Send command to ES library
@@ -781,7 +781,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.HostQuery", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -840,7 +840,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.AcceptAwos", EventLogEntryType.Error, False)
 
             Finally
@@ -903,7 +903,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.AcceptAwos", EventLogEntryType.Error, False)
 
             Finally
@@ -963,7 +963,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.RejectAwos", EventLogEntryType.Error, False)
 
             Finally
@@ -1010,7 +1010,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 myCommand = CType(resultData.SetDatos, String)
 
                                 'AG 02/01/2014 - BT #1433 add new log traces (v211 patch2)
-                                Dim myLogAcciones As New ApplicationLogManager()
+                                'Dim myLogAcciones As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Send message rejecting awos: " & msgId, "ESWrapper.RejectAwosDelayed", EventLogEntryType.Information, False)
 
                                 'Send command to ES library
@@ -1027,7 +1027,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.RejectAwosDelayed", EventLogEntryType.Error, False)
 
             Finally
@@ -1077,7 +1077,7 @@ Namespace Biosystems.Ax00.LISCommunications
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
 
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
@@ -1116,7 +1116,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 Debug.Print("Send LIS Message: " & msgId & " - " & Now.ToString("HH:mm:ss:fff")) 'SG 15/04/2012 - send LIS Message
 
                                 'AG 02/01/2014 - BT #1433 add new log traces (v211 patch2)
-                                'Dim myLogAcciones As New ApplicationLogManager()    ' XB 12/02/2014 - Task #1495
+                                ''Dim myLogAcciones As New ApplicationLogManager()    ' XB 12/02/2014 - Task #1495
                                 GlobalBase.CreateLogActivity("Send message uploading results: " & msgId, "ESWrapper.UploadOrdersResults", EventLogEntryType.Information, False)
 
                                 'Send command to ES library
@@ -1236,7 +1236,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.UploadOrdersResults", EventLogEntryType.Error, False)
 
             Finally
@@ -1265,7 +1265,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.ClearQueueOfSpecimenNotResponded", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1304,7 +1304,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.UpdateSpecimensNotResponded", EventLogEntryType.Error, False)
             End Try
             Return resultData
@@ -1327,7 +1327,7 @@ Namespace Biosystems.Ax00.LISCommunications
                     End If
                 End SyncLock
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.DecrementUploadMessagesWithOutNotification", EventLogEntryType.Error, False)
             End Try
             Return value
@@ -1345,7 +1345,7 @@ Namespace Biosystems.Ax00.LISCommunications
                     uploadResultsMessagesPendingNotificationAttribute = 0
                 End SyncLock
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.ResetUploadMessagesWithOutNotification", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -1417,7 +1417,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.SetMessageStorage", EventLogEntryType.Error, False)
 
             Finally
@@ -1443,7 +1443,7 @@ Namespace Biosystems.Ax00.LISCommunications
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '' pending to comment ! only for test !!!
                 'GlobalBase.CreateLogActivity("LIS reception event - ", "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Information, False)
                 '' pending to comment ! only for test !!!
@@ -1500,7 +1500,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "ESWrapper.OnNotificationEventHandler", EventLogEntryType.Error, False)
             End Try
 
@@ -1523,7 +1523,7 @@ Namespace Biosystems.Ax00.LISCommunications
             resultData = myUtils.GetNewGUID
 
             '' pending to comment ! only for test !!!
-            'Dim myLogAcciones As New ApplicationLogManager()
+            ''Dim myLogAcciones As New ApplicationLogManager()
             'GlobalBase.CreateLogActivity("LIS reception event - message fired: ", "ESWrapper.FireMessage", EventLogEntryType.Information, False)
             '' pending to comment ! only for test !!!
 
