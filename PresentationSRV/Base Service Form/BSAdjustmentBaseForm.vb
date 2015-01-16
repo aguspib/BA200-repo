@@ -2984,5 +2984,16 @@ Public Class BSAdjustmentBaseForm
     End Sub
 #End Region
 
+    <Obsolete("To access the tool tips control for this form, use ScreenTooltips property instead.")> _
+    Friend Overridable Function bsScreenTooltips() As Biosystems.Ax00.Controls.UserControls.BSToolTip
+        Return ScreenTooltips()
+    End Function
+
+    Friend Overridable Function ScreenTooltips() As Biosystems.Ax00.Controls.UserControls.BSToolTip
+        Return bsScreenToolTipsControl
+    End Function
+
+    'Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
+
 End Class
 

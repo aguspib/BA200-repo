@@ -5887,25 +5887,25 @@ Public Class IPositionsAdjustments
 
             ' For Tooltips...
 
-            MyBase.bsScreenToolTips.SetToolTip(BsOpticAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTips.SetToolTip(BsOpticCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsOpticStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsOpticAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsOpticCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsOpticStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(BsWSAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTips.SetToolTip(BsWSCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsWSAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsWSCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
             'MyBase.bsScreenToolTips.SetToolTip(BsArmsAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTips.SetToolTip(BsArmsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsArmsOkButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SAVE_LOCAL", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsArmsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsArmsOkButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SAVE_LOCAL", currentLanguage))
 
 
-            MyBase.bsScreenToolTips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             ' XBC 30/11/2011
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton3, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton3, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
 
 
         Catch ex As Exception

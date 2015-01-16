@@ -502,12 +502,12 @@ Public Class IStressModeTest
             ' For Tooltips...
 
             If myScreenDelegate.StatusStressMode = STRESS_STATUS.UNFINISHED Then
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
             Else
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
             End If
 
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

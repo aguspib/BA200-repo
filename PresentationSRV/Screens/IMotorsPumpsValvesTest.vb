@@ -776,7 +776,7 @@ Public Class IMotorsPumpsValvesTest
                     End If
 
                     myStartStopButtonImage = myStopImage
-                    bsScreenToolTips.SetToolTip(Col_StartStopButton, MyClass.myStopButtonToolTip)
+                    bsScreenToolTips2.SetToolTip(Col_StartStopButton, MyClass.myStopButtonToolTip)
 
                     Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status._ON
                     Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status._ON
@@ -789,7 +789,7 @@ Public Class IMotorsPumpsValvesTest
                     Me.Cursor = Cursors.Default
 
                     'SGM 25/10/2012
-                    Me.bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", MyClass.LanguageID))
+                    Me.bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", MyClass.LanguageID))
                     Me.Col_StartStopButton.Enabled = True
                 Else
                     auxIconName = GetIconName("ADJUSTMENT")
@@ -811,7 +811,7 @@ Public Class IMotorsPumpsValvesTest
                     End If
 
                     myStartStopButtonImage = myStartImage
-                    bsScreenToolTips.SetToolTip(Col_StartStopButton, MyClass.myStartButtonToolTip)
+                    bsScreenToolTips2.SetToolTip(Col_StartStopButton, MyClass.myStartButtonToolTip)
 
                     Me.Col_Reagent1LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
                     Me.Col_Reagent2LED.CurrentStatus = BSMonitorControlBase.Status.DISABLED
@@ -823,7 +823,7 @@ Public Class IMotorsPumpsValvesTest
                     End If
 
                     'SGM 25/10/2012
-                    Me.bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", MyClass.LanguageID))
+                    Me.bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", MyClass.LanguageID))
                     Me.Col_StartStopButton.Enabled = True
                 End If
 
@@ -1257,24 +1257,24 @@ Public Class IMotorsPumpsValvesTest
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            bsScreenToolTips.SetToolTip(InDo_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(ExWa_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(WSAsp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(WsDisp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(InOut_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
-            bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", pLanguageID))
+            bsScreenToolTips2.SetToolTip(InDo_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(ExWa_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(WSAsp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(WsDisp_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(InOut_StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", pLanguageID))
 
-            bsScreenToolTips.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
+            bsScreenToolTips2.SetToolTip(Col_StartStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
 
-            bsScreenToolTips.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Homes", pLanguageID))
-            bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
+            bsScreenToolTips2.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Homes", pLanguageID))
+            bsScreenToolTips2.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
 
             MyClass.myStartButtonToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", pLanguageID)
             MyClass.myStopButtonToolTip = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID)
 
             'SGM 18/05/2012
-            MyBase.bsScreenToolTips.SetToolTip(WSAsp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
-            MyBase.bsScreenToolTips.SetToolTip(WSDisp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(WSAsp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(WSDisp_UpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", pLanguageID))
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

@@ -470,11 +470,11 @@ Public Class IHistoricalReports
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(DeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(DeleteButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
