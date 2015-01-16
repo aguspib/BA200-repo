@@ -595,17 +595,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         i += 1
                     Next
 
-                    'With myFwScript1
-                    '    .FwScriptID = FwSCRIPTS_IDS.HOME_ALL_ARMS.ToString
-                    '    .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                    '    .EvaluateValue = 1
-                    '    .NextOnResultOK = Nothing
-                    '    .NextOnResultNG = Nothing
-                    '    .NextOnTimeOut = Nothing
-                    '    .NextOnError = Nothing
-                    '    .ParamList = Nothing
-                    'End With
-
                 End If
 
                 'add to the queue list
