@@ -4,6 +4,7 @@
     Partial Class BSMonitorTank
         Inherits BSMonitorControlBase
 
+
         'UserControl overrides dispose to clean up the component list.
         <System.Diagnostics.DebuggerNonUserCode()> _
         Protected Overrides Sub Dispose(ByVal disposing As Boolean)
@@ -36,6 +37,9 @@
 
         End Sub
 
+        Protected Friend Overrides Sub RefreshControl()
+            'Nothing to resize here.
+        End Sub
     End Class
 
 End Namespace

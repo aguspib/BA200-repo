@@ -230,7 +230,7 @@ Public Class InstallerForm
             If CurrentUserLevel = "OPERATOR" Then
                 EditButton.Enabled = False
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
 
             ElseIf CurrentUserLevel = "SUPERVISOR" Then
 

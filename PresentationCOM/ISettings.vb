@@ -284,7 +284,7 @@ Public Class ISettings
     ''' <remarks>
     ''' Created by:  DL 11/07/2011
     ''' </remarks>    
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Try
             CancelEdition()
         Catch ex As Exception
@@ -560,8 +560,8 @@ Public Class ISettings
     Private Sub ISettings_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         Try
             If (e.KeyCode = Keys.Escape) Then
-                If (CancelButton.Enabled) Then
-                    CancelButton.PerformClick()
+                If (ButtonCancel.Enabled) Then
+                    ButtonCancel.PerformClick()
                 Else
                     CloseButton.PerformClick()
                 End If
@@ -822,7 +822,7 @@ Public Class ISettings
 
             ' Fot tooltips
             bsScreenToolTips.SetToolTip(CloseButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(EditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
             bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
 
@@ -870,7 +870,7 @@ Public Class ISettings
             ' Undo Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
@@ -1132,7 +1132,7 @@ Public Class ISettings
 
             If (pInitializeListView) Then
                 EditButton.Enabled = True
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 SaveButton.Enabled = False
                 FilterComboBox.Enabled = True
             End If
@@ -1152,7 +1152,7 @@ Public Class ISettings
             If SettingsListView.SelectedItems.Count > 0 AndAlso originalselectedindex <> SettingsListView.SelectedItems.Item(0).Index Then
                 EditButton.Enabled = True
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 FilterComboBox.Enabled = True
 
                 If SettingsListView.SelectedItems.Item(0).Text.ToString = LblLimits Then
@@ -1445,7 +1445,7 @@ Public Class ISettings
 
                     EditButton.Enabled = True
                     SaveButton.Enabled = False
-                    CancelButton.Enabled = False
+                    ButtonCancel.Enabled = False
                     FilterComboBox.Enabled = True
                     EditionMode = False
 
@@ -1466,7 +1466,7 @@ Public Class ISettings
 
                 EditButton.Enabled = True
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 FilterComboBox.Enabled = True
                 EditionMode = False
             End If
@@ -1496,7 +1496,7 @@ Public Class ISettings
             EditionMode = True
             EditButton.Enabled = False
             SaveButton.Enabled = True
-            CancelButton.Enabled = True
+            ButtonCancel.Enabled = True
             FilterComboBox.Enabled = False
             ' XBC 14/09/2012
             Me.BsFwVersionTextBox.Enabled = True
@@ -1606,7 +1606,7 @@ Public Class ISettings
                 If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString) = Windows.Forms.DialogResult.Yes) Then
                     EditButton.Enabled = True
                     SaveButton.Enabled = False
-                    CancelButton.Enabled = False
+                    ButtonCancel.Enabled = False
                     FilterComboBox.Enabled = True
 
                     If SettingsListView.SelectedItems.Item(0).Text.ToString = LblLimits Then
@@ -1684,7 +1684,7 @@ Public Class ISettings
                 EditionMode = False
                 EditButton.Enabled = True
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 FilterComboBox.Enabled = True
 
                 If SettingsListView.SelectedItems.Item(0).Text.ToString = LblLimits Then

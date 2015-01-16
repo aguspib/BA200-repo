@@ -40,7 +40,7 @@ Partial Class IHistoricalReports
         Me.PrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.DeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.ExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
+        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.SRVAdjustmentsDSBindingSource = New System.Windows.Forms.BindingSource(Me.components)
         Me.SearchGroupBox = New System.Windows.Forms.GroupBox
         Me.ActivityGroupBox = New System.Windows.Forms.GroupBox
@@ -277,15 +277,15 @@ Partial Class IHistoricalReports
         '
         'CancelButton
         '
-        Me.CancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.CancelButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CancelButton.Enabled = False
-        Me.CancelButton.ForeColor = System.Drawing.Color.Black
-        Me.CancelButton.Location = New System.Drawing.Point(48, 1)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 55
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonCancel.Enabled = False
+        Me.ButtonCancel.ForeColor = System.Drawing.Color.Black
+        Me.ButtonCancel.Location = New System.Drawing.Point(48, 1)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 55
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'SRVAdjustmentsDSBindingSource
         '
@@ -463,7 +463,7 @@ Partial Class IHistoricalReports
         Me.BsButtonsPanel.Controls.Add(Me.PrintButton)
         Me.BsButtonsPanel.Controls.Add(Me.SaveButton)
         Me.BsButtonsPanel.Controls.Add(Me.DeleteButton)
-        Me.BsButtonsPanel.Controls.Add(Me.CancelButton)
+        Me.BsButtonsPanel.Controls.Add(Me.ButtonCancel)
         Me.BsButtonsPanel.Location = New System.Drawing.Point(784, 555)
         Me.BsButtonsPanel.Name = "BsButtonsPanel"
         Me.BsButtonsPanel.Size = New System.Drawing.Size(194, 35)
@@ -522,7 +522,7 @@ Partial Class IHistoricalReports
     Friend WithEvents PrintButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents DeleteButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents ExitButton As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents CancelButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents ButtonCancel As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents SRVAdjustmentsDSBindingSource As System.Windows.Forms.BindingSource
     Friend WithEvents SearchGroupBox As System.Windows.Forms.GroupBox
     Friend WithEvents ActivityGroupBox As System.Windows.Forms.GroupBox

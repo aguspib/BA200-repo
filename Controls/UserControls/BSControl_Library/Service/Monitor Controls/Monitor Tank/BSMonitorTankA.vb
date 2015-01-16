@@ -16,7 +16,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             InitializeComponent()
 
             ' Add any initialization after the InitializeComponent() call.
-            MyBase.InstrumentPanel = MyClass.myInstrumentPanel
+            'MyBase.InstrumentPanel = MyClass.myInstrumentPanel
             MyBase.InstrumentationControl = MyClass.IndicatorWidget1
 
 
@@ -210,6 +210,9 @@ Namespace Biosystems.Ax00.Controls.UserControls
             End Try
         End Sub
 
+        Protected Friend Overrides Sub RefreshControl()
+            UpdateContentsSize(Me.myInstrumentPanel)
+        End Sub
 
 
     End Class

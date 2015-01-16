@@ -240,7 +240,7 @@ Public Class IWarningAfectedElements
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
             End If
 
             'Warning PictureBox
@@ -296,11 +296,11 @@ Public Class IWarningAfectedElements
 
             'For Button ToolTips
             If (TestConcentrationAttribute) Then
-                myScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_No", pLanguageID))
+                myScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_No", pLanguageID))
                 myScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Yes", pLanguageID))
             Else
                 'For Tooltips...
-                myScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
+                myScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
                 myScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", pLanguageID))
             End If
         Catch ex As Exception
@@ -314,7 +314,7 @@ Public Class IWarningAfectedElements
     Private Sub AfectedElementsWarning_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         InitializeScreen()
     End Sub
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Close()
     End Sub
 #End Region
