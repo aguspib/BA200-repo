@@ -26,7 +26,6 @@ Public Class IConfigUsers
     'SA 20/09/2010 - Global variables to store the UserName and UserLevel of the connected User,
     '                and also the flag indicating if it is an Internal User
     Private CurrentUserID As String = ""
-    Private CurrentUserLevel As String = ""
     Private CurrentUserIsInternal As Boolean = False
 
     ' XBC 09/06/2011

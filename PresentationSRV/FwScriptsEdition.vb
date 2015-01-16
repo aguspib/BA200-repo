@@ -409,49 +409,6 @@ Public Class FwScriptsEdition
     End Sub
 
     ''' <summary>
-    ''' Loads resized the button images
-    ''' </summary>
-    ''' <param name="pButton"></param>
-    ''' <param name="pImageName"></param>
-    ''' <param name="pWidth"></param>
-    ''' <param name="pHeight"></param>
-    ''' <remarks></remarks>
-    Private Sub SetButtonImage(ByVal pButton As Button, ByVal pImageName As String, _
-                              Optional ByVal pWidth As Integer = 28, _
-                              Optional ByVal pHeight As Integer = 28)
-
-        Dim auxIconName As String = ""
-        Dim iconPath As String = MyBase.IconsPath
-        Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
-
-        Try
-
-            Dim myButtonImage As Image
-
-            auxIconName = GetIconName(pImageName)
-            If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
-
-                myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
-                If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-                    myButtonImage = CType(myGlobal.SetDatos, Bitmap)
-                Else
-                    myButtonImage = CType(myImage, Bitmap)
-                End If
-
-                pButton.BackgroundImage = myButtonImage
-                pButton.BackgroundImageLayout = ImageLayout.Stretch
-
-            End If
-
-        Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetButtonImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SetButtonImage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-    ''' <summary>
     ''' Loads the icons and tooltips used for painting the buttons
     ''' </summary>
     ''' <remarks>SG 19/09/2010</remarks>

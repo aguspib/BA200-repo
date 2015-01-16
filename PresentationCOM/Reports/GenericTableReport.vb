@@ -8,11 +8,12 @@ Public Class GenericTableReport
         XrHeaderLabel.Text = aText
     End Sub
 
-    Public Sub SetDataSource(ByVal aDataSource As IList)
+    'AJG
+    Public Overloads Sub SetDataSource(ByVal aDataSource As IList)
         DataSource = aDataSource
     End Sub
 
-    Public Sub SetDataSource(ByVal aDataSource As DataTable)
+    Public Overloads Sub SetDataSource(ByVal aDataSource As DataTable)
         DataSource = aDataSource
     End Sub
 
