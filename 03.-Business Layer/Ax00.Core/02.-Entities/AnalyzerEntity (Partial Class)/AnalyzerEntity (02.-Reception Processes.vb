@@ -297,6 +297,12 @@ Namespace Biosystems.Ax00.Core.Entities
                     Exit Try
                 End If
 
+                ''AG 16/01/2015 BA-2170 NEXT CODE MUST be commented!! Activate it only for simulate an analyzer with some persistent error code
+                'If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY AndAlso errorValue = 0 Then
+                '    errorValue = 302 'Problem with the fridge
+                'End If
+                ''AG 16/01/2015
+
                 'AG 23/11/2011 - Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
                 Dim ISEAvailableValue As Integer = 0
                 myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
@@ -4071,13 +4077,14 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="myAnalyzerFlagsDS"></param>
         ''' <remarks>
         ''' Created by: IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
+        ''' AG 16/01/2015 BA-2170 - During a process when a instruction reception involves send automatically a new non-inmediate instruction with action INI/END (for instance STANDBY (end) + WASH) set the AnalyzerIsReady value = FALSE
         ''' </remarks>
         Public Sub ValidateWarmUpProcess(ByVal myAnalyzerFlagsDS As AnalyzerManagerFlagsDS, ByVal flag As GlobalEnumerates.WarmUpProcessFlag) Implements IAnalyzerEntity.ValidateWarmUpProcess
 
             Dim myGlobal As New GlobalDataTO
 
             Try
-
+                Dim analyzerReadyFlagMustBeSetToFALSE As Boolean = False 'AG 16/01/2015 BA-2170
                 If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS") Then
 
                     Select Case flag
@@ -4099,6 +4106,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
 
                                     ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
+                                    'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
                                     Exit Select
                                 Else
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
@@ -4110,6 +4118,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                                     'Send a WASH instruction (Conditioning complete)
                                     ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                                    analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Exit Select
                                 End If
 
@@ -4127,6 +4136,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
 
                                     ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
+                                    'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
 
                                 Else
                                     'Send the ALIGHT instruction
@@ -4149,7 +4159,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         'When a process involves an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
                                         If Not myGlobal.HasError AndAlso ConnectedAttribute Then
                                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                                            SetAnalyzerNotReady()
+                                            analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         End If
                                     End If
 
@@ -4169,6 +4179,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                         CurrentInstructionAction = InstructionActions.FlightFilling
                                         Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
                                         ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                        analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Else
                                         UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
                                         UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
@@ -4183,6 +4194,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                     CurrentInstructionAction = InstructionActions.FlightReading
                                     Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
                                     ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                    analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                     Exit Select
                                 End If
 
@@ -4196,11 +4208,13 @@ Namespace Biosystems.Ax00.Core.Entities
                                             CurrentInstructionAction = InstructionActions.FlightEmptying
                                             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
                                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                            analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         Else
                                             'mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = ""
                                             CurrentInstructionAction = InstructionActions.FlightReading
                                             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
                                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                                            analyzerReadyFlagMustBeSetToFALSE = True 'AG 16/01/2015 BA-2170 
                                         End If
                                     Else
                                         UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
@@ -4213,6 +4227,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                         Case WarmUpProcessFlag.ConfigureBarCode
                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                            'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
 
                         Case WarmUpProcessFlag.Finalize
@@ -4253,17 +4268,23 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                         Case WarmUpProcessFlag.ConfigureBarCode
                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONFIG, True)
+                            'analyzerReadyFlagMustBeSetToFALSE =True 'AG 16/01/2015 BA-2170 Not required! It is an inmediate instruction
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "CLOSED")
 
                     End Select
 
                 End If
 
-
                 If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
+
+                'AG 16/01/2015 BA-2170 - During a process when a instruction reception involves send automatically a new non-inmediate instruction with action INI/END (for instance STANDBY (end) + WASH) set the AnalyzerIsReady value = FALSE
+                If Not myGlobal.HasError AndAlso analyzerReadyFlagMustBeSetToFALSE AndAlso ConnectedAttribute Then
+                    SetAnalyzerNotReady()
+                End If
+                'AG 16/01/2015
 
             Catch ex As Exception
                 Throw ex
