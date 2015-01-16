@@ -19,12 +19,12 @@ Public Class BSRImage
 
     ' To detect redundant calls
     Private disposed As Boolean = False
-    ' Implement IDisposable.
-    Public Overloads Sub Dispose() Implements IDisposable.Dispose
-        Dispose(True)
-        MyBase.Dispose()
-        GC.SuppressFinalize(Me)
-    End Sub
+    '' Implement IDisposable.
+    'Public Overload Sub Dispose() Implements IDisposable.Dispose
+    '    Dispose(True)
+    '    MyBase.Dispose()
+    '    GC.SuppressFinalize(Me)
+    'End Sub
 
     Protected Overridable Overloads Sub Dispose(ByVal disposing As Boolean)
         If Me.disposed = False Then
@@ -618,6 +618,6 @@ Public Class BSRImage
 
     End Function
 #End Region
-    
+
 End Class
 

@@ -593,72 +593,72 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Return myResultData
         End Function
 
-        ''' <summary>
-        ''' Creates the Script List for Homing operation
-        ''' </summary>
-        ''' <returns></returns>
-        ''' <remarks>Created by SG 10/03/11</remarks>
-        Protected Friend Function SendQueueForHOMING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
-            Dim myResultData As New GlobalDataTO
-            Dim myListFwScript As New List(Of FwScriptQueueItem)
-            Dim myFwScript1 As New FwScriptQueueItem
-            Try
+        ' ''' <summary>
+        ' ''' Creates the Script List for Homing operation
+        ' ''' </summary>
+        ' ''' <returns></returns>
+        ' ''' <remarks>Created by SG 10/03/11</remarks>
+        'Protected Friend Function SendQueueForHOMING(ByVal pAdjustment As ADJUSTMENT_GROUPS) As GlobalDataTO
+        '    Dim myResultData As New GlobalDataTO
+        '    Dim myListFwScript As New List(Of FwScriptQueueItem)
+        '    Dim myFwScript1 As New FwScriptQueueItem
+        '    Try
 
-                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
-                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
-                End If
+        '        If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+        '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+        '        End If
 
-                'get the pending Homes
-                Dim myHomes As New tadjPreliminaryHomesDAO
-                Dim myHomesDS As SRVPreliminaryHomesDS
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjustment.ToString)
+        '        'get the pending Homes
+        '        Dim myHomes As New tadjPreliminaryHomesDAO
+        '        Dim myHomesDS As SRVPreliminaryHomesDS
+        '        myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjustment.ToString)
 
-                If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
+        '        If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
 
-                    myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
+        '            myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
-                    Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
-                                    (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
-                                    Where a.Done = False Select a).ToList
+        '            Dim myPendingHomesList As List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow) = _
+        '                            (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
+        '                            Where a.Done = False Select a).ToList
 
-                    For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
-                        Dim myFwScript As New FwScriptQueueItem
-                        myListFwScript.Add(myFwScript)
-                    Next
-
-
-                    With myFwScript1
-                        .FwScriptID = FwSCRIPTS_IDS.HOME_ALL_ARMS.ToString
-                        .EvaluateType = EVALUATE_TYPES.NUM_VALUE
-                        .EvaluateValue = 1
-                        .NextOnResultOK = Nothing
-                        .NextOnResultNG = Nothing
-                        .NextOnTimeOut = Nothing
-                        .NextOnError = Nothing
-                        .ParamList = Nothing
-                    End With
+        '            For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
+        '                Dim myFwScript As New FwScriptQueueItem
+        '                myListFwScript.Add(myFwScript)
+        '            Next
 
 
-                End If
+        '            With myFwScript1
+        '                .FwScriptID = FwSCRIPTS_IDS.HOME_ALL_ARMS.ToString
+        '                .EvaluateType = EVALUATE_TYPES.NUM_VALUE
+        '                .EvaluateValue = 1
+        '                .NextOnResultOK = Nothing
+        '                .NextOnResultNG = Nothing
+        '                .NextOnTimeOut = Nothing
+        '                .NextOnError = Nothing
+        '                .ParamList = Nothing
+        '            End With
 
-                'add to the queue list
-                If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
+
+        '        End If
+
+        '        'add to the queue list
+        '        If Not myResultData.HasError Then myResultData = myFwScriptDelegate.AddToFwScriptQueue(myFwScript1, True)
 
 
-            Catch ex As Exception
-                myResultData.HasError = True
-                myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-                myResultData.ErrorMessage = ex.Message
+        '    Catch ex As Exception
+        '        myResultData.HasError = True
+        '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+        '        myResultData.ErrorMessage = ex.Message
 
-                If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
-                    myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
-                End If
+        '        If myFwScriptDelegate.CurrentFwScriptsQueue IsNot Nothing Then
+        '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
+        '        End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForHOMING", EventLogEntryType.Error, False)
-            End Try
-            Return myResultData
-        End Function
+        '        Dim myLogAcciones As New ApplicationLogManager()
+        '        myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendQueueForHOMING", EventLogEntryType.Error, False)
+        '    End Try
+        '    Return myResultData
+        'End Function
 
         ''' <summary>
         ''' Request for Fw Information values
