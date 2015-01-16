@@ -10,7 +10,7 @@ Public Class IWSDeleteAuxScreen
 
 #Region "Attributes"
     Private ScreenUseAttribute As String = "VROTORS"
-    Private AnalyzerModelAttribute As String = "A400"
+    'Private AnalyzerModelAttribute1 As String = "A400"
 #End Region
 
 #Region "Properties"
@@ -23,11 +23,11 @@ Public Class IWSDeleteAuxScreen
         End Set
     End Property
 
-    Public WriteOnly Property AnalyzerModel() As String
-        Set(ByVal value As String)
-            AnalyzerModelAttribute = value
-        End Set
-    End Property
+    'Public WriteOnly Property AnalyzerModel() As String
+    '    Set(ByVal value As String)
+    '        AnalyzerModelAttribute = value
+    '    End Set
+    'End Property
 #End Region
 
 #Region "Methods"
@@ -289,7 +289,7 @@ Public Class IWSDeleteAuxScreen
 
             'Load the list of existing Virtual Rotors sorted by Rotor Type and Rotor Name...
             Dim resultData As GlobalDataTO
-            If (String.Compare(AnalyzerModelAttribute, "A400", False) = 0) Then
+            If (String.Compare(AnalyzerModel(), "A400", False) = 0) Then
                 Dim myVRotorsDelegate As New VirtualRotorsDelegate
 
                 'Get all Virtual Rotors 

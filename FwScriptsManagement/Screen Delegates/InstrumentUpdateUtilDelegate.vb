@@ -80,8 +80,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 #Region "Properties"
 
-        Public Property AnalyzerId() As String
-
 
         '**************HISTORY********************ç
 

@@ -249,7 +249,6 @@ Public Class IWSRotorPositions
     '21/12/2009 SA - Definition of Fields for the Screen Properties
     Private WorkSessionIDAttribute As String
     Private AnalyzerIDAttribute As String
-    Private AnalyzerModelAttribute As String
     Private WorkSessionStatusAttribute As String = ""             'AG 18/01/2010
     Private ShowHostQueryScreenAttribute As Boolean = False       'AG 03/04/2013 - When TRUE after open the rotorpos screen the hostquery screen is opened automatically
     Private OpenByAutomaticProcessAttribute As Boolean = False    'AG 09/07/2013
@@ -298,13 +297,6 @@ Public Class IWSRotorPositions
     Public WriteOnly Property ActiveAnalyzer() As String
         Set(ByVal value As String)
             AnalyzerIDAttribute = value
-        End Set
-    End Property
-
-    '13/01/2010 TR - Definition of screen property to inform the Analyzer Model
-    Public WriteOnly Property AnalyzerModel() As String
-        Set(ByVal value As String)
-            AnalyzerModelAttribute = value
         End Set
     End Property
 
@@ -1013,7 +1005,7 @@ Public Class IWSRotorPositions
             Dim myRCPDelegate As New WSRotorContentByPositionDelegate
 
             'Get all available Tubes/Bottles 
-            myGlobalDataTO = myRCPDelegate.GetAllTubeSizes(Nothing, AnalyzerModelAttribute)
+            myGlobalDataTO = myRCPDelegate.GetAllTubeSizes(Nothing, AnalyzerModel)
             If (Not myGlobalDataTO.HasError) Then
                 AllTubeSizeList = CType(myGlobalDataTO.SetDatos, List(Of TubeSizeTO))
             Else
@@ -7338,7 +7330,7 @@ Public Class IWSRotorPositions
 
                         ' XB 06/02/2014 - CYCLE_MACHINE param is used instead of WDOG_TIME_BARCODE_SCAN due for accelerating the operation - Task #1438
                         'resultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.WDOG_TIME_BARCODE_SCAN.ToString, Nothing)
-                        resultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, AnalyzerModelAttribute)
+                        resultData = myParams.ReadByParameterName(Nothing, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, AnalyzerModel())
                         ' XB 06/02/2014
 
                         If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
@@ -7666,7 +7658,7 @@ Public Class IWSRotorPositions
             Dim validationOK As Boolean = (AnalyzerIDAttribute <> "" AndAlso WorkSessionIDAttribute <> "" AndAlso WorkSessionStatusAttribute <> "")
             If (validationOK) Then
                 'If the Analyzer Model is not informed, get it from the DB 
-                If (AnalyzerModelAttribute = String.Empty) Then
+                If (AnalyzerModel() = String.Empty) Then
                     Dim resultData As GlobalDataTO
                     Dim confAnalyzers As New AnalyzersDelegate
 
@@ -7676,7 +7668,7 @@ Public Class IWSRotorPositions
 
                         If (myAnalyzersDS.tcfgAnalyzers.Rows.Count = 1) Then
                             AnalyzerModel = myAnalyzersDS.tcfgAnalyzers(0).AnalyzerModel
-                            validationOK = (AnalyzerModelAttribute = "A400")   'This screen is only for Analyzers with Model A400 
+                            validationOK = (AnalyzerModel() = "A400")   'This screen is only for Analyzers with Model A400 
                         Else
                             validationOK = False
                         End If
@@ -7686,7 +7678,7 @@ Public Class IWSRotorPositions
                         validationOK = False
                     End If
                 Else
-                    validationOK = (AnalyzerModelAttribute = "A400")   'This screen is only for Analyzers with Model A400 
+                    validationOK = (AnalyzerModel() = "A400")   'This screen is only for Analyzers with Model A400 
                 End If
             End If
 

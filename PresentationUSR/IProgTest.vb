@@ -167,7 +167,7 @@ Public Class IProgTest
 #Region "Attributes"    'AG 10/03/10
     Private WorkSessionIDAttribute As String
     Private WorkSessionStatusAttribute As String
-    Private AnalyzerModelAttribute As String
+    Private AnalyzerModelAttribute1 As String
     Private AnalyzerIDAttribute As String
 
 #End Region             'AG 10/03/10
@@ -189,15 +189,6 @@ Public Class IProgTest
         End Get
         Set(ByVal value As String)
             WorkSessionStatusAttribute = value
-        End Set
-    End Property
-
-    Public Property AnalyzerModel() As String
-        Get
-            Return AnalyzerModelAttribute
-        End Get
-        Set(ByVal value As String)
-            AnalyzerModelAttribute = value
         End Set
     End Property
 
@@ -2950,7 +2941,7 @@ Public Class IProgTest
         Try
             Dim myGlobalDataTO As New GlobalDataTO()
             Dim mySwParametersDelegate As New SwParametersDelegate()
-            myGlobalDataTO = mySwParametersDelegate.ReadByAnalyzerModel(Nothing, AnalyzerModelAttribute)
+            myGlobalDataTO = mySwParametersDelegate.ReadByAnalyzerModel(Nothing, AnalyzerModel())
             If Not myGlobalDataTO.HasError Then
                 SwParametersDS = CType(myGlobalDataTO.SetDatos, ParametersDS)
             End If
@@ -3036,7 +3027,7 @@ Public Class IProgTest
             Dim cycleMachineSeconds As Integer = 0
             Dim qswParameter As List(Of ParametersDS.tfmwSwParametersRow) = (From a In SwParametersDS.tfmwSwParameters _
                                                                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                                                          AndAlso String.Compare(a.AnalyzerModel, AnalyzerModelAttribute, False) = 0 _
+                                                                          AndAlso String.Compare(a.AnalyzerModel, AnalyzerModel(), False) = 0 _
                                                                            Select a).ToList()
             If (qswParameter.Count > 0) Then cycleMachineSeconds = CType(qswParameter.First().ValueNumeric, Integer)
 
@@ -3993,7 +3984,7 @@ Public Class IProgTest
             'Get the Cycle machine
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                            Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                           AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                           AndAlso a.AnalyzerModel = AnalyzerModel() _
                            Select a).ToList()
 
 
@@ -4012,7 +4003,7 @@ Public Class IProgTest
                     'TIME SEC 1
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                     Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                    AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                    AndAlso a.AnalyzerModel = AnalyzerModel() _
                                     Select a).ToList()
                     If qswParameter.Count > 0 Then
                         FirstReadingSecUpDown.Minimum = CType((FirstReadingCycleUpDown.Minimum - 1) * _
@@ -4148,7 +4139,7 @@ Public Class IProgTest
                     'TIME SEC 1
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                     Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                    AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                    AndAlso a.AnalyzerModel = AnalyzerModel() _
                                     Select a).ToList()
 
                     If qswParameter.Count > 0 Then
@@ -4180,7 +4171,7 @@ Public Class IProgTest
                     'TIME SEC 1
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                    Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                   AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                   AndAlso a.AnalyzerModel = AnalyzerModel() _
                                    Select a).ToList()
                     If qswParameter.Count > 0 Then
                         FirstReadingSecUpDown.Minimum = CType((FirstReadingCycleUpDown.Minimum - 1) * _
@@ -7155,7 +7146,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
             If qswParameter.Count > 0 Then
                 FirstReadingSecUpDown.ResetText()
@@ -7180,7 +7171,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
             If qswParameter.Count > 0 Then
                 SecondReadingSecUpDown.ResetText()
@@ -7912,7 +7903,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
 
             If qswParameter.Count > 0 Then
@@ -8015,7 +8006,7 @@ Public Class IProgTest
                         'TR 14/03/2011 -Add the analyzer model on the query.
                         qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                         Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                        AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                        AndAlso a.AnalyzerModel = AnalyzerModel() _
                                         Select a).ToList()
                         If qswParameter.Count > 0 Then
                             MachineCycle = CType(qswParameter.First().ValueNumeric, Integer)
@@ -8190,7 +8181,7 @@ Public Class IProgTest
                     'TR 14/03/2011 -Add the analyzer model on the query.
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                     Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                    AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                    AndAlso a.AnalyzerModel = AnalyzerModel() _
                                     Select a).ToList()
 
                     If qswParameter.Count > 0 Then
@@ -10230,7 +10221,7 @@ Public Class IProgTest
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
             'TR 14/03/2011 -Set the Analyzer Model
-            myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.VOLUME_PREDILUTION.ToString, AnalyzerModelAttribute)
+            myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.VOLUME_PREDILUTION.ToString, AnalyzerModel())
             If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                 myVolume = CSng(myGlobalDataTO.SetDatos)
             Else
@@ -11081,7 +11072,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where String.Compare(a.ParameterName, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, False) = 0 _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
             If qswParameter.Count > 0 Then
                 FirstReadingCycleUpDown.Value = CType((FirstReadingSecUpDown.Value / qswParameter.First().ValueNumeric) + 1, Integer)
@@ -11109,7 +11100,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
 
             If qswParameter.Count > 0 Then

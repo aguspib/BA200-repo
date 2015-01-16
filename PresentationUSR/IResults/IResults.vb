@@ -161,7 +161,6 @@ Public Class IResults
 
     Private WorkSessionIDField As String = ""
     Private AnalyzerIDField As String = ""
-    Private AnalyzerModelField As String = ""
     Private WSStatusField As String = "" 'AG 19/03/2012
     Private LISWorkingModeRerunsAttr As String = "BOTH" 'SGM 17/04/2013
 
@@ -186,15 +185,6 @@ Public Class IResults
         End Get
         Set(ByVal value As String)
             AnalyzerIDField = value
-        End Set
-    End Property
-
-    Public Property AnalyzerModel() As String
-        Get
-            Return AnalyzerModelField
-        End Get
-        Set(ByVal value As String)
-            AnalyzerModelField = value
         End Set
     End Property
 
@@ -3890,7 +3880,7 @@ Public Class IResults
                     Dim myGlobal As GlobalDataTO
                     Dim myRecalDelegate As New RecalculateResultsDelegate
 
-                    myRecalDelegate.AnalyzerModel = AnalyzerModelField
+                    myRecalDelegate.AnalyzerModel = AnalyzerModel()
                     'myGlobal = myRecalDelegate.ChangeInUseFlagReplicate(Nothing, AnalyzerIDField, WorkSessionIDField, ExecutionResultRow.ExecutionID, Not ExecutionResultRow.InUse)
                     myGlobal = myRecalDelegate.ChangeInUseFlagReplicateNEW(ExecutionResultRow, Not ExecutionResultRow.InUse)
 
@@ -4017,7 +4007,7 @@ Public Class IResults
                 Dim myGlobal As GlobalDataTO
                 Dim myRecalDelegate As New RecalculateResultsDelegate
 
-                myRecalDelegate.AnalyzerModel = AnalyzerModelField
+                myRecalDelegate.AnalyzerModel = AnalyzerModel()
                 'myGlobal = myRecalDelegate.ChangeInUseFlagReplicate(Nothing, AnalyzerIDField, WorkSessionIDField, ExecutionResultRow.ExecutionID, Not ExecutionResultRow.InUse)
                 myGlobal = myRecalDelegate.ChangeInUseFlagReplicateNEW(ExecutionResultRow, Not ExecutionResultRow.InUse)
 
@@ -5168,7 +5158,7 @@ Public Class IResults
                 With myCurveForm
                     .ActiveAnalyzer = AnalyzerIDField
                     .ActiveWorkSession = WorkSessionIDField
-                    .AnalyzerModel = AnalyzerModelField
+                    .AnalyzerModel = AnalyzerModel()
                     .AverageResults = AverageResultsDS
                     .ExecutionResults = ExecutionsResultsDS
                     .SelectedTestName = TestsListViewText
@@ -5404,7 +5394,7 @@ Public Class IResults
             Dim myGlobal As New GlobalDataTO
             Dim myRecalDelegate As New RecalculateResultsDelegate
 
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
+            myRecalDelegate.AnalyzerModel = AnalyzerModel()
             Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
 
             If String.Equals(RowValues.TestType, "STD") Then
@@ -5489,7 +5479,7 @@ Public Class IResults
             Dim myGlobal As New GlobalDataTO
             Dim myRecalDelegate As New RecalculateResultsDelegate
 
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
+            myRecalDelegate.AnalyzerModel = AnalyzerModel()
             Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
 
             'Get the maximum MultiItemNumber for the selected OrderTestID/RerunNumber 
