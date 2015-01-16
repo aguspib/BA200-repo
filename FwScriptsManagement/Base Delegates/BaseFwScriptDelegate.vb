@@ -27,7 +27,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         End Sub
         Public Sub New(ByVal pAnalyzerID As String) 'SGM 20/01/2012
-            MyClass.AnalyzerIdAttr = pAnalyzerID
+            AnalyzerId = pAnalyzerID
         End Sub
 #End Region
         
@@ -48,7 +48,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         Private pValueSensorsAttr As String
 
-        Protected Friend AnalyzerIdAttr As String = "" 'SGM 20/01/2012
+        'Protected Friend AnalyzerIdAttr As String = "" 'SGM 20/01/2012     'MANEL
 #End Region
 
 #Region "Properties"
@@ -64,13 +64,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
         'SGM 20/01/2012
         Public Property AnalyzerId() As String
-            Get
-                Return AnalyzerIdAttr
-            End Get
-            Set(ByVal value As String)
-                AnalyzerIdAttr = value
-            End Set
-        End Property
 #End Region
 
 #Region "Communication Events"
@@ -264,7 +257,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim resultData As New GlobalDataTO
             Try
                 Dim myPreliminaryDAO As New tadjPreliminaryHomesDAO
-                resultData = myPreliminaryDAO.InsertAnalyzerPreliminaryHomes(pDBConnection, MyClass.AnalyzerIdAttr)
+                resultData = myPreliminaryDAO.InsertAnalyzerPreliminaryHomes(pDBConnection, MyClass.AnalyzerId)
 
             Catch ex As Exception
                 resultData.HasError = True
@@ -309,7 +302,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim resultdata As New GlobalDataTO
             Try
                 Dim myHomesDAO As New tadjPreliminaryHomesDAO
-                resultdata = myHomesDAO.GetAllPreliminaryHomes(pDBConnection, MyClass.AnalyzerIdAttr)
+                resultdata = myHomesDAO.GetAllPreliminaryHomes(pDBConnection, MyClass.AnalyzerId)
 
             Catch ex As Exception
                 resultdata.HasError = True
@@ -404,12 +397,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Dim myHomesDS As SRVPreliminaryHomesDS
                 Dim myPendingHomesList As New List(Of SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow)
 
-                myGlobal = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjustment.ToString)
+                myGlobal = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerId, pAdjustment.ToString)
                 If myGlobal IsNot Nothing AndAlso Not myGlobal.HasError Then
                     myHomesDS = CType(myGlobal.SetDatos, SRVPreliminaryHomesDS)
 
                     myPendingHomesList = (From a As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myHomesDS.srv_tadjPreliminaryHomes _
-                                    Where a.AnalyzerID = MyClass.AnalyzerIdAttr And a.AdjustmentGroupID = pAdjustment.ToString And a.Done = False Select a).ToList
+                                    Where a.AnalyzerID = MyClass.AnalyzerId And a.AdjustmentGroupID = pAdjustment.ToString And a.Done = False Select a).ToList
 
                 End If
 
@@ -440,7 +433,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Dim myHomes As New tadjPreliminaryHomesDAO
                 Dim myHomesDS As SRVPreliminaryHomesDS
 
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerIdAttr, pAdjGroup.ToString)
+                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyClass.AnalyzerId, pAdjGroup.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
                     myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
@@ -522,7 +515,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     For Each H As SRVPreliminaryHomesDS.srv_tadjPreliminaryHomesRow In myPendingHomesList
 
-                        myGlobal = myHomes.SetPreliminaryHomeAsDone(Nothing, MyClass.AnalyzerIdAttr, H.RequiredHomeID)
+                        myGlobal = myHomes.SetPreliminaryHomeAsDone(Nothing, AnalyzerId, H.RequiredHomeID)
                         If Not myGlobal.HasError Then
 
                         Else

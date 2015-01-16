@@ -81,13 +81,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #Region "Properties"
 
         Public Property AnalyzerId() As String
-            Get
-                Return AnalyzerIdAttr
-            End Get
-            Set(ByVal value As String)
-                AnalyzerIdAttr = value
-            End Set
-        End Property
+
 
         '**************HISTORY********************ç
 

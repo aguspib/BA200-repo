@@ -552,7 +552,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'get the pending Homes
                 Dim myHomes As New tadjPreliminaryHomesDAO
                 Dim myHomesDS As SRVPreliminaryHomesDS
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyBase.AnalyzerIdAttr, ADJUSTMENT_GROUPS.INTERNAL_TANKS.ToString)
+                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, ADJUSTMENT_GROUPS.INTERNAL_TANKS.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
                     myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 

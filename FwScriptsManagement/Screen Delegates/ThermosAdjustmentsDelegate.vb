@@ -774,14 +774,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Get
         End Property
 
-        Public Property AnalyzerId() As String
-            Get
-                Return MyClass.AnalyzerIDAttr
-            End Get
-            Set(ByVal value As String)
-                MyClass.AnalyzerIDAttr = value
-            End Set
-        End Property
 
         Public Property FinalResult(ByVal pElement As Integer) As Integer
             Get
@@ -1218,8 +1210,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             End Set
         End Property
 
-       
-        
+
+
         ''SGM 01/12/2011
         'Public Property Reagent1ParkingZ() As Single
         '    Get
@@ -4173,7 +4165,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myHistoricReportRow.TaskID = pTaskID
                 myHistoricReportRow.ActionID = pActionID
                 myHistoricReportRow.Data = MyClass.GenerateDataReport(myHistoricReportRow.TaskID, myHistoricReportRow.ActionID)
-                myHistoricReportRow.AnalyzerID = MyClass.AnalyzerIDAttr
+                myHistoricReportRow.AnalyzerID = AnalyzerId
 
                 resultData = myHistoricalReportsDelegate.Add(Nothing, myHistoricReportRow)
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then

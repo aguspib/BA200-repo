@@ -1447,7 +1447,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myAnalyzerLedPosDS As New AnalyzerLedPositionsDS
             Try
                 myResultData = myAnalyzerLedPositionsDelegate.GetAllWaveLengths(Nothing, pAnalyzerID)
-                MyBase.AnalyzerIdAttr = pAnalyzerID
+                AnalyzerId = pAnalyzerID
 
                 If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                     myAnalyzerLedPosDS = DirectCast(myResultData.SetDatos, AnalyzerLedPositionsDS)
@@ -1751,7 +1751,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                     myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
                     myPhotometryDataTO.AnalyzerID = pAnalyzerID
-                    MyBase.AnalyzerIdAttr = pAnalyzerID
+                    AnalyzerId = pAnalyzerID
                     myResultData = myUtility.Serialize(myPhotometryDataTO, pPath)
                 End If
 
@@ -2501,7 +2501,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO
                 Dim myHomesDS As SRVPreliminaryHomesDS
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyBase.AnalyzerIdAttr, pAdjustment.ToString)
+                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, pAdjustment.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
                     myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
@@ -3489,8 +3489,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myHistoricReportRow = myHistoricReport.srv_thrsResultsService.Newsrv_thrsResultsServiceRow
                     myHistoricReportRow.TaskID = pTaskID
                     myHistoricReportRow.ActionID = pActionID
-                    myHistoricReportRow.Data = MyClass.GenerateDataReport(myHistoricReportRow.TaskID, myHistoricReportRow.ActionID)
-                    myHistoricReportRow.AnalyzerID = MyBase.AnalyzerIdAttr
+                    myHistoricReportRow.Data = GenerateDataReport(myHistoricReportRow.TaskID, myHistoricReportRow.ActionID)
+                    myHistoricReportRow.AnalyzerID = AnalyzerId
 
                     myResultData = myHistoricalReportsDelegate.Add(Nothing, myHistoricReportRow)
                     If (Not myResultData.HasError AndAlso Not myResultData.SetDatos Is Nothing) Then

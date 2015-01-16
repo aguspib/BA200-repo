@@ -159,7 +159,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Private ReagentsRotorFirstPositionAttr As Integer
         Private ReagentsRotorLastPositionAttr As Integer
 
-        Private currentLanguageAttr As String
+        'Private currentLanguageAttr As String
 
         Private HomesDoneAttr As Boolean = False
 
@@ -178,22 +178,6 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #Region "Common"
 
         Public Property currentLanguage() As String
-            Get
-                Return MyClass.currentLanguageAttr
-            End Get
-            Set(ByVal value As String)
-                MyClass.currentLanguageAttr = value
-            End Set
-        End Property
-
-        Public Property AnalyzerId() As String
-            Get
-                Return MyClass.AnalyzerIDAttr
-            End Get
-            Set(ByVal value As String)
-                MyClass.AnalyzerIDAttr = value
-            End Set
-        End Property
 
         Public Property HomesDone() As Boolean
             Get

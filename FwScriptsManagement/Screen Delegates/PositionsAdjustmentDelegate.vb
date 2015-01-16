@@ -1860,7 +1860,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'get the pending Homes  
                 Dim myHomes As New tadjPreliminaryHomesDAO
                 Dim myHomesDS As SRVPreliminaryHomesDS
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyBase.AnalyzerIdAttr, pAdjustment.ToString)
+                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, pAdjustment.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
                     myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
@@ -3498,7 +3498,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 'get the pending Homes
                 Dim myHomes As New tadjPreliminaryHomesDAO
                 Dim myHomesDS As SRVPreliminaryHomesDS
-                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, MyBase.AnalyzerIdAttr, pAdjustment.ToString)
+                myResultData = myHomes.GetPreliminaryHomesByAdjID(Nothing, AnalyzerId, pAdjustment.ToString)
                 If myResultData IsNot Nothing AndAlso Not myResultData.HasError Then
                     myHomesDS = CType(myResultData.SetDatos, SRVPreliminaryHomesDS)
 
@@ -5910,7 +5910,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 Dim myHistoricalReportsDelegate As New HistoricalReportsDelegate
                 'Get the data of the Analyzers which have already registered activities
-                myResultData = myHistoricalReportsDelegate.GetAllResultsService(Nothing, MyBase.AnalyzerIdAttr, "ADJUST", "OPT", Nothing, Nothing)
+                myResultData = myHistoricalReportsDelegate.GetAllResultsService(Nothing, AnalyzerId, "ADJUST", "OPT", Nothing, Nothing)
 
                 If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                     Dim myResultsDS As SRVResultsServiceDecodedDS
