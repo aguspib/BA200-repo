@@ -1451,8 +1451,8 @@ Public Class Ax00ServiceMainMDI
 
                                         'obtain needed fw version SGM 22/06/2012
                                         Dim mySwVersion As String
-                                        Dim myUtil As New Utilities
-                                        myGlobal = myUtil.GetSoftwareVersion()
+                                        ''Dim myUtil As New Utilities.
+                                        myGlobal = Utilities.GetSoftwareVersion()
                                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                             mySwVersion = myGlobal.SetDatos.ToString
 
@@ -3259,7 +3259,7 @@ Public Class Ax00ServiceMainMDI
         Dim myOffset As Single
         Dim myTempValue As Single
 
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
             'Me.BsMonitor.DisableAllSensors()
 
@@ -3282,7 +3282,7 @@ Public Class Ax00ServiceMainMDI
                                 max = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.WASHING_SOLUTION, AXIS.FULL)
                             End If
 
-                            myGlobal = myUtil.CalculatePercent(S.Value, min, max)
+                            myGlobal = Utilities.CalculatePercent(S.Value, min, max)
                             If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                                 myPercentValue = CType(myGlobal.SetDatos, Single)
 
@@ -3302,7 +3302,7 @@ Public Class Ax00ServiceMainMDI
                                 max = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.HIGH_CONTAMINATION, AXIS.FULL)
                             End If
 
-                            myGlobal = myUtil.CalculatePercent(S.Value, min, max)
+                            myGlobal = Utilities.CalculatePercent(S.Value, min, max)
                             If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                                 myPercentValue = CType(myGlobal.SetDatos, Single)
 
@@ -3322,7 +3322,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_FRIDGE, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_FRIDGE, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf S.SensorID = AnalyzerSensors.TEMPERATURE_REACTIONS.ToString Then
@@ -3337,7 +3337,7 @@ Public Class Ax00ServiceMainMDI
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_PHOTOMETRY, AXIS.TARGET)
                                 ' XBC 07/05/2012
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf S.SensorID = AnalyzerSensors.TEMPERATURE_R1.ToString Then
@@ -3348,7 +3348,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT1, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT1, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf S.SensorID = AnalyzerSensors.TEMPERATURE_R2.ToString Then
@@ -3359,7 +3359,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT2, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT2, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf String.Compare(S.SensorID, AnalyzerSensors.TEMPERATURE_WASHINGSTATION.ToString, False) = 0 Then
@@ -3370,7 +3370,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_WS_HEATER, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_WS_HEATER, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                             '    'end SGM 19/02/2012
@@ -4356,7 +4356,7 @@ Public Class Ax00ServiceMainMDI
     Private Function ReadSensorAdjustmentValue(ByVal pAdjType As ADJUSTMENT_GROUPS, ByVal pSubType As AXIS) As Single
         Dim myGlobal As New GlobalDataTO
         Dim myResult As Single = -99999
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
             Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
             Dim myAdjustmentRowData As New AdjustmentRowData("")
@@ -4378,7 +4378,7 @@ Public Class Ax00ServiceMainMDI
                 'And a.AxisID.Trim.ToUpper = mySubType.Trim.ToUpper _
 
                 If myAdjustmentRows.Count > 0 Then
-                    myResult = myUtil.FormatToSingle(myAdjustmentRows.First.Value)
+                    myResult = Utilities.FormatToSingle(myAdjustmentRows.First.Value)
                     'Dim myValueStr As String = myAdjustmentRows.First.Value
                     'If IsNumeric(Trim(myValueStr.Replace(".", myDecimalSeparator))) Then
                     '    myResult = CSng(myValueStr.Replace(".", myDecimalSeparator))
@@ -5806,19 +5806,19 @@ Public Class Ax00ServiceMainMDI
     '            If FileSize > MAX_SIZE_LOG Then
     '                Rename(OldXmlFile, NewXmlFile)
 
-    '                Dim myUtil As New Utilities
+    '                'Dim myUtil As New Utilities.
     '                If (System.IO.File.Exists(sourcePath & "Temp")) Then
-    '                    myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+    '                    myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
     '                End If
 
-    '                myGlobal = myUtil.CreateFolder(sourcePath & "Temp")
+    '                myGlobal = Utilities.CreateFolder(sourcePath & "Temp")
     '                If (Not myGlobal.HasError) Then
-    '                    myGlobal = myUtil.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
+    '                    myGlobal = Utilities.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
 
     '                    Dim fileZip As String = "PreviousLog.zip"
     '                    If (Not myGlobal.HasError) Then
     '                        If (System.IO.File.Exists(sourcePath & fileZip)) Then
-    '                            myGlobal = myUtil.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
+    '                            myGlobal = Utilities.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
 
     '                            If (Not myGlobal.HasError) Then
     '                                Kill(sourcePath & fileZip)
@@ -5826,9 +5826,9 @@ Public Class Ax00ServiceMainMDI
     '                        End If
 
 
-    '                        myGlobal = myUtil.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
+    '                        myGlobal = Utilities.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
     '                        If (Not myGlobal.HasError) Then
-    '                            myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+    '                            myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
     '                        End If
     '                    End If
     '                End If
@@ -7522,7 +7522,7 @@ Public Class Ax00ServiceMainMDI
         Dim myGlobal As New GlobalDataTO
         Dim AnalyzerSensorNumericalValues As New Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)
         Dim myPercentValue As Single
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Try
             Dim Rnd As New Random()
@@ -7582,7 +7582,7 @@ Public Class Ax00ServiceMainMDI
 
                     If mySensorId = AnalyzerSensors.BOTTLE_WASHSOLUTION Or _
                        mySensorId = AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE Then
-                        myGlobal = myUtil.CalculatePercent(AnalyzerSensorNumericalValues(mySensorId), min, max)
+                        myGlobal = Utilities.CalculatePercent(AnalyzerSensorNumericalValues(mySensorId), min, max)
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myPercentValue = CType(myGlobal.SetDatos, Single)
 

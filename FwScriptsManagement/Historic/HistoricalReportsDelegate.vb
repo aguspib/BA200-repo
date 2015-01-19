@@ -1316,7 +1316,7 @@ Public Class HistoricalReportsDelegate
         Dim myResultData As New GlobalDataTO
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim myUtility As New Utilities()
+            ''Dim myUtility As New Utilities()
             Dim text1 As String
             Dim text As String = ""
 
@@ -1333,7 +1333,7 @@ Public Class HistoricalReportsDelegate
                             Else
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_ERR_COMM", pcurrentLanguage)
                             End If
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
                             j += 1
 
                             ' Communications mode
@@ -1342,19 +1342,19 @@ Public Class HistoricalReportsDelegate
                             Else
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Settings_Manual", pcurrentLanguage)
                             End If
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
                             j += 1
 
                             ' Speed value 
                             text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CfgAnalyzer_PortSpeed", pcurrentLanguage) + ": "
                             text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0")
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
                             j += 7
 
                             ' Port value 
                             text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CfgAnalyzer_Port", pcurrentLanguage) + ": "
                             text1 += pData.Substring(j, pData.Length - j)
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
 
                     End Select
 

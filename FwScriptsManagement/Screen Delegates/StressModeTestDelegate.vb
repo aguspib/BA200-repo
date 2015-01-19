@@ -520,7 +520,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String
                 Dim text As String = ""
                 Dim StressTypeValue As STRESS_TYPE
@@ -576,13 +576,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     Case STRESS_TYPE.REAGENT2_SYRINGE
                         text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2Syringe", pcurrentLanguage)
                 End Select
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
                 j += 2
 
                 ' Cycles number programmed
                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_STRESS_CYCLES_PROG_RES", pcurrentLanguage) + ": "
                 text1 += CSng(pData.Substring(j, 5)).ToString("##,##0")
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
                 j += 5
 
                 ' Total time programmed
@@ -590,15 +590,15 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Value = pData.Substring(j, 8)
                 If IsNumeric(Value) Then
                     TimeValue = CInt(Value)
-                    text1 += myUtility.FormatToHHmmss(TimeValue)
+                    text1 += Utilities.FormatToHHmmss(TimeValue)
                 End If
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
                 j += 8
 
                 ' Cycles number completed
                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_STRESS_CYCLES_COMP_RES", pcurrentLanguage) + ": "
                 text1 += CSng(pData.Substring(j, 5)).ToString("##,##0")
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
                 j += 5
 
                 ' Time completed
@@ -606,9 +606,9 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Value = pData.Substring(j, 8)
                 If IsNumeric(Value) Then
                     TimeValue = CInt(Value)
-                    text1 += myUtility.FormatToHHmmss(TimeValue)
+                    text1 += Utilities.FormatToHHmmss(TimeValue)
                 End If
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
                 j += 8
 
                 ' Final Result
@@ -618,19 +618,19 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Else
                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                 End If
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
                 j += 1
 
                 ' Number Resets detected
                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NUM_CYCLES_RESETS", pcurrentLanguage) + ": "
                 text1 += CSng(pData.Substring(j, 4)).ToString("#,##0")
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
                 j += 4
 
                 ' Number Errors detected
                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ERRNUM", pcurrentLanguage) + ": "
                 text1 += CSng(pData.Substring(j, 4)).ToString("#,##0")
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
 
                 ' XBC 13/09/2011 - put separator as a group thousands separator
                 text = text.Replace(MyClass.myGroupSeparator.ToString, " ")

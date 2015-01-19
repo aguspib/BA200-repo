@@ -1945,7 +1945,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlConnection
 
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
@@ -1974,7 +1974,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = myUtil.FormatToSingle(adjustValue)
+                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2015,7 +2015,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = myUtil.FormatToSingle(adjustValue)
+                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2056,7 +2056,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                             If (adjustValue <> String.Empty AndAlso _
                                 Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                tempSetPoint = myUtil.FormatToSingle(adjustValue)
+                                tempSetPoint = Utilities.FormatToSingle(adjustValue)
                             Else
                                 'Dim myLogAcciones2 As New ApplicationLogManager()
                                 GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2093,7 +2093,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                                 If (adjustValue <> String.Empty AndAlso _
                                     Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                    tempSetPoint = myUtil.FormatToSingle(adjustValue)
+                                    tempSetPoint = Utilities.FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2128,7 +2128,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'If (adjustValue <> String.Empty AndAlso IsNumeric(adjustValue)) Then
                                 If (adjustValue <> String.Empty AndAlso _
                                     Double.TryParse(adjustValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double)) Then
-                                    tempSetPoint = myUtil.FormatToSingle(adjustValue)
+                                    tempSetPoint = Utilities.FormatToSingle(adjustValue)
                                 Else
                                     'Dim myLogAcciones2 As New ApplicationLogManager()
                                     GlobalBase.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
@@ -2220,7 +2220,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim alarmID As Alarms = GlobalEnumerates.Alarms.NONE
                             Dim alarmStatus As Boolean = False
                             Dim limitList As New List(Of FieldLimitsDS.tfmwFieldLimitsRow)
-                            Dim myUtils As New Utilities
+                            'Dim Utilities As New Utilities
 
                             'High contamination container
                             'Read the parameter HIGH_CONTAMIN_DEPOSIT_LIMIT in tfmwFieldLimits
@@ -2234,7 +2234,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 resultData = GetBottlePercentage(CInt(pHighContaminationContainer), False)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     myPercentage = CSng(CType(resultData.SetDatos, Double))
-                                    myPercentage = myUtils.FormatToSingle(myUtils.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) ('AG 04/10/2011 - format mypercentage with 1 decimal)
+                                    myPercentage = Utilities.FormatToSingle(Utilities.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) ('AG 04/10/2011 - format mypercentage with 1 decimal)
 
                                     'AG 22/02/2012 Only inform new numerical value when the alarm is not locked to prevent level oscillations
                                     ''AG 01/04/2011 - Inform new numerical values for Ax00 sensors to be monitorized
@@ -2309,7 +2309,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 resultData = GetBottlePercentage(CInt(pWashSolutionContainer), True)
                                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                     myPercentage = CSng(CType(resultData.SetDatos, Double))
-                                    myPercentage = myUtils.FormatToSingle(myUtils.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena)  'AG 04/10/2011 - format mypercentage with 1 decimal
+                                    myPercentage = Utilities.FormatToSingle(Utilities.ToStringWithFormat(myPercentage, 0)) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena)  'AG 04/10/2011 - format mypercentage with 1 decimal
 
                                     'AG 22/02/2012 Only inform new numerical value when the alarm is not locked to prevent level oscillations
                                     ''AG 01/04/2011 - Inform new numerical values for Ax00 sensors to be monitorized
@@ -2756,7 +2756,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myCalc As New CalculationsDelegate()
 
                 Dim isLogActivity As Boolean = False 'SGM 11/10/2011
@@ -2883,7 +2883,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myEmptyLevel = myUtil.FormatToSingle(myValue)
+                        myEmptyLevel = Utilities.FormatToSingle(myValue)
                     End If
 
                     myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByGroupAndAxis(ADJUSTMENT_GROUPS.WASHING_SOLUTION.ToString, _
@@ -2891,7 +2891,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myFullLevel = myUtil.FormatToSingle(myValue)
+                        myFullLevel = Utilities.FormatToSingle(myValue)
                     End If
 
                     If myGlobal.SetDatos Is Nothing OrElse myGlobal.HasError Then
@@ -2904,12 +2904,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         myLastLevel = SensorValuesAttribute(AnalyzerSensors.BOTTLE_WASHSOLUTION)
                         myNewLevel = pSensors(AnalyzerSensors.BOTTLE_WASHSOLUTION)
 
-                        myGlobal = myUtil.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = Utilities.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myLastPercent = CType(myGlobal.SetDatos, Single)
                         End If
 
-                        myGlobal = myUtil.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = Utilities.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myNewPercent = CType(myGlobal.SetDatos, Single)
                         End If
@@ -2953,7 +2953,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myEmptyLevel = myUtil.FormatToSingle(myValue)
+                        myEmptyLevel = Utilities.FormatToSingle(myValue)
                     End If
 
                     myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByGroupAndAxis(ADJUSTMENT_GROUPS.HIGH_CONTAMINATION.ToString, _
@@ -2961,7 +2961,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myFullLevel = myUtil.FormatToSingle(myValue)
+                        myFullLevel = Utilities.FormatToSingle(myValue)
                     End If
 
                     If myGlobal.SetDatos Is Nothing OrElse myGlobal.HasError Then
@@ -2974,12 +2974,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         myLastLevel = SensorValuesAttribute(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
                         myNewLevel = pSensors(AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE)
 
-                        myGlobal = myUtil.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = Utilities.CalculatePercent(myLastLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myLastPercent = CType(myGlobal.SetDatos, Single)
                         End If
 
-                        myGlobal = myUtil.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
+                        myGlobal = Utilities.CalculatePercent(myNewLevel, myEmptyLevel, myFullLevel)
                         If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                             myNewPercent = CType(myGlobal.SetDatos, Single)
                         End If
@@ -3028,7 +3028,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = myUtil.FormatToSingle(myValue)
+                        mySetpointTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3039,7 +3039,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = myUtil.FormatToSingle(myValue)
+                        myTargetTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3051,7 +3051,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = myUtil.FormatToSingle(myValue)
+                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_FRIDGE), True)
@@ -3077,7 +3077,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = myUtil.FormatToSingle(myValue)
+                        mySetpointTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3088,7 +3088,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = myUtil.FormatToSingle(myValue)
+                        myTargetTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3100,7 +3100,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = myUtil.FormatToSingle(myValue)
+                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_REACTIONS), True)
@@ -3125,7 +3125,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = myUtil.FormatToSingle(myValue)
+                        mySetpointTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3136,7 +3136,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = myUtil.FormatToSingle(myValue)
+                        myTargetTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3148,7 +3148,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = myUtil.FormatToSingle(myValue)
+                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_WASHINGSTATION), True)
@@ -3173,7 +3173,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = myUtil.FormatToSingle(myValue)
+                        mySetpointTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3184,7 +3184,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = myUtil.FormatToSingle(myValue)
+                        myTargetTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3196,7 +3196,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = myUtil.FormatToSingle(myValue)
+                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R1), True)
@@ -3221,7 +3221,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'mySetpointTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        mySetpointTemp = myUtil.FormatToSingle(myValue)
+                        mySetpointTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3232,7 +3232,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'myTargetTemp = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        myTargetTemp = myUtil.FormatToSingle(myValue)
+                        myTargetTemp = Utilities.FormatToSingle(myValue)
                     Else
                         myGlobal.HasError = True
                         Exit Try
@@ -3244,7 +3244,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If myGlobal.SetDatos IsNot Nothing AndAlso Not myGlobal.HasError Then
                         'sensorValueToMonitor = CType(myGlobal.SetDatos, Single)
                         myValue = CType(myGlobal.SetDatos, String)
-                        sensorValueToMonitor = myUtil.FormatToSingle(myValue)
+                        sensorValueToMonitor = Utilities.FormatToSingle(myValue)
 
                         'Update the class attribute SensorValuesAttribute
                         'UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2, pSensors(GlobalEnumerates.AnalyzerSensors.TEMPERATURE_R2), True)
@@ -4126,8 +4126,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 If MinAdj <> -1 AndAlso MaxAdj <> -1 AndAlso MinAdj <> MaxAdj Then
-                    Dim myUtil As New Utilities
-                    myGlobal = myUtil.CalculatePercent(pCounts, MinAdj, MaxAdj, True)
+                    ''Dim myUtil As New Utilities.
+                    myGlobal = Utilities.CalculatePercent(pCounts, MinAdj, MaxAdj, True)
                 Else
                     myGlobal.SetDatos = Nothing
                 End If

@@ -114,8 +114,8 @@ Public Class TestCrearScripts
                     End If
 
                     'version
-                    Dim myUtil As New Utilities
-                    myGlobal = myUtil.GetSoftwareVersion
+                    'Dim myUtil As New Utilities.
+                    myGlobal = Utilities.GetSoftwareVersion
                     If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                         Dim myVersion As String = CStr(myGlobal.SetDatos)
                         Dim myRes As DialogResult = MessageBox.Show("La versión actual del software es: " & myVersion & vbCrLf & "¿Asignar esta versión?", Me.Text, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question)
@@ -593,7 +593,7 @@ Public Class TestCrearScripts
     Private Function Exportar(ByVal pScriptsData As FwScriptsDataTO, ByVal pPath As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
 
@@ -620,7 +620,7 @@ Public Class TestCrearScripts
     Private Function Importar(ByVal pScriptsDataType As Type, ByVal pPath As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
             Dim myScripts As New FwScripts
@@ -876,8 +876,8 @@ Public Class TestCrearScripts
         Try
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
-            myGlobal = myUtil.GetSoftwareVersion
+            'Dim myUtil As New Utilities.
+            myGlobal = Utilities.GetSoftwareVersion
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 BsVersionTextBox.Text = CStr(myGlobal.SetDatos)
             Else

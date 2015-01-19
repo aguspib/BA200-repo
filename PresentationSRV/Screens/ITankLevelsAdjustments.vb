@@ -951,7 +951,7 @@ Public Class ITankLevelsAdjustments
     Private Sub PrepareButtons()
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
-        Dim myutil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -971,7 +971,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsAdjustButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -980,7 +980,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
             '    BsSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -989,7 +989,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsCancelButton.Image = myImage
             '    BsCancelButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -998,7 +998,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1009,7 +1009,7 @@ Public Class ITankLevelsAdjustments
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
 
             '    WSFullAdjustButton.Image = myImage
             '    WSFullAdjustButton.ImageAlign = ContentAlignment.MiddleLeft
@@ -1047,7 +1047,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStartTestButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1056,7 +1056,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    BsStopTestButton.Image = myImage
             '    BsStopTestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -2813,10 +2813,10 @@ Public Class ITankLevelsAdjustments
                 Dim myNGImage As Image = Image.FromFile(iconPath & NG_IconName)
 
 
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewNGImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -3026,17 +3026,17 @@ Public Class ITankLevelsAdjustments
                 Dim myOKImage As Image = Image.FromFile(iconPath & OK_IconName)
 
 
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myUtil.ResizeImage(myRunImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myRunImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewRunImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
                     myNewRunImage = CType(myRunImage, Bitmap)
                 End If
 
-                myGlobal = myUtil.ResizeImage(myOKImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myOKImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewOKImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -4137,8 +4137,8 @@ Public Class ITankLevelsAdjustments
                 max = CSng(myGlobal.SetDatos)
             End If
 
-            Dim myUtil As New Utilities
-            myGlobal = myUtil.CalculatePercent(pValue, min, max)
+            ''Dim myUtil As New Utilities.
+            myGlobal = Utilities.CalculatePercent(pValue, min, max)
 
         Catch ex As Exception
             myGlobal.HasError = True

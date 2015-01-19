@@ -137,7 +137,7 @@ Public Class IMsgBox
         Dim myGlobal As New GlobalDataTO
 
 
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
 

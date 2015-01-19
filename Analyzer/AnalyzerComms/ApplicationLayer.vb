@@ -2321,9 +2321,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 ' Get the instruction type value (always in parameter index = 2)
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParameterTO As New InstructionParameterTO
-                myGlobal = myUtilities.GetItemByParameterIndex(myIndexedParameters, 2)
+                myGlobal = Utilities.GetItemByParameterIndex(myIndexedParameters, 2)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParameterTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2677,8 +2677,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 pConnectionString = myInstructionToSend
 
                 'FINALLY: Convert string to byte
-                Dim myUtilities As New Utilities
-                myGlobal = myUtilities.ConvertStringToAscii(myInstructionToSend, True)
+                'Dim myUtilities As New Utilities
+                myGlobal = Utilities.ConvertStringToAscii(myInstructionToSend, True)
 
             Catch ex As Exception
                 myGlobal.HasError = True
@@ -3502,9 +3502,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pFWAction.ActionType = GlobalEnumerates.FwUpdateActions.SendRepository Then
                     'blocks must be passed directly as byte array in order to avoid data loss in conversion
 
-                    Dim myUtilities As New Utilities
+                    'Dim myUtilities As New Utilities
                     Dim myCommand As String = "A400;FWUTIL;A:2;N:" & pFWAction.DataBlockIndex.ToString & ";S:" & pFWAction.DataBlockSize.ToString & ";"
-                    myGlobal = myUtilities.ConvertStringToAscii(myCommand, True)
+                    myGlobal = Utilities.ConvertStringToAscii(myCommand, True)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         Dim myCommandInBytes() As Byte = CType(myGlobal.SetDatos, Byte())
                         Dim myFinalByte As Byte = Asc(CChar(";"))
@@ -4579,9 +4579,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 lastInstructionSentAttribute = pInstruction     'AG 20/10/2010
 
                 'FIRST: Convert string to byte in order to send
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim bytesToSend() As Byte
-                myGlobal = myUtilities.ConvertStringToAscii(pInstruction, True)
+                myGlobal = Utilities.ConvertStringToAscii(pInstruction, True)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     bytesToSend = DirectCast(myGlobal.SetDatos, Byte())
                 Else

@@ -11,7 +11,7 @@ Namespace Biosystems.Ax00.Global
         End Sub
 
         Public Sub New(ByVal pActionType As GlobalEnumerates.FwUpdateActions)
-            MyClass.ActionTypeAttr = pActionType
+            ActionTypeAttr = pActionType
         End Sub
 
 
@@ -42,8 +42,8 @@ Namespace Biosystems.Ax00.Global
             Get
                 Try
                     Dim res As String = ""
-                    If MyClass.DataBlockBytesAttr IsNot Nothing AndAlso MyClass.DataBlockBytesAttr.Length > 0 Then
-                        res = System.Text.ASCIIEncoding.ASCII.GetString(MyClass.DataBlockBytesAttr)
+                    If DataBlockBytesAttr IsNot Nothing AndAlso DataBlockBytesAttr.Length > 0 Then
+                        res = System.Text.ASCIIEncoding.ASCII.GetString(DataBlockBytesAttr)
                     End If
                     Return res
                 Catch ex As Exception

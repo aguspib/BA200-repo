@@ -3809,7 +3809,7 @@ Public Class FormXavi
             'End With
             'myInstruction.Add(myPar4)
 
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
 
             'myGlobal = myAnalyzerManager.ProcessRecivedISEResult(myInstruction)
             'Dim myISEResultData As New ISEResultsDataTO

@@ -2415,7 +2415,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String
                 Dim text As String = ""
 
@@ -2433,7 +2433,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Filling option used for the test
@@ -2443,7 +2443,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MANUALLY_FILL", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2455,7 +2455,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' SetPoint temperature test
@@ -2467,7 +2467,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 text += Environment.NewLine
@@ -2482,10 +2482,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP_POINT", pcurrentLanguage) + (i + 1).ToString + ": "
 
                                         ' alignment...
-                                        text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                        text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                         text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                        text += myUtility.FormatLineHistorics(text1)
+                                        text += Utilities.FormatLineHistorics(text1)
                                     End If
                                     j += 5
                                 Next
@@ -2495,20 +2495,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MeanTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Sensor Temperature received
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                             Case "REG1_TER", "REG2_TER"
 
@@ -2520,7 +2520,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Selected Arm
@@ -2530,7 +2530,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2542,7 +2542,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' SetPoint temperature test
@@ -2554,7 +2554,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2568,10 +2568,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2579,10 +2579,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                                 ' XBC 22/11/2011 - register Counter into Historics
                                 j += 5
@@ -2591,10 +2591,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumDispensations", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
                                 text1 += CSng(pData.Substring(j, 2)).ToString()
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 2
                                 ' XBC 22/11/2011 - register Counter into Historics
 
@@ -2608,7 +2608,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2620,7 +2620,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' SetPoint temperature test
@@ -2632,7 +2632,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2646,10 +2646,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2657,10 +2657,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                         End Select
 
@@ -2678,7 +2678,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' New Assigned values
@@ -2688,7 +2688,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Filling option used for the test
@@ -2698,7 +2698,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MANUALLY_FILL", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2710,7 +2710,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 text += Environment.NewLine
@@ -2725,10 +2725,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP_POINT", pcurrentLanguage) + (i + 1).ToString + ": "
 
                                         ' alignment...
-                                        text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                        text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                         text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                        text += myUtility.FormatLineHistorics(text1)
+                                        text += Utilities.FormatLineHistorics(text1)
                                     End If
                                     j += 5
                                 Next
@@ -2738,30 +2738,30 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MeanTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Sensor Temperature received
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Final Correction Adjustment
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CorrectionAdj", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 6)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                             Case "REG1_TER", "REG2_TER"
 
@@ -2773,7 +2773,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Selected Arm
@@ -2783,7 +2783,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' New Assigned values
@@ -2793,7 +2793,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2805,7 +2805,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2819,10 +2819,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2830,20 +2830,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Final Correction Adjustment
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CorrectionAdj", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 6)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                                 ' XBC 22/11/2011 - register Counter into Historics
                                 j += 6
@@ -2852,10 +2852,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumDispensations", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
                                 text1 += CSng(pData.Substring(j, 2)).ToString()
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 2
                                 ' XBC 22/11/2011 - register Counter into Historics
 
@@ -2869,7 +2869,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' New Assigned values
@@ -2879,7 +2879,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2891,7 +2891,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2905,10 +2905,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2916,20 +2916,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Final Correction Adjustment
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CorrectionAdj", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 6)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                         End Select
 

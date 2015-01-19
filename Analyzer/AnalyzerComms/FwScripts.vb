@@ -674,8 +674,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'encrypt the file
                     If File.Exists(myTempFile) Then
 
-                        Dim myUtil As New Utilities
-                        resultData = myUtil.EncryptFile(myTempFile, pFilePath)
+                        ''Dim myUtil As New Utilities.
+                        resultData = Utilities.EncryptFile(myTempFile, pFilePath)
 
                     Else
                         Throw New Exception(GlobalEnumerates.Messages.SYSTEM_ERROR.ToString)
@@ -712,7 +712,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </remarks>
         Private Function ImportFwScriptsDataFromXML(ByVal pFwScriptsDataType As Type, ByVal pFilePath As String, ByVal pDecrypt As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim myUtil As New Utilities 'PG 26/11/2010 
+            ''Dim myUtil As New Utilities. 'PG 26/11/2010 
             ' 
             Dim FS As FileStream = Nothing
             Dim myTempFilePath As String = ""
@@ -728,7 +728,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         File.Delete(myTempFilePath)
                     End If
 
-                    resultData = myUtil.DecryptFile(pFilePath, myTempFilePath)
+                    resultData = Utilities.DecryptFile(pFilePath, myTempFilePath)
 
                     If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                         If File.Exists(myTempFilePath) Then
@@ -824,7 +824,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Dim myAppVersion() As String
                 Dim myScriptsVersion() As String
                 Dim isVersionOK As Boolean = True
-                'Dim myUtil As New Utilities
+                ''Dim myUtil As New Utilities.
 
                 ' XBC 08/05/2012
                 Dim myVersionsDelegate As New VersionsDelegate
@@ -849,7 +849,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
                 End If
 
-                'resultData = myUtil.GetSoftwareVersion
+                'resultData = Utilities.GetSoftwareVersion
                 'If Not pSkipVersion Then
                 '    If Not resultData.HasError And Not resultData Is Nothing Then
                 '        myAppVersion = CType(resultData.SetDatos, String).Split(CChar("."))

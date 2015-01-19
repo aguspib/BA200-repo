@@ -703,8 +703,8 @@ Public Class ISettings
             If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
                 myVersionsDS = CType(myGlobal.SetDatos, VersionsDS)
 
-                Dim myUtil As New Utilities
-                myGlobal = myUtil.GetSoftwareVersion()
+                'Dim myUtil As New Utilities.
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim SwVersion As String = myGlobal.SetDatos.ToString
 

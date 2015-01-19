@@ -289,7 +289,7 @@ Public Class ICycleCountScreen
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
             MyClass.SetButtonImage(BsExitButton, "CANCEL")
             MyClass.SetButtonImage(BsWriteButton, "SAVEALL", 24, 24)

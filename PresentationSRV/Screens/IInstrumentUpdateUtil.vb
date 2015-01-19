@@ -729,7 +729,7 @@ Public Class IInstrumentUpdateUtil
 
 
                 'deserialize decrypted data
-                Dim myUtility As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myOpenAdjustmentsDS As New SRVAdjustmentsDS
                 myTempPath = path.Replace(FwAdjustmentsDelegate.AdjustmentCryptedFileExtension, FwAdjustmentsDelegate.AdjustmentDecryptedFileExtension)
 
@@ -857,8 +857,8 @@ Public Class IInstrumentUpdateUtil
                 'encrypt the file
                 If File.Exists(pTempFilePath) Then
 
-                    Dim myUtil As New Utilities
-                    resultData = myUtil.EncryptFile(pTempFilePath, pFilePath)
+                    'Dim Utilities As New Utilities
+                    resultData = Utilities.EncryptFile(pTempFilePath, pFilePath)
 
                 Else
                     Throw New Exception(GlobalEnumerates.Messages.SYSTEM_ERROR.ToString)
@@ -892,7 +892,7 @@ Public Class IInstrumentUpdateUtil
     ''' <remarks>Created by SGM 23/06/2011</remarks>
     Private Function ImportAdjustmentsDataset(ByVal pAdjustmentsDatasetType As Type, ByVal pFilePath As String, ByVal pTempFilePath As String, ByVal pDecrypt As Boolean) As GlobalDataTO
         Dim resultData As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
         ' 
         Dim FS As FileStream = Nothing
 
@@ -906,7 +906,7 @@ Public Class IInstrumentUpdateUtil
                     File.Delete(pTempFilePath)
                 End If
 
-                resultData = myUtil.DecryptFile(pFilePath, pTempFilePath)
+                resultData = Utilities.DecryptFile(pFilePath, pTempFilePath)
 
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     If File.Exists(pTempFilePath) Then
@@ -3734,7 +3734,7 @@ Public Class IInstrumentUpdateUtil
     Private Sub BsOpenFileButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsFwOpenFileButton.Click
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 

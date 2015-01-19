@@ -894,9 +894,9 @@ Public Class IAx00Login
                 ' END DL
 
                 'TR 07/02/2012 -Get the version information from the assembly information.
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities.
                 Dim myGlobalDataTO As GlobalDataTO
-                myGlobalDataTO = myUtil.GetSoftwareVersion()
+                myGlobalDataTO = Utilities.GetSoftwareVersion()
                 If Not myGlobalDataTO.HasError Then
                     bsVersionLabel.Text = "Version: " & myGlobalDataTO.SetDatos.ToString()
                 Else
@@ -918,7 +918,7 @@ Public Class IAx00Login
                     Dim myVersionFileName As String = GlobalBase.VersionFileName
 
                     If Not File.Exists(myFolder & myVersionFileName) Then
-                        myUtil.CreateVersionFile(myFolder & myVersionFileName)
+                        Utilities.CreateVersionFile(myFolder & myVersionFileName)
                     End If
 
                 End If

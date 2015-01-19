@@ -993,7 +993,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -1160,7 +1160,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         Case 6 : newLine = False 'max level value
                                         Case 7 : newLine = False 'max level adjusted
                                     End Select
-                                    FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                    FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 Next
 
                                 myResultData.SetDatos = FinalText
@@ -1265,7 +1265,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         Case 2 : newLine = False 'title & tested
 
                                     End Select
-                                    FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                    FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 Next
 
                                 myResultData.SetDatos = FinalText

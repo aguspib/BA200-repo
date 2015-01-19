@@ -5509,14 +5509,14 @@ Partial Public Class IAx00MainMDI
                     'If (System.IO.File.Exists(OldXmlFile)) Then
                     '    Rename(OldXmlFile, NewXmlFile)
 
-                    '    Dim myUtil As New Utilities
+                    '    'Dim myUtil As New Utilities.
                     '    If (System.IO.File.Exists(sourcePath & "Temp")) Then
-                    '        myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+                    '        myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
                     '    End If
 
-                    '    myGlobal = myUtil.CreateFolder(sourcePath & "Temp")
+                    '    myGlobal = Utilities.CreateFolder(sourcePath & "Temp")
                     '    If (Not myGlobal.HasError) Then
-                    '        myGlobal = myUtil.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
+                    '        myGlobal = Utilities.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
 
                     '        If (Not myGlobal.HasError) Then
                     '            If (System.IO.File.Exists(sourcePath & fileZip)) Then
@@ -5530,20 +5530,20 @@ Partial Public Class IAx00MainMDI
                     '                    If (System.IO.File.Exists(sourcePath & fileZip)) Then Rename(sourcePath & fileZip, sourcePath & "PreviousLog " & Format(Now, "yyyyMMdd hhmmss") & ".zip")
                     '                End If
 
-                    '                myGlobal = myUtil.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
+                    '                myGlobal = Utilities.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
 
                     '                If (Not myGlobal.HasError) Then Kill(sourcePath & fileZip)
                     '            End If
 
                     '            '' dl 14/06/2011
                     '            'If GenerateResultsExcel Then
-                    '            '    myGlobal = myUtil.MoveFiles(ExcelPath, sourcePath & "Temp\", "*.xls")
+                    '            '    myGlobal = Utilities.MoveFiles(ExcelPath, sourcePath & "Temp\", "*.xls")
                     '            'End If
                     '            '' dl 14/06/2011
 
-                    '            myGlobal = myUtil.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
+                    '            myGlobal = Utilities.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
                     '            If (Not myGlobal.HasError) Then
-                    '                myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+                    '                myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
                     '            End If
                     '        End If
                     '    End If

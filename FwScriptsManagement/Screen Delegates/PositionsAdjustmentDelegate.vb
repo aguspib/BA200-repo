@@ -4562,7 +4562,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -4727,7 +4727,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         Case 2 : newLine = False 'title & tested
 
                                     End Select
-                                    FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                    FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 Next
 
                                 myResultData.SetDatos = FinalText
@@ -4791,7 +4791,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         Case 2 : newLine = False
 
                                     End Select
-                                    FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                    FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 Next
 
                                 myResultData.SetDatos = FinalText
@@ -4930,7 +4930,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     Else
                                         newLine = False
                                     End If
-                                    FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                    FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                     'End If
                                 Next
 
@@ -5192,7 +5192,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 '       '**************
                                 '       For Each Line As List(Of String) In myLines
                                 '           Dim newLine As Boolean = (myLines.IndexOf(Line) Mod 2 = 0)
-                                '           FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                '           FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 '       Next
 
                                 '       myResultData.SetDatos = FinalText
@@ -5256,7 +5256,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         Case 2 : newLine = True
 
                                     End Select
-                                    FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                    FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 Next
 
                                 myResultData.SetDatos = FinalText
@@ -5393,7 +5393,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     Else
                                         newLine = False
                                     End If
-                                    FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                    FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 Next
 
                                 myResultData.SetDatos = FinalText
@@ -5654,7 +5654,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 '           '**************
                                 '           For Each Line As List(Of String) In myLines
                                 '               Dim newLine As Boolean = (myLines.IndexOf(Line) Mod 2 = 0)
-                                '               FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                '               FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 '           Next
 
                                 '           myResultData.SetDatos = FinalText
@@ -5710,7 +5710,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 '                   Case 2 : newLine = False
 
                                 '               End Select
-                                '               FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                '               FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                                 '           Next
 
                                 '           myResultData.SetDatos = FinalText

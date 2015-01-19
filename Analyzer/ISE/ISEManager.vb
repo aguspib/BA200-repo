@@ -1563,10 +1563,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Get
                 'Return 5 'For Test Document
                 Dim myglobal As New GlobalDataTO
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_A)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
-                    Return myUtil.FormatToSingle(CStr(myglobal.SetDatos))
+                    Return Utilities.FormatToSingle(CStr(myglobal.SetDatos))
                 Else
                     Return -1
                 End If
@@ -1576,10 +1576,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private ReadOnly Property ReagentsPackRemainingVolCalB() As Single
             Get
                 Dim myglobal As New GlobalDataTO
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_B)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
-                    Return myUtil.FormatToSingle(CStr(myglobal.SetDatos))
+                    Return Utilities.FormatToSingle(CStr(myglobal.SetDatos))
                 Else
                     Return -1
                 End If
@@ -1658,7 +1658,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     ISEDallasPage01Attr = value
 
-                    Dim myUtil As New Utilities
+                    'Dim Utilities As New Utilities
                     Dim myGlobal As New GlobalDataTO
 
                     'if the current consumption value in the Dallas > saved in DB then update the db, 
@@ -1671,7 +1671,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If ISEDallasPage00 IsNot Nothing Then 'SGM 13/06/2012
                         myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_A)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                            myCalibAVolumeSaved = myUtil.FormatToSingle(CStr(myGlobal.SetDatos))
+                            myCalibAVolumeSaved = Utilities.FormatToSingle(CStr(myGlobal.SetDatos))
 
 
                             Dim myDallasCalibAVolume As Single
@@ -1693,7 +1693,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
                         myGlobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.AVAILABLE_VOL_CAL_B)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
-                            myCalibBVolumeSaved = myUtil.FormatToSingle(CStr(myGlobal.SetDatos))
+                            myCalibBVolumeSaved = Utilities.FormatToSingle(CStr(myGlobal.SetDatos))
 
                             Dim myDallasCalibBVolume As Single
 
@@ -2342,7 +2342,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Property TestsCountSinceLastClean() As Integer
             Get
                 'Dim myglobal As New GlobalDataTO
-                'Dim myUtil As New Utilities
+                ''Dim myUtil As New Utilities.
                 Dim myglobal = MyClass.GetISEInfoSettingValue(ISEModuleSettings.SAMPLES_SINCE_LAST_CLEAN)
                 If Not myglobal.HasError AndAlso myglobal.SetDatos IsNot Nothing Then
                     TestsCountSinceLastCleanAttr = CInt(myglobal.SetDatos)
@@ -5089,7 +5089,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by SGM 05/06/2012</remarks>
         Private Function ValidateBiosystemsPack() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             'Dim myLogAcciones As New ApplicationLogManager()
             Try
 
@@ -5194,7 +5194,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Dim myGlobal As New GlobalDataTO
             'Dim myLogAcciones As New ApplicationLogManager()
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
 
             Try
                 Dim result As Boolean = False
@@ -5215,7 +5215,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'X = ([ID4][ID3][ID2][ID1]) 4 Bytes
                 Dim strX As String = mySerialID.Substring(6, 8)
-                myGlobal = myUtil.ConvertHexToUInt32(strX)
+                myGlobal = Utilities.ConvertHexToUInt32(strX)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     Dim X As UInt32 = Convert.ToUInt32(myGlobal.SetDatos)
 
@@ -5224,7 +5224,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'new way for power to 2 SGM 31/08/2012
                     Dim X2 As UInt64
-                    myGlobal = myUtil.PowUint64To2(X)
+                    myGlobal = Utilities.PowUint64To2(X)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         X2 = Convert.ToUInt64(myGlobal.SetDatos)
                         'X2 = Convert.ToUInt64((Convert.ToUInt64(X)) * (Convert.ToUInt64(X)))
@@ -5234,7 +5234,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim Low As UInt32 = CType((X2 And LMask), UInt32)
 
                         Dim strHigh As String = ""
-                        myGlobal = myUtil.ConvertUint32ToHex(High)
+                        myGlobal = Utilities.ConvertUint32ToHex(High)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             strHigh = CStr(myGlobal.SetDatos)
 
@@ -5251,7 +5251,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         Dim strLow As String = ""
-                        myGlobal = myUtil.ConvertUint32ToHex(Low)
+                        myGlobal = Utilities.ConvertUint32ToHex(Low)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             strLow = CStr(myGlobal.SetDatos)
 
@@ -5277,7 +5277,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             For c As Integer = 1 To difTo8 Step 1
                                 strHighLow = "0" & strHighLow
                             Next
-                            myGlobal = myUtil.ConvertHexToBinaryString(strHighLow)
+                            myGlobal = Utilities.ConvertHexToBinaryString(strHighLow)
                             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                 Dim myBinary As String = CStr(myGlobal.SetDatos)
                                 If myBinary.Length = 32 Then
@@ -5290,10 +5290,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     'Y = 0x[MSB][LSB]
                                     Dim strMSBLSB As String = strbMSB & strbLSB
-                                    myGlobal = myUtil.ConvertBinaryStringToDecimal(strMSBLSB)
+                                    myGlobal = Utilities.ConvertBinaryStringToDecimal(strMSBLSB)
                                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                         Dim intY As UInt64 = Convert.ToUInt64(myGlobal.SetDatos)
-                                        myGlobal = myUtil.ConvertDecimalToHex(Convert.ToInt64(intY))
+                                        myGlobal = Utilities.ConvertDecimalToHex(Convert.ToInt64(intY))
                                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 
                                             'Security Key Validation:
@@ -6305,7 +6305,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ' XBC 15/03/2012
                     ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
                     'If IsNumeric(myPosition) Then
-                    '    myglobal = myUtility.ConvertDecimalToHex(CLng(myPosition))
+                    '    myglobal = Utilities.ConvertDecimalToHex(CLng(myPosition))
                     '    If Not myglobal.HasError AndAlso Not myglobal.SetDatos Is Nothing Then
                     '        myPosition = CType(myglobal.SetDatos, String)
                     '    Else
@@ -6316,7 +6316,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'End If
 
                     'If IsNumeric(myInfo) Then
-                    '    myglobal = myUtility.ConvertDecimalToHex(CLng(myInfo))
+                    '    myglobal = Utilities.ConvertDecimalToHex(CLng(myInfo))
                     '    If Not myglobal.HasError AndAlso Not myglobal.SetDatos Is Nothing Then
                     '        myInfo = CType(myglobal.SetDatos, String)
                     '    Else
@@ -9032,14 +9032,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '        Dim myReason As String
         '        Dim myPosition As String
 
-        '        resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.NoGoodByte))
+        '        resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.NoGoodByte))
         '        If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
         '            myPosition = CType(resultData.SetDatos, String)
         '        Else
         '            Exit Try
         '        End If
         '        If IsNumeric(pReason) Then
-        '            resultData = myUtility.ConvertDecimalToHex(CLng(pReason))
+        '            resultData = Utilities.ConvertDecimalToHex(CLng(pReason))
         '            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
         '                myReason = CType(resultData.SetDatos, String)
         '            Else
@@ -9085,14 +9085,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' XBC 15/03/2012
                 ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
-                'resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.InstallDay))
+                'resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.InstallDay))
                 'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '    myPosition = CType(resultData.SetDatos, String)
                 'Else
                 '    Exit Try
                 'End If
                 'If IsNumeric(pDay) Then
-                '    resultData = myUtility.ConvertDecimalToHex(CLng(pDay))
+                '    resultData = Utilities.ConvertDecimalToHex(CLng(pDay))
                 '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '        myDay = CType(resultData.SetDatos, String)
                 '    Else
@@ -9143,14 +9143,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' XBC 15/03/2012
                 ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
-                'resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.InstallMonth))
+                'resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.InstallMonth))
                 'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '    myPosition = CType(resultData.SetDatos, String)
                 'Else
                 '    Exit Try
                 'End If
                 'If IsNumeric(pMonth) Then
-                '    resultData = myUtility.ConvertDecimalToHex(CLng(pMonth))
+                '    resultData = Utilities.ConvertDecimalToHex(CLng(pMonth))
                 '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '        myMonth = CType(resultData.SetDatos, String)
                 '    Else
@@ -9201,14 +9201,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' XBC 15/03/2012
                 ' Sw envia la informacion al Fw en decimal (porque así lo espera Fw) y es Fw quien lo convierte a Hexadecimal
-                'resultData = myUtility.ConvertDecimalToHex(CLng(DallasXipPage1.InstallYear))
+                'resultData = Utilities.ConvertDecimalToHex(CLng(DallasXipPage1.InstallYear))
                 'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '    myPosition = CType(resultData.SetDatos, String)
                 'Else
                 '    Exit Try
                 'End If
                 'If IsNumeric(pYear) Then
-                '    resultData = myUtility.ConvertDecimalToHex(CLng(pYear) - 2000)
+                '    resultData = Utilities.ConvertDecimalToHex(CLng(pYear) - 2000)
                 '    If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                 '        myYear = CType(resultData.SetDatos, String)
                 '    Else

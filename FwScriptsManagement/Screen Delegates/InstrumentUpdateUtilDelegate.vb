@@ -283,7 +283,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -480,7 +480,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         myLines.Add(myLine)
 
                         For Each Line As List(Of String) In myLines
-                            FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, False)
+                            FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, False)
                         Next
 
                         myGlobal.SetDatos = FinalText
@@ -1037,13 +1037,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myTempFilePath As String = ""
 
             Try
-                Dim myUtil As New Utilities
+                'Dim utilities As New Utilities
                 Dim myFileBytes As Byte() = Nothing
 
                 '0- Decrypt if needed
                 If pDecrypt Then
                     myTempFilePath = Directory.GetDirectoryRoot(pFilePath)
-                    myGlobal = myUtil.DecryptFile(pFilePath, myTempFilePath)
+                    myGlobal = Utilities.DecryptFile(pFilePath, myTempFilePath)
 
                     If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                         myFileBytes = (File.ReadAllBytes(myTempFilePath))
@@ -1219,8 +1219,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim iscompatible As Boolean = False
-                Dim myUtil As New Utilities
-                myGlobal = myUtil.GetSoftwareVersion()
+                'Dim myUtil As New Utilities.
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim SwVersion As String = myGlobal.SetDatos.ToString
                     myGlobal = MyClass.myFwScriptDelegate.AnalyzerManager.ValidateFwSwCompatibility(pFWFileVersion, SwVersion)

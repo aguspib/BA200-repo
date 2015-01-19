@@ -14,7 +14,8 @@ Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by 
 Imports Microsoft.Win32
 
 Namespace Biosystems.Ax00.Global
-    Public Class Utilities
+
+    Public Module Utilities
 
 #Region "Constants"
         'PG 23/11/2010. Add the CrypKey
@@ -535,7 +536,7 @@ Namespace Biosystems.Ax00.Global
                 Dim lenToConvert As Integer = pLax00Instruction.Length
                 ReDim buffAscii(lenToConvert - 1)
 
-                buffAscii = Me.AscB(pLax00Instruction)
+                buffAscii = AscB(pLax00Instruction)
 
                 'AG 28/10/2010 - Comment this Ax5 code. RPM say electronics dont implement it by now
                 'He is not sure to do it or define other protocol for send fractional data (for instance load Firmware)
@@ -741,8 +742,8 @@ Namespace Biosystems.Ax00.Global
                     myGlobal.SetDatos = pAppVersion
                 Else
                     'Function has been called for SAT Report Generation ==> The SW Version is obtained from the DLL
-                    Dim myUtil As New Utilities
-                    myGlobal = myUtil.GetSoftwareVersion(False, pForRSATFromServiceSW)
+                    ''Dim myUtil As New Utilities.
+                    myGlobal = Utilities.GetSoftwareVersion(False, pForRSATFromServiceSW)
                 End If
 
                 'Write the SW Version in the Version.txt file
@@ -909,7 +910,7 @@ Namespace Biosystems.Ax00.Global
                     If Directory.GetDirectories(pFullPath).Length > 0 Then
                         Dim myDirectories() As String = Directory.GetDirectories(pFullPath)
                         For D As Integer = 0 To myDirectories.Length - 1
-                            MyClass.RemoveFolderAndContents(myDirectories(D))
+                            Utilities.RemoveFolderAndContents(myDirectories(D))
                         Next
                     End If
                     If Directory.GetFiles(pFullPath).Length > 0 Then
@@ -2003,7 +2004,7 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by: SA 02/08/2012 - Added code to calculate correctly the Patient age: if the Patient Birthday has not still passed,
         '''                              decrement the calculate age by one
         ''' </remarks>
-        Public Shared Function GetAgeUnits(ByVal pDateOfBirth As Date, ByVal AgeUnitsListDS As PreloadedMasterDataDS) As String
+        Public Function GetAgeUnits(ByVal pDateOfBirth As Date, ByVal AgeUnitsListDS As PreloadedMasterDataDS) As String
             Dim ageUnitDesc As String = String.Empty
 
             Try
@@ -2088,7 +2089,7 @@ Namespace Biosystems.Ax00.Global
                 '----------------------------------------------------
 
                 '1-Se obtiene el valor binario
-                myGlobal = MyClass.ConvertIntegerToBinaryString(N)
+                myGlobal = Utilities.ConvertIntegerToBinaryString(N)
                 Dim Nstr As String = CStr(myGlobal.SetDatos)
                 Dim Nstr2 As String = Nstr
 
@@ -2120,7 +2121,7 @@ Namespace Biosystems.Ax00.Global
                 '4-se realiza la suma final
                 Dim Sum As UInt64
                 For Each s As String In Sumatory2
-                    myGlobal = MyClass.ConvertBinaryStringToDecimal(s)
+                    myGlobal = Utilities.ConvertBinaryStringToDecimal(s)
                     Dim D As UInt64 = Convert.ToUInt64(myGlobal.SetDatos)
                     Sum += D
                 Next
@@ -2595,14 +2596,14 @@ Namespace Biosystems.Ax00.Global
 
                 'Process 32-bits, 4 at a time, or 8 rounds
 
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28)) ' Assumes 32-bit reg, masking index to 4-bits
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28)) '  0x04C11DB7 Polynomial used in STM32
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28)) ' Assumes 32-bit reg, masking index to 4-bits
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28)) '  0x04C11DB7 Polynomial used in STM32
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
 
                 Return pCRC
 
@@ -2651,7 +2652,7 @@ Namespace Biosystems.Ax00.Global
 
                                     'FinalData = Convert.ToInt32((DataLowLow << 24) Or (DataMediumLow << 16) Or (DataMediumHigh << 8) Or (DataHighHigh)) '// El micro de st tracta la posicio del bytes al reves
 
-                                    myCRCResult = MyClass.CRC32Fast(myCRCResult, FinalData) '// Per calcular el CRC igual que el STM32
+                                    myCRCResult = CRC32Fast(myCRCResult, FinalData) '// Per calcular el CRC igual que el STM32
 
                                 End If
                             End If
@@ -2661,13 +2662,6 @@ Namespace Biosystems.Ax00.Global
 
                 myGlobal.SetDatos = myCRCResult
 
-                'If myCRCResult <> &HFFFFFFFFUI Then
-                '    MyClass.CRC32DecimalAttr = myCRCResult
-                '    MyClass.CRC32HexAttr = MyClass.ConvertUint32ToHex(MyClass.CRC32DecimalAttr)
-                'Else
-                '    MyClass.CRC32DecimalAttr = 0
-                '    MyClass.CRC32HexAttr = "0x00000000"
-                'End If
 
             Catch ex As Exception
                 Throw ex
@@ -2681,7 +2675,7 @@ Namespace Biosystems.Ax00.Global
 
 #Region "FOR TESTING"
 
-        Public Shared Sub GetExceptionData(ByVal ex As Exception, ByRef pModule As String, ByRef pMethod As String, ByRef pLine As Integer, ByRef pColumn As Integer)
+        Public Sub GetExceptionData(ByVal ex As Exception, ByRef pModule As String, ByRef pMethod As String, ByRef pLine As Integer, ByRef pColumn As Integer)
             If ex IsNot Nothing Then
                 Dim ExTrace As System.Diagnostics.StackTrace = New System.Diagnostics.StackTrace(ex, True)
                 If ExTrace.GetFrames.Count > 0 Then
@@ -2695,5 +2689,6 @@ Namespace Biosystems.Ax00.Global
 
 #End Region
 
-    End Class
+    End Module
+
 End Namespace

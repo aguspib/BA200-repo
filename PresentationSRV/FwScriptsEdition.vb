@@ -416,7 +416,7 @@ Public Class FwScriptsEdition
         'Dim auxIconName As String = ""
         'Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             Dim auxIconName As String = ""

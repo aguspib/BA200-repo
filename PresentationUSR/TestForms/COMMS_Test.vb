@@ -480,9 +480,9 @@ Public Class bsReception
     End Sub
 
     Private Sub bsNewGUID_Click(sender As Object, e As EventArgs) Handles bsNewGUID.Click
-        Dim myUtils As New Utilities
+        'Dim myUtils As New Utilities
         Dim myGlobal As New GlobalDataTO
-        myGlobal = myUtils.GetNewGUID
+        myGlobal = Utilities.GetNewGUID
         If Not myGlobal.HasError Then
             MessageBox.Show(CType(myGlobal.SetDatos, String))
         Else

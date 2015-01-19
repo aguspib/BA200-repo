@@ -102,10 +102,10 @@ Public Class LIS_Test
 #Region "LIS"
 
     Private Sub BsButton1_Click(sender As Object, e As EventArgs) Handles BsButton1.Click
-        Dim myUtils As New Utilities
+        'Dim Utilities As New Utilities
         Dim ResultData As New GlobalDataTO
         Dim myXML As String = ""
-        Dim myGuid As String = CStr(myUtils.GetNewGUID.SetDatos)
+        Dim myGuid As String = CStr(Utilities.GetNewGUID.SetDatos)
 
         If EncodeComboBox.SelectedItem IsNot Nothing Then
             Select Case EncodeComboBox.SelectedItem.ToString

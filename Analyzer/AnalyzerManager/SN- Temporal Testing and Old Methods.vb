@@ -693,7 +693,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '                    'myPreparationID = CInt((From a In pInstructionReceived Where a.ParameterIndex = (4 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
         '                    'Read the preparation ID (parameter index = 4 + 5*i)
         '                    'TR 25/05/2010 implement the method to get a value through the index.
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (4 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (4 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myPreparationID = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For
@@ -728,7 +728,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '                        'myWellUsed = CInt((From a In pInstructionReceived Where a.ParameterIndex = (8 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
         '                        'Read the well used (parameter index 8) & inform it and the base line too
         '                        'TR 25/05/2010 implement the method to get a value through the index.
-        '                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (8 + (iteration - 1) * myOffset))
+        '                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (8 + (iteration - 1) * myOffset))
         '                        If Not myGlobal.HasError Then
         '                            myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                        Else : Exit For
@@ -779,7 +779,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '                    'AG 19/05/2010 - IF Reading number > than READING1.CYCLES.min --- reactioncomplete = TRUE
         '                    'myReadingRow.ReadingNumber = CInt((From a In pInstructionReceived Where a.ParameterIndex = (5 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
         '                    'TR 25/05/2010 implement the method to get a value through the index.
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (5 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (5 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myReadingRow.ReadingNumber = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For
@@ -797,14 +797,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '                    'Counts
         '                    'TR 25/05/2010 implement the method to get a value through the index.
         '                    'myReadingRow.MainCounts = CInt((From a In pInstructionReceived Where a.ParameterIndex = (6 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (6 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (6 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myReadingRow.MainCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For
         '                    End If
 
         '                    'myReadingRow.RefCounts = CInt((From a In pInstructionReceived Where a.ParameterIndex = (7 + (iteration - 1) * myOffset) Select a.ParameterValue).First)
-        '                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (7 + (iteration - 1) * myOffset))
+        '                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (7 + (iteration - 1) * myOffset))
         '                    If Not myGlobal.HasError Then
         '                        myReadingRow.RefCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
         '                    Else : Exit For

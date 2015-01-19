@@ -327,7 +327,7 @@ Public Class IHistoricalReports
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        'Dim myutil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             'DL 20/04/2012. Substitute icons and optimize
@@ -379,7 +379,7 @@ Public Class IHistoricalReports
             '    Dim myImage As Image
             '    myImage = Image.FromFile(iconPath & auxIconName)
 
-            '    myGlobal = myutil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myAuxImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else

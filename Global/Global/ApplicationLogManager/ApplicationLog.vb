@@ -13,12 +13,12 @@ Imports Biosystems.Ax00.Global.DAL
 Namespace Biosystems.Ax00.Global
 
     ''' <summary>
-    ''' Class than handle the Application log, create and insert logs
+    ''' Class to handle the Application log, create and insert logs
     ''' into an XML File Document, And/Or System Log.
     ''' </summary>
-    ''' <remarks></remarks>
-    Public MustInherit Class ApplicationLogManager
-        Inherits GlobalBase
+    ''' <remarks>This class needs to be converted to a Module</remarks>
+    Public Module ApplicationLogManager
+        'Inherits GlobalBase
 
 
 #Region "Declarations"
@@ -38,7 +38,7 @@ Namespace Biosystems.Ax00.Global
         ''' Created by: TR 03/07/2012
         ''' Modified by: SG 18/02/2013 - add Xml log file for database update version process
         ''' </remarks>
-        Public Shared Sub InsertLog(ByVal pApplicationLogTO As ApplicationLogTO)
+        Public Sub InsertLog(ByVal pApplicationLogTO As ApplicationLogTO)
             Dim myGlobalDataTO As New GlobalDataTO
             Try
 
@@ -69,7 +69,7 @@ Namespace Biosystems.Ax00.Global
         ''' <remarks>
         ''' Created by:  TR 03/07/2012
         ''' </remarks>
-        Public Shared Function Create(ByVal pApplicationLogTOList As List(Of ApplicationLogTO)) As GlobalDataTO
+        Public Function Create(ByVal pApplicationLogTOList As List(Of ApplicationLogTO)) As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Try
                 Dim myApplicationLogDAO As New tfmwApplicationLogDAO
@@ -90,7 +90,7 @@ Namespace Biosystems.Ax00.Global
         ''' <remarks>
         ''' Created by:  DL 07/03/2012
         ''' </remarks>
-        Public Shared Function DeleteAll() As GlobalDataTO
+        Public Function DeleteAll() As GlobalDataTO
             Dim myGlobalDataTO As GlobalDataTO = Nothing
             Try
                 Dim myApplicationLogDAO As New tfmwApplicationLogDAO
@@ -121,18 +121,18 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by: XB 28/05/2013 - Correction : Condition must done by Directory instead of File (bugstranking: # 1139)
         ''' AG 08/05/2014 - #1625 add protections for not return always error when exists files with not std name format (for example "Ax00Log_999.xml")
         ''' </remarks>
-        Private Shared Function ManageLogFiles(ByVal pCurrentDate As String, _
+        Private Function ManageLogFiles(ByVal pCurrentDate As String, _
                                         ByVal pLogMaxDays As Integer) As GlobalDataTO
 
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
-                Dim myLogPath As String = Application.StartupPath & XmlLogFilePath
+                Dim myLogPath As String = Application.StartupPath & GlobalBase.XmlLogFilePath
 
                 ' XBC+TR 03/10/2012 - Correction
                 'If Not File.Exists(Application.StartupPath & GlobalBase.XmlLogFilePath) Then
-                If Not Directory.Exists(Application.StartupPath & XmlLogFilePath) Then ' XB 28/05/2013 - Correction : condition must done by Directory instead of File
-                    Directory.CreateDirectory(Application.StartupPath & XmlLogFilePath)
+                If Not Directory.Exists(Application.StartupPath & GlobalBase.XmlLogFilePath) Then ' XB 28/05/2013 - Correction : condition must done by Directory instead of File
+                    Directory.CreateDirectory(Application.StartupPath & GlobalBase.XmlLogFilePath)
                 End If
                 ' XBC+TR 03/10/2012 - Correction
 
@@ -170,20 +170,20 @@ Namespace Biosystems.Ax00.Global
 
                     If (fileDate <> pCurrentDate) Then
                         'Create the TEMP Folder to move all XMLLog Files to compress
-                        Dim myUtils As New Utilities
+                        'Dim myUtils As New Utilities
                         Dim myTempFolder As String = myLogPath & TEMP_FOLDER 'DL 04/06/2013
 
                         'TR 05/09/2012 -Change File Exist by Directory exist to validate if the TEMP folder exist.
-                        If (Directory.Exists(myTempFolder)) Then myGlobalDataTO = myUtils.RemoveFolder(myTempFolder)
-                        If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = myUtils.CreateFolder(myTempFolder)
+                        If (Directory.Exists(myTempFolder)) Then myGlobalDataTO = Utilities.RemoveFolder(myTempFolder)
+                        If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = Utilities.CreateFolder(myTempFolder)
 
                         'If the ZIP File already exists, extract in the TEMP Folder all Log Files it contains and delete the ZIP File
                         If (Not myGlobalDataTO.HasError) Then
                             If (File.Exists(myLogPath & PREVIOUS_LOG_ZIP)) Then
-                                myGlobalDataTO = myUtils.ExtractFromZip(myLogPath & PREVIOUS_LOG_ZIP, myTempFolder & "\")
+                                myGlobalDataTO = Utilities.ExtractFromZip(myLogPath & PREVIOUS_LOG_ZIP, myTempFolder & "\")
                                 If (Not myGlobalDataTO.HasError) Then
                                     If myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.ZIP_ERROR.ToString Then
-                                        myGlobalDataTO = myUtils.MoveFiles(myLogPath, myTempFolder & "\", PREVIOUS_LOG_ZIP, CORRUPTED_LOG_ZIP)
+                                        myGlobalDataTO = Utilities.MoveFiles(myLogPath, myTempFolder & "\", PREVIOUS_LOG_ZIP, CORRUPTED_LOG_ZIP)
                                     Else
                                         Kill(myLogPath & PREVIOUS_LOG_ZIP)
                                     End If
@@ -212,7 +212,7 @@ Namespace Biosystems.Ax00.Global
                                 ''DL 01/06/2013. Add only files witch days elapsed are lower than MAX_DAYS_IN_PREVIOUSLOG
                                 'If currentday.Subtract(endday).Days <= pLogMaxDays Then
                                 '    'AG 04/06/2013 - Do not move nothing, there already are in Temp Folder
-                                '    'myGlobalDataTO = myUtils.MoveFiles(myLogPath, myTempFolder & "\", myXmlFile)
+                                '    'myGlobalDataTO = Utilities.MoveFiles(myLogPath, myTempFolder & "\", myXmlFile)
 
                                 '    ''Delete the XML file
                                 '    'If (Not myGlobalDataTO.HasError) Then File.Delete(myLogPath & "\" & myXmlFile)
@@ -247,14 +247,14 @@ Namespace Biosystems.Ax00.Global
 
                         'AG 04/06/2013 - Move all xml from logFolder to Temp folder
                         For Each myLogFile In myLogFilesList
-                            myGlobalDataTO = myUtils.MoveFiles(myLogPath, myTempFolder & "\", myLogFile.ToString)
+                            myGlobalDataTO = Utilities.MoveFiles(myLogPath, myTempFolder & "\", myLogFile.ToString)
                         Next
                         'AG 04/06/2013
 
                         'Finally, create a new ZIP File, compress all Files in the TEMP Folder (xml and CorruptedLog.zip (if exists) ), and remove the TEMP Folder
                         If (Not myGlobalDataTO.HasError) Then
-                            myGlobalDataTO = myUtils.CompressToZip(myLogPath & TEMP_FOLDER & "\", myLogPath & PREVIOUS_LOG_ZIP)
-                            If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = myUtils.RemoveFolder(myLogPath & TEMP_FOLDER)
+                            myGlobalDataTO = Utilities.CompressToZip(myLogPath & TEMP_FOLDER & "\", myLogPath & PREVIOUS_LOG_ZIP)
+                            If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = Utilities.RemoveFolder(myLogPath & TEMP_FOLDER)
                         End If
                     Else
                         'AG 08/05/2014 - #1625 add protection against user file rename
@@ -334,7 +334,7 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by: DL 31/05/2013 - Add new parameter pLogMaxDays - Copy into PreviousLog.zin only those xml files in list pxmlList witch days elapsed are lower than MAX_DAYS_IN_PREVIOUSLOG
         ''' AG 08/05/2014 #1625 fix error in code v300 (do not use "Ax00Log_999.xml" it is not the std name instead of it use "Ax00Log_YYYYMMDD_999.xml"
         ''' </remarks>
-        Public Shared Function ExportLogToXml(ByVal pWorkSessionID As String, _
+        Public Function ExportLogToXml(ByVal pWorkSessionID As String, _
                                        ByVal pLogMaxDays As Integer) As GlobalDataTO
 
             Dim myGlobalDataTO As GlobalDataTO = Nothing
@@ -342,7 +342,7 @@ Namespace Biosystems.Ax00.Global
             Try
                 'Get the date part for the identifier of the active WorkSession
                 Dim wsDatePart As String = pWorkSessionID.Substring(0, 8)
-                Dim myLogPath As String = Application.StartupPath & XmlLogFilePath
+                Dim myLogPath As String = Application.StartupPath & GlobalBase.XmlLogFilePath
                 Dim myFileName As String
 
                 'Search the name of the next XML file to create, and verify if XML files from previous days have to be moved to a zip file
@@ -389,8 +389,8 @@ Namespace Biosystems.Ax00.Global
 
 #Region "UPDATE VERSION"
 
-        Private Shared LockObject As Object 'RH 26/03/2012
-        Private Shared ReadOnly myUpdateLogPath As String = Application.StartupPath & My.Settings.PreviousFolder & UpdateLogFile
+        Private LockObject As Object 'RH 26/03/2012
+        Private ReadOnly myUpdateLogPath As String = Application.StartupPath & My.Settings.PreviousFolder & GlobalBase.UpdateLogFile
 
 
         'Public Sub InsertUpdateVersionLog(ByVal MyApplicationLogTO As ApplicationLogTO)
@@ -405,7 +405,7 @@ Namespace Biosystems.Ax00.Global
         '''' <remarks>
         '''' Created by SG 18/02/2013 - for Update Version Error Log
         '''' </remarks>
-        Private Shared Sub InsertUpdateVersionLog(ByVal MyApplicationLogTO As ApplicationLogTO)
+        Private Sub InsertUpdateVersionLog(ByVal MyApplicationLogTO As ApplicationLogTO)
             'Try
 
             LockObject = New Object
@@ -449,7 +449,7 @@ Namespace Biosystems.Ax00.Global
         '''' Initialize the LogWiter control writing in the Log file Xml.
         '''' </summary>
         '''' <remarks>Created by SG 18/02/2013</remarks>
-        Private Shared Sub InitUpdateVersionLogFile()
+        Private Sub InitUpdateVersionLogFile()
 
             If Not Directory.Exists(Application.StartupPath & My.Settings.PreviousFolder) Then
                 Directory.CreateDirectory(Application.StartupPath & My.Settings.PreviousFolder)
@@ -478,5 +478,5 @@ Namespace Biosystems.Ax00.Global
 
 #End Region
 
-    End Class
+    End Module
 End Namespace

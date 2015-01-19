@@ -122,14 +122,14 @@ Public Class FwAdjustmentsDelegate
         Try
 
 
-            resultData = MyClass.ConvertDSToString()
+            resultData = Me.ConvertDSToString()
             If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                 Dim myText As String = CType(resultData.SetDatos, String)
 
                 'Dim myGlobalbase As New GlobalBase
                 Dim myPath As String
 
-                Dim myHeader As String = MyClass.MakeAdjustmentsFileHeader()
+                Dim myHeader As String = Me.MakeAdjustmentsFileHeader()
 
                 myText = myHeader & myText
 
@@ -158,7 +158,7 @@ Public Class FwAdjustmentsDelegate
                 myStreamWriter.Close()
 
                 If pEncrypt Then
-                    resultData = MyClass.EncryptAdjustmentsFile(myPath)
+                    resultData = Me.EncryptAdjustmentsFile(myPath)
                 End If
 
                 resultData.SetDatos = myPath
@@ -191,7 +191,7 @@ Public Class FwAdjustmentsDelegate
     Public Function EncryptAdjustmentsFile(ByVal pTextPath As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Try
 
@@ -205,7 +205,7 @@ Public Class FwAdjustmentsDelegate
 
                 If File.Exists(pTextPath) Then
 
-                    myGlobal = myUtil.EncryptFile(pTextPath, myCryptFilePath)
+                    myGlobal = Utilities.EncryptFile(pTextPath, myCryptFilePath)
                 Else
                     Throw New FileNotFoundException
                 End If
@@ -230,7 +230,7 @@ Public Class FwAdjustmentsDelegate
 
         Dim myGlobal As New GlobalDataTO
         'Dim objReader As System.IO.StreamReader
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Try
             'Dim myData As String
@@ -238,7 +238,7 @@ Public Class FwAdjustmentsDelegate
             Dim myTempDirPath As String = New FileInfo(pCryptFilePath).DirectoryName
             If Not myTempDirPath.EndsWith("\") Then myTempDirPath &= "\"
             Dim myDecryptFilePath As String = myTempDirPath & FileName.Replace(FwAdjustmentsDelegate.AdjustmentCryptedFileExtension, FwAdjustmentsDelegate.AdjustmentDecryptedFileExtension)
-            myGlobal = myUtil.DecryptFile(pCryptFilePath, myDecryptFilePath)
+            myGlobal = Utilities.DecryptFile(pCryptFilePath, myDecryptFilePath)
 
             If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                 If Not File.Exists(myDecryptFilePath) Then
@@ -520,7 +520,7 @@ Public Class FwAdjustmentsDelegate
             myAdjustmentsDS.AcceptChanges()
 
             'export the updated data to the external file
-            resultData = MyClass.ExportDSToFile(pAnalyzerID)
+            resultData = Me.ExportDSToFile(pAnalyzerID)
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                 resultData.SetDatos = myAdjustmentsDS
             End If
@@ -701,10 +701,10 @@ Public Class FwAdjustmentsDelegate
     'Public Function ConvertReceivedDataToDS(ByVal pAdjustmentsData As String) As GlobalDataTO
     '    Dim resultData As New GlobalDataTO
     '    Dim CopyOfAdjustmentsDS As SRVAdjustmentsDS = myAdjustmentsDS
-    '    Dim myUtil As New Utilities
+    '    'Dim myUtil As New Utilities.
     '    Try
 
-    '        resultData = myUtil.ConvertAdjustmentsTextToDS(pAdjustmentsData)
+    '        resultData = Utilities.ConvertAdjustmentsTextToDS(pAdjustmentsData)
 
     '        If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
 
@@ -743,7 +743,7 @@ Public Class FwAdjustmentsDelegate
         Try
 
             'SGM 01/11/2011
-            resultData = MyClass.Clone(MyClass.myAdjustmentsDS)
+            resultData = Me.Clone(Me.myAdjustmentsDS)
             If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                 CopyOfAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
 
@@ -877,12 +877,12 @@ Public Class FwAdjustmentsDelegate
                     resultData.SetDatos = CopyOfAdjustmentsDS
 
                     'SGM 01/11/2011
-                    resultData = MyClass.Clone(CopyOfAdjustmentsDS)
+                    resultData = Me.Clone(CopyOfAdjustmentsDS)
                     If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                         If pExternalDS IsNot Nothing Then
                             pExternalDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
                         Else
-                            MyClass.myAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
+                            Me.myAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
                         End If
                     End If
 

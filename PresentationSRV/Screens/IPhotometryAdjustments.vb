@@ -552,7 +552,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareButtons()
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -630,7 +630,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -639,7 +639,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsTestButton.Image = myImage
             '    BsTestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -648,7 +648,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("EDIT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1DacsReferenceButton.Image = myImage
             '    BsStep1DacsReferenceButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -657,7 +657,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITSaveButton.Image = myImage
             '    BsStep1ITSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -666,7 +666,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("UNDO")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITExitButton.Image = myImage
             '    BsStep1ITExitButton.ImageAlign = ContentAlignment.MiddleCenter
             '    'BsStep1ITExitButton.BackgroundImageLayout = ImageLayout.Stretch
@@ -693,7 +693,7 @@ Public Class IPhotometryAdjustments
 
             Dim myNewNGImage As Bitmap = Nothing
             Dim myNGImage As Image = Nothing
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Dim myGlobal As New GlobalDataTO
 
             ' Icons used to informate about warning Limits into ListViews PhMain & PhRef and also Intesities of the LEDs
@@ -704,7 +704,7 @@ Public Class IPhotometryAdjustments
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 myNGImage = Image.FromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myClearImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -718,7 +718,7 @@ Public Class IPhotometryAdjustments
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 myNGImage = Image.FromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myWarningImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -733,7 +733,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("UPDOWN") ' UPDOWNROW
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myImage = CType(myGlobal.SetDatos, Image)
             '    End If

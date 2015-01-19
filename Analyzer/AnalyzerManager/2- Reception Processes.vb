@@ -52,7 +52,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
@@ -72,7 +72,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myStatusValue As AnalyzerManagerStatus = AnalyzerManagerStatus.NONE
                 ' AG+XBC 24/05/2012
 
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -97,7 +97,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' Get Action field (parameter index 4)
                 Dim myActionValue As AnalyzerManagerAx00Actions = AnalyzerManagerAx00Actions.NO_ACTION
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -184,7 +184,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 25/10/2010 - Get Time field (parameter index 5)
                 Dim myExpectedTime As Integer = WAITING_TIME_OFF 'If no request .... get the estimated time and activate the waiting timer
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -203,7 +203,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' Get Well field (parameter index 7)
                 Dim myWellValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -219,7 +219,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' Get Request field (parameter index 8)
                 Dim myRequestValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -288,7 +288,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' Get Error field (parameter index 9)
                 Dim errorValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -471,7 +471,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 23/11/2011 - Get ISE field (parameter index 10) also ISEModuleIsReadyAttribute is updated using the Fw information send
                 Dim ISEAvailableValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1228,7 +1228,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim query As New List(Of InstructionParameterTO)
                         'Const myRowIndex As Integer = 0
                         Dim myOffset As Integer = -1
-                        Dim myUtility As New Utilities()
+                        'Dim Utilities As New Utilities()
                         Dim nextBaseLineID As Integer = 0
                         Dim myInstructionType As String = ""
                         Dim myWell As Integer = 0
@@ -1236,7 +1236,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim baseLineWithAdjust As Boolean = False
 
                         'AG 03/01/2011 - Get the instruction type value. to set the offset.
-                        myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 2)
+                        myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 2)
 
                         If Not myGlobalDataTO.HasError Then
                             myInstructionType = DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue
@@ -1288,7 +1288,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myBaseLineRow.DateTime = DateTime.Now
 
                                 'Get the Wavelenght
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     myBaseLineRow.Wavelength = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
                                 Else
@@ -1296,7 +1296,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'MainLine
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.MainLight = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1306,7 +1306,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'RefLight
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.RefLight = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1316,7 +1316,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'MainDark
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.MainDark = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1326,7 +1326,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'RefDark
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.RefDark = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -1336,7 +1336,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'IT
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.IT = CType(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -1346,7 +1346,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     Exit For
                                 End If
                                 'DAC
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         myBaseLineRow.DAC = CType(DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -1648,12 +1648,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 '1- Read the different instruction fields (implement in the same way as we do for instance at ProcessStatusReceived)
                 '   and fill the internal alarm & alarm status lists using the method PrepareLocalAlarmList 
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 ' Get error number field
                 Dim errorNumber As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1671,7 +1671,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myErrorCode As New List(Of Integer)
 
                 For i As Integer = 1 To errorNumber
-                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3 + i)
+                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3 + i)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Else
@@ -1831,7 +1831,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim dbConnection As SqlConnection = Nothing
 
             Try
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
 
@@ -1840,7 +1840,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '*******************************************************'
                 'Get Instruction field (parameter index 2)
                 Dim myInst As String = String.Empty
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 2)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 2)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1850,7 +1850,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Get Preparation Identifier field (ID, parameter index 3)
                 Dim myPrepID As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1862,7 +1862,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Get Well Number field (W, parameter index 4)
                 Dim myWell As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1874,7 +1874,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Get Well Status field (S, parameter index 5)
                 Dim myWellStatus As String = ""
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1884,7 +1884,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Get Bottle Position  field (P, parameter index 6)
                 Dim myBottlePos As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1896,7 +1896,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Get Level Control field (L, parameter index 7)
                 Dim myLevelControl As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -1912,7 +1912,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myRotorName = "SAMPLES"
 
                     'Get Clot Status field (C, parameter index 8)
-                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Else
@@ -2769,7 +2769,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
 
 
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
                 Dim mySensors As New Dictionary(Of AnalyzerSensors, Single) 'Local structure
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
@@ -2781,7 +2781,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Get General cover (parameter index 3)
                 Dim myIntValue As Integer = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2795,7 +2795,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Get Photometrics (Reaccions) cover (parameter index 4)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2809,7 +2809,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Get Reagents (Fridge) cover (parameter index 5)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2823,7 +2823,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Get Samples cover (parameter index 6)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2837,7 +2837,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Get System liquid sensor (parameter index 7)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2851,7 +2851,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Get Waste sensor (parameter index 8)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2865,7 +2865,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Get Weight sensors (wash solution & high contamination waste) (parameter index 9, 10)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2877,7 +2877,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     mySensors.Add(AnalyzerSensors.BOTTLE_WASHSOLUTION, CSng(myIntValue))
                 End If
 
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2892,7 +2892,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'Get Temperature Reactions
                 Dim mySingleValue As Single = 0
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 11)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 11)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2902,7 +2902,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'If IsNumeric(myInstParamTO.ParameterValue) Then    
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
                     mySensors.Add(AnalyzerSensors.TEMPERATURE_REACTIONS, mySingleValue)
                 Else
                     'Dim myLogAcciones2 As New ApplicationLogManager()
@@ -2910,7 +2910,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Get Temperature fridge
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 13)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 13)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2920,7 +2920,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
                     mySensors.Add(AnalyzerSensors.TEMPERATURE_FRIDGE, mySingleValue)
                 Else
                     'Dim myLogAcciones2 As New ApplicationLogManager()
@@ -2928,7 +2928,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Get Temperature Washing station heater
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 14)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 14)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2938,7 +2938,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
                     mySensors.Add(AnalyzerSensors.TEMPERATURE_WASHINGSTATION, mySingleValue)
                 Else
                     'Dim myLogAcciones2 As New ApplicationLogManager()
@@ -2946,7 +2946,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Get Temperature R1 probe
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 15)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 15)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2956,7 +2956,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
                     mySensors.Add(AnalyzerSensors.TEMPERATURE_R1, mySingleValue)
                 Else
                     'Dim myLogAcciones2 As New ApplicationLogManager()
@@ -2964,7 +2964,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Get Temperature R2 probe
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 16)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 16)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2974,7 +2974,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'If IsNumeric(myInstParamTO.ParameterValue) Then
                 If Double.TryParse(myInstParamTO.ParameterValue, NumberStyles.Any, CultureInfo.InvariantCulture, New Double) Then
                     'mySingleValue = CSng(myInstParamTO.ParameterValue)
-                    mySingleValue = myUtilities.FormatToSingle(myInstParamTO.ParameterValue)
+                    mySingleValue = Utilities.FormatToSingle(myInstParamTO.ParameterValue)
                     mySensors.Add(AnalyzerSensors.TEMPERATURE_R2, mySingleValue)
                 Else
                     'Dim myLogAcciones2 As New ApplicationLogManager()
@@ -2982,7 +2982,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Get Fridge status (parameter index 12)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 12)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 12)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -2995,7 +2995,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Get ISE status (parameter index 17)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 17)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 17)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -3205,12 +3205,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'AG 11/10/2011
 
                         Dim errorFlag As Boolean = True
-                        Dim myUtilities As New Utilities
+                        'Dim Utilities As New Utilities
                         Dim myInstParamTO As New InstructionParameterTO
 
                         'Get Reader selector (parameter index 3)
                         Dim rotorSelected As Integer = 0
-                        myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -3228,7 +3228,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'Get Status (parameter index 4)
                         Dim barCodeStatus As Integer = 0
-                        myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -3246,7 +3246,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'Get Number of Reads (parameter index 5)
                         Dim readsNumber As Integer = 0
-                        myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -3357,7 +3357,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 For itera As Integer = 0 To readsNumber - 1
                                     'Get Number of Reads (parameter index 6)
                                     Dim readPosition As Integer = 0
-                                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6 + itera * offset)
+                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + itera * offset)
                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -3374,7 +3374,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     'Get diagnostics (parameter index 7)
                                     Dim diagnostics As Integer = 0
-                                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7 + itera * offset)
+                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + itera * offset)
                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -3391,7 +3391,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     'Get value (parameter index 8)
                                     Dim value As String = String.Empty
-                                    myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8 + itera * offset)
+                                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + itera * offset)
                                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                         myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 

@@ -1744,7 +1744,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myPhotometryDataTO As PhotometryDataTO = Nothing
             Try
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
 
                 ' Serialize PhotometryDataTO / save value of the current test executed
                 myResultData = myFwScriptDelegate.AnalyzerManager.ReadPhotometryData()
@@ -1752,7 +1752,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
                     myPhotometryDataTO.AnalyzerID = pAnalyzerID
                     AnalyzerId = pAnalyzerID
-                    myResultData = myUtility.Serialize(myPhotometryDataTO, pPath)
+                    myResultData = Utilities.Serialize(myPhotometryDataTO, pPath)
                 End If
 
                 If Not myResultData.HasError Then
@@ -1820,10 +1820,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Dim myPhotometryDataTO As New PhotometryDataTO
             Try
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
 
                 ' Serialitze PhotometryDataTO / save value of the current test executed
-                myResultData = myUtility.DeSerialize(myPhotometryDataTO, pPath)
+                myResultData = Utilities.DeSerialize(myPhotometryDataTO, pPath)
                 If (Not myResultData.HasError And Not myResultData.SetDatos Is Nothing) Then
                     myPhotometryDataTO = DirectCast(myResultData.SetDatos, PhotometryDataTO)
                     myResultData = myFwScriptDelegate.AnalyzerManager.SetPhotometryData(myPhotometryDataTO)
@@ -1935,7 +1935,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String
                 Dim text2 As String
                 Dim text3 As String
@@ -1959,7 +1959,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 ' Well used for the test
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WELL_USED", pcurrentLanguage) + ": "
                                 text1 += CSng(pData.Substring(j, 3)).ToString("##0")
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 3
 
                                 ' Filling option used for the test
@@ -1969,7 +1969,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MANUALLY_FILL", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 Dim numLeds As Integer
@@ -1979,7 +1979,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 '' Integration Time common (x all Leds)
                                 'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTEGRATION_TIME", pcurrentLanguage) + ": "
                                 'text1 += CSng(pData.Substring(18, 5)).ToString("##,##0")
-                                'text += myUtility.FormatLineHistorics(text1)
+                                'text += Utilities.FormatLineHistorics(text1)
 
                                 Dim darkPhMain As String
                                 Dim darkPhRef As String
@@ -1995,7 +1995,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 'Else
                                 '    text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NO", pcurrentLanguage)
                                 'End If
-                                'text += myUtility.FormatLineHistorics(text1)
+                                'text += Utilities.FormatLineHistorics(text1)
                                 'j += 1
 
                                 For i As Integer = 0 To numLeds - 1
@@ -2017,7 +2017,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                     text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2027,7 +2027,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                     text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2037,7 +2037,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTENSITY", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("##,##0").Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("##,##0").Replace("+", "").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("##,##0").Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2068,7 +2068,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                             text1 = ReportInfo(k)(t).ToString
                                             text2 = ReportInfo(k + 1)(t).ToString
                                             text3 = ReportInfo(k + 2)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1, text2, text3)
+                                            text += Utilities.FormatLineHistorics(text1, text2, text3)
                                         Next
 
                                         k += 2
@@ -2078,7 +2078,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         For t As Integer = 0 To ReportInfo(k).Count - 1
                                             text1 = ReportInfo(k)(t).ToString
                                             text2 = ReportInfo(k + 1)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1, text2)
+                                            text += Utilities.FormatLineHistorics(text1, text2)
                                         Next
                                         k += 1
                                     Else
@@ -2086,7 +2086,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                                         For t As Integer = 0 To ReportInfo(k).Count - 1
                                             text1 = ReportInfo(k)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1)
+                                            text += Utilities.FormatLineHistorics(text1)
                                         Next
                                     End If
 
@@ -2096,24 +2096,24 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text += Environment.NewLine
                                 ' Darkness Results
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_DARKNESS", pcurrentLanguage) + ": "
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                                 ' PhMain Dark Counts Mean
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - darkPhMain.Replace("+", "").Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - darkPhMain.Replace("+", "").Length)
                                 text1 += darkPhMain.Replace("+", "")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 ' PhRef Dark Counts Mean
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - darkPhRef.Replace("+", "").Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - darkPhRef.Replace("+", "").Length)
                                 text1 += darkPhRef.Replace("+", "")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                             Case "REPEAT", "STAB"
 
@@ -2121,7 +2121,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 ' Well used for the test
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WELL_USED", pcurrentLanguage) + ": "
                                 text1 += CSng(pData.Substring(j, 3)).ToString("##0")
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 3
 
                                 ' Filling option used for the test
@@ -2131,7 +2131,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MANUALLY_FILL", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 Dim numLeds As Integer
@@ -2158,7 +2158,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pcurrentLanguage) + ": " 'JB 01/10/2012 - Resource String unification
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
                                     text1 += pData.Substring(j, 7).ToString().Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2168,7 +2168,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SDevShort", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
                                     text1 += pData.Substring(j, 7).ToString().Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2178,7 +2178,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CoefShort", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
                                     text1 += pData.Substring(j, 7).ToString().Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2188,7 +2188,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MaxShort", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
                                     text1 += pData.Substring(j, 7).ToString().Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2198,7 +2198,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MinShort", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
                                     text1 += pData.Substring(j, 7).ToString().Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2208,7 +2208,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
                                     text1 += pData.Substring(j, 7).ToString().Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2229,7 +2229,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                             text1 = ReportInfo(k)(t).ToString
                                             text2 = ReportInfo(k + 1)(t).ToString
                                             text3 = ReportInfo(k + 2)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1, text2, text3)
+                                            text += Utilities.FormatLineHistorics(text1, text2, text3)
                                         Next
 
                                         k += 2
@@ -2239,7 +2239,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         For t As Integer = 0 To ReportInfo(k).Count - 1
                                             text1 = ReportInfo(k)(t).ToString
                                             text2 = ReportInfo(k + 1)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1, text2)
+                                            text += Utilities.FormatLineHistorics(text1, text2)
                                         Next
                                         k += 1
                                     Else
@@ -2247,7 +2247,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                                         For t As Integer = 0 To ReportInfo(k).Count - 1
                                             text1 = ReportInfo(k)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1)
+                                            text += Utilities.FormatLineHistorics(text1)
                                         Next
                                     End If
 
@@ -2259,90 +2259,90 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text += Environment.NewLine
                                 ' Darkness Results
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_DARKNESS", pcurrentLanguage) + ": "
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
                                 text2 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
-                                text += myUtility.FormatLineHistorics(text1, text2)
+                                text += Utilities.FormatLineHistorics(text1, text2)
 
                                 ' Mean dark
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pcurrentLanguage) + ": " 'JB 01/10/2012 - Resource String unification
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "")
 
                                 text2 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pcurrentLanguage) + ": " 'JB 01/10/2012 - Resource string unnification
 
                                 ' alignment...
-                                text2 += myUtility.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text2 += Utilities.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text2 += CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "")
 
-                                text += myUtility.FormatLineHistorics(text1, text2)
+                                text += Utilities.FormatLineHistorics(text1, text2)
                                 j += 7
 
                                 ' Std. Deviation dark
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SDevResult", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("##,##0").Replace("+", "").Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("##,##0").Replace("+", "").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("##,##0").Replace("+", "")
 
                                 text2 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SDevResult", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text2 += myUtility.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 5)).ToString("##,##0").Replace("+", "").Length)
+                                text2 += Utilities.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 5)).ToString("##,##0").Replace("+", "").Length)
                                 text2 += CSng(pData.Substring(j + 33, 5)).ToString("##,##0").Replace("+", "")
 
-                                text += myUtility.FormatLineHistorics(text1, text2)
+                                text += Utilities.FormatLineHistorics(text1, text2)
                                 j += 5
 
                                 ' Max value dark
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MaxShort", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "")
 
                                 text2 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MaxShort", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text2 += myUtility.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text2 += Utilities.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text2 += CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "")
 
-                                text += myUtility.FormatLineHistorics(text1, text2)
+                                text += Utilities.FormatLineHistorics(text1, text2)
                                 j += 7
 
                                 ' Min value dark
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MinShort", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "")
 
                                 text2 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MinShort", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text2 += myUtility.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text2 += Utilities.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text2 += CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "")
 
-                                text += myUtility.FormatLineHistorics(text1, text2)
+                                text += Utilities.FormatLineHistorics(text1, text2)
                                 j += 7
 
                                 ' Range dark
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0").Replace("+", "")
 
                                 text2 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text2 += myUtility.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
+                                text2 += Utilities.SetSpaces(22 - text2.Length - 1 - CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "").Length)
                                 text2 += CSng(pData.Substring(j + 33, 7)).ToString("#,###,##0").Replace("+", "")
 
-                                text += myUtility.FormatLineHistorics(text1, text2)
+                                text += Utilities.FormatLineHistorics(text1, text2)
 
 
                             Case "ABS"
@@ -2351,7 +2351,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 ' Well used for the test
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_WELL_USED", pcurrentLanguage) + ": "
                                 text1 += CSng(pData.Substring(j, 3)).ToString("##0")
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 3
 
                                 ' Filling option used for the test
@@ -2361,7 +2361,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MANUALLY_FILL", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 Dim numLeds As Integer
@@ -2388,7 +2388,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pcurrentLanguage) + ": " 'JB 01/10/2012 - Resource string unification
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
+                                    text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 7).Replace("+", "").Length)
                                     text1 += pData.Substring(j, 7).ToString().Replace("+", "")
 
                                     ReportInfo(UBound(ReportInfo)).Add(text1)
@@ -2410,7 +2410,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                             text1 = ReportInfo(k)(t).ToString
                                             text2 = ReportInfo(k + 1)(t).ToString
                                             text3 = ReportInfo(k + 2)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1, text2, text3)
+                                            text += Utilities.FormatLineHistorics(text1, text2, text3)
                                         Next
 
                                         k += 2
@@ -2420,7 +2420,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         For t As Integer = 0 To ReportInfo(k).Count - 1
                                             text1 = ReportInfo(k)(t).ToString
                                             text2 = ReportInfo(k + 1)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1, text2)
+                                            text += Utilities.FormatLineHistorics(text1, text2)
                                         Next
                                         k += 1
                                     Else
@@ -2428,7 +2428,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                                         For t As Integer = 0 To ReportInfo(k).Count - 1
                                             text1 = ReportInfo(k)(t).ToString
-                                            text += myUtility.FormatLineHistorics(text1)
+                                            text += Utilities.FormatLineHistorics(text1)
                                         Next
                                     End If
 
@@ -4201,7 +4201,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text1 += CSng(pData.Substring(19, 3)).ToString("##0") + ":"
         'text2 += CSng(pData.Substring(44, 3)).ToString("##0") + ":"
         'text3 += CSng(pData.Substring(69, 3)).ToString("##0") + ":"
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' PhMain BL Counts wavelenghts 1, 2, 3
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
@@ -4210,7 +4210,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(47, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(72, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' PhRef BL Counts wavelenghts 1, 2, 3
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
@@ -4219,7 +4219,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(55, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(80, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Current intensity wavelenghts 1, 2, 3
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTENSITY", pcurrentLanguage) + ": "
@@ -4228,7 +4228,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(63, 5)).ToString("##,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTENSITY", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(88, 5)).ToString("##,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Warnings wavelenghts 1, 2, 3
         'If pData.Substring(29, 1) = "1" Or pData.Substring(37, 1) = "1" Or pData.Substring(43, 1) = "1" Then
@@ -4246,7 +4246,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'Else
         '    text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_OK", pcurrentLanguage)
         'End If
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
 
         'text += Environment.NewLine
@@ -4257,7 +4257,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text1 += CSng(pData.Substring(94, 3)).ToString("##0") + ":"
         'text2 += CSng(pData.Substring(119, 3)).ToString("##0") + ":"
         'text3 += CSng(pData.Substring(144, 3)).ToString("##0") + ":"
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' PhMain BL Counts wavelenghts 4, 5, 6
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
@@ -4266,7 +4266,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(122, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(147, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' PhRef BL Counts wavelenghts 4, 5, 6
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
@@ -4275,7 +4275,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(130, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(155, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Current intensity wavelenghts 4, 5, 6
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTENSITY", pcurrentLanguage) + ": "
@@ -4284,7 +4284,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(138, 5)).ToString("##,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTENSITY", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(163, 5)).ToString("##,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Warnings wavelenghts 4, 5, 6
         'If pData.Substring(104, 1) = "1" Or pData.Substring(112, 1) = "1" Or pData.Substring(118, 1) = "1" Then
@@ -4302,7 +4302,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'Else
         '    text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_OK", pcurrentLanguage)
         'End If
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
 
         'text += Environment.NewLine
@@ -4313,7 +4313,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text1 += CSng(pData.Substring(169, 3)).ToString("##0") + ":"
         'text2 += CSng(pData.Substring(194, 3)).ToString("##0") + ":"
         'text3 += CSng(pData.Substring(219, 3)).ToString("##0") + ":"
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' PhMain BL Counts wavelenghts 7, 8, 9
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
@@ -4322,7 +4322,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(197, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(222, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' PhRef BL Counts wavelenghts 7, 8, 9 
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
@@ -4331,7 +4331,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(205, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(230, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Current intensity wavelenghts 7, 8, 9
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTENSITY", pcurrentLanguage) + ": "
@@ -4340,7 +4340,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(213, 5)).ToString("##,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_INTENSITY", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(238, 5)).ToString("##,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Warnings wavelenghts 7, 8, 9
         'If pData.Substring(179, 1) = "1" Or pData.Substring(187, 1) = "1" Or pData.Substring(193, 1) = "1" Then
@@ -4358,7 +4358,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'Else
         '    text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_OK", pcurrentLanguage)
         'End If
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
 
 
@@ -4371,7 +4371,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '' Darkness Results
         'text2 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode1", pcurrentLanguage) + ": "
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Photodiode2", pcurrentLanguage) + ": "
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' LIGHT Results
         '' Mean
@@ -4382,7 +4382,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(49, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", pcurrentLanguage) + ": " 'JB 01/10/2012 - Resource String unification
         'text3 += CSng(pData.Substring(82, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Std. Deviation
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SDevResult", pcurrentLanguage) + ": "
@@ -4392,12 +4392,12 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(56, 5)).ToString("##,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SDevResult", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(89, 5)).ToString("##,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Coef. Variation
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CDevResult", pcurrentLanguage) + ": "
         'text1 += pData.Substring(21, 7).ToString()
-        'text += myUtility.FormatLineHistorics(text1)
+        'text += Utilities.FormatLineHistorics(text1)
 
         '' Max value
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MaxValue", pcurrentLanguage) + ": "
@@ -4407,7 +4407,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(61, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MaxValue", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(94, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Min value
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MinValue", pcurrentLanguage) + ": "
@@ -4417,7 +4417,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(68, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MinValue", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(101, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         '' Range
         'text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pcurrentLanguage) + ": "
@@ -4427,7 +4427,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         'text2 += CSng(pData.Substring(75, 7)).ToString("#,###,##0")
         'text3 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Range", pcurrentLanguage) + ": "
         'text3 += CSng(pData.Substring(108, 7)).ToString("#,###,##0")
-        'text += myUtility.FormatLineHistorics(text1, text2, text3)
+        'text += Utilities.FormatLineHistorics(text1, text2, text3)
 
         ' ******************************************
 #End Region

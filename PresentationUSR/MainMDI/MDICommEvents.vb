@@ -857,9 +857,9 @@ Partial Public Class IAx00MainMDI
 
                 'Obtain needed fw version
                 Dim mySwVersion As String
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities.
 
-                myGlobal = myUtil.GetSoftwareVersion()
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     mySwVersion = myGlobal.SetDatos.ToString
 

@@ -410,9 +410,9 @@ Public Class ILISUtilities
     Private Function SetTraceLevel() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
         Try
-            Dim myUtilities As New Utilities
+            'Dim myUtilities As New Utilities
 
-            myGlobalDataTO = myUtilities.SetLISTraceLevel(TraceLevelCombo.SelectedValue.ToString())
+            myGlobalDataTO = Utilities.SetLISTraceLevel(TraceLevelCombo.SelectedValue.ToString())
 
             If Not myGlobalDataTO.HasError Then
                 'Save on tcfgUserSettings the saved value.

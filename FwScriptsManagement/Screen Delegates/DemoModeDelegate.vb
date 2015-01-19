@@ -297,7 +297,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String
                 Dim text As String = ""
 
@@ -308,7 +308,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Else
                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                 End If
-                text += myUtility.FormatLineHistorics(text1)
+                text += Utilities.FormatLineHistorics(text1)
 
                 myResultData.SetDatos = text
 

@@ -1603,7 +1603,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim mySign As Integer = 1
                 Dim myLiNaKClValues As New ISEResultTO.LiNaKCl(-1, -1, -1, -1)
 
@@ -1646,7 +1646,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Else
                                 mySign = 1
                             End If
-                            .Li = mySign * myUtil.FormatToSingle(myLiValueStr)
+                            .Li = mySign * Utilities.FormatToSingle(myLiValueStr)
                         End With
                     End If
 
@@ -1661,7 +1661,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Else
                                 mySign = 1
                             End If
-                            .Na = mySign * myUtil.FormatToSingle(myNaValueStr)
+                            .Na = mySign * Utilities.FormatToSingle(myNaValueStr)
                         End With
                     End If
 
@@ -1676,7 +1676,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Else
                                 mySign = 1
                             End If
-                            .K = mySign * myUtil.FormatToSingle(myKValueStr)
+                            .K = mySign * Utilities.FormatToSingle(myKValueStr)
                         End With
                     End If
 
@@ -1695,7 +1695,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Else
                                 mySign = 1
                             End If
-                            .Cl = mySign * myUtil.FormatToSingle(myClValueStr)
+                            .Cl = mySign * Utilities.FormatToSingle(myClValueStr)
                         End With
                     End If
 
@@ -1729,7 +1729,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim mySign As Integer = 1
                 Dim myPumpValues As New ISEResultTO.PumpCalibrationValues(-1, -1, -1)
 
@@ -1758,21 +1758,21 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Else
                                 mySign = 1
                             End If
-                            .PumpA = mySign * myUtil.FormatToSingle(myPumpAValueStr)
+                            .PumpA = mySign * Utilities.FormatToSingle(myPumpAValueStr)
 
                             If myPumpBValueStr.Contains("-") Then
                                 myPumpBValueStr = myPumpBValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .PumpB = mySign * myUtil.FormatToSingle(myPumpBValueStr)
+                            .PumpB = mySign * Utilities.FormatToSingle(myPumpBValueStr)
 
                             If myPumpWValueStr.Contains("-") Then
                                 myPumpWValueStr = myPumpWValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .PumpW = mySign * myUtil.FormatToSingle(myPumpWValueStr)
+                            .PumpW = mySign * Utilities.FormatToSingle(myPumpWValueStr)
 
                         End With
                     End If
@@ -1807,7 +1807,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim mySign As Integer = 1
                 Dim myBubbleCalibValues As New ISEResultTO.BubbleCalibrationValues(-1, -1, -1)
 
@@ -1836,21 +1836,21 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Else
                                 mySign = 1
                             End If
-                            .ValueA = mySign * myUtil.FormatToSingle(myBubbleAValueStr)
+                            .ValueA = mySign * Utilities.FormatToSingle(myBubbleAValueStr)
 
                             If myBubbleMValueStr.Contains("-") Then
                                 myBubbleMValueStr = myBubbleMValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .ValueM = mySign * myUtil.FormatToSingle(myBubbleMValueStr)
+                            .ValueM = mySign * Utilities.FormatToSingle(myBubbleMValueStr)
 
                             If myBubbleLValueStr.Contains("-") Then
                                 myBubbleLValueStr = myBubbleLValueStr.Replace("-", "").Trim : mySign = -1
                             Else
                                 mySign = 1
                             End If
-                            .ValueL = mySign * myUtil.FormatToSingle(myBubbleLValueStr)
+                            .ValueL = mySign * Utilities.FormatToSingle(myBubbleLValueStr)
 
                         End With
                     End If
@@ -2075,7 +2075,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetDallasSNValues(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Dim myDallasSNData As New ISEDallasSNTO
 
             Try
@@ -2123,7 +2123,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetDallasPage00Values(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
 
             ''PENDING UNTIL INSTALLING BIOSYSTEMS REAGENTS PACKS
             ''If Environment.MachineName = "AUXSOFTWARE1" Then
@@ -2152,19 +2152,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     .LotNumber = myLotNumberHex
 
                     'ExpirationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationDay = CInt(myGlobal.SetDatos)
                     End If
 
                     'ExpirationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationMonth = CInt(myGlobal.SetDatos)
                     End If
 
                     'ExpirationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationYear = 2000 + CInt(myGlobal.SetDatos)
                     End If
@@ -2174,19 +2174,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     '.ExpirationYear = 2000 + CInt(myExpirationYearHex)
 
                     'InitialCalibAVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibAVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibAVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibAVolume = 10 * CInt(myGlobal.SetDatos)
                     End If
 
                     'InitialCalibBVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibBVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibBVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibBVolume = 10 * CInt(myGlobal.SetDatos)
                     End If
 
                     'DistributorCode 
-                    myGlobal = myUtil.ConvertHexToUInt32(myDistributorCodeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myDistributorCodeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .DistributorCode = CStr(myGlobal.SetDatos)
                     End If
@@ -2221,7 +2221,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetDallasPage01Values(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
 
             ''PENDING UNTIL INSTALLING BIOSYSTEMS REAGENTS PACKS
             ''If Environment.MachineName = "AUXSOFTWARE1" Then
@@ -2245,19 +2245,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     .Page01DataString = pDataStr.Trim
 
                     'InstallationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationDay = CInt(myGlobal.SetDatos)
                     End If
 
                     'InstallationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationMonth = CInt(myGlobal.SetDatos)
                     End If
 
                     'InstallationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationYear = 2000 + CInt(myGlobal.SetDatos)
                     End If
@@ -2311,7 +2311,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetDallasPage00Values_NEW(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             Dim myDallas00Data As New ISEDallasPage00TO
 
             Try
@@ -2334,7 +2334,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     .Page00DataString = pDataStr.Trim
 
                     'LotNumber
-                    myGlobal = myUtil.ConvertHexToUInt32(myLotNumberHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myLotNumberHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .LotNumber = CInt(myGlobal.SetDatos).ToString
                     Else
@@ -2343,7 +2343,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                     'ExpirationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationDay = CInt(myGlobal.SetDatos)
                     Else
@@ -2351,7 +2351,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'ExpirationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationMonth = CInt(myGlobal.SetDatos)
                     Else
@@ -2359,7 +2359,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'ExpirationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .ExpirationYear = 2000 + CInt(myGlobal.SetDatos)
                     Else
@@ -2371,7 +2371,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     '.ExpirationYear = 2000 + CInt(myExpirationYearHex)
 
                     'InitialCalibAVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibAVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibAVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibAVolume = 10 * CInt(myGlobal.SetDatos)
                     Else
@@ -2379,7 +2379,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'InitialCalibBVolume (mililitres)
-                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibBVolumeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibBVolumeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InitialCalibBVolume = 10 * CInt(myGlobal.SetDatos)
                     Else
@@ -2387,7 +2387,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'DistributorCode 
-                    myGlobal = myUtil.ConvertHexToUInt32(myDistributorCodeHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myDistributorCodeHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .DistributorCode = CStr(myGlobal.SetDatos)
                     Else
@@ -2435,7 +2435,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetDallasPage01Values_NEW(ByVal pDataStr As String) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             Dim myDallas01Data As New ISEDallasPage01TO
 
             Try
@@ -2453,7 +2453,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     .Page01DataString = pDataStr.Trim
 
                     'InstallationDay
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationDayHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationDayHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationDay = CInt(myGlobal.SetDatos)
                     Else
@@ -2461,7 +2461,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'InstallationMonth
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationMonthHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationMonthHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationMonth = CInt(myGlobal.SetDatos)
                     Else
@@ -2469,7 +2469,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'InstallationYear
-                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationYearHex)
+                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationYearHex)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         .InstallationYear = 2000 + CInt(myGlobal.SetDatos)
                     Else
@@ -2535,7 +2535,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 Dim myConsumption As Integer
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
 
                 'each byte (2 char) represents 8%, one per bit
                 Dim myBytes As New List(Of String)
@@ -2544,7 +2544,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Next c
                 For Each B As String In myBytes
                     Dim myBinaryString As String
-                    myGlobal = myUtil.ConvertHexToBinaryString(B)
+                    myGlobal = Utilities.ConvertHexToBinaryString(B)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myBinaryString = CStr(myGlobal.SetDatos)
                         Dim myHighWord As String = myBinaryString.Substring(0, 4)

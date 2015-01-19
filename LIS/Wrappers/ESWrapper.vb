@@ -270,12 +270,12 @@ Namespace Biosystems.Ax00.LISCommunications
                     If (Not dbConnection Is Nothing) Then
 
                         'TR 24/05/2013
-                        Dim myUtilities As New Utilities
-                        resultData = myUtilities.GetLISTraceLevel()
+                        'Dim myUtilities As New Utilities
+                        resultData = Utilities.GetLISTraceLevel()
                         If Not resultData.HasError Then
                             If resultData.SetDatos.ToString() = "NONE" Then
                                 'Set the default trace level (MEDIUM) in the registry.
-                                resultData = myUtilities.SetLISTraceLevel("MEDIUM")
+                                resultData = Utilities.SetLISTraceLevel("MEDIUM")
                                 If Not resultData.HasError Then
                                     resultData.SetDatos = "MEDIUM"
                                 End If
@@ -675,8 +675,8 @@ Namespace Biosystems.Ax00.LISCommunications
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get the messageID
-                        Dim myUtils As New Utilities
-                        resultData = myUtils.GetNewGUID
+                        'Dim myUtils As New Utilities
+                        resultData = Utilities.GetNewGUID
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             Dim msgId As String = CType(resultData.SetDatos, String)
 
@@ -734,9 +734,9 @@ Namespace Biosystems.Ax00.LISCommunications
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get the messageID
-                        Dim myUtils As New Utilities
+                        'Dim myUtils As New Utilities
 
-                        resultData = myUtils.GetNewGUID
+                        resultData = Utilities.GetNewGUID
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                             Dim msgId As String = CType(resultData.SetDatos, String)
 
@@ -814,7 +814,7 @@ Namespace Biosystems.Ax00.LISCommunications
 
                         ''Get the messageID
                         'Dim myUtils As New Utilities
-                        'resultData = myUtils.GetNewGUID
+                        'resultData = Utilities.GetNewGUID
                         'If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                         '    Dim msgId As String = CType(resultData.SetDatos, String)
 
@@ -873,8 +873,8 @@ Namespace Biosystems.Ax00.LISCommunications
                     If (Not dbConnection Is Nothing) Then
 
                         'Get the messageID
-                        Dim myUtils As New Utilities
-                        resultData = myUtils.GetNewGUID
+                        'Dim myUtils As New Utilities
+                        resultData = Utilities.GetNewGUID
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             Dim msgId As String = CType(resultData.SetDatos, String)
 
@@ -936,8 +936,8 @@ Namespace Biosystems.Ax00.LISCommunications
                     If (Not dbConnection Is Nothing) Then
 
                         'Get the messageID
-                        Dim myUtils As New Utilities
-                        resultData = myUtils.GetNewGUID
+                        'Dim myUtils As New Utilities
+                        resultData = Utilities.GetNewGUID
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             Dim msgId As String = CType(resultData.SetDatos, String)
 
@@ -996,8 +996,8 @@ Namespace Biosystems.Ax00.LISCommunications
                     If (Not dbConnection Is Nothing) Then
 
                         'Get the messageID
-                        Dim myUtils As New Utilities
-                        resultData = myUtils.GetNewGUID
+                        'Dim myUtils As New Utilities
+                        resultData = Utilities.GetNewGUID
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             Dim msgId As String = CType(resultData.SetDatos, String)
 
@@ -1087,8 +1087,8 @@ Namespace Biosystems.Ax00.LISCommunications
                     If (Not dbConnection Is Nothing) Then
 
                         'Get the messageID
-                        Dim myUtils As New Utilities
-                        resultData = myUtils.GetNewGUID
+                        'Dim myUtils As New Utilities
+                        resultData = Utilities.GetNewGUID
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             Dim msgId As String = CType(resultData.SetDatos, String)
 
@@ -1519,8 +1519,8 @@ Namespace Biosystems.Ax00.LISCommunications
             Dim resultData As New GlobalDataTO
 
             'Save the xml into database
-            Dim myUtils As New Utilities
-            resultData = myUtils.GetNewGUID
+            'Dim myUtils As New Utilities
+            resultData = Utilities.GetNewGUID
 
             '' pending to comment ! only for test !!!
             ''Dim myLogAcciones As New ApplicationLogManager()

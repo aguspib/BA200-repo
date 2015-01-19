@@ -126,7 +126,7 @@ Public Class ICreateRestorePoint
     Private Function CreateRestorePoint() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 

@@ -443,9 +443,9 @@ Public Class InstallerForm
     End Sub
 
     Private Sub Button7_Click(sender As Object, e As EventArgs) Handles Button7.Click
-        Dim myUtility As New Utilities
+        'Dim Utilities As New Utilities
         Dim myGlobalData As New GlobalDataTO
-        'myGlobalData = myUtility.SaveSynapseEventLog("MyEventLog", "C:\Temp\")
+        'myGlobalData = Utilities.SaveSynapseEventLog("MyEventLog", "C:\Temp\")
 
         If myGlobalData.HasError Then
             MessageBox.Show(myGlobalData.ErrorMessage)

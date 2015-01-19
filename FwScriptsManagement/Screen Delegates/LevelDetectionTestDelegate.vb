@@ -1437,7 +1437,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -1570,7 +1570,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     Case 3 : newLine = False 'frequencies
                                     Case 4 : newLine = True 'range check result
                                 End Select
-                                FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                             Next
 
                             myResultData.SetDatos = FinalText
@@ -1608,7 +1608,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             End If
 
                             myResult = MyClass.DecodeHistoryDataResult(pData, myArea, Arms.SAMPLE)
-                            
+
                             Dim myColWidth As Integer = 20
 
                             '1st LINE (title)
@@ -1673,7 +1673,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     Case 3 : newLine = False 'Position
                                     Case 4 : newLine = True 'result
                                 End Select
-                                FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                             Next
 
                             myResultData.SetDatos = FinalText

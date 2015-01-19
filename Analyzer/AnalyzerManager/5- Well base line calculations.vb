@@ -237,13 +237,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'InstructionReceived = CType(e.Argument, List(Of InstructionParameterTO))
 
                 '2) Get instruction parameters
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 ' Get BLW (base line well) field (parameter index 3)
                 Dim myBaseLineWell As Integer = 0
                 Dim newID As Integer = 0
-                resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
                     myBaseLineWell = CType(myInstParamTO.ParameterValue, Integer)
@@ -275,7 +275,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         newRow.SetIsMeanNull()  'This field is informed after base line by well calculations
 
                         'WaveLenght
-                        resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
+                        resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
                         If Not resultData.HasError Then
                             newRow.Wavelength = CInt(CType(resultData.SetDatos, InstructionParameterTO).ParameterValue)
                         Else
@@ -283,7 +283,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         'Main light counts
-                        resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
+                        resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
                         If Not resultData.HasError Then
                             newRow.MainLight = CInt(CType(resultData.SetDatos, InstructionParameterTO).ParameterValue)
                         Else
@@ -291,7 +291,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         'Ref light counts
-                        resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
+                        resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
                         If Not resultData.HasError Then
                             newRow.RefLight = CInt(CType(resultData.SetDatos, InstructionParameterTO).ParameterValue)
                         Else
@@ -444,7 +444,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End SyncLock
 
                 'Process all Readings received
-                Dim myUtility As New Utilities()
+                'Dim Utilities As New Utilities()
 
                 Dim myExecutionDS As New ExecutionsDS
                 Dim allExecutionsDS As New ExecutionsDS
@@ -469,7 +469,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'TR 10/10/2013 declare variable to get the ST (Status Photimetric Reading)
                 Dim myPause As Boolean = False
-                myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, 47)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 47)
                 If Not (myGlobal.HasError) Then
                     myPause = CBool(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
                 End If
@@ -490,28 +490,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'AG 25/09/2012
 
                     'Read the PreparationID using ParameterIndex = 48 + (i - 1) * 6
-                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (49 + (i - 1) * myOffset)) '48 +1 TR 10/10/2013 
+                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (49 + (i - 1) * myOffset)) '48 +1 TR 10/10/2013 
                     If (myGlobal.HasError) Then Exit For
 
                     myPreparationID = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
                     If (myPreparationID <> 0) Then   'Ignore DUMMY Readings
                         'Read the ReadingNumber using ParameterIndex = 47 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (48 + (i - 1) * myOffset)) '47+1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (48 + (i - 1) * myOffset)) '47+1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myReadingNumber = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                         'Read the LedPosition using ParameterIndex = 50 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (51 + (i - 1) * myOffset)) '50+1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (51 + (i - 1) * myOffset)) '50+1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myLedPosition = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                         'Read the MainCounts using ParameterIndex = 51 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (52 + (i - 1) * myOffset)) '51+1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (52 + (i - 1) * myOffset)) '51+1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myMainCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                         'Read the RefCounts using ParameterIndex = 52 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (53 + (i - 1) * myOffset)) '52 + 1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (53 + (i - 1) * myOffset)) '52 + 1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myRefCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
@@ -530,7 +530,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myExecutionDS.twksWSExecutions(0).IsAdjustBaseLineIDNull) Then
 
                                 'Read the ReadingNumber using ParameterIndex = 49 + (i - 1) * 6
-                                myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (50 + (i - 1) * myOffset)) '49 + 1 TR 10/10/2013 
+                                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (50 + (i - 1) * myOffset)) '49 + 1 TR 10/10/2013 
                                 If (myGlobal.HasError) Then Exit For
                                 myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 

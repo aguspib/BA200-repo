@@ -159,7 +159,7 @@ Public Class ISATReportLoad
     ''' </remarks>
     Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 
@@ -252,7 +252,7 @@ Public Class ISATReportLoad
                     End If
                     'RH 12/11/2010 tempFolder
 
-                    myGlobal = myUtil.ExtractFromZip(RestorePointPath, tempFolder)
+                    myGlobal = Utilities.ExtractFromZip(RestorePointPath, tempFolder)
 
                     If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                         'search for the .bak file
@@ -510,12 +510,12 @@ Public Class ISATReportLoad
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim mySATUtil As New SATReportUtilities
 
             'obtain the APP version
             Dim myAppVersion As String
-            myGlobal = myUtil.GetSoftwareVersion()
+            myGlobal = Utilities.GetSoftwareVersion()
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 myAppVersion = CStr(myGlobal.SetDatos)
 
@@ -958,8 +958,8 @@ Public Class ISATReportLoad
                     End If
 
                     'Get the registry information 
-                    Dim myUtilities As New Utilities
-                    myGlobal = myUtilities.GetLISTraceLevel()
+                    'Dim Utilities As New Utilities
+                    myGlobal = Utilities.GetLISTraceLevel()
                     If Not myGlobal.HasError Then
                         RegistryLISTraceValue = myGlobal.SetDatos.ToString()
                     End If

@@ -1421,7 +1421,7 @@ Public Class IPositionsAdjustments
     Private Sub PrepareStirrerButton(ByRef pButton As BSButton)
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
@@ -1442,7 +1442,7 @@ Public Class IPositionsAdjustments
                 Dim myImage As Image
                 myImage = Image.FromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
+                myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -3972,7 +3972,7 @@ Public Class IPositionsAdjustments
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
             ' XBC 02/01/2012 - Add Encoder functionality
@@ -4050,7 +4050,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsOpticAdjustButton.Image = myImage
             '    BsWSAdjustButton.Image = myImage
             '    'BsArmsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
@@ -4060,7 +4060,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsOpticCancelButton.Image = myImage
             '    BsWSCancelButton.Image = myImage
             '    BsArmsCancelButton.Image = myImage
@@ -4073,7 +4073,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(32, 32)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(32, 32)).SetDatos, Image)
             '    BsSaveButton.Image = myImage
             '    'BsSaveButton.BackgroundImageLayout = ImageLayout.Center
             'End If
@@ -4083,7 +4083,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
@@ -4091,7 +4091,7 @@ Public Class IPositionsAdjustments
             auxIconName = GetIconName("ACCEPTF")
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-                myImage = CType(myUtil.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
+                myImage = CType(Utilities.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
                 Me.BsGridSample.OkImage = myImage
                 Me.BsGridReagent1.OkImage = myImage
                 Me.BsGridReagent2.OkImage = myImage
@@ -4121,7 +4121,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If auxIconName <> "" Then
             '    'Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    'myImage = CType(myUtil.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
+            '    'myImage = CType(Utilities.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
             '    'Me.BsGridSample.AdjustButtonImage = myImage
             '    'Me.BsGridReagent1.AdjustButtonImage = myImage
             '    'Me.BsGridReagent2.AdjustButtonImage = myImage
@@ -4138,7 +4138,7 @@ Public Class IPositionsAdjustments
             '    Dim myImage As Image
             '    myImage = Image.FromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myMixerImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -4156,7 +4156,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("UPDOWN")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(20, 20)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(20, 20)).SetDatos, Image)
             '    Me.BsUpDownWSButton1.Image = myImage
             '    Me.BsUpDownWSButton2.Image = myImage
             '    Me.BsUpDownWSButton3.Image = myImage
@@ -4167,7 +4167,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    BsOpticStopButton.Image = myImage
             '    'BsStopButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
@@ -4177,7 +4177,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("ACCEPT1")
             'If auxIconName <> "" Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    Me.BsArmsOkButton.Image = myImage
             'End If
 

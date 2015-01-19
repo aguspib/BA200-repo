@@ -2263,7 +2263,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -2535,7 +2535,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         Next
 
                         If myAllLines.Count > 0 Then
-                            FinalText = myUtility.FormatLineHistorics(myAreaLine, myColWidth, True)
+                            FinalText = Utilities.FormatLineHistorics(myAreaLine, myColWidth, True)
                         End If
 
                         For Each LL As List(Of List(Of String)) In myAllLines
@@ -2561,7 +2561,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     End If
                                 Next
 
-                                If hasText Then FinalText &= myUtility.FormatLineHistorics(L, myColWidth, newLine)
+                                If hasText Then FinalText &= Utilities.FormatLineHistorics(L, myColWidth, newLine)
 
                             Next L
 
@@ -2623,7 +2623,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     t.PadRight(myColWidth)
                                 End If
                             Next
-                            FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, True)
+                            FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, True)
                         Next
 
                         myResultData.SetDatos = FinalText
@@ -2668,7 +2668,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     t.PadRight(myColWidth)
                                 End If
                             Next
-                            FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, True)
+                            FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, True)
                         Next
 
                         myResultData.SetDatos = FinalText

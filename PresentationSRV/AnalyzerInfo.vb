@@ -3117,8 +3117,8 @@ Public Class AnalyzerInfo
                 'obtain needed fw version SGM 22/06/2012
                 Dim myGlobal As New GlobalDataTO
                 Dim mySwVersion As String
-                Dim myUtil As New Utilities
-                myGlobal = myUtil.GetSoftwareVersion()
+                ''Dim myUtil As New Utilities.
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     mySwVersion = myGlobal.SetDatos.ToString
 
