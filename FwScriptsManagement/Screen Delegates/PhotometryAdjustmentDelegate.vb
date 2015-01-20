@@ -1190,7 +1190,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <param name="pResponse">response type</param>
         ''' <param name="pData">data received</param>
         ''' <remarks>Created by XBC 01/03/11</remarks>
-        Private Sub ScreenReceptionLastFwScriptEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) Handles MyClass.ReceivedLastFwScriptEvent
+        Private Sub ScreenReceptionLastFwScriptEvent(ByVal pResponse As RESPONSE_TYPES, ByVal pData As Object) Handles Me.ReceivedLastFwScriptEvent
             Dim myGlobal As New GlobalDataTO
             Try
                 'manage special operations according to the screen characteristics

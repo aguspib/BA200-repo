@@ -251,6 +251,7 @@ Public Class BSBaseForm
     ''' Created to replace current calls to CreateLogActivity in Forms
     ''' PENDING: not used yet 
     ''' </remarks>
+    <Obsolete("USe GlobalBase.ShowExceptionDetails instead")>
     Public Sub ShowExceptionDetails(ByVal pException As Exception)
         Try
             'Dim myGlobalbase As New GlobalBase

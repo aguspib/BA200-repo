@@ -10456,7 +10456,7 @@ Partial Public Class IAx00MainMDI
 
     ''' <summary>
     ''' Call the method SynchronousDeleteAllMessage.
-    ''' </summary>
+    ''' </summary> 
     ''' <remarks>
     ''' Created by: TR 22/04/2013
     ''' </remarks>

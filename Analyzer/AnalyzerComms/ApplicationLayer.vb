@@ -3507,7 +3507,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myGlobal = Utilities.ConvertStringToAscii(myCommand, True)
                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                         Dim myCommandInBytes() As Byte = CType(myGlobal.SetDatos, Byte())
-                        Dim myFinalByte As Byte = Asc(CChar(";"))
+                        Dim myFinalByte As Byte = CByte(Asc(CChar(";")))
 
                         Dim myFinalInstruction(myCommandInBytes.Length + pFWAction.DataBlockSize) As Byte
                         Dim i As Integer = 0

@@ -4,6 +4,7 @@ Option Strict On
 Imports Biosystems.Ax00.Global.TO
 Imports System.Reflection
 Imports System.IO
+Imports System.Text
 
 
 Namespace Biosystems.Ax00.Global
@@ -597,6 +598,53 @@ Namespace Biosystems.Ax00.Global
 
             Catch ex As Exception
             End Try
+        End Sub
+
+        ''' <summary>
+        ''' This function creates log activity for a given exception. This routine will fill all required data automatically, including method and class name where the exception occurred. Use this function instead to log excetions
+        ''' </summary>
+        ''' <param name="ex">A execption to be notified into the application log</param>
+        ''' <remarks>Use this function to add exception to the application log when possible.</remarks>
+        Public Shared Sub CreateLogActivity(ex As Exception)
+
+            Try
+                If ex IsNot Nothing AndAlso ex.TargetSite IsNot Nothing Then
+                    Dim exeptionIterator = ex, exceptionDesc As New StringBuilder, count = 0
+
+                    '1.- We iterate the exception an all innerException data (up to 10 levels) to build a detailed explanation of the unhanled exception:
+                    While exeptionIterator IsNot Nothing And count < 10
+                        exceptionDesc.Append(exeptionIterator.ToString & " ((" & exeptionIterator.HResult & "))")
+                        exeptionIterator = exeptionIterator.InnerException
+                        If exeptionIterator IsNot Nothing Then
+                            exeptionIterator = exeptionIterator.InnerException
+                        End If
+                        count += 1    'Cross reference prevention
+                    End While
+
+                    '2.- We inspect the exception origin by inspecing the target of main exception 
+                    Dim sourceOfException = ex.Source &
+                        ex.TargetSite.DeclaringType.ToString & "." &
+                        ex.TargetSite.Name
+
+
+
+                    Dim exceptionCompleteMessage = exceptionDesc.ToString
+                    GlobalBase.CreateLogActivity(
+                        exceptionCompleteMessage,
+                        sourceOfException,
+                        EventLogEntryType.Error,
+                        False)
+                    MsgBox(sourceOfException & vbCr & Environment.StackTrace)
+                Else
+                    GlobalBase.CreateLogActivity(
+                        "An Unhandled Exception has been occurred, but exception data is missing ",
+                        Environment.StackTrace, EventLogEntryType.Error, False)
+                End If
+            Catch
+            End Try
+
+
+
         End Sub
 
         ''' <summary>

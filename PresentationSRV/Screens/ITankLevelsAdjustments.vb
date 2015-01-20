@@ -5013,7 +5013,7 @@ Public Class ITankLevelsAdjustments
         End Try
     End Sub
 
-    Private Sub OnTankLevelChanged(ByVal pTank As INTERMEDIATE_TANKS) Handles MyClass.TankLevelChanged
+    Private Sub OnTankLevelChanged(ByVal pTank As INTERMEDIATE_TANKS) Handles Me.TankLevelChanged
         Try
             Select Case pTank
                 Case INTERMEDIATE_TANKS.DISTILLED_WATER
@@ -5036,7 +5036,7 @@ Public Class ITankLevelsAdjustments
         End Try
     End Sub
 
-    Private Sub OnTankLevelUndefined(ByVal pTank As INTERMEDIATE_TANKS) Handles MyClass.TankLevelUndefined
+    Private Sub OnTankLevelUndefined(ByVal pTank As INTERMEDIATE_TANKS) Handles Me.TankLevelUndefined
         Try
             Select Case pTank
                 Case INTERMEDIATE_TANKS.DISTILLED_WATER
