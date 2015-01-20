@@ -641,7 +641,6 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <summary>
         ''' 
         ''' </summary>
-        ''' <returns></returns>
         ''' <remarks></remarks>
         Private Sub RestartProcess()
 

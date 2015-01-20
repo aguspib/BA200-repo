@@ -1220,7 +1220,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pDBConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <returns>GlobalDataTO (setDatos as boolean: TRUE results valid, FALSE results not valid)</returns>
-        ''' <remarks>AG 25/11/2014 BA-2081</remarks>
+        ''' <remarks>AG 25/11/2014 BA-2081
+        ''' AG 20/01/2015 - code improvements: remove warning in loop</remarks>
         Public Function ValidateDynamicBaseLinesResults(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String) As GlobalDataTO Implements IBaseLineEntity.ValidateDynamicBaseLinesResults
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -1256,21 +1257,25 @@ Namespace Biosystems.Ax00.Core.Entities
                             listOfWells = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines Select a.WellUsed Distinct).ToList
 
                             '4) Validation for each led
+                            Dim currentLedPosition As Integer = 0
+                            Dim currentWellPosition As Integer = 0
                             For ledPosition As Integer = 0 To listOfLeds.Count - 1
                                 'Only validate the active leds
                                 If adjustBL.enabled(ledPosition) Then
 
+                                    currentLedPosition = ledPosition
                                     'Validation for each well
                                     For Each wellPosition In listOfWells
+                                        currentWellPosition = wellPosition
                                         'Get data by well and led
                                         linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In LastDynamicBaseLineDS.twksWSBaseLines _
-                                                                   Where a.Wavelength = listOfLeds(ledPosition) AndAlso a.WellUsed = wellPosition Select a Order By a.BaseLineID Descending).ToList
+                                                                   Where a.Wavelength = listOfLeds(currentLedPosition) AndAlso a.WellUsed = currentWellPosition Select a Order By a.BaseLineID Descending).ToList
 
                                         If linqRes.Count > 0 Then
                                             'Calculate well absorbance by led
                                             If linqRes(0).MainLight <> 0 AndAlso linqRes(0).RefLight <> 0 Then
-                                                resultData = calcDel.CalculateAbsorbance(linqRes(0).MainLight, linqRes(0).RefLight, adjustBL.mainLight(ledPosition), _
-                                                                                          adjustBL.refLight(ledPosition), adjustBL.mainDark(ledPosition), adjustBL.refDark(ledPosition), _
+                                                resultData = calcDel.CalculateAbsorbance(linqRes(0).MainLight, linqRes(0).RefLight, adjustBL.mainLight(currentLedPosition), _
+                                                                                          adjustBL.refLight(currentLedPosition), adjustBL.mainDark(currentLedPosition), adjustBL.refDark(currentLedPosition), _
                                                                                            0, PATH_LENGHT, LIMIT_ABS, False)
                                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                                     'Validate if the absorbance calculated is inside limits
