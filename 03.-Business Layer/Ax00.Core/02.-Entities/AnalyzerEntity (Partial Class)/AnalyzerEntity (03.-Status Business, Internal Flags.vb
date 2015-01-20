@@ -2026,7 +2026,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by: DL 21/06/2012 - 
         '''              AG 19/07/2012 -review and modify
         '''              XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
-        '''              AG 19/01/2015 BA-2216
+        '''              AG 20 and 19/01/2015 BA-2216 add dynamic BL functionality and fix issues found!!!
         ''' </remarks>
         Private Function RecoverStableSetup(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -2048,13 +2048,24 @@ Namespace Biosystems.Ax00.Core.Entities
                     '6. DynamicBL_Empty = 'INI'
 
                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "INI" Then
                         '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                            'AG 20/01/2015 BA-2216
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "")
                             ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.StartInstrument)
+
+                            'AG 20/01/2015 BA-2216 - new conditions
+                        ElseIf AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash)
+                            'AG 20/01/2015 BA-2216
                         End If
 
+                        'AG 20/01/2015 BA-2216 - changes conditions
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "INI" Then
                         '2.	Re-send WASH instruction. Requires analyzer status STANDBY
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
@@ -2078,7 +2089,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
                             ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
                         End If
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"  Then
                         '3.	Re-send FLIGHT instruction in mode read
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
@@ -2199,8 +2210,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         'Re-send FLIGHT instruction in mode empty
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
-                            CurrentInstructionAction = InstructionActions.FlightReading
-                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                            CurrentInstructionAction = InstructionActions.FlightEmptying
+                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
                             ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
                         End If
                         'AG 19/01/2015 BA-2216
