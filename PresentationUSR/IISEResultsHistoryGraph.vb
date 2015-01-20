@@ -1,4 +1,7 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports DevExpress.XtraCharts
@@ -383,10 +386,10 @@ Public Class IISEResultsHistoryGraph
             Dim aux As Single
             For Each serie As Series In pGraph.Series
                 If serie.Visible Then
-                    aux = (From p In serie.Points Select p.Values(0)).Min
+                    aux = CSng((From p In serie.Points Select p.Values(0)).Min)
                     If Not minY.HasValue OrElse aux < minY Then minY = aux
 
-                    aux = (From p In serie.Points Select p.Values(0)).Max
+                    aux = CSng((From p In serie.Points Select p.Values(0)).Max)
                     If Not maxY.HasValue OrElse aux > maxY Then maxY = aux
                 End If
             Next

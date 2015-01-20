@@ -1,5 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 'Imports ICSharpCode.SharpZipLib.Zip
 Imports System.IO

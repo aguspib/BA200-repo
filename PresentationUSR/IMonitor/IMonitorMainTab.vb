@@ -1,4 +1,9 @@
-﻿'Put here your business code for the tab MainTab inside Monitor Form
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+
+'Put here your business code for the tab MainTab inside Monitor Form
 
 'Imports System.Text
 Imports Biosystems.Ax00.Controls.UserControls

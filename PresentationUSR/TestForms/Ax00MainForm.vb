@@ -1,6 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
-
+Option Infer On
 Imports System.Windows.Forms
 
 Imports Biosystems.Ax00.BL

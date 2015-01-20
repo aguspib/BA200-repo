@@ -1,4 +1,9 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 
 'Put here your business code for the tab ReactionsTab inside Monitor Form

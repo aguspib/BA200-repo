@@ -1,4 +1,7 @@
-﻿
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
 'Imports Biosystems.Ax00.Global
 Imports System.Runtime.InteropServices.ComTypes
 Imports Biosystems.Ax00.PresentationCOM

@@ -1,6 +1,6 @@
 ﻿Option Explicit On
-'Option Strict On
-
+Option Strict On
+Option Infer On
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
@@ -393,7 +393,7 @@ Partial Class IResults
                         If linqRes.Count = 0 Then
                             Dim newItem As New PatientSpecimenTO
                             newItem.patientID = sampleRow.PatientID
-                            newItem.UpdateSpecimenList(dgv("PatientID", RowIndex).Value)
+                            newItem.UpdateSpecimenList(CStr(dgv("PatientID", RowIndex).Value))
                             newItem.RowIndex = RowIndex
                             If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
                                 auxPatientToolTipInfo = String.Format("({0}) - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)

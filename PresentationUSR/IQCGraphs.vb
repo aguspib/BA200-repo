@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
@@ -821,37 +825,37 @@ Public Class IQCGraphs
 
                 If (numSelectedWithMean = 1) Then
                     'Only one Control is selected to be graph
-                    CreateConstantLine(LabelMEAN, myDiagram, openQCResultRow.Mean, Color.Black, DashStyle.Solid)
+                    CreateConstantLine(LabelMEAN, myDiagram, CSng(openQCResultRow.Mean), Color.Black, DashStyle.Solid)
 
                     If (openQCResultRow.SD > 0) Then
                         'Create the Constant line for the Rejection Criteria
                         If (RejectionCriteriaAttribute = 1) Then
-                            CreateConstantLine("+1 " & LabelSD, myDiagram, openQCResultRow.Mean + (1 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-1 " & LabelSD, myDiagram, openQCResultRow.Mean - (1 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("+1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (1 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (1 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         Else
-                            CreateConstantLine("+1 " & LabelSD, myDiagram, openQCResultRow.Mean + (1 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
-                            CreateConstantLine("-1 " & LabelSD, myDiagram, openQCResultRow.Mean - (1 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("+1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (1 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("-1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (1 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
                         End If
 
                         If (RejectionCriteriaAttribute = 2) Then
-                            CreateConstantLine("+2 " & LabelSD, myDiagram, openQCResultRow.Mean + (2 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-2 " & LabelSD, myDiagram, openQCResultRow.Mean - (2 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("+2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (2 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (2 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         Else
-                            CreateConstantLine("+2 " & LabelSD, myDiagram, openQCResultRow.Mean + (2 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
-                            CreateConstantLine("-2 " & LabelSD, myDiagram, openQCResultRow.Mean - (2 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("+2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (2 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("-2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (2 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
                         End If
 
                         If (RejectionCriteriaAttribute = 3) Then
-                            CreateConstantLine("+3 " & LabelSD, myDiagram, openQCResultRow.Mean + (3 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-3 " & LabelSD, myDiagram, openQCResultRow.Mean - (3 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("+3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (3 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (3 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         Else
-                            CreateConstantLine("+3 " & LabelSD, myDiagram, openQCResultRow.Mean + (3 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
-                            CreateConstantLine("-3 " & LabelSD, myDiagram, openQCResultRow.Mean - (3 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("+3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (3 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("-3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (3 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
                         End If
 
                         If ((RejectionCriteriaAttribute Mod 1) = 1 OrElse RejectionCriteriaAttribute >= 4) Then
-                            CreateConstantLine("+4 " & LabelSD, myDiagram, openQCResultRow.Mean + (RejectionCriteriaAttribute * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-4 " & LabelSD, myDiagram, openQCResultRow.Mean - (RejectionCriteriaAttribute * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("+4 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (RejectionCriteriaAttribute * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-4 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (RejectionCriteriaAttribute * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         End If
                     End If
 
@@ -1488,7 +1492,7 @@ Public Class IQCGraphs
 
                         'Create cross lines with the Control Mean
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Blue)
-                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Blue)
+                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, CSng(mySelectecControlLotList.First().Mean), Color.Blue)
                     End If
 
                 ElseIf (numOfSelectedCtrls = 2) Then
@@ -1515,10 +1519,10 @@ Public Class IQCGraphs
                                   AndAlso Not a.Excluded _
                                        Select a.VisibleResultValue).ToList()
 
-                        Dim MinValue As Single = Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MinValue As Single = CSng(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3))
                         If (MinValue > XResultValues.Min) Then MinValue = XResultValues.Min
 
-                        Dim MaxValue As Single = Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MaxValue As Single = CSng(Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3))
                         If (MaxValue < XResultValues.Max) Then MaxValue = XResultValues.Max
 
                         myDiagram.AxisX.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
@@ -1536,10 +1540,10 @@ Public Class IQCGraphs
                                                          AndAlso Not a.Excluded _
                                                               Select a.VisibleResultValue).ToList()
 
-                        MinValue = Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3)
+                        MinValue = CSng(Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MinValue > YResultValues.Min) Then MinValue = YResultValues.Min
 
-                        MaxValue = Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3)
+                        MaxValue = CSng(Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MaxValue < YResultValues.Max) Then MaxValue = YResultValues.Max
 
                         myDiagram.AxisY.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
@@ -1552,7 +1556,7 @@ Public Class IQCGraphs
 
                         'Create cross lines with the Mean of selected Controls
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Blue)
-                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.Last().Mean, Color.Blue)
+                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, CSng(mySelectecControlLotList.Last().Mean), Color.Blue)
 
                         'Create the graph squares
                         CreateSquares(mySelectecControlLotList.First().Mean, mySelectecControlLotList.First().SD, _
@@ -1745,7 +1749,7 @@ Public Class IQCGraphs
                         bsResultControlLotGridView.CurrentCell.Value = False
                         bsResultControlLotGridView.CommitEdit(DataGridViewDataErrorContexts.Commit)
                     Else
-                        If (bsResultControlLotGridView.CurrentCell.Value) Then
+                        If (CBool(bsResultControlLotGridView.CurrentCell.Value)) Then
                             If (IsDBNull(bsResultControlLotGridView.CurrentRow.Cells("Mean").Value)) Then
                                 'The CheckBox was checked by User and the action is allowed, but there is not enough data to plot. 
                                 'A warning message is shown and the CheckBox value is set to False

@@ -1,6 +1,6 @@
 ﻿Option Explicit On
-'Option Strict On
-
+Option Strict On
+Option Infer On
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types

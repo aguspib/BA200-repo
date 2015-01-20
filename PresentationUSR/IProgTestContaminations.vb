@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global
@@ -1021,7 +1025,7 @@ Public Class IProgTestContaminations
                     bsR1ContaminatedDataGridView.Rows(i).ReadOnly = (Not pStatus)
                     bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").ReadOnly = (Not pStatus)
 
-                    If (bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value) Then
+                    If (CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)) Then
                         bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = (Not pStatus)
                         'bsR1ContaminatedDataGridView.Rows(i).Cells("AlreadySaved").Value = "Y"
                     Else
@@ -1055,7 +1059,7 @@ Public Class IProgTestContaminations
                     bsR2ContaminatedDataGridView.Rows(i).ReadOnly = (Not pStatus)
                     bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").ReadOnly = (Not pStatus)
 
-                    If (bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").Value) Then
+                    If (CBool(bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").Value)) Then
                         bsR2ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = (Not pStatus)
                         'bsR1ContaminatedDataGridView.Rows(i).Cells("AlreadySaved").Value = "Y"
                     Else
@@ -1247,11 +1251,11 @@ Public Class IProgTestContaminations
                         Distinct).Max
                         'Search for new, updated or deleted R1 contaminations
                         For i As Integer = 0 To bsR1ContaminatedDataGridView.Rows.Count - 1
-                            Dim mySelectedValue As Boolean = bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value
-                            Dim myContaminatedReagentID As Integer = bsR1ContaminatedDataGridView.Rows(i).Cells("ReagentID").Value
+                            Dim mySelectedValue = CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)
+                            Dim myContaminatedReagentID = CInt(bsR1ContaminatedDataGridView.Rows(i).Cells("ReagentID").Value)
                             Dim mwWashSolution As String = ""
                             If bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value.ToString <> "" Then
-                                mwWashSolution = bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value
+                                mwWashSolution = CStr(bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value)
                             End If
                             If mySelectedValue Then
                                 Dim newRow As ContaminationsDS.tparContaminationsRow

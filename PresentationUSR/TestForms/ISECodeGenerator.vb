@@ -1,5 +1,7 @@
-﻿Option Explicit On
-'Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
 
 Imports System
 ' For Missing.Value and BindingFlags
@@ -486,7 +488,7 @@ Public Class ISECodeGenerator
                 Me.BsProgressBar.Visible = True
                 For N As Integer = 1 To 4102 Step 1
                     Me.BsProgressBar.Value = N
-                    myGlobal = MyClass.GenerateDSNDDT00(N, True)
+                    myGlobal = MyClass.GenerateDSNDDT00(CUInt(N), True)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         Me.BsCodeTextBox.Text = CStr(myGlobal.SetDatos)
                         MyClass.SelectedDSND00 = Me.BsCodeTextBox.Text

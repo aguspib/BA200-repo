@@ -1,6 +1,6 @@
 ﻿Option Explicit On
-'Option Strict On
-
+Option Strict On
+Option Infer On
 Imports Biosystems.Ax00.BL
 'Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
@@ -660,7 +660,7 @@ Partial Class IResults
                                                  resultRow.ResultDateTime.ToString(SystemInfoManager.OSLongTimeFormat)
 
                     CurrentRow.PatientName = resultRow.PatientName
-                    CurrentRow.PatientID = IIf(resultRow.RerunNumber = 1, resultRow.PatientID, String.Format("{0} ({1})", resultRow.PatientID, resultRow.RerunNumber))
+                    CurrentRow.PatientID = TryCast(IIf(resultRow.RerunNumber = 1, resultRow.PatientID, String.Format("{0} ({1})", resultRow.PatientID, resultRow.RerunNumber)), String)
                     CurrentRow.TestType = resultRow.TestType 'RH 23/03/2012
 
                     'AG + DL 14/06/2013 - show specimen id in the Group 
@@ -804,7 +804,7 @@ Partial Class IResults
                                 'TR(07/06 /2012)
 
                             Else
-                                CurrentRow.ReplicateNumber = SampleList(j).ReplicateNumber
+                                CurrentRow.ReplicateNumber = CStr(SampleList(j).ReplicateNumber)
                             End If
                             'dgv("No", k).ToolTipText = Remark
                             'RH 03/08/2011
@@ -888,7 +888,7 @@ Partial Class IResults
     ''' </remarks>
     Private Sub SamplesXtraGridView_RowStyle(ByVal sender As System.Object, ByVal e As DevExpress.XtraGrid.Views.Grid.RowStyleEventArgs) Handles SamplesXtraGridView.RowStyle
         Try
-            Dim View As GridView = sender
+            Dim View = TryCast(sender, GridView)
 
             If (e.RowHandle >= 0) Then
                 'This is how to get the DataRow behind the GridViewRow
@@ -925,7 +925,7 @@ Partial Class IResults
     ''' </remarks>
     Private Sub SamplesXtraGridView_CellMerge(ByVal sender As System.Object, ByVal e As DevExpress.XtraGrid.Views.Grid.CellMergeEventArgs) Handles SamplesXtraGridView.CellMerge
         Try
-            Dim View As GridView = sender
+            Dim View = TryCast(sender, GridView)
 
             Dim CurrentRow1 As ResultsDS.XtraSamplesRow = CType(View.GetDataRow(e.RowHandle1), ResultsDS.XtraSamplesRow) 'tblXtraSamples(e.RowHandle1)
             Dim CurrentRow2 As ResultsDS.XtraSamplesRow = CType(View.GetDataRow(e.RowHandle2), ResultsDS.XtraSamplesRow) 'tblXtraSamples(e.RowHandle2)
@@ -957,7 +957,7 @@ Partial Class IResults
 
             If info Is Nothing Then Return
 
-            Dim View As GridView = sender
+            Dim View = TryCast(sender, GridView)
 
             Dim ChildHandle As Integer = View.GetChildRowHandle(e.RowHandle, 0)
 
@@ -1092,7 +1092,7 @@ Partial Class IResults
 
             If sender Is Nothing Then Return
 
-            Dim dgv As GridView = sender
+            Dim dgv = TryCast(sender, GridView)
 
             'This is how to get the DataRow behind the GridViewRow
             Dim CurrentRow As ResultsDS.XtraSamplesRow = CType(dgv.GetDataRow(e.RowHandle), ResultsDS.XtraSamplesRow) 'tblXtraSamples(e.RowHandle)
@@ -1236,7 +1236,7 @@ Partial Class IResults
             If Not e.SelectedControl Is SamplesXtraGrid Then Return
 
             'Get the view at the current mouse position
-            Dim view As GridView = SamplesXtraGrid.GetViewAt(e.ControlMousePosition)
+            Dim view = TryCast(SamplesXtraGrid.GetViewAt(e.ControlMousePosition), GridView)
             If view Is Nothing Then Return
 
             'Get the view's element information that resides at the current position

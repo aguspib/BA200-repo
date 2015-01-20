@@ -1,5 +1,6 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports System
 ' For Missing.Value and BindingFlags

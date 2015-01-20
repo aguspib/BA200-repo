@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
@@ -1869,16 +1873,16 @@ Partial Public Class IMonitor
                     CleanInfoArea(False)
 
                     If (pRotorType = "SAMPLES") Then
-                        bsSampleCellTextBox.Text = pCellNumber
+                        bsSampleCellTextBox.Text = CStr(pCellNumber)
                         bsSampleCellTextBox.Refresh()
-                        bsSampleDiskNameTextBox.Text = pRingNumber
+                        bsSampleDiskNameTextBox.Text = CStr(pRingNumber)
                         bsSampleDiskNameTextBox.Refresh()
                         bsSampleStatusTextBox.Text = String.Empty
 
                     ElseIf (pRotorType = "REAGENTS") Then
-                        bsReagentsCellTextBox.Text = pCellNumber
+                        bsReagentsCellTextBox.Text = CStr(pCellNumber)
                         bsReagentsCellTextBox.Refresh()
-                        bsReagentsDiskNameTextBox.Text = pRingNumber
+                        bsReagentsDiskNameTextBox.Text = CStr(pRingNumber)
                         bsReagentsDiskNameTextBox.Refresh()
                         bsReagentsStatusTextBox.Text = String.Empty
                     End If
@@ -2163,9 +2167,8 @@ Partial Public Class IMonitor
                 If myMonth <> "" AndAlso myYear <> "" AndAlso CInt(myMonth) >= 1 AndAlso CInt(myMonth) <= 12 Then
                     ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
                     'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
-                    ExpirationDate = New DateTime(CInt(myYear), CInt(myMonth), 1)
-                    'This is wrong:
                     'ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
+                    ExpirationDate = New DateTime(CInt(myYear), CInt(myMonth), 1)
                 End If
             End If
         Catch ex As Exception
@@ -2212,7 +2215,7 @@ Partial Public Class IMonitor
                 If (currentStatus = "FREE") Then
                     CleanInfoArea(False)
 
-                    bsWellNrTextBox.Text = pCellNumber
+                    bsWellNrTextBox.Text = CStr(pCellNumber)
                     bsWellNrTextBox.Refresh()
 
                     bsReacStatusTextBox.Text = String.Empty
@@ -2241,7 +2244,7 @@ Partial Public Class IMonitor
                         Dim myReactionRotorDetails As ReactionRotorDetailsDS = DirectCast(myGlobalDataTO.SetDatos, ReactionRotorDetailsDS)
 
                         If (myReactionRotorDetails.ReactionsRotorDetails.Rows.Count > 0) Then
-                            bsWellNrTextBox.Text = pCellNumber
+                            bsWellNrTextBox.Text = CStr(pCellNumber)
                             bsWellNrTextBox.Refresh()
 
                             Dim mySampleClass As String = ""
@@ -2280,17 +2283,17 @@ Partial Public Class IMonitor
 
                             BsExecutionIDTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsExecutionIDNull) Then
-                                BsExecutionIDTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.ExecutionID
+                                BsExecutionIDTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.ExecutionID)
                             End If
 
                             bsCalibNrTextBox.Clear()
                             If (mySampleClass = "CALIB" AndAlso Not myReactionRotorDetails.ReactionsRotorDetails.First.IsMultiItemNumberNull) Then
-                                bsCalibNrTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.MultiItemNumber
+                                bsCalibNrTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.MultiItemNumber)
                             End If
 
                             bsOrderTestIDTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsOrderTestIDNull) Then
-                                bsOrderTestIDTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.OrderTestID
+                                bsOrderTestIDTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.OrderTestID)
                             End If
 
                             bsDilutionTextBox.Clear()
@@ -2300,12 +2303,12 @@ Partial Public Class IMonitor
 
                             bsReplicateTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsReplicateNumberNull) Then
-                                bsReplicateTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.ReplicateNumber
+                                bsReplicateTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.ReplicateNumber)
                             End If
 
                             bsRerunTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsRerunNumberNull) Then
-                                bsRerunTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.RerunNumber
+                                bsRerunTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.RerunNumber)
                             End If
 
                             bsReacStatusTextBox.Clear()
@@ -2315,7 +2318,7 @@ Partial Public Class IMonitor
                         Else
                             CleanInfoArea(False)
 
-                            bsWellNrTextBox.Text = pCellNumber
+                            bsWellNrTextBox.Text = CStr(pCellNumber)
                             bsWellNrTextBox.Refresh()
                         End If
                     Else
@@ -2453,9 +2456,15 @@ Partial Public Class IMonitor
                     myControlName = "Reac" & pRotorContenByPosRow.CellNumber
                 End If
 
-                Dim lstRotorControl As List(Of Control) = (From a As Control In myControls _
-                                                          Where a.Name = myControlName _
-                                                         Select a).ToList()
+                'Dim lstRotorControl2 As List(Of Control) = (From a As Control In myControls _
+                '                                          Where a.Name = myControlName _
+                '                                         Select a).ToList()
+                Dim lstRotorControl As New List(Of Control)
+                For Each obj In myControls
+                    Dim a = TryCast(obj, Control)
+                    If a IsNot Nothing AndAlso a.Name = myControlName Then lstRotorControl.Add(a)
+                Next
+
                 If (lstRotorControl.Count = 1) Then
                     Dim myBSRImage As BSRImage = CType(lstRotorControl(0), BSRImage)
 
@@ -2533,7 +2542,7 @@ Partial Public Class IMonitor
                    Select a).ToList()
 
             For Each myrow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In query
-                myrow.ItemArray = pRotorContentByPosRow.ItemArray.Clone()
+                myrow.ItemArray = CType(pRotorContentByPosRow.ItemArray.Clone(), Object())
             Next
             result = True
         Catch ex As Exception
@@ -2576,7 +2585,7 @@ Partial Public Class IMonitor
                                      Select a).ToList()
 
             If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
-                Dim myRotorPicture As Object
+                Dim myRotorPicture As Control
                 Dim auxIconPath As String = String.Empty
                 Dim myVirtualRotorPosititionsDS As VirtualRotorPosititionsDS
                 Dim myWSRequiredElementsDelegate As New WSRequiredElementsDelegate

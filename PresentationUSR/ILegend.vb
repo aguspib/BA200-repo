@@ -1,5 +1,6 @@
 ﻿Option Explicit On
-
+Option Strict On
+Option Infer On
 
 'Imports DevExpress.XtraGrid
 'Imports DevExpress.Data

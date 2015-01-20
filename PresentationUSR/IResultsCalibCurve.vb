@@ -1,7 +1,8 @@
 ﻿'Created by AG 10/08/2010 - Based on ResultFormAG
 
-Option Explicit On
 Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports System.Text
 Imports Biosystems.Ax00.BL

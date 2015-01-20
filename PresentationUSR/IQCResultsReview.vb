@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -723,11 +727,11 @@ Public Class IQCResultsReview
                     myResultInformationRow.RunsGroupNumber = CInt(bsResultControlLotGridView.SelectedRows(0).Cells("RunsGroupNumber").Value)
                     myResultInformationRow.NumberOfSeries = CInt(bsResultsDetailsGridView.SelectedRows(0).Cells("RunNumber").Value)
                     myResultInformationRow.CalNumberSeries = CInt(bsResultsDetailsGridView.SelectedRows(0).Cells("CalcRunNumber").Value)
-                    myResultInformationRow.ResultValue = CDbl(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultValue").Value)
+                    myResultInformationRow.ResultValue = CSng(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultValue").Value)
                     myResultInformationRow.Excluded = CBool(bsResultsDetailsGridView.SelectedRows(0).Cells("Excluded").Value)
 
                     If (Not bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value Is DBNull.Value) Then
-                        myResultInformationRow.ResultComment = bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value
+                        myResultInformationRow.ResultComment = CStr(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value)
                     End If
                     myResultInformationRow.ManualResultValue = 0
                     myResultInformationDS.tResultInformation.AddtResultInformationRow(myResultInformationRow)
