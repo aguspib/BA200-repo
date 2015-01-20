@@ -68,7 +68,7 @@ Public NotInheritable Class StartupSRV
 #Else
                 ShowBackground = True
 #End If
-                Dim myBackForm As New IBackground(Ax00ServiceMainMDI, Nothing)
+                Dim myBackForm As New IBackground(TryCast(Ax00ServiceMainMDI, Form), Nothing)
                 myBackForm.ShowMDI(ShowBackground)
             End If
         End Using

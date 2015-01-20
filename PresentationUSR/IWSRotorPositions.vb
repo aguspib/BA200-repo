@@ -1,4 +1,6 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Strict On
+Option Infer On
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -1151,7 +1153,7 @@ Public Class IWSRotorPositions
                                 'AG 10/10/2011 - Inform the calibrator to position only the not positioned tubes when multicalibrator
                                 If (reqElement.TubeContent = "CALIB" AndAlso rotorContentDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
                                     rotorContentDS.twksWSRotorContentByPosition(0).BeginEdit()
-                                    rotorContentDS.twksWSRotorContentByPosition(0).CalibratorID = reqElement.ElementCode
+                                    rotorContentDS.twksWSRotorContentByPosition(0).CalibratorID = CInt(reqElement.ElementCode)
                                     rotorContentDS.twksWSRotorContentByPosition(0).EndEdit()
                                     rotorContentDS.twksWSRotorContentByPosition.AcceptChanges()
                                 End If
@@ -1336,17 +1338,17 @@ Public Class IWSRotorPositions
 
                 'RH 13/10/2011 Update mySelectedElementInfo
                 If Not mySelectedElementInfo Is Nothing Then
-                    Dim query As List(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
+                    Dim query As EnumerableRowCollection(Of WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
 
                     For Each row As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In mySelectedElementInfo.twksWSRotorContentByPosition
                         query = (From a In myRotorContentByPositionDSForm.twksWSRotorContentByPosition _
                                  Where a.RotorType = row.RotorType _
                                  AndAlso a.RingNumber = row.RingNumber _
                                  AndAlso a.CellNumber = row.CellNumber _
-                                 Select a).ToList()
+                                 Select a)
 
                         If (query.Count > 0) Then 'JV 03/12/2013: #1384 assure there are elements in the query
-                            row.ItemArray = query.First().ItemArray.Clone()
+                            row.ItemArray = CType(query.First().ItemArray.Clone(), Object())
                             row.Selected = True
                         End If
                     Next
@@ -1402,7 +1404,7 @@ Public Class IWSRotorPositions
                 If myMonth <> "" AndAlso myYear <> "" AndAlso CInt(myMonth) >= 1 AndAlso CInt(myMonth) <= 12 Then
                     ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
                     'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
-                    ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
+                    ExpirationDate = New Date(CInt(myYear), CInt(myMonth), 1) 'CDate(myMonth & "-" & "01" & "-" & myYear) '.ToString(CultureInfo.InvariantCulture)
                 End If
             End If
         Catch ex As Exception
@@ -1720,7 +1722,7 @@ Public Class IWSRotorPositions
                             End If
                         Else
                             Dim auxIconPath As String = ""
-                            Dim myRotorPicture As Object = Nothing
+                            Dim myRotorPicture As Control = Nothing
 
                             If (pRotorType = "SAMPLES") Then
                                 myRotorPicture = Me.SamplesTab
@@ -1761,11 +1763,11 @@ Public Class IWSRotorPositions
                                 End If
 
                                 'Update the rotor area with the new icon path          
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
+                                UpdateRotorArea(rotorPosition, auxIconPath, CType(myRotorPicture, Control))
 
                             Else
                                 'Position is empty...icon is also empty, clean the cell
-                                UpdateRotorArea(rotorPosition, auxIconPath, myRotorPicture)
+                                UpdateRotorArea(rotorPosition, auxIconPath, CType(myRotorPicture, Control))
                             End If
                         End If
                     End If
@@ -1944,7 +1946,7 @@ Public Class IWSRotorPositions
             For Each myPosControl As Control In SamplesTab.Controls
                 If (myPosControl.Controls.Count = 0) Then
                     'Get the control type to validate if it will go to our list (only for PictureBox)
-                    myPosControlList.Add(myPosControl)
+                    myPosControlList.Add(CType(myPosControl, BSRImage))
 
                     lastIndex = (myPosControlList.Count - 1)
                     myPosControlList(lastIndex).Tag = myPosControlList(lastIndex).Name.Replace("Sam", String.Empty).Insert(1, ",")
@@ -1962,7 +1964,7 @@ Public Class IWSRotorPositions
             For Each myPosControl As Control In ReagentsTab.Controls
                 If (myPosControl.Controls.Count = 0) Then
                     'Get the control type to validate if it will go to our list (only for PictureBox)
-                    myPosControlList.Add(myPosControl)
+                    myPosControlList.Add(CType(myPosControl, BSRImage))
 
                     lastIndex = (myPosControlList.Count - 1)
                     myPosControlList(lastIndex).Tag = myPosControlList(lastIndex).Name.Replace("Reag", String.Empty).Insert(1, ",")
@@ -2023,7 +2025,7 @@ Public Class IWSRotorPositions
                     'Get the control type to validate if it will go to our list (only for PictureBox)
                     'If (myPosControl.GetType().Name = "BSRImage") Then
                     If TypeOf myPosControl Is BSRImage Then 'RH 11/02/2011
-                        myPosControlList.Add(myPosControl)
+                        myPosControlList.Add(CType(myPosControl, BSRImage))
                     End If
                 End If
             Next
@@ -2060,7 +2062,7 @@ Public Class IWSRotorPositions
                        Select a).ToList()
 
                 For Each myrow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In query
-                    myrow.ItemArray = pRotorContentByPosRow.ItemArray.Clone()
+                    myrow.ItemArray = CType(pRotorContentByPosRow.ItemArray.Clone(), Object())
                     'myrow.Selected = pRotorContentByPosRow.Selected
                 Next
                 result = True
@@ -2505,9 +2507,19 @@ Public Class IWSRotorPositions
                     myControlName = String.Format("Reag{0}{1}", pRotorContenByPosRow.RingNumber, pRotorContenByPosRow.CellNumber)
                 End If
 
-                Dim lstRotorControl As List(Of Control) = (From a As Control In myControls _
-                                                          Where a.Name = myControlName _
-                                                         Select a).ToList()
+                'Dim lstRotorControl As IEnumerable(Of Control) = (From a As Object In myControls _
+                '                                          Where CType(a, Control).Name = myControlName _
+                '                                         Select a)
+                Dim lstRotorControl = New List(Of Control)
+                For Each Obj In myControls
+                    If Obj Is Nothing Then Continue For
+                    Dim ctrl = TryCast(Obj, Control)
+                    If ctrl Is Nothing Then Continue For
+                    If ctrl.Name = myControlName Then
+                        lstRotorControl.Add(ctrl)
+                    End If
+                Next
+
                 If (lstRotorControl.Count = 1) Then
                     Dim myBSRImage As BSRImage = CType(lstRotorControl(0), BSRImage)
 
@@ -2591,7 +2603,7 @@ Public Class IWSRotorPositions
                             Dim myGlobalDataTO As GlobalDataTO
                             Dim calibratorFullPositionedFlag As Boolean = True
                             myGlobalDataTO = myWSReqElementDelegate.GetMultiPointCalibratorElements(Nothing, WorkSessionIDAttribute, _
-                                                                    myNodeTag.ElementID, myNodeTag.ElementCode)
+                                                                    myNodeTag.ElementID, CInt(myNodeTag.ElementCode))
                             'If Not myGlobalDataTO.HasError Then
                             If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then ' XB 11/03/2014 - #1523 No refresh if screen is closing
                                 Dim myReqElementDS As WSRequiredElementsDS
@@ -2629,7 +2641,7 @@ Public Class IWSRotorPositions
                     result = myNode
 
                     'RH 04/08/2011
-                    Dim myRotorPicture As Object
+                    Dim myRotorPicture As Control
                     If (pRotorType = "SAMPLES") Then
                         myRotorPicture = Me.SamplesTab
                     Else
@@ -2783,16 +2795,16 @@ Public Class IWSRotorPositions
                 CleanInfoArea(False, True)  'AG 03/10/2011 - Only in this case add optional parameter to TRUE for not disable barcode controls
 
                 If (pRotorType = "SAMPLES") Then
-                    bsSampleCellTextBox.Text = pCellNumber
+                    bsSampleCellTextBox.Text = CStr(pCellNumber)
                     bsSampleCellTextBox.Refresh()
-                    bsSampleRingNumTextBox.Text = pRingNumber
+                    bsSampleRingNumTextBox.Text = CStr(pRingNumber)
                     bsSampleRingNumTextBox.Refresh()
 
                     'TODO: when Status=IDLE maybe more fields can be informed?
                 ElseIf (pRotorType = "REAGENTS") Then
-                    bsReagentsCellTextBox.Text = pCellNumber
+                    bsReagentsCellTextBox.Text = CStr(pCellNumber)
                     bsReagentsCellTextBox.Refresh()
-                    bsReagentsRingNumTextBox.Text = pRingNumber
+                    bsReagentsRingNumTextBox.Text = CStr(pRingNumber)
                     bsReagentsRingNumTextBox.Refresh()
 
                     'TODO: when Status=IDLE maybe more fields can be informed?
@@ -4821,7 +4833,7 @@ Public Class IWSRotorPositions
                 If (query1.Count > 0 AndAlso Not query1.First.IsBarCodeInfoNull) Then pCellBarcodeInfo = query1.First.BarCodeInfo
                 Return (query1.Count > 0)
             Else
-                Return (0)
+                Return (False)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IsPositionFree ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -5097,7 +5109,7 @@ Public Class IWSRotorPositions
                     myGlobalDataTo.SetDatos = newRotorContentPosDS  'AG 05/01/2010
 
                     'TR 03/05/2012 -Update local values.
-                    LoadRotorAreaInfo(WorkSessionIDAttribute, AnalyzerIDAttribute, False, False)
+                    LoadRotorAreaInfo(WorkSessionIDAttribute, AnalyzerIDAttribute, False, False.ToString)
                     'TR 03/05/2012 -END.
 
                     'AG 28/01/2010 - show info area
@@ -6168,7 +6180,7 @@ Public Class IWSRotorPositions
                 'Validate if it's a calibrator
                 If (myReqElementTO.TubeContent = "CALIB") Then
                     Dim myWSReqElementDelegate As New WSRequiredElementsDelegate
-                    myGlobalDataTO = myWSReqElementDelegate.GetMultiPointCalibratorElements(Nothing, WorkSessionIDAttribute, myReqElementTO.ElementID, myReqElementTO.ElementCode)
+                    myGlobalDataTO = myWSReqElementDelegate.GetMultiPointCalibratorElements(Nothing, WorkSessionIDAttribute, myReqElementTO.ElementID, CInt(myReqElementTO.ElementCode))
                     If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                         'Validate if it's a Multipoint Calibrator to add all other elements on my element list.
                         Dim myReqElementDS As WSRequiredElementsDS = DirectCast(myGlobalDataTO.SetDatos, WSRequiredElementsDS)
@@ -6198,7 +6210,7 @@ Public Class IWSRotorPositions
                             Dim myRotorPosRow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow
 
                             If (Not multiSel) Then 'Only one selected element
-                                myRotorPosRow = myWSRotorbPosDS.twksWSRotorContentByPosition.Rows(0)
+                                myRotorPosRow = CType(myWSRotorbPosDS.twksWSRotorContentByPosition.Rows(0), WSRotorContentByPositionDS.twksWSRotorContentByPositionRow)
                                 ShowPositionInfoArea(AnalyzerIDAttribute, myRotorTypeForm, myRotorPosRow.RingNumber, myRotorPosRow.CellNumber)
                             Else
                                 'RH 10/10/2011
@@ -6863,7 +6875,7 @@ Public Class IWSRotorPositions
                     myRCPList = Nothing
                     myWSRotorPosInProcessDS = Nothing
                 Else
-                    ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR, myGlobalDataTO.ErrorMessage)
+                    ShowMessage(Me.Name & ".RefreshScreen", CStr(GlobalEnumerates.Messages.SYSTEM_ERROR), myGlobalDataTO.ErrorMessage)
                 End If
                 'TR 21/11/2013 -BT #1380 (2) END.
 
@@ -7140,7 +7152,7 @@ Public Class IWSRotorPositions
                     Else
                         returnValue.HasError = True 'AG 10/05/2012
                         Application.DoEvents()
-                        Dim ErrorData As String() = ErrorOnCreateWSExecutions.Split("|")
+                        Dim ErrorData As String() = ErrorOnCreateWSExecutions.Split("|"c)
                         ErrorOnCreateWSExecutions = String.Empty 'Reset the value after using it
                         ShowMessage(Me.Name, ErrorData(0), ErrorData(1), Me)
                     End If
@@ -7831,9 +7843,9 @@ Public Class IWSRotorPositions
     Private Sub bsElementsTreeView_ItemDrag(ByVal sender As Object, ByVal e As System.Windows.Forms.ItemDragEventArgs) Handles bsElementsTreeView.ItemDrag
         Try
             If isTreeDragDropAllowed = True Then
-                sourceNode = e.Item
+                sourceNode = CType(e.Item, TreeNode)
                 isDragging = True
-                DoDragDrop(e.Item.ToString(), DragDropEffects.Move + DragDropEffects.Copy)
+                DoDragDrop(e.Item.ToString(), DragDropEffects.Move And DragDropEffects.Copy)
             Else
                 isDragging = False
             End If
@@ -7925,8 +7937,8 @@ Public Class IWSRotorPositions
                 'Dim myPictureBox As New BSRImage
                 Dim myPictureBox As BSRImage
                 myPictureBox = CType(sender, BSRImage)
-                ringNumberForm = CType(myPictureBox.Tag().ToString().Split(",")(0), Integer)
-                cellNumberForm = CType(myPictureBox.Tag().ToString().Split(",")(1), Integer)
+                ringNumberForm = CType(myPictureBox.Tag().ToString().Split(","c)(0), Integer)
+                cellNumberForm = CType(myPictureBox.Tag().ToString().Split(","c)(1), Integer)
 
                 'TR 04/01/2010 - Validate if the new selected position is free 
                 If IsPositionFree(ringNumberForm, cellNumberForm) Then
@@ -7982,8 +7994,8 @@ Public Class IWSRotorPositions
                 'Validate that the Tag property is not empty to get the information.
                 If (Not myPictureBox.Tag Is Nothing) Then
                     'Get the selected Ring and Cell Number
-                    Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(0), Integer)
-                    Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(1), Integer)
+                    Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(0), Integer)
+                    Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(1), Integer)
 
                     'Validate if the pressed key is Shift or Control to allow multiselection
                     If (Control.ModifierKeys And Keys.Control) = Keys.Control OrElse (Control.ModifierKeys And Keys.Shift) = Keys.Shift Then
@@ -8319,8 +8331,8 @@ Public Class IWSRotorPositions
                     Dim myPictureBox As BSRImage = CType(sender, BSRImage)
                     If Not myPictureBox.Tag Is Nothing Then
                         'Get the new Ring and Cell values (from the Position where the Drop was done)
-                        Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(0), Integer)
-                        Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(",")(1), Integer)
+                        Dim myRingNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(0), Integer)
+                        Dim myCellNumber As Integer = CType(myPictureBox.Tag.ToString().Split(","c)(1), Integer)
 
                         Dim myNewCellBarCodeStatus As String = "" 'AG 06/10/2011 - using barcode there are new situations:
                         '                                                   - drag (from rotor) one bottle into another with BarcodeStatus ERROR (status FREE) (no changes are required)
@@ -8419,9 +8431,9 @@ Public Class IWSRotorPositions
             'i.e., that we are dragging a file. Ignore all other draggs
             If e.Data.GetDataPresent(DataFormats.Text) Then
                 'Change the feedback (the effect) to show that this drag is allowable
-                If e.AllowedEffect AndAlso DragDropEffects.Copy Then
-                    e.Effect = DragDropEffects.Copy
-                End If
+                'If e.AllowedEffect AndAlso DragDropEffects.Copy Then
+                e.Effect = DragDropEffects.Copy
+                'End If
             End If
         Catch ex As Exception
             'Write error in the Application Log and show it  

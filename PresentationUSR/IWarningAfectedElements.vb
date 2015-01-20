@@ -247,7 +247,7 @@ Public Class IWarningAfectedElements
             auxIconName = GetIconName("STUS_WITHERRS") 'WARNING") dl 23/03/2012
             If (auxIconName <> "") Then
                 bsWarningPictureBox.ImageLocation = MyBase.IconsPath & auxIconName
-                bsWarningPictureBox.SizeMode = ImageLayout.Stretch
+                bsWarningPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtonsAndPicturesControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

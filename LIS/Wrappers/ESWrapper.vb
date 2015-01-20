@@ -1161,8 +1161,8 @@ Namespace Biosystems.Ax00.LISCommunications
                                         Else
                                             'MyExportStatus is SENDING and msgID informed
                                             'Correction, when message is sent mark as SENDING with LISMessageID informed only those results included in message
-                                            .ExportStatus = IIf(dr.LISMappingError, "NOTSENT".ToString, "SENDING".ToString)
-                                            .LISMessageID = IIf(dr.LISMappingError, String.Empty, msgId.ToString)
+                                            .ExportStatus = CStr(IIf(dr.LISMappingError, "NOTSENT".ToString, "SENDING".ToString))
+                                            .LISMessageID = CStr(IIf(dr.LISMappingError, String.Empty, msgId.ToString))
                                         End If
                                         'AG 29/09/2014 - BA-1440
 
@@ -1196,8 +1196,8 @@ Namespace Biosystems.Ax00.LISCommunications
                                         Else
                                             'MyExportStatus is SENDING and msgID informed
                                             'Correction, when message is sent mark as SENDING with LISMessageID informed only those results included in message
-                                            .ExportStatus = IIf(myWSExecutionRow.LISMappingError, "NOTSENT".ToString, "SENDING".ToString)
-                                            .LISMessageID = IIf(myWSExecutionRow.LISMappingError, String.Empty, msgId.ToString)
+                                            .ExportStatus = CStr(IIf(myWSExecutionRow.LISMappingError, "NOTSENT".ToString, "SENDING".ToString))
+                                            .LISMessageID = CStr(IIf(myWSExecutionRow.LISMappingError, String.Empty, msgId.ToString))
                                         End If
                                         'AG 29/09/2014 - BA-1440
 

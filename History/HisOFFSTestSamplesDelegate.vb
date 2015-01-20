@@ -52,7 +52,7 @@ Namespace Biosystems.Ax00.BL
                                             offsTestSampleRow.OffSystemTestName = myOFFSTestDataDS.tparOffSystemTests.First.Name
                                             offsTestSampleRow.ResultType = myOFFSTestDataDS.tparOffSystemTests.First.ResultType
                                             offsTestSampleRow.MeasureUnit = myOFFSTestDataDS.tparOffSystemTests.First.Units
-                                            offsTestSampleRow.DecimalsAllowed = myOFFSTestDataDS.tparOffSystemTests.First.Decimals
+                                            offsTestSampleRow.DecimalsAllowed = CInt(myOFFSTestDataDS.tparOffSystemTests.First.Decimals)
                                             offsTestSampleRow.EndEdit()
                                         End If
                                     Else

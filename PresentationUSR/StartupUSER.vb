@@ -1,5 +1,6 @@
 ﻿
 'Imports Biosystems.Ax00.Global
+Imports System.Runtime.InteropServices.ComTypes
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global
 Imports System.Threading
@@ -98,7 +99,7 @@ Public NotInheritable Class StartupUSER
                             .WaitText = "", _
                             .Background = ""}
 
-                Dim myBackForm As New IBackground(IAx00MainMDI, Ax00StartUp)
+                Dim myBackForm As New IBackground(TryCast(IAx00MainMDI, Form), TryCast(Ax00StartUp, Form))
                 Application.DoEvents()
 
                 myBackForm.TopMost = True 'IT 18/11/2014: BA-2025

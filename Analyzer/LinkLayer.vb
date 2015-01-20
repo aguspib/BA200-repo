@@ -149,7 +149,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             'GlobalBase.CreateLogActivity("[Link][StartComm] --->> Try StartComm", "Link.StartComm", EventLogEntryType.Information, False)
             Try
-                StartComm = cls_serialPort.StartComm(ConnectionData)
+                StartComm = cls_serialPort.StartComm(DirectCast(ConnectionData, System.Array))
                 'GlobalBase.CreateLogActivity("[Link][StartComm] --->> StartComm value: '" & StartComm & "'", "Link.StartComm", EventLogEntryType.Information, False)
 
                 ActivateReception()
@@ -168,7 +168,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function SendSynchronousByte(ByRef in_datosByte() As Byte) As Boolean
 
             'Try
-            SendSynchronousByte = cls_serialPort.SendSynchronousDataByte(in_datosByte)
+
+            SendSynchronousByte = cls_serialPort.SendSynchronousDataByte(DirectCast(in_datosByte, System.Array))
 
             'RH 14/10/2010 It is a bad practice to catch an exception, do nothing with it and throw it again.
             'Catch an exception only if you want to do something with it
@@ -267,7 +268,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 cls_tmrReception.Enabled = False
 
                 'Reception byte array from CommAx00
-                If cls_serialPort.ReceiveDataByteToString(dataReceivedByte) Then
+                If cls_serialPort.ReceiveDataByteToString(DirectCast(dataReceivedByte, System.Array)) Then
                     dataReceived = ""
 
                     If Not dataReceivedByte Is Nothing Then

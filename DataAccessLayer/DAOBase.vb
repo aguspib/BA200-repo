@@ -1,6 +1,8 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
+Imports System.Data.Common
 Imports Biosystems.Ax00.Global
 
 
@@ -244,6 +246,40 @@ Namespace Biosystems.Ax00.DAL
 
             Return openConnection
         End Function
+
+        Public Shared Function GetGenericOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As GenericGlobalDataTo(Of SqlClient.SqlConnection)
+
+            Dim openConnection As New GenericGlobalDataTo(Of SqlClient.SqlConnection)
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            Try
+                If (pDBConnection Is Nothing) Then
+                    'A local Database Connection is opened
+                    dbConnection = New SqlClient.SqlConnection
+                    dbConnection.ConnectionString = GetConnectionString()
+                    dbConnection.Open()
+                Else
+                    'The opened Database Connection is used
+                    dbConnection = pDBConnection
+                End If
+
+                openConnection.HasError = False
+                openConnection.SetDatos = dbConnection
+
+            Catch ex As Exception
+                openConnection.HasError = True
+                openConnection.ErrorCode = "DB_CONNECTION_ERROR"
+                openConnection.ErrorMessage = ex.Message
+
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
+
+            End Try
+
+            Return openConnection
+
+        End Function
+
 
         ''' <summary>
         ''' Verify if the informed Database Connection is open; if not, open a new one and

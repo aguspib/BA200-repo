@@ -423,7 +423,8 @@ Partial Class IResults
                     ElseIf updateRow Then
                         'Get the row in grid
                         If linqRes.Count > 0 Then
-                            dgv("PatientID", linqRes(0).RowIndex).Value &= ", " & sampleRow.SpecimenIDList
+                            Dim auxStr = dgv("PatientID", linqRes(0).RowIndex).Value.ToString
+                            dgv("PatientID", linqRes(0).RowIndex).Value = auxStr & ", " & sampleRow.SpecimenIDList
                             dgv("PatientID", linqRes(0).RowIndex).ToolTipText &= ", " & sampleRow.SpecimenIDList
 
                             linqRes(0).UpdateSpecimenList(sampleRow.SpecimenIDList) 'Add specimen to the TO list

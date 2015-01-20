@@ -1,5 +1,7 @@
-﻿Option Strict On
-Option Explicit On
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
 
 Imports System.Drawing
 Imports System.Windows.Forms

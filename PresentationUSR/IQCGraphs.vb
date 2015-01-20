@@ -122,7 +122,7 @@ Public Class IQCGraphs
                 Dim myPoint As SeriesPoint = TryCast(e.SeriesPoint, SeriesPoint)
                 If (Not myPoint Is Nothing AndAlso Not myPoint.Tag Is Nothing) Then
                     'Validate if the n on the tag property is the last to change the icon
-                    If (e.Series.Points(e.Series.Points.Count - 1).Tag = DirectCast(myPoint.Tag, Integer)) Then
+                    If (CInt(e.Series.Points(e.Series.Points.Count - 1).Tag) = CInt(myPoint.Tag)) Then
                         CType(e.SeriesDrawOptions, PointDrawOptions).Marker.FillStyle.FillMode = FillMode.Solid
                         CType(e.SeriesDrawOptions, PointDrawOptions).Marker.Kind = MarkerKind.Star
                         e.SeriesDrawOptions.Color = Color.CornflowerBlue
@@ -232,7 +232,7 @@ Public Class IQCGraphs
 
             'Inform controls for Test Name and Rejection Criteria with the value of the correspondent attributes
             bsTestNameTextBox.Text = TestNameAttribute
-            bsRejectionTextBox.Text = RejectionCriteriaAttribute
+            bsRejectionTextBox.Text = CStr(RejectionCriteriaAttribute)
 
             'Select LJ Graph by default
             If (Not bsLeveyJenningsRB.Checked) Then bsLeveyJenningsRB.Checked = True
@@ -288,7 +288,7 @@ Public Class IQCGraphs
                                  ": " & myPoint.Values(0).ToString("F" & LocalDecimalAllowedAttribute)
 
                 ElseIf (bsYoudenRB.Checked) Then
-                    myToolTip &= " n: " & myPoint.Tag & Environment.NewLine
+                    myToolTip &= " n: " & myPoint.Tag.ToString & Environment.NewLine
                     myToolTip &= " x: " & myPoint.NumericalArgument.ToString("F" & LocalDecimalAllowedAttribute) & Environment.NewLine
                     myToolTip &= " y: " & myPoint.Values(0).ToString("F" & LocalDecimalAllowedAttribute)
                 End If
@@ -849,7 +849,7 @@ Public Class IQCGraphs
                             CreateConstantLine("-3 " & LabelSD, myDiagram, openQCResultRow.Mean - (3 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
                         End If
 
-                        If (RejectionCriteriaAttribute Mod 1 OrElse RejectionCriteriaAttribute >= 4) Then
+                        If ((RejectionCriteriaAttribute Mod 1) = 1 OrElse RejectionCriteriaAttribute >= 4) Then
                             CreateConstantLine("+4 " & LabelSD, myDiagram, openQCResultRow.Mean + (RejectionCriteriaAttribute * openQCResultRow.SD), Color.Red, DashStyle.Solid)
                             CreateConstantLine("-4 " & LabelSD, myDiagram, openQCResultRow.Mean - (RejectionCriteriaAttribute * openQCResultRow.SD), Color.Red, DashStyle.Solid)
                         End If
@@ -879,7 +879,7 @@ Public Class IQCGraphs
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
                                             Where a.QCControlLotID = openQCResultRow.QCControlLotID _
-                                          AndAlso a.CalcRunNumber = runNumber("Argument") _
+                                          AndAlso a.CalcRunNumber = CInt(runNumber("Argument")) _
                                          Order By a.CalcRunNumber _
                                            Select a).ToList
 
@@ -949,7 +949,7 @@ Public Class IQCGraphs
                             CreateConstantLine("-3 " & LabelSD, myDiagram, -3, Color.Black, DashStyle.Dash)
                         End If
 
-                        If (RejectionCriteriaAttribute Mod 1 OrElse RejectionCriteriaAttribute >= 4) Then
+                        If ((RejectionCriteriaAttribute Mod 1) = 1 OrElse RejectionCriteriaAttribute >= 4) Then
                             CreateConstantLine("+" & RejectionCriteriaAttribute.ToString() & LabelSD, myDiagram, RejectionCriteriaAttribute, Color.Red, DashStyle.Solid)
                             CreateConstantLine("-" & RejectionCriteriaAttribute.ToString() & LabelSD, myDiagram, -RejectionCriteriaAttribute, Color.Red, DashStyle.Solid)
                         End If
@@ -978,7 +978,7 @@ Public Class IQCGraphs
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
                                             Where a.QCControlLotID = openQCResultRow.QCControlLotID _
-                                          AndAlso a.CalcRunNumber = runNumber("Argument") _
+                                          AndAlso a.CalcRunNumber = CInt(runNumber("Argument")) _
                                          Order By a.CalcRunNumber _
                                            Select a).ToList
 

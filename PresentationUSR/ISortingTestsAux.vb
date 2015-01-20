@@ -1,4 +1,6 @@
-﻿Imports Biosystems.Ax00.Global.GlobalEnumerates
+﻿Option Infer On
+Option Strict On
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -566,7 +568,7 @@ Public Class ISortingTestsAux
     Private Sub UpPosButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles UpPosButton.Click
         Try
             'MoveItemsInListView(TestListView, True)
-            MoveItemsInListInGrid(bsTestListGrid, True) 'AG 03/09/2014 - BA-1869
+            MoveItemsInListInGrid(TryCast(bsTestListGrid, DataGridView), True) 'AG 03/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UpPosButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -576,7 +578,7 @@ Public Class ISortingTestsAux
     Private Sub DownPosButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DownPosButton.Click
         Try
             'MoveItemsInListView(TestListView, False)
-            MoveItemsInListInGrid(bsTestListGrid, False) 'AG 03/09/2014 - BA-1869
+            MoveItemsInListInGrid(TryCast(bsTestListGrid, DataGridView), False) 'AG 03/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DownPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DownPosButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -681,9 +683,19 @@ Public Class ISortingTestsAux
                         Dim dgv As BSDataGridView = bsTestListGrid
 
                         'Some not available new value = avaliable ALL // all available new value = available NONE
-                        Dim disabledRows As List(Of DataGridViewRow) = (From a As DataGridViewRow In dgv.Rows _
-                                                    Where a.Cells("Available").Value = False Select a).ToList
+                        'Dim disabledRows As IEnumerable(Of DataGridViewRow) = (From a As DataGridViewRow In dgv.Rows _
+                        '                            Where a.Cells("Available").Value = False Select a)
 
+                        Dim disabledRows As New List(Of DataGridViewRow)
+                        For Each item In dgv.Rows
+                            If item Is Nothing Then Continue For
+                            Dim dataGridRow = TryCast(item, DataGridViewRow)
+                            If dataGridRow Is Nothing Then Continue For
+                            Dim cell = dataGridRow.Cells("Available")
+                            If cell IsNot Nothing AndAlso CBool(cell.Value) = False Then
+                                disabledRows.Add(dataGridRow)
+                            End If
+                        Next
 
                         If disabledRows.Count > 0 Then
                             'Some disable ... set all available
@@ -694,7 +706,7 @@ Public Class ISortingTestsAux
                         Else
                             'All enable ... set disable
                             For Each row As DataGridViewRow In dgv.Rows
-                                If row.Cells("Available").Value Then
+                                If CBool(row.Cells("Available").Value) Then
                                     row.Cells("Available").Value = False
                                 End If
                             Next
@@ -726,8 +738,8 @@ Public Class ISortingTestsAux
 
 
                 If e.ColumnIndex = AvailableIndex Then
-                    HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
-                                             e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
+                    HeadRect = New Rectangle(CInt(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2), _
+                                             CInt(e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2), _
                                              HeadImageSide, HeadImageSide)
 
                     e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
@@ -935,7 +947,7 @@ Public Class ISortingTestsAux
     ''' </remarks>
     Private Sub MoveTopOrBottomItemsInGrid(ByVal pGridView As DataGridView, ByVal pMoveTop As Boolean)
         Try
-            Dim dgv As BSDataGridView = pGridView
+            Dim dgv As BSDataGridView = TryCast(pGridView, BSDataGridView)
 
             'If tests are moving to botton, set index to the last element in list
             'If tests are moving to top, set index to the first element in list
@@ -1019,7 +1031,7 @@ Public Class ISortingTestsAux
     ''' </remarks>
     Private Sub MoveItemsInListInGrid(ByRef pGridView As DataGridView, ByVal pMoveUp As Boolean)
         Try
-            Dim dgv As BSDataGridView = pGridView
+            Dim dgv = TryCast(pGridView, BSDataGridView)
 
             'Get the list of selected positions (indexes)
             Dim selectedIndexesList As New List(Of Integer)

@@ -270,7 +270,7 @@ Namespace Biosystems.Ax00.LISCommunications
                 End If
             Catch ex As Exception
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageFiledFromNotification, on Position " + position, EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ESBusiness.ExtractMessageFiledFromNotification, on Position " & position, EventLogEntryType.Error, False)
             End Try
             Return myFiled
         End Function

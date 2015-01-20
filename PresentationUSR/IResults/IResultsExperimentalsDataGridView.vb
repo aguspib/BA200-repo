@@ -406,7 +406,7 @@ Partial Class IResults
                     'AG 22/09/2014 - BA-1940 show specimen in the grid (sample type column)
                     dgv("TestName", MaxRows).ToolTipText = String.Empty
                     If Not resultRow.IsSpecimenIDListNull Then
-                        dgv("TestName", MaxRows).ToolTipText = resultRow.SpecimenIDList & " (" & dgv("TestName", MaxRows).Value & ")"
+                        dgv("TestName", MaxRows).ToolTipText = resultRow.SpecimenIDList & " (" & dgv("TestName", MaxRows).Value.ToString & ")"
                     End If
                     'AG 22/09/2014
 

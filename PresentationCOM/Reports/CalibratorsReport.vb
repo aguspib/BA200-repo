@@ -10,7 +10,7 @@ Public Class CalibratorsReport
     End Sub
 
     Private Sub XrTableRowDetails_BeforePrint(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles XrTableRowDetails.BeforePrint
-        Dim Row As XRTableRow = sender
+        Dim Row As XRTableRow = TryCast(sender, XRTableRow)
 
         Dim TreatDuplicates = Sub(assignment As ValueSuppressType)
                                   XrTableCellTest.ProcessDuplicates = assignment

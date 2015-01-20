@@ -1250,7 +1250,7 @@ Public Class IConfigLISMapping
     ''' <remarks>
     ''' Created by SGM 02/05/2013
     ''' </remarks>
-    Private Function CheckCalcTestIsMultiSampleType(ByRef pDataRow As DataGridViewRow)
+    Private Function CheckCalcTestIsMultiSampleType(ByRef pDataRow As DataGridViewRow) As Boolean
         Dim ReadOnlyRow As Boolean
         Try
             Dim resultData As New GlobalDataTO

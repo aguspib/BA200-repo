@@ -416,11 +416,11 @@ Public Class ISECodeGenerator
             'Generar valores de 64 bits cuya raiz cuadrada es entera
             For N As UInt32 = 0 To 16842751UI Step 1
 
-                Me.BsProgressBar.Value = N
+                Me.BsProgressBar.Value = CInt(N)
 
                 Dim myPow2 As UInt64
                 Try
-                    myPow2 = Math.Pow(16842751UI - N, 2)
+                    myPow2 = CULng(Math.Pow(16842751UI - N, 2))
                 Catch ex As Exception
                     Exit For
                 End Try
@@ -522,7 +522,7 @@ Public Class ISECodeGenerator
             If Me.BsValidateAllCheckbox.Checked Then
                 Dim myCodesOK As New List(Of String)
                 Dim myCodesERROR As New List(Of String)
-                Dim codes() As String = Me.BsCodesTextBox.Text.Split(vbCrLf)
+                Dim codes() As String = Me.BsCodesTextBox.Text.Split(vbCrLf.ToCharArray)
                 For c As Integer = 0 To codes.Length - 1
                     MyClass.SelectedDSND00 = codes(c).Trim
                     If MyClass.SelectedDSND00.Length > 0 Then
@@ -629,13 +629,13 @@ Public Class ISECodeGenerator
         Dim res As DateTime
         Try
             If (pString.Length = 15) Then
-                Dim Day As Short = pString.Substring(0, 2)
-                Dim Month As Short = pString.Substring(2, 2)
-                Dim Year As Short = pString.Substring(4, 2)
-                Dim Hour As Short = pString.Substring(6, 2)
-                Dim Minute As Short = pString.Substring(8, 2)
-                Dim Second As Short = pString.Substring(10, 2)
-                Dim MiliSec As Short = pString.Substring(12, 3)
+                Dim Day As Integer = CInt(pString.Substring(0, 2))
+                Dim Month As Integer = CInt(pString.Substring(2, 2))
+                Dim Year As Integer = CInt(pString.Substring(4, 2))
+                Dim Hour As Integer = CInt(pString.Substring(6, 2))
+                Dim Minute As Integer = CInt(pString.Substring(8, 2))
+                Dim Second As Integer = CInt(pString.Substring(10, 2))
+                Dim MiliSec As Integer = CInt(pString.Substring(12, 3))
 
                 res = New DateTime(Year, Month, Day, Hour, Minute, Second, MiliSec)
 

@@ -111,7 +111,7 @@ Public Class IQCCumulatedReview
                     Dim myCumulateResultsRow As CumulatedResultsDS.tqcCumulatedResultsRow
 
                     For Each SelQCResult As DataGridViewRow In bsResultsDetailsGridView.SelectedRows
-                        myCumulateResultsRow = myCumulateResultsDS.tqcCumulatedResults.NewRow
+                        myCumulateResultsRow = CType(myCumulateResultsDS.tqcCumulatedResults.NewRow, CumulatedResultsDS.tqcCumulatedResultsRow)
 
                         myCumulateResultsRow.QCTestSampleID = CInt(SelQCResult.Cells("QCTestSampleID").Value)
                         myCumulateResultsRow.QCControlLotID = CInt(SelQCResult.Cells("QCControlLotID").Value)
@@ -199,10 +199,10 @@ Public Class IQCCumulatedReview
 
                     'Add the Test/Sample Type to the ListView
                     bsTestSampleListView.Items.Add(historyTestSampRow.TestName, myIconNameVar).SubItems.Add(historyTestSampRow.SampleType)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample.ToString)
                     bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestType)
 
                     myIndex += 1
@@ -579,8 +579,9 @@ Public Class IQCCumulatedReview
                         bsFirstCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsFirstCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber.ToString
+
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 2) Then
@@ -590,8 +591,8 @@ Public Class IQCCumulatedReview
                         bsSecondCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsSecondCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 3) Then
@@ -601,8 +602,8 @@ Public Class IQCCumulatedReview
                         bsThirdCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsThirdCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
                     End If
 

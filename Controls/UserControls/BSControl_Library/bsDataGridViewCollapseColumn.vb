@@ -244,8 +244,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
                 headerPictureBox.Size = New Size(PlusImage.Width, PlusImage.Height)
 
-                Dim OffsetWidth As Integer = (Width - PlusImage.Width) / 2 + 1
-                Dim OffsetHeight As Integer = (DataGridView.ColumnHeadersHeight - PlusImage.Height) / 2 + 2
+                Dim OffsetWidth As Integer = CInt((Width - PlusImage.Width) / 2 + 1)
+                Dim OffsetHeight As Integer = CInt((DataGridView.ColumnHeadersHeight - PlusImage.Height) / 2 + 2)
 
                 Dim LeftPadding As Integer = OffsetWidth
                 For i As Integer = 0 To Me.Index - 1
