@@ -32,8 +32,23 @@ Namespace My
     Partial Friend Class MyApplication
 
         Private Sub MyApplication_UnhandledException(sender As Object, e As ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
-            ' Write into Log
-            GlobalBase.CreateLogActivity("An Unhandled Exception has been occurred ", "MyApplication.ApplicationEvents", EventLogEntryType.Error, False)
+
+            Try
+                If e.Exception IsNot Nothing AndAlso e.Exception.TargetSite IsNot Nothing Then
+                    Dim sourceOfException = e.Exception.Source &
+                        e.Exception.TargetSite.DeclaringType.ToString & "." & e.Exception.TargetSite.Name
+                    GlobalBase.CreateLogActivity(
+                        e.Exception.ToString,
+                        sourceOfException,
+                        EventLogEntryType.Error,
+                        False)
+                    MsgBox(sourceOfException & vbCr & Environment.StackTrace)
+                Else
+                    GlobalBase.CreateLogActivity("An Unhandled Exception has been occurred, but exception data is missing ", "MyApplication.ApplicationEvents", EventLogEntryType.Error, False)
+                End If
+            Catch
+            End Try
+
             ' Display message to user and then exit.
             MessageBox.Show(Biosystems.Ax00.Global.GlobalConstants.UNHANDLED_EXCEPTION_ERR.ToString, My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Question)
             e.ExitApplication = False
