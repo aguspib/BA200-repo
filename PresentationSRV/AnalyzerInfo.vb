@@ -391,35 +391,35 @@ Public Class AnalyzerInfo
             ' PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 bsPrintButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If File.Exists(iconPath & auxIconName) Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             End If
 
             ' EDIT serial number button
             auxIconName = GetIconName("EDIT")
             If File.Exists(iconPath & auxIconName) Then
-                bsEditSNButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditSNButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'bsEditSNButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
             ' SAVE serial number button
             auxIconName = GetIconName("SAVE")
             If File.Exists(iconPath & auxIconName) Then
-                bsSaveSNButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveSNButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'bsSaveSNButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
             ' CANCEL serial number edition button
             auxIconName = GetIconName("UNDO")
             If File.Exists(iconPath & auxIconName) Then
-                bsCancelSNButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelSNButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'bsCancelSNButton.BackgroundImageLayout = ImageLayout.Center
             End If
 

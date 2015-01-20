@@ -159,7 +159,7 @@ Public Class IWSImportLIMSErrors
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

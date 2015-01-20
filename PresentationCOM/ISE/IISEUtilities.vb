@@ -731,10 +731,10 @@ Public Class IISEUtilities
                     If Exists Then
                         If System.IO.File.Exists(iconPath & auxIconName) Then
                             'Dim myUtil As New Utilities.
-                            Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                            Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             myGlobalDataTO = Utilities.ResizeImage(myImage, New Size(20, 20))
                             If Not myGlobalDataTO.HasError And myGlobalDataTO.SetDatos IsNot Nothing Then
-                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             Else
                                 Me.BsMessageImage.BackgroundImage = myImage
                             End If
@@ -1420,65 +1420,65 @@ Public Class IISEUtilities
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If (auxIconName <> "") Then
-            '    BsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''Exit button
             'auxIconName = GetIconName("CANCEL")
             'If (auxIconName <> "") Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("READADJ")
             'If (auxIconName <> "") Then
-            '    BsSaveAsButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveAsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("RESETFIELD")
             'If (auxIconName <> "") Then
-            '    BsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''STOP Button
             'auxIconName = GetIconName("STOP")
             'If (auxIconName <> "") Then
-            '    BsStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
 
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '            BsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '            BsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '           BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             '          End If
 
             'EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("READADJ")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveAsButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveAsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsSaveAsButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("RESETFIELD")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsClearButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''STOP Button
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStopButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
@@ -1505,7 +1505,7 @@ Public Class IISEUtilities
             auxIconName = GetIconName(pImageName)
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 myGlobal = Utilities.ResizeImage(myImage, New Size(pWidth, pHeight))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -1610,19 +1610,19 @@ Public Class IISEUtilities
             'NONE Image
             auxIconName = GetIconName("FREECELL") ' NONE
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("NONE", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("NONE", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'ACTION Image
             auxIconName = GetIconName("ADJUSTMENT") ' ACTION
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("ACTION", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("ACTION", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'DONE Image SGM 08/06/2012
             auxIconName = GetIconName("ACCEPT1") ' ACTION DONE
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("DONE", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("DONE", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
 

@@ -1440,7 +1440,7 @@ Public Class IPositionsAdjustments
             If System.IO.File.Exists(iconPath & auxIconName) Then
 
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -3981,49 +3981,49 @@ Public Class IPositionsAdjustments
             'dl 20/04/2012
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsOpticAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsWSAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsOpticAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsWSAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsUpDownWSButton1.Image = Image.FromFile(iconPath & auxIconName)
-                BsUpDownWSButton2.Image = Image.FromFile(iconPath & auxIconName)
-                BsUpDownWSButton3.Image = Image.FromFile(iconPath & auxIconName)
+                BsUpDownWSButton1.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUpDownWSButton2.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUpDownWSButton3.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             MyBase.SetButtonImage(BsOpticStopButton, "STOP", 24, 24) 'SGM 09/05/2012
             'auxIconName = GetIconName("STOP")
             'If (auxIconName <> "") Then
-            '    BsOpticStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsOpticStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             auxIconName = GetIconName("ESPIRAL")
             If (auxIconName <> "") Then
-                BsStirrer1Button.Image = Image.FromFile(iconPath & auxIconName)
-                BsStirrer2Button.Image = Image.FromFile(iconPath & auxIconName)
+                BsStirrer1Button.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsStirrer2Button.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                BsOpticCancelButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsWSCancelButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsArmsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsOpticCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsWSCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsArmsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                BsArmsOkButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsArmsOkButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'dl 20/04/2012
 
@@ -4053,7 +4053,7 @@ Public Class IPositionsAdjustments
             '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsOpticAdjustButton.Image = myImage
             '    BsWSAdjustButton.Image = myImage
-            '    'BsArmsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    'BsArmsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''CANCEL Button
@@ -4136,7 +4136,7 @@ Public Class IPositionsAdjustments
             'Dim myMixerImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             '    myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then

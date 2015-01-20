@@ -852,31 +852,31 @@ Public Class ISettings
             ' Close Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                CloseButton.Image = Image.FromFile(iconPath & auxIconName)
+                CloseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Edit EditButton
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                EditButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Save SaveButton
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Undo Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 

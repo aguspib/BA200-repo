@@ -146,7 +146,7 @@ Public Class IWSNotPosWarning
             'POSITIONING Button
             auxIconName = GetIconName("SENDTOPOS")
             If (auxIconName <> "") Then
-                bsPositioningButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPositioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 27/09/2013 - Validate the OpenModeAttribute to set the corresponding ICON
@@ -158,7 +158,7 @@ Public Class IWSNotPosWarning
             End If
             'TR 27/09/2013 -END.
             If auxIconName <> "" Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -227,7 +227,7 @@ Public Class IWSNotPosWarning
             Dim WARNING_IconName As String = ""
             WARNING_IconName = GetIconName("STUS_WITHERRS") 'WARNING") dl 23/03/2012
 
-            bsWarningPictureBox.BackgroundImage = Image.FromFile(MyBase.IconsPath & WARNING_IconName)
+            bsWarningPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & WARNING_IconName)
             bsWarningPictureBox.BackgroundImageLayout = ImageLayout.Stretch
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareIconNames ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

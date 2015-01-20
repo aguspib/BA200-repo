@@ -333,38 +333,38 @@ Public Class IHistoricalReports
             'DL 20/04/2012. Substitute icons and optimize
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                SearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                SearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                DeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'DL 20/04/2012
 
@@ -377,7 +377,7 @@ Public Class IHistoricalReports
             'Dim myAuxImage As Image
             'If File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -393,35 +393,35 @@ Public Class IHistoricalReports
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'SaveButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    CancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'CancelButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''DELETE Button
             'auxIconName = GetIconName("REMOVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    DeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    DeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'DeleteButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''PRINT Button
             'auxIconName = GetIconName("PRINT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'PrintButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'ExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -1102,7 +1102,7 @@ Public Class IHistoricalReports
     '    '                path = Me.MonitorTaskIconNameAttr
     '    '        End Select
 
-    '    '        Dim bm_source As New Bitmap(Image.FromFile(path))
+    '    '        Dim bm_source As New Bitmap(ImageUtilities.ImageFromFile(path))
     '    '        Dim scale_factor As Integer = 20
     '    '        ' Make a bitmap for the result.
     '    '        Dim bm_dest As New Bitmap(CInt(scale_factor), CInt(scale_factor))

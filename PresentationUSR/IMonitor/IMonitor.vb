@@ -2246,7 +2246,7 @@ Public Class IMonitor
     'Private Sub BsButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton1.Click
 
     '    If testbackgroundMaintab Then
-    '        MainTab.Appearance.PageClient.Image = Image.FromFile("C:\Users\David Luna\Documents\Ax00 v1\PresentationCOM\Images\Embedded\BackgroundMainMonitor-Start.png") 'GlobalBase.ImagesPath & "Embedded\BackgroundMainMonitor-Start.png")
+    '        MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile("C:\Users\David Luna\Documents\Ax00 v1\PresentationCOM\Images\Embedded\BackgroundMainMonitor-Start.png") 'GlobalBase.ImagesPath & "Embedded\BackgroundMainMonitor-Start.png")
     '        PanelControl12.Visible = False
     '        CoverReagentsPicture.Visible = False
     '        CoverReactionsPicture.Visible = False
@@ -2257,7 +2257,7 @@ Public Class IMonitor
     '        testbackgroundMaintab = False
 
     '    Else
-    '        MainTab.Appearance.PageClient.Image = Image.FromFile("C:\Users\David Luna\Documents\Ax00 v1\PresentationCOM\Images\Embedded\BackgroundMainMonitor.png") 'GlobalBase.ImagesPath & "Embedded\BackgroundMainMonitor.png")
+    '        MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile("C:\Users\David Luna\Documents\Ax00 v1\PresentationCOM\Images\Embedded\BackgroundMainMonitor.png") 'GlobalBase.ImagesPath & "Embedded\BackgroundMainMonitor.png")
     '        PanelControl12.Visible = True
     '        CoverReagentsPicture.Visible = True
     '        CoverReactionsPicture.Visible = True

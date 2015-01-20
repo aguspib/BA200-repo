@@ -44,15 +44,15 @@ Public Class IChangeRotor
 
             'CHANGE ROTOR Button
             auxIconName = GetIconName("CHANGEROTORB")
-            If (auxIconName <> String.Empty) Then bsChangeRotortButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsChangeRotortButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CONTINUE Button
             auxIconName = GetIconName("ADJUSTMENT")
-            If (auxIconName <> String.Empty) Then bsContinueButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsContinueButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> String.Empty) Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Icons for the final result of the Rotor change process: OK or ERROR
             auxIconName = GetIconName("ACCEPTF")
@@ -506,7 +506,7 @@ Public Class IChangeRotor
                                 dxProgressBar.Visible = True
                                 dxProgressBar.Position = dxProgressBar.Properties.Maximum
 
-                                bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                                bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
                                 bsStatusImage.Visible = True
 
                                 IAx00MainMDI.EnableButtonAndMenus(True)
@@ -603,11 +603,11 @@ Public Class IChangeRotor
 
                         If Not ExistBaseLineInitError Then
                             bsStatusImage.Visible = True
-                            bsStatusImage.Image = Image.FromFile(OKIconName)
+                            bsStatusImage.Image = ImageUtilities.ImageFromFile(OKIconName)
 
                         Else
                             bsStatusImage.Visible = True
-                            bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                            bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
                         End If
 
                         'DL 26/09/2012. begin

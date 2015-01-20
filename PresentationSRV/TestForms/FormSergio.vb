@@ -61,7 +61,7 @@ Public Class FormSergio
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("ADJUSTMENT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myGlobal = Utilities.ResizeImage(myImage, New Size(16, 16))
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
@@ -877,7 +877,7 @@ Public Class FormSergio
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("ADJUSTMENT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myGlobal = Utilities.ResizeImage(myImage, New Size(16, 16))
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then

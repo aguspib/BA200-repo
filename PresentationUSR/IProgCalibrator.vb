@@ -295,58 +295,58 @@ Public Class IProgCalibrator
             'NEW Calibrator
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                AddCalibButon.Image = Image.FromFile(iconPath & auxIconName)
+                AddCalibButon.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(AddCalibButon, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", pLanguageID))
             End If
 
             'EDIT Calibrator and EDIT Calibrator Values
             auxIconName = GetIconName("EDIT")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                EditCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(EditCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
 
-                EditCalTestSampleButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditCalTestSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(EditCalTestSampleButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
             End If
 
             'DELETE Calibrators
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                DeleteCalbButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteCalbButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(DeleteCalbButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'PRINT Calibrators Report
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'SAVE Changes (Calibrators and SAVE Calibrator Values)
             auxIconName = GetIconName("SAVE")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                SaveCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(SaveCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Calibs_SaveCalib", pLanguageID))
 
-                SaveTestSampleCalValue.Image = Image.FromFile(iconPath & auxIconName)
+                SaveTestSampleCalValue.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(SaveTestSampleCalValue, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Calibs_SaveCurve", pLanguageID))
             End If
 
             'CANCEL Changes (Calibrators and SAVE Calibrator Values)
             auxIconName = GetIconName("UNDO")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                CancelCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                CancelCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(CancelCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
 
-                CancelTestSampleCalValue.Image = Image.FromFile(iconPath & auxIconName)
+                CancelTestSampleCalValue.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(CancelTestSampleCalValue, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
             End If
 
             'CLOSE SCREEN
             auxIconName = GetIconName("CANCEL")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsAcceptButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
         Catch ex As Exception

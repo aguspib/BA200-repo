@@ -863,47 +863,47 @@ Public Class IWSRotorPositions
             'MOVE TO FIRST ROTOR POSITION Buttons
             auxIconName = GetIconName("BACKWARDL")
             If (auxIconName <> "") Then
-                bsSamplesMoveFirstPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsMoveFirstPositionButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesMoveFirstPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsMoveFirstPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO PREVIOUS ROTOR POSITION Buttons
             auxIconName = GetIconName("LEFT")
             If (auxIconName <> "") Then
-                bsReagentsDecreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsSamplesDecreaseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsReagentsDecreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsSamplesDecreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO NEXT ROTOR POSITION Buttons
             auxIconName = GetIconName("RIGHT")
             If (auxIconName <> "") Then
-                bsSamplesIncreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsIncreaseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesIncreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsIncreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO LAST ROTO POSITION Buttons
             auxIconName = GetIconName("FORWARDL")
             If (auxIconName <> "") Then
-                bsSamplesMoveLastPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsMoveLastPositionButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesMoveLastPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsMoveLastPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'REFILL TUBE/BOTTLE Buttons
             auxIconName = GetIconName("REFILL")
             If (auxIconName <> String.Empty) Then
-                bsSamplesRefillPosButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsRefillPosButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesRefillPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsRefillPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CHECK ROTOR POSITION VOLUME Button (only for Reagents
             auxIconName = GetIconName("VOLUMETEST")
-            If (auxIconName <> String.Empty) Then bsReagentsCheckVolumePosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsReagentsCheckVolumePosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DELETE POSITION Buttons
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsSamplesDeletePosButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsDeletePosButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesDeletePosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsDeletePosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             '********************
@@ -912,25 +912,25 @@ Public Class IWSRotorPositions
 
             'SAMPLES AUTOPOSITIONING Button
             auxIconName = GetIconName("SAMPLEPOS")
-            If (auxIconName <> "") Then bsSamplesAutoPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSamplesAutoPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'REAGENTS AUTOPOSITIONING Button
             auxIconName = GetIconName("REAGENTPOS")
-            If (auxIconName <> "") Then bsReagentAutoPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsReagentAutoPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ' XB 25/03/2014 - Memory leaks - Improve Dispose (SplitContainer disallows dispose memory)
             ''EXPAND TREE VIEW Button
             'auxIconName = GetIconName("FORWARD")
-            'If (auxIconName <> "") Then BsForwardButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then BsForwardButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ''CONTRACT TREE VIEW Button
             'auxIconName = GetIconName("BACKWARD")
-            'If (auxIconName <> "") Then BsBackwardButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then BsBackwardButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ' XB 25/03/2014
 
             'SCANNING Button
             auxIconName = GetIconName("BARCODE")
-            If (auxIconName <> "") Then bsScanningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsScanningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'INCOMPLETE SAMPLES Button (if LIS is implemented with FILES) or HOST QUERY Button (if LIS is implemented with ES)
             If (Not LisWithFilesMode) Then
@@ -938,35 +938,35 @@ Public Class IWSRotorPositions
             Else
                 auxIconName = GetIconName("BCWARNING")
             End If
-            If (auxIconName <> "") Then BarcodeWarningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BarcodeWarningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SHOW NOT POSITIONED ELEMENTS Button
             auxIconName = GetIconName("WARNING")
-            If (auxIconName <> "") Then bsWarningsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsWarningsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
-            If (auxIconName <> "") Then bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CHECK ROTOR VOLUME Button
             auxIconName = GetIconName("VOLUME")
-            If (auxIconName <> String.Empty) Then bsCheckRotorVolumeButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsCheckRotorVolumeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE VIRTUAL ROTOR Button
             auxIconName = GetIconName("SAVE")
-            If (auxIconName <> "") Then bsSaveVRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSaveVRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'LOAD VIRTUAL ROTOR Button
             auxIconName = GetIconName("OPEN")
-            If (auxIconName <> "") Then bsLoadVRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsLoadVRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'RESET ROTOR Button
             auxIconName = GetIconName("RESETROTOR")
-            If (auxIconName <> "") Then bsResetRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsResetRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EXIT Button 
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Get the Barcode reader activation/deactivation status
             Dim resultData As New GlobalDataTO
@@ -2114,7 +2114,7 @@ Public Class IWSRotorPositions
             'Select Case pStatus
             '    Case "NO_INUSE"
             '        If (pRotorType <> "REAGENTS") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & NOTINUSE_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & NOTINUSE_IconName)
 
             '        ElseIf (pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1") Then
             '            If (pRingNumber = 1) Then
@@ -2130,7 +2130,7 @@ Public Class IWSRotorPositions
 
             '    Case "DEPLETED", "LOCKED"
             '        If (pRotorType <> "REAGENTS") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & DEPLETED_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & DEPLETED_IconName)
 
             '        ElseIf (pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1") Then
             '            If (pRingNumber = 1) Then
@@ -2146,36 +2146,36 @@ Public Class IWSRotorPositions
 
             '    Case "PENDING"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & PENDING_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & PENDING_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "INPROCESS"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & INPROGRESS_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & INPROGRESS_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "FINISHED"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FINISHED_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FINISHED_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "BARERROR"
             '        If (pRotorType = "SAMPLES") Then
-            '            pPositionControl.Image = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+            '            pPositionControl.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
             '            pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
             '        End If
             '        Exit Select
 
             '    Case "FEW"
             '        If (pRotorType <> "REAGENTS") Then
-            '            pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FEWVOL_IconName)
+            '            pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FEWVOL_IconName)
 
             '        ElseIf (pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1") Then
             '            If pRingNumber = 1 Then
@@ -2413,29 +2413,29 @@ Public Class IWSRotorPositions
             If (pBarCodeStatus = String.Empty OrElse pBarCodeStatus = "OK" OrElse pBarCodeStatus = "EMPTY") Then
                 Select Case (pStatus)
                     Case "NO_INUSE"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & NOTINUSE_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & NOTINUSE_IconName)
                         Exit Select
 
                     Case "DEPLETED"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & DEPLETED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & DEPLETED_IconName)
                         Exit Select
 
                     Case "PENDING"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & PENDING_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & PENDING_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                         Exit Select
 
                     Case "INPROCESS"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & INPROGRESS_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & INPROGRESS_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
 
                     Case "FINISHED"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FINISHED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FINISHED_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
 
                     Case "BARERROR"
-                        pPositionControl.Image = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        pPositionControl.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                         Exit Select
                     Case Else
@@ -3076,7 +3076,7 @@ Public Class IWSRotorPositions
     End Sub
 
 
-   	 ''' <summary>
+    ''' <summary>
     ''' Get the information that has to be shown in the Report related to the Rotor and the Info Area section
     ''' </summary>
     ''' <param name="pAnalyzerID">Analyzer identifier</param>
@@ -3462,7 +3462,7 @@ Public Class IWSRotorPositions
         End Try
     End Sub
 
-   	    ''' <summary>
+    ''' <summary>
     ''' To Save the Virtual Rotor Position Details
     ''' </summary>
     ''' <remarks>
@@ -4144,24 +4144,24 @@ Public Class IWSRotorPositions
             '                String.Equals(myTubeContent, "CTRL")) Then
 
             '                If String.Equals(posContent.First.BarcodeStatus, "ERROR") Then
-            '                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+            '                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
 
             '                Else
             '                    Select Case posContent.First.Status
             '                        Case "PENDING"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
 
             '                        Case "DEPLETED"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
 
             '                        Case "NO_INUSE"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
 
             '                        Case "FINISHED"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
 
             '                        Case "INPROCESS"
-            '                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
+            '                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
 
             '                            'Case "FREE", "PATIENT"
             '                            'bsSamplesDeletePosButton.Enabled = True
@@ -4173,11 +4173,11 @@ Public Class IWSRotorPositions
 
             '            Else
             '                If String.Equals(posContent.First.BarcodeStatus, "ERROR") Then
-            '                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+            '                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
 
             '                    If String.Equals(posContent.First.Status, "FREE") Then BarCodeErrorSampleFree = True
             '                Else
-            '                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+            '                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
             '                End If
 
             '            End If
@@ -4331,7 +4331,7 @@ Public Class IWSRotorPositions
             '                        If String.Equals(posContent.First.BarcodeStatus, "ERROR") Or String.Equals(posContent.First.BarcodeStatus, "UNKNOWN") Then
             '                            BarCodeErrorReagentFree = True
             '                            'Else
-            '                            '    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+            '                            '    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
             '                        End If
 
             '                        ChangeControlPositionImage(controlQuery.First, Nothing, True)
@@ -4474,27 +4474,27 @@ Public Class IWSRotorPositions
                         myTubeContent = "SPEC_SOL" OrElse myTubeContent = "TUBE_SPEC_SOL" OrElse _
                         myTubeContent = "WASH_SOL" OrElse myTubeContent = "TUBE_WASH_SOL") Then
                         If (posContent.First.BarcodeStatus = "ERROR") Then
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                         Else
                             Select Case (posContent.First.Status)
                                 Case "NO_INUSE"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
                                 Case "DEPLETED"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
                                 Case "PENDING"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
                                 Case "INPROCESS"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
                                 Case "FINISHED"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
                             End Select
                         End If
                     Else
                         If (posContent.First.BarcodeStatus = "ERROR") Then
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                             If (posContent.First.Status = "FREE") Then BarCodeErrorSampleFree = True
                         Else
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
                         End If
                     End If
                 Else
@@ -6268,7 +6268,7 @@ Public Class IWSRotorPositions
                 pControl.IsTransparentImage = pTransparentImage
 
                 If (pImagePath <> Nothing) Then ' AndAlso Not setControlPosToNothing Then
-                    pControl.Image = Image.FromFile(pImagePath)
+                    pControl.Image = ImageUtilities.ImageFromFile(pImagePath)
                     pControl.BringToFront()
                 Else
                     pControl.Image = Nothing

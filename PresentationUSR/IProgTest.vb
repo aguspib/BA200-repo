@@ -2452,7 +2452,7 @@ Public Class IProgTest
                                 Case "TESTICON", "INUSETEST", "USERTEST", "INUSUSTEST"
                                     If IO.File.Exists(MyBase.IconsPath & PreMasterRow.FixedItemDesc) Then
                                         testIconList.Images.Add(PreMasterRow.ItemID, _
-                                                Image.FromFile(MyBase.IconsPath & PreMasterRow.FixedItemDesc))
+                                                ImageUtilities.ImageFromFile(MyBase.IconsPath & PreMasterRow.FixedItemDesc))
                                     End If
                                     Exit Select
                                 Case Else
@@ -8842,18 +8842,18 @@ Public Class IProgTest
             'ADD AddButton, AddSampleTypeButton, AddCalibratorButton, BSReferenceRanges-Add Range Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                AddButton.Image = Image.FromFile(iconPath & auxIconName)
-                'AddSampleTypeButton.Image = Image.FromFile(iconPath & auxIconName)'TR 10/05/2011 commented
-                AddCalibratorButton.Image = Image.FromFile(iconPath & auxIconName)
+                AddButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                'AddSampleTypeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)'TR 10/05/2011 commented
+                AddCalibratorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'TR 06/04/2011 -Add image for Add control button.
-                AddControls.Image = Image.FromFile(iconPath & auxIconName)
+                AddControls.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             End If
 
             'EDIT EditButton
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                EditButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 10/05/2011 -Add sampletype icon
@@ -8863,7 +8863,7 @@ Public Class IProgTest
             'DL 27/09/2011
             'auxIconName = GetIconName("DROPDOWN")
             'If (auxIconName <> "") Then
-            'AddSampleTypeButton.Image = Image.FromFile(iconPath & auxIconName)
+            'AddSampleTypeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
             'DL 11/01/2012. End
             'TR 10/05/2011 -END
@@ -8871,19 +8871,19 @@ Public Class IProgTest
             'DELETE DeleteButton; DeleteSampleTypeButton; DeleteGenderAgeButton; BSReferenceRanges-Delete Ranges Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                DeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                DeleteSampleTypeButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                DeleteSampleTypeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 'TR 06/04/2011 -Add image to Delete control button.
-                DeleteControlButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteControlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT PrintTestButton
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             PrintTestButton.Visible = False
@@ -8891,32 +8891,32 @@ Public Class IProgTest
             'TR 09/01/2012 -Get the copy test button icon.
             auxIconName = GetIconName("COPY")
             If (auxIconName <> "") Then
-                CopyTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                CopyTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'TR 09/01/2012 -END.
 
             'AG 05/09/2014 - BA-1869
             auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
-                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE SaveButton
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                ButtonCancel.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT ExitButton
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception

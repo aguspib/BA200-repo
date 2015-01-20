@@ -334,16 +334,16 @@ Public Class QCSimulator
             Dim iconPath As String = MyBase.IconsPath
 
             auxIconName = GetIconName("ADD")
-            If (auxIconName <> "") Then bsAddResultsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsAddResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("SAVE")
-            If (auxIconName <> "") Then bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("UNDO")
-            If (auxIconName <> "") Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             MessageBox.Show(ex.Message, Me.Name & ".PrepareButtons", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try

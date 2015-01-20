@@ -845,9 +845,9 @@ Partial Public Class IAx00MainMDI
             Application.DoEvents()
 
             'JV + AG - Revision 18/10/2013 task # 1341
-            imagePause = Image.FromFile(".\Images\Embedded\MDIVertPause.png")
-            imagePlay = Image.FromFile(".\Images\Embedded\MDIVertPlay.png")
-            
+            imagePause = ImageUtilities.ImageFromFile(".\Images\Embedded\MDIVertPause.png")
+            imagePlay = ImageUtilities.ImageFromFile(".\Images\Embedded\MDIVertPlay.png")
+
             showSTARTWSiconFlag = True
             showPAUSEWSiconFlag = False
             ChangeStatusImageMultipleSessionButton()
@@ -1383,7 +1383,7 @@ Partial Public Class IAx00MainMDI
                             If (MDIAnalyzerManager.ISE_Manager IsNot Nothing) Then
                                 MDIAnalyzerManager.ISE_Manager.ISEWSCancelErrorCounter = 0
                             End If
-                            
+
                             'TR 16/05/2012
                             If (Not Me.ActiveMdiChild Is Nothing) Then
                                 DisabledMdiForms = Me.ActiveMdiChild
@@ -4545,7 +4545,7 @@ Partial Public Class IAx00MainMDI
 
                         End If
 
-                            ' ISE self-maintenance
+                        ' ISE self-maintenance
                     Else
                         ' Check if ISE Pumps calibration is required
                         myGlobal = MDIAnalyzerManager.ISE_Manager.CheckPumpsCalibrationIsNeeded
@@ -5609,63 +5609,63 @@ Partial Public Class IAx00MainMDI
             'temporal
             'Analyzer Configuration Button
             'auxIconName = GetIconName("ANALYZER")
-            'If (auxIconName <> "") Then bsTSAnalysersButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSAnalysersButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Test Profiles Button
             'auxIconName = GetIconName("PROFILES")
-            'If (auxIconName <> "") Then bsTSProfileButtton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSProfileButtton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Work Session Preparation Button
             'auxIconName = GetIconName("SAMPLES")
-            'If (auxIconName <> "") Then bsTSNewSampleButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSNewSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'temporal
             'Rotor Positioning Button
             'auxIconName = GetIconName("POSITIONIN")
-            'If (auxIconName <> "") Then bsTSPositionButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Monitor Button
             'auxIconName = GetIconName("MONITOR")
-            'If (auxIconName <> "") Then bsTSMonitorButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSMonitorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Results Review Button
             'auxIconName = GetIconName("RESULTS")
-            'If (auxIconName <> "") Then bsTSResultsButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'AG 17/06/2010
             'ReportSAT button
             'auxIconName = GetIconName("REPORTSAT")
-            'If (auxIconName <> "") Then bsTSReportSATButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSReportSATButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'temporal
             'Reset button
             'auxIconName = GetIconName("RESETSES")
-            'If (auxIconName <> "") Then bsTSResetSessionButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSResetSessionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ' temporal
             'Alarms button
             'auxIconName = GetIconName("ALARM")
-            'If (auxIconName <> "") Then bsTSAlarmsButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSAlarmsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'temporal
             'Alarm Utilities button
             'auxIconName = GetIconName("UTILITIES")
-            'If (auxIconName <> "") Then bsTSUtilitiesButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSUtilitiesButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Test Programming button
             'auxIconName = GetIconName("TESTPROG")
-            'If (auxIconName <> "") Then BsTSTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then BsTSTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Error Status Label button 
             'TR 05/05/2011 -Change icon
             'auxIconName = GetIconName("FORMULAWR")
             auxIconName = GetIconName("STUS_WITHERRS")
             'TR 05/05/2011 -END
-            If Not String.Equals(auxIconName, String.Empty) Then ErrorStatusLabel.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then ErrorStatusLabel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ''TR 27/10/2011 -SOUND OFF BUTTON 
             'auxIconName = GetIconName("SOUNDOFF")
-            'If (auxIconName <> "") Then SoundOffButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then SoundOffButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''TR 27/10/2011 -
 
         Catch ex As Exception

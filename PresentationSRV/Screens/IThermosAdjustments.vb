@@ -118,7 +118,7 @@ Public Class IThermosAdjustments
     '            If value Then
     '                auxIconName = GetIconName("REDO")
     '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = Image.FromFile(iconPath & auxIconName)
+    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
     '                Else
     '                    myAuxButtonImage = Nothing
     '                End If
@@ -127,7 +127,7 @@ Public Class IThermosAdjustments
     '            Else
     '                auxIconName = GetIconName("UNDO")
     '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = Image.FromFile(iconPath & auxIconName)
+    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
     '                Else
     '                    myAuxButtonImage = Nothing
     '                End If
@@ -176,7 +176,7 @@ Public Class IThermosAdjustments
 
                     If System.IO.File.Exists(iconPath & auxIconName) Then
                         Dim myImage As Image
-                        myImage = Image.FromFile(iconPath & auxIconName)
+                        myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                         myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -196,7 +196,7 @@ Public Class IThermosAdjustments
 
                     auxIconName = GetIconName("ADJUSTMENT")
                     If System.IO.File.Exists(iconPath & auxIconName) Then
-                        myRotorCondImage = Image.FromFile(iconPath & auxIconName)
+                        myRotorCondImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                     Else
                         myRotorCondImage = Nothing
                     End If
@@ -1094,30 +1094,30 @@ Public Class IThermosAdjustments
             'dl 20/04/2012
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                Tab1ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab1AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2MeasureButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+                Tab1ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab1AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2MeasureButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsUpDownWSButton1.Image = Image.FromFile(iconPath & auxIconName)
-                BsUpDownWSButton2.Image = Image.FromFile(iconPath & auxIconName)
+                BsUpDownWSButton1.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUpDownWSButton2.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'dl 20/04/2012
 
@@ -1141,28 +1141,28 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab1ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab1ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ' ''MEASUREMENT TEMP Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1MeasureButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab1MeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab1MeasureButton.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ' ''CANCEL MEASUREMENT Button
             ''auxIconName = GetIconName("UNDO")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1UndoMeasureButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab1UndoMeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab1UndoMeasureButton.BackgroundImageLayout = ImageLayout.Stretch
             ''End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab1AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab1AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -1174,28 +1174,28 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''MEASUREMENT TEMP Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2MeasureButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2MeasureButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2MeasureButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ' ''AUX TO PARKING/TO WASHING Button SGM 01/12/2011
             ''auxIconName = GetIconName("UNDO")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab2AuxButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab2AuxButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Stretch
             ''End If
 
@@ -1207,14 +1207,14 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab3ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab3ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab3AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -1224,14 +1224,14 @@ Public Class IThermosAdjustments
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsSaveButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 

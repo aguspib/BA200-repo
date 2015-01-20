@@ -178,20 +178,20 @@ Public Class IConfigGeneral
             'SAVE Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             If MyClass.IsService Then
                 'TEST Communications Button
                 auxIconName = GetIconName("ADJUSTMENT")
                 If System.IO.File.Exists(iconPath & auxIconName) Then
-                    BsTestCommunicationsButton.Image = Image.FromFile(iconPath & auxIconName)
+                    BsTestCommunicationsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                     BsTestCommunicationsButton.Visible = True
                 End If
             End If

@@ -3,6 +3,7 @@ Option Strict On
 
 Imports System.Windows.Forms
 Imports System.Drawing
+Imports Biosystems.Ax00.Global
 
 
 ''' <summary>
@@ -225,7 +226,7 @@ Public Class BSGridControl
             End If
 
             If System.IO.File.Exists(path) Then
-                Dim bm_source As New Bitmap(Image.FromFile(path))
+                Dim bm_source As New Bitmap(ImageUtilities.ImageFromFile(path))
                 Dim scale_factor As Integer = 20
                 ' Make a bitmap for the result.
                 Dim bm_dest As New Bitmap(CInt(scale_factor), CInt(scale_factor))

@@ -1029,13 +1029,13 @@ Public Class IProgCalculatedTest
             'Get the Icon defined for Calculated Tests that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("TCALC")
             If (notInUseIcon <> "") Then
-                myIcons.Images.Add("TCALC", Image.FromFile(MyBase.IconsPath & notInUseIcon))
+                myIcons.Images.Add("TCALC", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
             End If
 
             'Get the Icon defined for Calculated Tests that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSETCALC")
             If (inUseIcon <> "") Then
-                myIcons.Images.Add("INUSETCALC", Image.FromFile(MyBase.IconsPath & inUseIcon))
+                myIcons.Images.Add("INUSETCALC", ImageUtilities.ImageFromFile(MyBase.IconsPath & inUseIcon))
             End If
 
             'Assign the Icons to the Calculated Tests List View
@@ -1586,26 +1586,26 @@ Public Class IProgCalculatedTest
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Buttons
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
@@ -1613,25 +1613,25 @@ Public Class IProgCalculatedTest
             'CUSTOM SORT Button 'AG 05/09/2014 - BA-1869
             auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
-                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Buttons for status of the Calculated Test Formula

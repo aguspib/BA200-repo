@@ -391,13 +391,13 @@ Public Class FwScriptsEdition
             'SCREEN Image
             auxIconName = GetIconName("GRID")   ' SCREEN PDT !!! i totes les icones !!!
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BStreeScreenIcons.Images.Add("SCREEN", Image.FromFile(iconPath & auxIconName))
+                BStreeScreenIcons.Images.Add("SCREEN", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'ACTION Image
             auxIconName = GetIconName("ADJUSTMENT") ' ACTION
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BStreeScreenIcons.Images.Add("ACTION", Image.FromFile(iconPath & auxIconName))
+                BStreeScreenIcons.Images.Add("ACTION", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             Me.BsScreenActionsTreeView.ImageList = BStreeScreenIcons
@@ -424,55 +424,55 @@ Public Class FwScriptsEdition
 
 
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then BsCheckButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsCheckButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VOLUME")
-            If (auxIconName <> "") Then BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                BsRemoveButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsUnTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsRemoveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUnTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsSaveAllButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsSaveAllButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("EDIT")
-            If (auxIconName <> "") Then BsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("FACTORY")
-            If (auxIconName <> "") Then BsRestoreButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsRestoreButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("IMPORTSCRIPT")
-            If (auxIconName <> "") Then BsImportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsImportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("EXPORTSCRIPT")
-            If (auxIconName <> "") Then BsExportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("UNDO")
-            If (auxIconName <> "") Then BsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("OPEN")
-            If (auxIconName <> "") Then BsImportAllButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsImportAllButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("ADD")
-            If (auxIconName <> "") Then BsAddButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsAddButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CHANGEROTORB")
-            If (auxIconName <> "") Then BsMoveUpButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsMoveUpButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("DECREASEBUT")
-            If (auxIconName <> "") Then BsMoveDownButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsMoveDownButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("READADJ")
-            If (auxIconName <> "") Then BsExportAllToFileButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExportAllToFileButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MyClass.SetButtonImage(BsCheckButton, "ACCEPT1")
             'MyClass.SetButtonImage(BsTestButton, "VOLUME")

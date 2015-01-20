@@ -305,11 +305,11 @@ Public Class IWSDeleteAuxScreen
 
                         'Icon for RotorType=Reagents
                         auxIconName = GetIconName("REAGENTPOS")
-                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("REAGENTS", Image.FromFile(iconPath & auxIconName))
+                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("REAGENTS", ImageUtilities.ImageFromFile(iconPath & auxIconName))
 
                         'Icon for RotorType=Samples
                         auxIconName = GetIconName("SAMPLEPOS")
-                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("SAMPLES", Image.FromFile(iconPath & auxIconName))
+                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("SAMPLES", ImageUtilities.ImageFromFile(iconPath & auxIconName))
 
                         'Link the Icons to the ListView
                         bsElementsListView.SmallImageList = myIcons
@@ -346,11 +346,11 @@ Public Class IWSDeleteAuxScreen
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
-            If (String.Compare(auxIconName, "", False) <> 0) Then bsDeleteButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            If (String.Compare(auxIconName, "", False) <> 0) Then bsDeleteButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
-            If (String.Compare(auxIconName, "", False) <> 0) Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (String.Compare(auxIconName, "", False) <> 0) Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

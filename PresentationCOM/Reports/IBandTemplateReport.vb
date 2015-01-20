@@ -1864,31 +1864,31 @@ Public Class IBandTemplateReport
 
             'NEW Button
             auxIconName = GetIconName("ADD")
-            If Not String.Equals(auxIconName, String.Empty) Then bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EDIT REPORT Button
             auxIconName = GetIconName("EDITREPORT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsEditReport.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsEditReport.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DELETE Buttons
             auxIconName = GetIconName("REMOVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
-            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
-            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

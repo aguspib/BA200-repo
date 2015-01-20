@@ -53,13 +53,13 @@ Public Class ICreateRestorePoint
             'OK Button
             auxIconName = GetIconName("CREATE_REP_SAT")
             If (auxIconName <> "") Then
-                bsCreateButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCreateButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception

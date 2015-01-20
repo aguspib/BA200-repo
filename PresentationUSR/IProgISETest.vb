@@ -956,11 +956,11 @@ Public Class IProgISETest
 
             'Get the Icon defined for ISE Tests that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("TISE_SYS")
-            If Not String.Equals(notInUseIcon, String.Empty) Then myIcons.Images.Add("TISE_SYS", Image.FromFile(MyBase.IconsPath & notInUseIcon, True))
+            If Not String.Equals(notInUseIcon, String.Empty) Then myIcons.Images.Add("TISE_SYS", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
 
             'Get the Icon defined for ISE Tests that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSETISE")
-            If Not String.Equals(inUseIcon, String.Empty) Then myIcons.Images.Add("INUSETISE", Image.FromFile(MyBase.IconsPath & inUseIcon, True))
+            If Not String.Equals(inUseIcon, String.Empty) Then myIcons.Images.Add("INUSETISE", ImageUtilities.ImageFromFile(MyBase.IconsPath & inUseIcon))
 
             'Assign the Icons to the ISE Tests List View
             bsISETestListView.Items.Clear()
@@ -1271,42 +1271,42 @@ Public Class IProgISETest
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsPrintButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
 
             'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
             auxIconName = GetIconName("ORDER_TESTS")
-            If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
-            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
-            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Reference Ranges Buttons
             'DELETE DETAILED RANGE Button
             auxIconName = GetIconName("REMOVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'RH 05/06/2012
             auxIconName = GetIconName("ADD")
-            If Not String.Equals(auxIconName, String.Empty) Then AddControls.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then AddControls.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("REMOVE")
-            If Not String.Equals(auxIconName, String.Empty) Then DeleteControlButton.Image = Image.FromFile(iconPath & auxIconName, True)
+            If Not String.Equals(auxIconName, String.Empty) Then DeleteControlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'RH 05/06/2012 END
 

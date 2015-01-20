@@ -193,11 +193,11 @@ Public Class IWSManualRepetition
 
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name, Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")

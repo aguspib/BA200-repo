@@ -2481,51 +2481,51 @@ Public Class IResults
             'dl 12/05/2011
             'Excel Export Button
             'auxIconName = GetIconName("BTN_EXCELEXPORT")
-            'If Not String.Equals(auxIconName, "") Then bsXlsresults.Image = Image.FromFile(iconPath & auxIconName)
+            'If Not String.Equals(auxIconName, "") Then bsXlsresults.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'TEST()
             'PRINT REPORT Button
             auxIconName = GetIconName("FINALPRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintReportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintReportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'cf 26/09/2013
             'Print compact report button
             auxIconName = GetIconName("COMPACTPRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintCompactReportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintCompactReportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("COMPACTPRINTCTR")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintTestCtrlButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintTestCtrlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SUMMARY Button
             auxIconName = GetIconName("GRID")
-            If Not String.Equals(auxIconName, String.Empty) Then SummaryButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then SummaryButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'PRINT Buttons: PrintSampleButton, PrintTestButton
             auxIconName = GetIconName("PRINT")
             If Not String.Equals(auxIconName, String.Empty) Then
-                PrintSampleButton.Image = Image.FromFile(iconPath & auxIconName)
-                '                bsPrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
-                PrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                '                bsPrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SEND MANUAL REPETITION Button
             auxIconName = GetIconName("MANUAL_REP")
-            If Not String.Equals(auxIconName, String.Empty) Then SendManRepButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then SendManRepButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'OFF SYSTEM TESTS RESULTS Button
             auxIconName = GetIconName("OFFSYSTEMBUT")
-            If Not String.Equals(auxIconName, String.Empty) Then OffSystemResultsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then OffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ' Export Button
             auxIconName = GetIconName("MANUAL_EXP")
-            If Not String.Equals(auxIconName, String.Empty) Then ExportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then ExportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CANCEL")
-            If Not String.Equals(auxIconName, String.Empty) Then ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Icons to be used in Grids
             auxIconName = GetIconName("PRINTL")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintImage = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             auxIconName = GetIconName("LOGIN")
             If Not String.Equals(auxIconName, String.Empty) Then RepImage = preloadedDataConfig.GetIconImage("LOGIN")
 
@@ -2540,21 +2540,21 @@ Public Class IResults
             End If
 
             '
-            bsXlsresults.Image = Image.FromFile(iconPath & "BTN_EXCELEXPORT.png")
-            PrintReportButton.Image = Image.FromFile(iconPath & "FinalPrint.png")
-            SummaryButton.Image = Image.FromFile(iconPath & "Grid_16.png")
+            bsXlsresults.Image = ImageUtilities.ImageFromFile(iconPath & "BTN_EXCELEXPORT.png")
+            PrintReportButton.Image = ImageUtilities.ImageFromFile(iconPath & "FinalPrint.png")
+            SummaryButton.Image = ImageUtilities.ImageFromFile(iconPath & "Grid_16.png")
             '
-            PrintSampleButton.Image = Image.FromFile(iconPath & "Print.png")
-            '            bsPrintTestButton.Image = Image.FromFile(iconPath & "Print.png")
-            PrintTestButton.Image = Image.FromFile(iconPath & "Print.png")
+            PrintSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
+            '            bsPrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
+            PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
             '
-            SendManRepButton.Image = Image.FromFile(iconPath & "Manual_Repeat.png")
-            OffSystemResultsButton.Image = Image.FromFile(iconPath & "OFFSTestButton.png")
+            SendManRepButton.Image = ImageUtilities.ImageFromFile(iconPath & "Manual_Repeat.png")
+            OffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & "OFFSTestButton.png")
 
-            ExportButton.Image = Image.FromFile(iconPath & "Export.png")
-            ExitButton.Image = Image.FromFile(iconPath & "Cancel.png")
+            ExportButton.Image = ImageUtilities.ImageFromFile(iconPath & "Export.png")
+            ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & "Cancel.png")
 
-            PrintImage = Image.FromFile(iconPath & "PrintL.png")
+            PrintImage = ImageUtilities.ImageFromFile(iconPath & "PrintL.png")
 
             'RepImage = preloadedDataConfig.GetIconImage("LOGIN")
             auxIconName = GetIconName("LOGIN")
@@ -2655,22 +2655,22 @@ Public Class IResults
 
             'auxIconName = GetIconName("TCALC") 'CALC Tests Icon
             'If (auxIconName <> String.Empty) Then
-            '    TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+            '    TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             'End If
 
             auxIconName = GetIconName("TISE_SYS") 'ISE Tests Icon
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TOFF_SYS") 'OFFS Tests Icon
             If (auxIconName <> String.Empty) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TCALC") 'CALC Tests Icon
             If (auxIconName <> String.Empty) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
             ' WE 13/01/2015 (BA-2153) - End.
 
@@ -2701,30 +2701,30 @@ Public Class IResults
 
             auxIconName = GetIconName("PRINTHEAD")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                'PrintPictureBox.Image = Image.FromFile(iconPath & auxIconName)
-                PrintHeadImage = Image.FromFile(iconPath & auxIconName) 'RH 04/06/2012
+                'PrintPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                PrintHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName) 'RH 04/06/2012
             End If
 
             auxIconName = GetIconName("EXPORTHEAD")
             If (auxIconName <> String.Empty) Then
                 'HISSentImage = preloadedDataConfig.GetIconImage("MANUAL_EXP")
                 'LISHeadImage = preloadedDataConfig.GetIconImage("EXPORTHEAD")
-                'HISPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+                'HISPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 'RH 19/10/2011
-                LISExperimentalHeadImage = Image.FromFile(iconPath & auxIconName)
-                LISControlHeadImage = Image.FromFile(iconPath & auxIconName)
-                LISSamplesHeadImage = Image.FromFile(iconPath & auxIconName)
+                LISExperimentalHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                LISControlHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                LISSamplesHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 LISSubHeaderImage = preloadedDataConfig.GetIconImage("EXPORTHEAD")
                 'END RH 19/10/2011
 
-                LISHeadImage = Image.FromFile(iconPath & auxIconName) 'RH 04/06/2012
+                LISHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName) 'RH 04/06/2012
             End If
 
             'IT 21/10/2014: INI BA-2036
             auxIconName = GetIconName("EXPORTHEADCHECK")
             If (auxIconName <> String.Empty) Then
-                LISHeadCheckImage = Image.FromFile(iconPath & GetIconName("EXPORTHEADCHECK"))
+                LISHeadCheckImage = ImageUtilities.ImageFromFile(iconPath & GetIconName("EXPORTHEADCHECK"))
             End If
             'IT 21/10/2014: END BA-2036
 
@@ -2806,7 +2806,7 @@ Public Class IResults
             auxIconName = GetIconName("XTRAVERTICALBAR")
             'auxIconName = "XtraVerticalBar.png"
             If (auxIconName <> String.Empty) Then
-                XtraVerticalBar = Image.FromFile(iconPath & auxIconName)
+                XtraVerticalBar = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
