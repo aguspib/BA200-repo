@@ -274,7 +274,8 @@ Partial Public Class IMonitor
                     'DL 17/05/2012. END
 
                 Else
-                    MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor.png")
+                    MainTab.Appearance.PageClient.Image = Image.FromFile(IconsPath & "Embedded\BackgroundMainMonitor.png")
+                    'MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor.png")
 
                     'DL 17/05/2012. BEGIN
                     CoverReagentsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReagents.png")
