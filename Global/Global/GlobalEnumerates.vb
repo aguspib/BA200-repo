@@ -977,6 +977,10 @@ Namespace Biosystems.Ax00.Global
             ISE_ACTIVATED 'WARNING! Sw generates this warning when ISE module is Activated (Software business)
             ISE_RP_NO_INST_ERR ' ERROR! Sw generates this error when Reagents Pack is wrong installed (Software business)
 
+            ISE_CALB_PDT_WARN   ' CALIBS WARNING! Sw generates this warning when ISE Electrodes calibration is not performed or is expired - BA-1873
+            ISE_PUMP_PDT_WARN   ' CALIBS WARNING! Sw generates this warning when ISE Pumps calibration is not performed or is expired - BA-1873
+            ISE_CLEAN_PDT_WARN  ' CALIBS WARNING! Sw generates this warning when ISE Clean is not performed or is expired - BA-1873
+
             'Software business alarms
             '========================
             BASELINE_INIT_ERR 'ERROR! Sw generates this error when the base line calculations determine a Baseline error (initialization)

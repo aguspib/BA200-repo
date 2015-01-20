@@ -3053,6 +3053,16 @@
       VALUES('COMMS_TIMEOUT_ERR', 'INS', 'ERROR', 'Timeout communications with Analyzer', 'COMMS_TIMEOUT_ERR', 'Analyzer doesn''t respond', 'ALM_COMMS_TIMEOUT_ERR', 'Try to perform the same action again', 'SOL_COMMS_TIMEOUT_ERR', 0, 0, NULL, 1, NULL)
       END
       GO
+      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwAlarms') = 1)
+      BEGIN
+      INSERT INTO tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, Freeze, OKType, LISValue)
+      VALUES('ISE_CALB_PDT_WARN', 'CAL', 'WARNING', 'Electrodes calibration not performed/expired', 'ISE_CALB_PDT_WARN', 'Electrodes calibration recommended', 'ALM_ISE_CALB_PDT_WARN', 'Enter ISE utilities screen and perform required ISE actions', 'SOL_ISE_CONNECT_PDT', 0, 0, NULL, 1, NULL)
+  	  INSERT INTO tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, Freeze, OKType, LISValue)
+	    VALUES('ISE_PUMP_PDT_WARN', 'CAL', 'WARNING', 'Pumps calibration not performed/expired', 'ISE_PUMP_PDT_WARN', 'Pumps calibration recommended', 'ALM_ISE_PUMP_PDT_WARN', 'Enter ISE utilities screen and perform required ISE actions', 'SOL_ISE_CONNECT_PDT', 0, 0, NULL, 1, NULL)
+  	  INSERT INTO tfmwAlarms (AlarmID, AlarmSource, AlarmType, Name, NameResourceID, Description, DescResourceID, Solution, SolResourceID, Sound, OnRunningSound, Freeze, OKType, LISValue)
+	    VALUES('ISE_CLEAN_PDT_WARN', 'CAL', 'WARNING', 'Clean not performed/expired', 'ISE_CLEAN_PDT_WARN', 'Clean recommended', 'ALM_ISE_CLEAN_PDT_WARN', 'Enter ISE utilities screen and perform required ISE actions', 'SOL_ISE_CONNECT_PDT', 0, 0, NULL, 1, NULL)
+      END
+      GO
     </UpdateScript>
   </AppVersion>
 </TaskListDS>

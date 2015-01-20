@@ -4646,6 +4646,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by:  AG 05/03/2012
         ''' Modified by: SA 22/10/2013 - BT #1355 - Added Case for new Alarm WS_PAUSE_MODE_WARN
+        '''              XB 20/01/2015 - Add new ISE Alarms - BA-1873
         ''' </remarks>
         Private Function ConvertToAlarmIDEnumerate(ByVal pAlarmStringCodes As List(Of String)) As List(Of GlobalEnumerates.Alarms)
             'Do not implement Try/Catch: the caller method does it
@@ -4807,6 +4808,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Case "ISE_ELEC_DATE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
                     Case "ISE_ACTIVATED" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
                     Case "ISE_CONNECT_PDT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
+
+                        ' XB 20/01/2015 - BA-1873
+                    Case "ISE_CALB_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                    Case "ISE_PUMP_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                    Case "ISE_CLEAN_PDT_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
                         '
                     Case "BASELINE_INIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
                     Case "BASELINE_WELL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
