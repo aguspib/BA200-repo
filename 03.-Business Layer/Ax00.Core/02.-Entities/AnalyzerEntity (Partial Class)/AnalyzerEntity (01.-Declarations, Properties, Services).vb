@@ -3733,6 +3733,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.QueueContains", EventLogEntryType.Error, False)
                 returnValue = False
             End Try
+            Return returnValue
         End Function
 
         ''' <summary>
