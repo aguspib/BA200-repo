@@ -158,8 +158,8 @@ Public Class ILISUtilities
         Try
             MainMDI = CType(Me.MdiParent, IAx00MainMDI)
 
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             FillLogLevels()
@@ -216,8 +216,8 @@ Public Class ILISUtilities
             MyClass.RefreshElementsEnabled() 'SG 15/05/2013
 
             'If user level operator read only.
-            Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = myGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             If CurrentUserLevel = "OPERATOR" Then
                 MainGroupBox.Enabled = False
                 ExecuteActionButton.Enabled = False
@@ -410,9 +410,9 @@ Public Class ILISUtilities
     Private Function SetTraceLevel() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
         Try
-            Dim myUtilities As New Utilities
+            'Dim myUtilities As New Utilities
 
-            myGlobalDataTO = myUtilities.SetLISTraceLevel(TraceLevelCombo.SelectedValue.ToString())
+            myGlobalDataTO = Utilities.SetLISTraceLevel(TraceLevelCombo.SelectedValue.ToString())
 
             If Not myGlobalDataTO.HasError Then
                 'Save on tcfgUserSettings the saved value.

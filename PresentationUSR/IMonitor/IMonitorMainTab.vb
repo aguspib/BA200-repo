@@ -317,34 +317,34 @@ Partial Public Class IMonitor
         WasteLabel.Text = sensorValue.ToStringWithPercent(0) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) 'RH 20/10/2011
 
         'TR 30/09/2011 -Format the values (ask AG the desired format)
-        'Dim myUtil As New Utilities
-        'WashingLabel.Text = myUtil.ToStringWithFormat(chart2.Series("Series1").Points(1).YValues(0), 1) & "%"
-        'WasteLabel.Text = myUtil.ToStringWithFormat(chart2.Series("Series1").Points(2).YValues(0), 1) & "%"
+        ''Dim myUtil As New Utilities.
+        'WashingLabel.Text = Utilities.ToStringWithFormat(chart2.Series("Series1").Points(1).YValues(0), 1) & "%"
+        'WasteLabel.Text = Utilities.ToStringWithFormat(chart2.Series("Series1").Points(2).YValues(0), 1) & "%"
         'TR 30/09/2011 -END.
 
         'RH 20/10/2011
-        'Function myUtil.ToStringWithFormat() does not work properly and has some problems in its definition and use.
+        'Function Utilities.ToStringWithFormat() does not work properly and has some problems in its definition and use.
         'It does not remove comma zeroes (,0...) for every case. The problem it try to solve is not trivial.
         'I replaced it by the extension method ToStringWithPercent().
         'Just run the following lines in debug mode to compare both results. Try different decimal values.
 
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         'Dim decimals As Integer = 1 'or 2, or 3...
         'Dim s As Single = 1.1234 'Or Double
         'Dim st As String = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         's = 1.01987
         'st = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         's = 1.001
         'st = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         's = 1.0001
         'st = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         chart2.ResetAutoValues()
 

@@ -60,8 +60,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetNEWorUPDContaminationsR1", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetNEWorUPDContaminationsR1", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -112,8 +112,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetNEWorUPDContaminationsCUVETTES", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetNEWorUPDContaminationsCUVETTES", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -173,8 +173,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetDELContaminationsR1", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetDELContaminationsR1", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -225,8 +225,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetDELContaminationsCUVETTES", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetDELContaminationsCUVETTES", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -291,8 +291,8 @@ End Namespace
 '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        dataToReturn.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetAffectedItemsFromFactory", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetAffectedItemsFromFactory", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -342,8 +342,8 @@ End Namespace
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetContaminationsByContaminatorID", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.GetContaminationsByContaminatorID", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -389,8 +389,8 @@ End Namespace
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.IsFactoryReagent", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.IsFactoryReagent", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -434,8 +434,8 @@ End Namespace
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.IsFactoryTest", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.IsFactoryTest", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -481,8 +481,8 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.Delete", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.Delete", EventLogEntryType.Error, False)
 '    End Try
 '    Return resultData
 'End Function
@@ -524,8 +524,8 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.DeleteCuvettes", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsUpdateDAO.DeleteCuvettes", EventLogEntryType.Error, False)
 '    End Try
 '    Return resultData
 'End Function

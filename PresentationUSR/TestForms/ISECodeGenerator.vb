@@ -43,7 +43,7 @@ Public Class ISECodeGenerator
     Private Function GetDallasSNValues(ByVal pDataStr As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
         Dim myDallasSNData As New ISEDallasSNTO
 
         Try
@@ -69,8 +69,8 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GetDallasSNValues", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetDallasSNValues", EventLogEntryType.Error, False)
         End Try
 
         myGlobal.SetDatos = myDallasSNData
@@ -81,7 +81,7 @@ Public Class ISECodeGenerator
     Private Function GetDallasPage00Values(ByVal pDataStr As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
         Dim myDallas00Data As New ISEDallasPage00TO
 
         Try
@@ -104,7 +104,7 @@ Public Class ISECodeGenerator
                 .Page00DataString = pDataStr.Trim
 
                 'LotNumber
-                myGlobal = myUtil.ConvertHexToUInt32(myLotNumberHex)
+                myGlobal = Utilities.ConvertHexToUInt32(myLotNumberHex)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     .LotNumber = CInt(myGlobal.SetDatos).ToString
                 Else
@@ -113,7 +113,7 @@ Public Class ISECodeGenerator
 
 
                 'ExpirationDay
-                myGlobal = myUtil.ConvertHexToUInt32(myExpirationDayHex)
+                myGlobal = Utilities.ConvertHexToUInt32(myExpirationDayHex)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     .ExpirationDay = CInt(myGlobal.SetDatos)
                 Else
@@ -121,7 +121,7 @@ Public Class ISECodeGenerator
                 End If
 
                 'ExpirationMonth
-                myGlobal = myUtil.ConvertHexToUInt32(myExpirationMonthHex)
+                myGlobal = Utilities.ConvertHexToUInt32(myExpirationMonthHex)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     .ExpirationMonth = CInt(myGlobal.SetDatos)
                 Else
@@ -129,7 +129,7 @@ Public Class ISECodeGenerator
                 End If
 
                 'ExpirationYear
-                myGlobal = myUtil.ConvertHexToUInt32(myExpirationYearHex)
+                myGlobal = Utilities.ConvertHexToUInt32(myExpirationYearHex)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     .ExpirationYear = 2000 + CInt(myGlobal.SetDatos)
                 Else
@@ -141,7 +141,7 @@ Public Class ISECodeGenerator
                 '.ExpirationYear = 2000 + CInt(myExpirationYearHex)
 
                 'InitialCalibAVolume (mililitres)
-                myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibAVolumeHex)
+                myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibAVolumeHex)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     .InitialCalibAVolume = 10 * CInt(myGlobal.SetDatos)
                 Else
@@ -149,7 +149,7 @@ Public Class ISECodeGenerator
                 End If
 
                 'InitialCalibBVolume (mililitres)
-                myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibBVolumeHex)
+                myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibBVolumeHex)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     .InitialCalibBVolume = 10 * CInt(myGlobal.SetDatos)
                 Else
@@ -157,7 +157,7 @@ Public Class ISECodeGenerator
                 End If
 
                 'DistributorCode 
-                myGlobal = myUtil.ConvertHexToUInt32(myDistributorCodeHex)
+                myGlobal = Utilities.ConvertHexToUInt32(myDistributorCodeHex)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     .DistributorCode = CStr(myGlobal.SetDatos)
                 Else
@@ -184,8 +184,8 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GetDallasPage00Values", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetDallasPage00Values", EventLogEntryType.Error, False)
         End Try
 
         myGlobal.SetDatos = myDallas00Data
@@ -199,7 +199,7 @@ Public Class ISECodeGenerator
     Private Function GenerateBiosystemsCode(ByVal pSerialNumber As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
         Dim myFinalHex As String = ""
 
         Try
@@ -210,7 +210,7 @@ Public Class ISECodeGenerator
             If pSerialNumber.Length = 8 Then
 
                 'Se convierte a formato binario
-                myGlobal = myUtil.ConvertHexToBinaryString(pSerialNumber)
+                myGlobal = Utilities.ConvertHexToBinaryString(pSerialNumber)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     Dim myBinary1 As String = CType(myGlobal.SetDatos, String)
 
@@ -230,12 +230,12 @@ Public Class ISECodeGenerator
                     Next
 
                     'Se convierte el resultado binario a un hexadecimal
-                    myGlobal = myUtil.ConvertBinaryStringToDecimal(myBinary2)
+                    myGlobal = Utilities.ConvertBinaryStringToDecimal(myBinary2)
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         Dim myDecimal As UInt32 = CType(myGlobal.SetDatos, UInt32)
 
                         'Se convierte el resultado an Uint32
-                        myGlobal = myUtil.ConvertDecimalToHex(myDecimal)
+                        myGlobal = Utilities.ConvertDecimalToHex(myDecimal)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             Dim myHexadecimalLow As String = CStr(myGlobal.SetDatos)
                             'Se añaden los ceros que puedan faltar para llegar a 8 cifras
@@ -263,14 +263,14 @@ Public Class ISECodeGenerator
                             If myHexadecimalValue.Length > 0 Then
                                 'Se convierte a decimal 64 bits y se realiza la raiz cuadrada
                                 Dim myRoot As Double
-                                myGlobal = myUtil.ConvertHexToUInt64(myHexadecimalValue)
+                                myGlobal = Utilities.ConvertHexToUInt64(myHexadecimalValue)
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                     Dim myDecimalTotal As UInt64 = CType(myGlobal.SetDatos, UInt64)
                                     myRoot = Math.Sqrt(myDecimalTotal)
                                 End If
 
                                 'Se convierte el resultado de la raiz a a hexadecimal 32 bits
-                                myGlobal = myUtil.ConvertDecimalToHex(CInt(myRoot))
+                                myGlobal = Utilities.ConvertDecimalToHex(CInt(myRoot))
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                     myFinalHex = CType(myGlobal.SetDatos, String)
 
@@ -307,15 +307,15 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
         End Try
         Return myGlobal
     End Function
 
     Private Function GenerateDSNDDT00(ByVal pValue As UInt32, Optional ByVal FindAll As Boolean = False) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
             Dim myD00CodeBytesHex As String = "" 'input
@@ -338,7 +338,7 @@ Public Class ISECodeGenerator
                     pValue = myRandomValue
                 End If
 
-                myGlobal = myUtil.ConvertDecimalToHex(pValue)
+                myGlobal = Utilities.ConvertDecimalToHex(pValue)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     myD00CodeBytesHex = CType(myGlobal.SetDatos, String)
                     Dim dif8 As Integer = 8 - myD00CodeBytesHex.Length
@@ -392,8 +392,8 @@ Public Class ISECodeGenerator
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GenerateBiosystemsCode", EventLogEntryType.Error, False)
         End Try
         Return myGlobal
     End Function
@@ -402,7 +402,7 @@ Public Class ISECodeGenerator
     Private Sub BsPrepareButton_Click(sender As Object, e As EventArgs) Handles BsPrepareButton.Click
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
 
@@ -416,16 +416,16 @@ Public Class ISECodeGenerator
             'Generar valores de 64 bits cuya raiz cuadrada es entera
             For N As UInt32 = 0 To 16842751UI Step 1
 
-                Me.BsProgressBar.Value = N
+                Me.BsProgressBar.Value = CInt(N)
 
                 Dim myPow2 As UInt64
                 Try
-                    myPow2 = Math.Pow(16842751UI - N, 2)
+                    myPow2 = CULng(Math.Pow(16842751UI - N, 2))
                 Catch ex As Exception
                     Exit For
                 End Try
 
-                myGlobal = myUtil.ConvertUint64ToHex(myPow2)
+                myGlobal = Utilities.ConvertUint64ToHex(myPow2)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                     Dim myValidHex As String = CType(myGlobal.SetDatos, String)
                     Dim dif16 As Integer = 16 - myValidHex.Length
@@ -522,7 +522,7 @@ Public Class ISECodeGenerator
             If Me.BsValidateAllCheckbox.Checked Then
                 Dim myCodesOK As New List(Of String)
                 Dim myCodesERROR As New List(Of String)
-                Dim codes() As String = Me.BsCodesTextBox.Text.Split(vbCrLf)
+                Dim codes() As String = Me.BsCodesTextBox.Text.Split(vbCrLf.ToCharArray)
                 For c As Integer = 0 To codes.Length - 1
                     MyClass.SelectedDSND00 = codes(c).Trim
                     If MyClass.SelectedDSND00.Length > 0 Then
@@ -629,13 +629,13 @@ Public Class ISECodeGenerator
         Dim res As DateTime
         Try
             If (pString.Length = 15) Then
-                Dim Day As Short = pString.Substring(0, 2)
-                Dim Month As Short = pString.Substring(2, 2)
-                Dim Year As Short = pString.Substring(4, 2)
-                Dim Hour As Short = pString.Substring(6, 2)
-                Dim Minute As Short = pString.Substring(8, 2)
-                Dim Second As Short = pString.Substring(10, 2)
-                Dim MiliSec As Short = pString.Substring(12, 3)
+                Dim Day As Integer = CInt(pString.Substring(0, 2))
+                Dim Month As Integer = CInt(pString.Substring(2, 2))
+                Dim Year As Integer = CInt(pString.Substring(4, 2))
+                Dim Hour As Integer = CInt(pString.Substring(6, 2))
+                Dim Minute As Integer = CInt(pString.Substring(8, 2))
+                Dim Second As Integer = CInt(pString.Substring(10, 2))
+                Dim MiliSec As Integer = CInt(pString.Substring(12, 3))
 
                 res = New DateTime(Year, Month, Day, Hour, Minute, Second, MiliSec)
 

@@ -48,8 +48,8 @@ Public Class IConfigLanguage
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
             GetScreenLabels(currentLanguage)
@@ -281,9 +281,9 @@ Public Class IConfigLanguage
     Private Sub SetApplicationSessionInfo(ByVal pNewLanguageID As String)
         Try
             'Get current Session Values before reset the Session
-            Dim currentSession As New GlobalBase
-            Dim currentUserID As String = currentSession.GetSessionInfo().UserName.Trim.ToString
-            Dim currentUserLevel As String = currentSession.GetSessionInfo().UserLevel.Trim.ToString
+            'Dim currentSession As New GlobalBase
+            Dim currentUserID As String = GlobalBase.GetSessionInfo().UserName.Trim.ToString
+            Dim currentUserLevel As String = GlobalBase.GetSessionInfo().UserLevel.Trim.ToString
 
             Dim resetStatus As Boolean = False
             Dim myApplicationSessionManager As New ApplicationSessionManager
@@ -335,13 +335,13 @@ Public Class IConfigLanguage
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             ScreenLoad()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Config Language LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Config Language LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IConfigLanguage.LanguageConfig_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -374,7 +374,7 @@ Public Class IConfigLanguage
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Save the selected Language as the current one and refresh opened screens
@@ -386,7 +386,7 @@ Public Class IConfigLanguage
 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity(" Change Lang and Close Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity(" Change Lang and Close Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IConfigLanguage.bsAcceptButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 

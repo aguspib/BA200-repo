@@ -289,7 +289,7 @@ Public Class ICycleCountScreen
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
             MyClass.SetButtonImage(BsExitButton, "CANCEL")
             MyClass.SetButtonImage(BsWriteButton, "SAVEALL", 24, 24)
@@ -1500,7 +1500,7 @@ Public Class ICycleCountScreen
     Private Sub ICycleCountScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
 
         Dim myglobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
 
         Try
             'screen delegate SGM 20/01/2012
@@ -1513,8 +1513,8 @@ Public Class ICycleCountScreen
             End If
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             'AnalyzerId
             MyClass.myScreenDelegate.AnalyzerId = MyBase.myServiceMDI.ActiveAnalyzer

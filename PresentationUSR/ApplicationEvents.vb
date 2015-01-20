@@ -1,5 +1,8 @@
-﻿Namespace My
-    ' The following events are available for MyApplication:
+﻿Imports Biosystems.Ax00.Global
+
+Namespace My
+
+    ' The following events are available for MyApplication:
     ' 
     ' Startup: Raised when the application starts, before the startup form is created.
     ' Shutdown: Raised after all application forms are closed.  This event is not raised if the application terminates abnormally.
@@ -26,8 +29,7 @@
 
         Private Sub MyApplication_UnhandledException(sender As Object, e As ApplicationServices.UnhandledExceptionEventArgs) Handles Me.UnhandledException
             ' Write into Log
-            Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-            myLogAcciones.CreateLogActivity("An Unhandled Exception has been occurred ", "MyApplication.ApplicationEvents", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity("An Unhandled Exception has been occurred ", "MyApplication.ApplicationEvents", EventLogEntryType.Error, False)
             ' Display message to user and then exit.
             MessageBox.Show(Biosystems.Ax00.Global.GlobalConstants.UNHANDLED_EXCEPTION_ERR.ToString, My.Application.Info.Title, MessageBoxButtons.OK, MessageBoxIcon.Question)
             e.ExitApplication = False

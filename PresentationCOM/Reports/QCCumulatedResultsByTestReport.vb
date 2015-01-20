@@ -67,8 +67,8 @@ Public Class QCCumulatedResultsByTestReport
         If Me.DesignMode Then Exit Sub
 
         'Multilanguage support
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         'Multilanguage. Get texts from DB.

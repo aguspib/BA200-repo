@@ -217,7 +217,7 @@ Public Class IBandTemplateReport
     ''' Created by: DL 23/11/2011
     ''' AG 12/06/2014 - #1661
     ''' </remarks>
-    Private Function AddTemplate(ByVal pFileReport) As GlobalDataTO
+    Private Function AddTemplate(ByVal pFileReport As String) As GlobalDataTO
 
         Dim resultData As New GlobalDataTO
 
@@ -276,10 +276,10 @@ Public Class IBandTemplateReport
                         resultData.SetDatos = myTemplateDS 'AG 12/06/2014 - #1661
 
                         bsTemplatesListView.Items.Add(bsTemplateTextBox.Text)
-                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(False)
+                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(False.ToString)
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(myCurrentOrientation) 'UCase(bsOrientationComboBox.Text.Trim))
                         bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(pFileReport)
-                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(bsDefaultCheckbox.Checked)
+                        bsTemplatesListView.Items(bsTemplatesListView.Items.Count - 1).SubItems.Add(bsDefaultCheckbox.Checked.ToString)
                     End If
                 End If
 
@@ -612,7 +612,7 @@ Public Class IBandTemplateReport
         oImageFormat.ExportMode = ImageExportMode.SingleFilePageByPage
         oImageFormat.Format = ImageFormat.Gif
         oImageFormat.Resolution = nResolution
-        oImageFormat.PageRange = 1
+        oImageFormat.PageRange = 1.ToString
         oImageFormat.PageBorderWidth = 1
         oImageFormat.PageBorderColor = Color.Black
 
@@ -1014,23 +1014,23 @@ Public Class IBandTemplateReport
                 .ActiveDesignPanel.SetCommandVisibility(ReportCommand.Closing, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
                 .ActiveDesignPanel.SetCommandVisibility(ReportCommand.PropertiesWindow, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
                 .ActiveDesignPanel.SetCommandVisibility(ReportCommand.Zoom, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Customize, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.File, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Open, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageOrientation, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Parameters, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Pointer, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PrintDirect, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ViewWholePage, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Save, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Find, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Magnifier, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageSetup, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Watermark, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Background, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportCsv, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportFile, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
-                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.SendFile, DevExpress.XtraReports.UserDesigner.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Customize, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.File, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Open, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageOrientation, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Parameters, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Pointer, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PrintDirect, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ViewWholePage, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Save, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Find, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Magnifier, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.PageSetup, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Watermark, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Background, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportCsv, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.ExportFile, DevExpress.XtraPrinting.CommandVisibility.None)
+                .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.SendFile, DevExpress.XtraPrinting.CommandVisibility.None)
                 .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.Background, DevExpress.XtraPrinting.CommandVisibility.None)
                 .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.DocumentMap, DevExpress.XtraPrinting.CommandVisibility.None)
                 .ActiveDesignPanel.Report.PrintingSystem.SetCommandVisibility(DevExpress.XtraPrinting.PrintingSystemCommand.EditPageHF, DevExpress.XtraPrinting.CommandVisibility.None)
@@ -1590,8 +1590,8 @@ Public Class IBandTemplateReport
             Cursor = Cursors.WaitCursor 'RH 15/12/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels()
@@ -1686,7 +1686,7 @@ Public Class IBandTemplateReport
 
 
                 For Each fi In aryFi
-                    myfilewithoutextension = fi.Name.Split(".")(0).ToString '& ".repx"
+                    myfilewithoutextension = fi.Name.Split("."c)(0).ToString '& ".repx"
                     'myLength = Len(myfilewithoutextension)
 
                     If Not String.Equals(myfilewithoutextension, "MASTERTEMPLATE") AndAlso _
@@ -1916,7 +1916,7 @@ Public Class IBandTemplateReport
                     'AG 12/06/2014 - #1661 check if user wants delete the defaulttemplate .. in this case mark the mastertemplate as new default before delete
                     'resultData = templateList.Delete(Nothing, bsTemplatesListView.Items(iRow).Text)
                     Dim newDefault As Boolean = False
-                    If bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text Then
+                    If bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(4).Text <> "" Then
                         'Get the current orientation
                         Dim myOrientation As String = bsTemplatesListView.Items(bsTemplatesListView.SelectedIndices(0)).SubItems(2).Text
                         resultData = templateList.SetDefaultTemplateStatus(Nothing, True, True, myOrientation)
@@ -1928,8 +1928,8 @@ Public Class IBandTemplateReport
                     If (Not resultData.HasError) Then
                         Dim fileImage As String = PathTemplates & "\" & bsTemplatesListView.Items(iRow).SubItems(3).Text
 
-                        File.Delete(fileImage.Split(".")(0) & ".REPX")
-                        File.Delete(fileImage.Split(".")(0) & ".GIF")
+                        File.Delete(fileImage.Split("."c)(0) & ".REPX")
+                        File.Delete(fileImage.Split("."c)(0) & ".GIF")
 
                         bsTemplatesListView.Items.Remove(bsTemplatesListView.Items(iRow))
 
@@ -1963,7 +1963,7 @@ Public Class IBandTemplateReport
     ''' <remarks>
     ''' IT 13/06/2014 #1661 
     ''' </remarks>
-    Private Function IsValidTemplate(ByVal templateName) As Boolean
+    Private Function IsValidTemplate(ByVal templateName As String) As Boolean
 
         Dim isDuplicated As Boolean = False
         bsScreenErrorProvider.Clear()

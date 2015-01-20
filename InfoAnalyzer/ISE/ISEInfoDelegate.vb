@@ -160,8 +160,8 @@
 '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                resultData.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEInfoDelegate.CreateNewMasterData", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEInfoDelegate.CreateNewMasterData", EventLogEntryType.Error, False)
 '            Finally
 '                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '            End Try
@@ -194,8 +194,8 @@
 '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                resultData.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEInfoDelegate.ReadAllInfo", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEInfoDelegate.ReadAllInfo", EventLogEntryType.Error, False)
 '            Finally
 '                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '            End Try
@@ -228,8 +228,8 @@
 '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                resultData.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEInfoDelegate.ReadInfoItemValue", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEInfoDelegate.ReadInfoItemValue", EventLogEntryType.Error, False)
 '            Finally
 '                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '            End Try
@@ -275,8 +275,8 @@
 '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                resultData.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEInfoDelegate.UpdateISEInfo", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEInfoDelegate.UpdateISEInfo", EventLogEntryType.Error, False)
 '            Finally
 '                If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '            End Try
@@ -303,8 +303,8 @@
 '                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEInfoDelegate.UpdateISEModuleManagerData", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEInfoDelegate.UpdateISEModuleManagerData", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -337,8 +337,8 @@
 '                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEModuleModuleManager.GetValidationLimits", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEModuleModuleManager.GetValidationLimits", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -604,8 +604,8 @@
 '                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEModuleModuleManager.GetISEInfoFlagValue", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEModuleModuleManager.GetISEInfoFlagValue", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -642,8 +642,8 @@
 '                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEModuleModuleManager.GetISEParameterValue", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEModuleModuleManager.GetISEParameterValue", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -658,7 +658,7 @@
 '            Dim myGlobal As New GlobalDataTO
 '            Dim myParams As New SwParametersDelegate
 '            Dim myAllParametersDS As New ParametersDS
-'            Dim myGlobalbase As New GlobalBase
+'            'Dim myGlobalbase As New GlobalBase
 '            Try
 '                If MyClass.AnalyzerModelAttr.Length > 0 Then
 '                    myGlobal = myParams.GetAllISEList(Nothing, MyClass.AnalyzerModelAttr)
@@ -674,8 +674,8 @@
 '                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEModuleModuleManager.LoadISEParameters", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEModuleModuleManager.LoadISEParameters", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function

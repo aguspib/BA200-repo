@@ -55,7 +55,7 @@ Partial Public Class IAx00MainMDI
                                          ByVal pTreated As Boolean, _
                                          ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), _
                                          ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) As Boolean
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         'RH Save UIRefreshDS for recording generated UIRefreshDS data and reproduce bugs in Debug sessions
         'pRefreshDS.WriteXml(String.Format("UIRefreshDS{0}.xml", DSNumber))
 
@@ -79,12 +79,12 @@ Partial Public Class IAx00MainMDI
             Dim copyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
 
             ''TR 18/09/2012 -Log to trace incase Exception error is race.
-            'myLogAcciones.CreateLogActivity("START BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
+            'GlobalBase.CreateLogActivity("START BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
             '                                EventLogEntryType.FailureAudit, False)
 
             ' XB 30/08/2013
             If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ANSFCP_RECEIVED Then
-                myLogAcciones.CreateLogActivity("START ANSFCP received with pTreated value as [" & pTreated & "] ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("START ANSFCP received with pTreated value as [" & pTreated & "] ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
             End If
 
             'AG 04/04/2012 - This code is needed because the incomplete samples screen is open using ShowDialog
@@ -115,7 +115,7 @@ Partial Public Class IAx00MainMDI
             SyncLock lockThis
                 copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("BEFORE pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("BEFORE pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 For Each item As GlobalEnumerates.UI_RefreshEvents In pRefreshEvent
                     'copyRefreshEventList.Add(item)
                     If item = UI_RefreshEvents.BARCODE_POSITION_READ AndAlso incompleteSamplesOpenFlag Then
@@ -125,19 +125,19 @@ Partial Public Class IAx00MainMDI
                     End If
                 Next
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("AFTER pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("AFTER pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
 
                 If pRefreshEvent.Count > 0 Then MDIAnalyzerManager.ReadyToClearUIRefreshDS(pMainThread) 'Inform the ui refresh dataset can be cleared so they are already copied
             End SyncLock
             'END DL 16/09/2011
 
             ''TR 18/09/2012 -Log to trace incase Exception error is race.
-            'myLogAcciones.CreateLogActivity("END BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
+            'GlobalBase.CreateLogActivity("END BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
             '                                EventLogEntryType.FailureAudit, False)
 
             If pTreated Then '(1) 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("START BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("START BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
                 '////////////////////////////
                 'REFRESH MDI BUTTONS & STATUS
@@ -233,13 +233,13 @@ Partial Public Class IAx00MainMDI
                 End If '(2)
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("END BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("END BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
 
                 ChangeErrorStatusLabel(False) 'AG 18/05/2012 - When some process is paused by some error set the error providers text to 'Not Finished'
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("START BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("START BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
                 '////////////////
                 ' REFRESH SCREENS
@@ -299,11 +299,11 @@ Partial Public Class IAx00MainMDI
                     PerformNewWRotorPositionChange(copyRefreshEventList, copyRefreshDS, monitorTreated, wsRotorPositionTreated)
                 End If
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("END BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("END BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("START BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("START BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
 
                 'LAST EVENT REFRESH TREATMENT DUE some PopUp screen can be opened
@@ -632,14 +632,14 @@ Partial Public Class IAx00MainMDI
                 ' XBC 15/06/2012
                 If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ANSFCP_RECEIVED Then
                     ' XB 30/08/2013
-                    myLogAcciones.CreateLogActivity("(Analyzer Change) ANSFCP received (get it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("(Analyzer Change) ANSFCP received (get it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
                     If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.FWCPUVALUE_CHANGED) Then
                         ' XB 30/08/2013
-                        myLogAcciones.CreateLogActivity("(Analyzer Change) ANSFCP received (manage it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("(Analyzer Change) ANSFCP received (manage it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
-                        Dim myLogAccionesAux As New ApplicationLogManager()
-                        myLogAccionesAux.CreateLogActivity("(Analyzer Change) calling function ManageAnalyzerConnected ... ", Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                        'Dim myLogAccionesAux As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("(Analyzer Change) calling function ManageAnalyzerConnected ... ", Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
                         ManageAnalyzerConnected(True, False)
                         MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.NONE
@@ -707,7 +707,7 @@ Partial Public Class IAx00MainMDI
                 'AG 02/04/2013
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("END BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("END BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
                 '                                 EventLogEntryType.FailureAudit, False)
             End If
 
@@ -740,7 +740,7 @@ Partial Public Class IAx00MainMDI
                                 Dim myTmpAnalyzerConnected As String = ""
                                 myTmpAnalyzerConnected = MDIAnalyzerManager.TemporalAnalyzerConnected
                                 If myAnalyzerData.tcfgAnalyzers(0).Generic OrElse myAnalyzerData.tcfgAnalyzers(0).AnalyzerID <> myTmpAnalyzerConnected Then
-                                    myLogAcciones.CreateLogActivity("(Analyzer Change) Activate protection to register the Connected Analyzer... ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("(Analyzer Change) Activate protection to register the Connected Analyzer... ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
                                     ManageAnalyzerConnected(True, False)
                                     CheckAnalyzerIDOnFirstConnection = False
                                 End If
@@ -827,11 +827,11 @@ Partial Public Class IAx00MainMDI
             'AG 04/12/2013
 
         Catch ex As Exception
-            'Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))" & ". SOURCE --> " & ex.Source, "ManageReceptionEvent", _
+            ''Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))" & ". SOURCE --> " & ex.Source, "ManageReceptionEvent", _
                                             EventLogEntryType.Error, False)
 
-            myLogAcciones.CreateLogActivity("Instruction Recived --> " & pInstructionReceived, "ManageReceptionEvent", _
+            GlobalBase.CreateLogActivity("Instruction Recived --> " & pInstructionReceived, "ManageReceptionEvent", _
                                             EventLogEntryType.Error, False)
         End Try
 
@@ -844,8 +844,8 @@ Partial Public Class IAx00MainMDI
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myLogAccionesAux As New ApplicationLogManager()
-            myLogAccionesAux.CreateLogActivity("(Analyzer Change) Manage Analyzer Connection... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
+            'Dim myLogAccionesAux As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity("(Analyzer Change) Manage Analyzer Connection... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
 
             If (pisReportSATLoading) Then Exit Sub
 
@@ -857,9 +857,9 @@ Partial Public Class IAx00MainMDI
 
                 'Obtain needed fw version
                 Dim mySwVersion As String
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities.
 
-                myGlobal = myUtil.GetSoftwareVersion()
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     mySwVersion = myGlobal.SetDatos.ToString
 
@@ -917,12 +917,12 @@ Partial Public Class IAx00MainMDI
                 Exit Try
             End If
 
-            myLogAccionesAux.CreateLogActivity("(Analyzer Change) ActiveWorkSession [ " & ActiveWorkSession & " ] ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("(Analyzer Change) ActiveWorkSession [ " & ActiveWorkSession & " ] ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
 
             If (ActiveWorkSession.Length > 0) Then
                 ' Execute process to update the corresponding Work Session tables 
                 MDIAnalyzerManager.ForceAbortSession = False
-                myLogAccionesAux.CreateLogActivity("(Analyzer Change) Calling function ProcessUpdateWSByAnalyzerID ... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("(Analyzer Change) Calling function ProcessUpdateWSByAnalyzerID ... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
                 myGlobal = MDIAnalyzerManager.ProcessUpdateWSByAnalyzerID(Nothing)
                 If (Not myGlobal.HasError) Then
                     'If (MDIAnalyzerManager.ForceAbortSession) Then
@@ -958,14 +958,14 @@ Partial Public Class IAx00MainMDI
                     End If
 
                 Else
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Analyzer ID checking", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Analyzer ID checking", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
                     ShowMessage("Error", GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString)
                 End If
             End If
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1082,8 +1082,8 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageSentEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageSentEvent", EventLogEntryType.Error, False)
         End Try
         Return True
     End Function
@@ -1187,8 +1187,8 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageWatchDogEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageWatchDogEvent", EventLogEntryType.Error, False)
         End Try
         Return True
     End Function
@@ -1661,7 +1661,7 @@ Partial Public Class IAx00MainMDI
                     Dim found As Boolean = False
                     Dim index As Integer
                     ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                    'myLogAcciones.CreateLogActivity("1- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                    'GlobalBase.CreateLogActivity("1- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                     For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
                         If String.Compare(NoMDIChildActiveFormsAttribute.Item(index).Name, IResultsCalibCurve.Name, False) = 0 Then
                             found = True
@@ -1669,7 +1669,7 @@ Partial Public Class IAx00MainMDI
                         End If
                     Next index
                     ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                    'myLogAcciones.CreateLogActivity("1- AFTER NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                    'GlobalBase.CreateLogActivity("1- AFTER NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
 
                     If found Then
                         Dim CurrentNoMdiChild As IResultsCalibCurve
@@ -1719,7 +1719,7 @@ Partial Public Class IAx00MainMDI
                 Dim found As Boolean = False
                 Dim index As Integer
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("2- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("2- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
                     If NoMDIChildActiveFormsAttribute.Item(index).Name = IResultsAbsCurve.Name Then
                         found = True
@@ -1727,7 +1727,7 @@ Partial Public Class IAx00MainMDI
                     End If
                 Next index
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("2- After NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("2- After NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 If found Then
                     Dim CurrentNoMdiChild As IResultsAbsCurve
                     CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), IResultsAbsCurve)

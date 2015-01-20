@@ -327,7 +327,7 @@ Public Class IHistoricalReports
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        'Dim myutil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             'DL 20/04/2012. Substitute icons and optimize
@@ -379,7 +379,7 @@ Public Class IHistoricalReports
             '    Dim myImage As Image
             '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myutil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myAuxImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -810,18 +810,18 @@ Public Class IHistoricalReports
 
     Private Sub IHistoricalReports_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             myScreenDelegate.currentLanguage = Me.currentLanguage
 
             'Get the current user level
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             InitializeGridControl1()
 

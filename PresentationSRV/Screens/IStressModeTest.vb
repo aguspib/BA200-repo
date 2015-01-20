@@ -846,7 +846,7 @@ Public Class IStressModeTest
     ''' <remarks>Created by XBC 22/03/2011</remarks>
     Private Sub PrepareTestingMode()
         Try
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             ' Configurate GUI Controls
             Me.DisableAll()
             Me.BsResultsGroupBox.Enabled = True
@@ -861,10 +861,10 @@ Public Class IStressModeTest
 
             Me.TotalTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + _
                                  (myScreenDelegate.NumCycles * myScreenDelegate.TimeMachineCycle)
-            Me.TimeTotalLabel.Text = myUtil.FormatToHHmmss(Me.TotalTimeStress)
+            Me.TimeTotalLabel.Text = Utilities.FormatToHHmmss(Me.TotalTimeStress)
 
             Me.CompletedTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + myScreenDelegate.TimeElapsedStressTest
-            Me.TimeCompletedLabel.Text = myUtil.FormatToHHmmss(Me.CompletedTimeStress)
+            Me.TimeCompletedLabel.Text = Utilities.FormatToHHmmss(Me.CompletedTimeStress)
 
             Me.ResetsNumLabel.Text = myScreenDelegate.NumResetsStress.ToString
             Me.ErrorsNumLabel.Text = myScreenDelegate.NumErrorsStress.ToString
@@ -906,7 +906,7 @@ Public Class IStressModeTest
             '    Debug.Print("aqui !!!")
             'End If
 
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             Me.BsCyclesUpDown.Enabled = True
             Me.bsCompleteRadioButton.Enabled = True
 
@@ -948,10 +948,10 @@ Public Class IStressModeTest
 
             Me.TotalTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + _
                                  (myScreenDelegate.NumCycles * myScreenDelegate.TimeMachineCycle)
-            Me.TimeTotalLabel.Text = myUtil.FormatToHHmmss(Me.TotalTimeStress)
+            Me.TimeTotalLabel.Text = Utilities.FormatToHHmmss(Me.TotalTimeStress)
 
             Me.CompletedTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + myScreenDelegate.TimeElapsedStressTest
-            Me.TimeCompletedLabel.Text = myUtil.FormatToHHmmss(Me.CompletedTimeStress)
+            Me.TimeCompletedLabel.Text = Utilities.FormatToHHmmss(Me.CompletedTimeStress)
 
             Me.ResetsNumLabel.Text = myScreenDelegate.NumResetsStress.ToString
             Me.ErrorsNumLabel.Text = myScreenDelegate.NumErrorsStress.ToString
@@ -1245,8 +1245,8 @@ Public Class IStressModeTest
             MyClass.myScreenDelegate = New StressModeTestDelegate(MyBase.myServiceMDI.ActiveAnalyzer, myFwScriptDelegate)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             myScreenDelegate.currentLanguage = Me.currentLanguage
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
@@ -1535,7 +1535,7 @@ Public Class IStressModeTest
     Private Sub PrepareTestButton()
 
         'Dim myGlobal As New GlobalDataTO
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
@@ -1557,7 +1557,7 @@ Public Class IStressModeTest
             '    Dim myImage As Image
             '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myNewImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else

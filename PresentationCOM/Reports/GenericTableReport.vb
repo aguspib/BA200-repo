@@ -28,7 +28,7 @@ Public Class GenericTableReport
     End Sub
 
     Private Sub XrTableRowDetails_BeforePrint(ByVal sender As System.Object, ByVal e As System.Drawing.Printing.PrintEventArgs) Handles XrTableRowDetails.BeforePrint
-        Dim Row As XRTableRow = sender
+        Dim Row As XRTableRow = TryCast(sender, XRTableRow)
 
         If Not TypeOf Row.Report.DataSource Is IList Then Return
 
@@ -73,7 +73,7 @@ Public Class GenericTableReport
     End Sub
 
     Private Sub XrTableRowDetails_AfterPrint(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles XrTableRowDetails.AfterPrint
-        Dim Row As XRTableRow = sender
+        Dim Row As XRTableRow = TryCast(sender, XRTableRow)
 
         'Restore Cell's ProcessDuplicates value
         For Each Cell As XRTableCell In Row.Cells

@@ -1016,8 +1016,8 @@ Public Class HistoricalReportsDelegate
             resultdataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultdataToReturn.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.GetAllResultsService", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.GetAllResultsService", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1059,8 +1059,8 @@ Public Class HistoricalReportsDelegate
             resultdata.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultdata.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.GetAnalyzerResultsService", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.GetAnalyzerResultsService", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1103,8 +1103,8 @@ Public Class HistoricalReportsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.Add", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.Add", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1147,8 +1147,8 @@ Public Class HistoricalReportsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.AddRecommendations", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.AddRecommendations", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1191,8 +1191,8 @@ Public Class HistoricalReportsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.UpdateComments", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.UpdateComments", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1247,8 +1247,8 @@ Public Class HistoricalReportsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.Delete", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.Delete", EventLogEntryType.Error, False)
         Finally
             If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         End Try
@@ -1294,8 +1294,8 @@ Public Class HistoricalReportsDelegate
             myResultData.HasError = True
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.GetRecommendations", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.GetRecommendations", EventLogEntryType.Error, False)
         End Try
 
         Return myResultData
@@ -1316,7 +1316,7 @@ Public Class HistoricalReportsDelegate
         Dim myResultData As New GlobalDataTO
         Try
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim myUtility As New Utilities()
+            ''Dim myUtility As New Utilities()
             Dim text1 As String
             Dim text As String = ""
 
@@ -1333,7 +1333,7 @@ Public Class HistoricalReportsDelegate
                             Else
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_ERR_COMM", pcurrentLanguage)
                             End If
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
                             j += 1
 
                             ' Communications mode
@@ -1342,19 +1342,19 @@ Public Class HistoricalReportsDelegate
                             Else
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Settings_Manual", pcurrentLanguage)
                             End If
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
                             j += 1
 
                             ' Speed value 
                             text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CfgAnalyzer_PortSpeed", pcurrentLanguage) + ": "
                             text1 += CSng(pData.Substring(j, 7)).ToString("#,###,##0")
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
                             j += 7
 
                             ' Port value 
                             text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CfgAnalyzer_Port", pcurrentLanguage) + ": "
                             text1 += pData.Substring(j, pData.Length - j)
-                            text += myUtility.FormatLineHistorics(text1)
+                            text += Utilities.FormatLineHistorics(text1)
 
                     End Select
 
@@ -1367,8 +1367,8 @@ Public Class HistoricalReportsDelegate
             myResultData.HasError = True
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.DecodeDataReport", EventLogEntryType.Error, False)
         End Try
         Return myResultData
     End Function
@@ -1480,8 +1480,8 @@ Public Class HistoricalReportsDelegate
     '        returnValue += Environment.NewLine
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.FormatLine", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.FormatLine", EventLogEntryType.Error, False)
     '    End Try
     '    Return returnValue
     'End Function
@@ -1495,8 +1495,8 @@ Public Class HistoricalReportsDelegate
     '        Next
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.SetSpaces", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, "HistoricalReportsDelegate.SetSpaces", EventLogEntryType.Error, False)
     '    End Try
     '    Return returnValue
     'End Function

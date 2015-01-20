@@ -297,7 +297,7 @@ Partial Public Class IMonitor
                 Else
                     'Get the control type to validate if it will go to our list (only for PictureBox)
                     If (TypeOf myPosControl Is BSRImage) Then
-                        myPosControlList.Add(myPosControl)
+                        myPosControlList.Add(CType(myPosControl, BSRImage))
                     End If
                 End If
             Next
@@ -751,8 +751,9 @@ Partial Public Class IMonitor
                 Dim auxIconPath As String = String.Empty
 
                 If (pMarkPosition) Then
-                    Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\")
-                    Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png")
+                    Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\"c)
+                    'TODO: This is wrong parsing, we're splitting by a ., p, n and g. Not by ".png"
+                    Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png".ToCharArray)
 
                     'Set cell to selected and check previous status
                     PreviousSelect = myImageName(0)
@@ -2163,7 +2164,9 @@ Partial Public Class IMonitor
                 If myMonth <> "" AndAlso myYear <> "" AndAlso CInt(myMonth) >= 1 AndAlso CInt(myMonth) <= 12 Then
                     ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
                     'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
-                    ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
+                    ExpirationDate = New DateTime(CInt(myYear), CInt(myMonth), 1)
+                    'This is wrong:
+                    'ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
                 End If
             End If
         Catch ex As Exception
@@ -3121,8 +3124,8 @@ Partial Public Class IMonitor
 
                 If (controlQuery.Count > 0) Then
                     If (pMarkPosition) Then
-                        Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\")
-                        Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png")
+                        Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\"c)
+                        Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png".ToCharArray)
 
                         PreviousSelect = myImageName(0)
 

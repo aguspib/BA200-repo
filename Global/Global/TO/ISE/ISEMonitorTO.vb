@@ -206,19 +206,19 @@ Namespace Biosystems.Ax00.Global
         'The initialization has been performed successfully
         Public Property IsInitiatedOK() As Boolean
             Get
-                Return MyClass.IsInitiatedOKAttr
+                Return Me.IsInitiatedOKAttr
             End Get
             Set(ByVal value As Boolean)
-                MyClass.IsInitiatedOKAttr = value
+                Me.IsInitiatedOKAttr = value
             End Set
         End Property
 
         Public Property IsLongTermDeactivation() As Boolean
             Get
-                Return MyClass.IsLongTermDeactivationAttr
+                Return Me.IsLongTermDeactivationAttr
             End Get
             Set(ByVal value As Boolean)
-                MyClass.IsLongTermDeactivationAttr = value
+                Me.IsLongTermDeactivationAttr = value
             End Set
         End Property
 

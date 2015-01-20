@@ -1231,8 +1231,8 @@ Public Class IProgPatientData
     Private Sub PatientSearchLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(currentLanguage)
@@ -1399,7 +1399,7 @@ Public Class IProgPatientData
                 If (bsCommentsTextBox.Text.Trim() <> "") Then .Comments = bsCommentsTextBox.Text.Trim()
 
                 Dim currentSession As New ApplicationSessionManager
-                .TS_User = currentSession.GetSessionInfo().UserName
+                .TS_User = GlobalBase.GetSessionInfo().UserName
                 .TS_DateTime = Date.Now
             End With
             patientData.tparPatients.AddtparPatientsRow(patientRow)
@@ -1448,7 +1448,7 @@ Public Class IProgPatientData
                 If (bsCommentsTextBox.Text.Trim() <> "") Then .Comments = bsCommentsTextBox.Text.Trim()
 
                 Dim currentSession As New ApplicationSessionManager
-                .TS_User = currentSession.GetSessionInfo().UserName
+                .TS_User = GlobalBase.GetSessionInfo().UserName
                 .TS_DateTime = Date.Now
             End With
             patientData.tparPatients.AddtparPatientsRow(patientRow)
@@ -1740,8 +1740,8 @@ Public Class IProgPatientData
     Private Sub IProgPatientData_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'Get Level of the connected User
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             PrepareButtons()
             PatientSearchLoad()

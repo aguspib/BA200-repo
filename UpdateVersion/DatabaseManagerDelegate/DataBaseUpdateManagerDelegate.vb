@@ -48,8 +48,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Dim result As Boolean = False
             Dim myGlobalDataTO As New GlobalDataTO
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity("On UpdateDatabase method ", "DataBaseUpdateManager.UpdateDatabase", EventLogEntryType.Information, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity("On UpdateDatabase method ", "DataBaseUpdateManager.UpdateDatabase", EventLogEntryType.Information, False)
 
             Try
                 'Compare the DB Version in CUSTOMER and FACTORY Databases
@@ -75,7 +75,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                             'Restore the temporary DB (Ax00TEM)
                             If (myDatabaseAdmin.RestoreDatabase(pServerName, GlobalBase.TemporalDBName, pDBLogin, pDBPassword, myBackUpFile)) Then
-                                myLogAcciones.CreateLogActivity("Temporal Database restore Success ", "DataBaseUpdateManager.UpdateDatabase", _
+                                GlobalBase.CreateLogActivity("Temporal Database restore Success ", "DataBaseUpdateManager.UpdateDatabase", _
                                                                 EventLogEntryType.Information, False)
 
                                 Dim myServer As Server = New Server(pServerName)
@@ -159,7 +159,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " Innner: " + ex.InnerException.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseUpdateManager.UpdateDatabase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseUpdateManager.UpdateDatabase", EventLogEntryType.Error, False)
             End Try
 
             'Set the update process as finished - SGM 18/02/2013
@@ -178,7 +178,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' </remarks>
         Public Function UpdateDatabaseSructureAndData(ByVal pDataBaseName As String, ByRef pServer As Server) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Try
                 'Get installed Database Version
                 Dim InstalledDataBaseVersion As Single = 0
@@ -253,10 +253,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                     'update data if there any
                                     If Not AppVersionkRow.UpdateScript = String.Empty Then 'validate if there is any data update script.
                                         If myDataBaseMangDelegate.RunDatabaseScript(pServer, pDataBaseName, AppVersionkRow.UpdateScript) Then
-                                            myLogAcciones.CreateLogActivity("Data Updated", "DataBaseAdmin.UpdataDatabaseSructureAndData", EventLogEntryType.Information, False)
+                                            GlobalBase.CreateLogActivity("Data Updated", "DataBaseAdmin.UpdataDatabaseSructureAndData", EventLogEntryType.Information, False)
                                             DataUpdate = True
                                         Else
-                                            myLogAcciones.CreateLogActivity("DataUpdate error.", "DataBaseAdmin.UpdateDatabaseSructureAndData", EventLogEntryType.Information, False)
+                                            GlobalBase.CreateLogActivity("DataUpdate error.", "DataBaseAdmin.UpdateDatabaseSructureAndData", EventLogEntryType.Information, False)
                                         End If
                                     Else
                                         DataUpdate = True
@@ -290,7 +290,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseAdmin.UpdateDatabaseSructureAndData", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseAdmin.UpdateDatabaseSructureAndData", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -322,8 +322,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     NewBackupFilePath = TempDirectory & GlobalBase.TempDBBakupFileName ' assigne the value to send as result of the operation.
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseUpdateManager.CopyBackupToTEMPDirectory", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseUpdateManager.CopyBackupToTEMPDirectory", EventLogEntryType.Error, False)
             End Try
             Return NewBackupFilePath
         End Function
@@ -349,8 +349,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myDatabaseAdmin As New DataBaseManagerDelegate()
                 result = myDatabaseAdmin.DeleteDatabase(ServerName, TempDatabaseName, DBLogin, DBPassword) 'remover Temp. Database
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " --- " & ex.InnerException.ToString(), _
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message & " --- " & ex.InnerException.ToString(), _
                                                 "DataBaseUpdateManager.RemoveBackupFileAndTempDatabase", EventLogEntryType.Error, False)
             End Try
             Return result
@@ -387,8 +387,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " Innner: " + ex.InnerException.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseUpdateManager.ShrinkDatabase", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseUpdateManager.ShrinkDatabase", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -429,8 +429,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DatabaseUpdateManager.DecryptFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DatabaseUpdateManager.DecryptFile", EventLogEntryType.Error, False)
             Finally
                 '// Close the files
                 If Not fsread Is Nothing Then
@@ -497,8 +497,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseUpdateManager.DataBaseVersionEqual", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseUpdateManager.DataBaseVersionEqual", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -521,8 +521,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                     result = True
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseVerGreaterThanAppVer.UpdateDatabase", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseVerGreaterThanAppVer.UpdateDatabase", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -614,8 +614,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.ConfigureDataBaseAfterUpdateVersion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.ConfigureDataBaseAfterUpdateVersion", EventLogEntryType.Error, False)
                 myGlobal.HasError = True
                 myGlobal.ErrorMessage = ex.Message
             End Try
@@ -675,8 +675,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.GetAnalyzerAndWorksessionInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseManagerDelegate.GetAnalyzerAndWorksessionInfo", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message

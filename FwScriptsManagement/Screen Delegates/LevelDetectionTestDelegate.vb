@@ -812,8 +812,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "PhotometryAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -854,8 +854,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -981,8 +981,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendQueueForLEVEL_DETECTION_START", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendQueueForLEVEL_DETECTION_START", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1055,8 +1055,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendQueueForLEVEL_DETECTION_END", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.SendQueueForLEVEL_DETECTION_END", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1096,8 +1096,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GetFrequencyLimits", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GetFrequencyLimits", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1126,8 +1126,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.LoadRotorsConfiguration", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.LoadRotorsConfiguration", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobalDataTO
@@ -1198,8 +1198,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.LoadRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.LoadRotorPositions", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobalDataTO
@@ -1248,8 +1248,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobalDataTO.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GetRotorRingByPosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GetRotorRingByPosition", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobalDataTO
@@ -1286,8 +1286,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1322,8 +1322,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.REQUEST_ANALYZER_INFO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.REQUEST_ANALYZER_INFO", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1412,8 +1412,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.HasError = True
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.ManageHistoryResults", EventLogEntryType.Error, False)
             End Try
 
             Return myResultData
@@ -1437,7 +1437,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
             Try
 
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String = ""
                 Dim text2 As String = ""
                 Dim text3 As String = ""
@@ -1570,7 +1570,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     Case 3 : newLine = False 'frequencies
                                     Case 4 : newLine = True 'range check result
                                 End Select
-                                FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                             Next
 
                             myResultData.SetDatos = FinalText
@@ -1608,7 +1608,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                             End If
 
                             myResult = MyClass.DecodeHistoryDataResult(pData, myArea, Arms.SAMPLE)
-                            
+
                             Dim myColWidth As Integer = 20
 
                             '1st LINE (title)
@@ -1673,7 +1673,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     Case 3 : newLine = False 'Position
                                     Case 4 : newLine = True 'result
                                 End Select
-                                FinalText &= myUtility.FormatLineHistorics(Line, myColWidth, newLine)
+                                FinalText &= Utilities.FormatLineHistorics(Line, myColWidth, newLine)
                             Next
 
                             myResultData.SetDatos = FinalText
@@ -1689,8 +1689,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.DecodeDataReport", EventLogEntryType.Error, False)
 
             Finally
                 If Not dbConnection IsNot Nothing Then dbConnection.Close()
@@ -1735,8 +1735,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GenerateResultData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GenerateResultData", EventLogEntryType.Error, False)
             End Try
 
             Return myData
@@ -1761,8 +1761,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.EncodeHistoryResult", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -1783,8 +1783,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 res = pValue.ToString("0000")
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.EncodeHistoryValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.EncodeHistoryValue", EventLogEntryType.Error, False)
                 res = "xxxx"
             End Try
 
@@ -1836,8 +1836,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
             Return myResult
@@ -1882,8 +1882,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.DecodeHistoryDataResult", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -1922,8 +1922,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                 End Select
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.GetResultLanguageResource", EventLogEntryType.Error, False)
             End Try
 
             Return res
@@ -1944,8 +1944,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.RecommendationsList.Add(pRecommendationID)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LevelDetectionTestDelegate.UpdateRecommendations", EventLogEntryType.Error, False)
             End Try
         End Sub
 

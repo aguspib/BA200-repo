@@ -121,9 +121,9 @@ Public Class IProgTestContaminations
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
-            Dim currentLanguage As String = MyGlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
 
             'RH 27/09/2011 Initialize ExistsExecutions
@@ -160,8 +160,8 @@ Public Class IProgTestContaminations
         Try
             'If pcurrentLanguage = "" Then
             '    'Get the current Language from the current Application Session
-            '    Dim currentLanguageGlobal As New GlobalBase
-            '    pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            '    'Dim currentLanguageGlobal As New GlobalBase
+            '    pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             'End If
 
             ''Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -179,8 +179,8 @@ Public Class IProgTestContaminations
 
             If String.IsNullOrEmpty(pCurrentLanguage) Then
                 'Get the current Language from the current Application Session
-                Dim currentLanguageGlobal As New GlobalBase
-                pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                'Dim currentLanguageGlobal As New GlobalBase
+                pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
             End If
 
             'Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -388,7 +388,7 @@ Public Class IProgTestContaminations
                             bsTestContaminatorsListView.Items(0).Selected = True
 
                             ReadOnlyMode()
-                            LoadContaminationsByTest(bsTestContaminatorsListView.Items(0).Name)
+                            LoadContaminationsByTest(CInt(bsTestContaminatorsListView.Items(0).Name))
                         End If
                     End If
 
@@ -928,7 +928,7 @@ Public Class IProgTestContaminations
             If EditionMode Then ChangesMade = True
             If (pType = "R1") Then
                 For Each test As TestContaminationsDS.tparContaminationsRow In R1TestsDS.tparContaminations.Rows
-                    If (test.TestID <> bsTestContaminatorsListView.SelectedItems(0).Name) Then
+                    If (test.TestID <> CInt(bsTestContaminatorsListView.SelectedItems(0).Name)) Then
                         test.BeginEdit()
                         test.Selected = pCheckedState
                         test.EndEdit()
@@ -937,7 +937,7 @@ Public Class IProgTestContaminations
 
             ElseIf (pType = "R2") Then
                 For Each test As TestContaminationsDS.tparContaminationsRow In R2TestsDS.tparContaminations.Rows
-                    If (test.TestID <> bsTestContaminatorsListView.SelectedItems(0).Name) Then
+                    If (test.TestID <> CInt(bsTestContaminatorsListView.SelectedItems(0).Name)) Then
                         test.BeginEdit()
                         test.Selected = pCheckedState
                         test.EndEdit()
@@ -1200,7 +1200,7 @@ Public Class IProgTestContaminations
                 'RH 28/06/2011
                 For i As Integer = 0 To bsR1ContaminatedDataGridView.RowCount - 1
                     bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = _
-                            (Not bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)
+                            (Not CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value))
                 Next
             End If
 
@@ -1222,7 +1222,7 @@ Public Class IProgTestContaminations
             ChangesMade = False
 
             Using testNewContaminationsDS As New ContaminationsDS()
-                Dim myTestID As Integer = bsTestContaminatorsListView.SelectedItems(0).Name
+                Dim myTestID As Integer = CInt(bsTestContaminatorsListView.SelectedItems(0).Name)
                 Dim currentTestIsContaminator As Boolean = False
                 'Read current contaminations defined for current selected TEST
 
@@ -1321,7 +1321,7 @@ Public Class IProgTestContaminations
                 '(1)
                 If (Not resultData.HasError) Then
                     ReadOnlyMode()
-                    LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                    LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
                 Else
                     'Error saving the list of Contaminations defined for the selected Test; shown it
                     ShowMessage(Name & ".SaveTestContaminations", resultData.ErrorCode, resultData.ErrorMessage, Me)
@@ -1350,7 +1350,7 @@ Public Class IProgTestContaminations
 
             If (executeAction) Then
                 ReadOnlyMode()
-                If bsTestContaminatorsListView.SelectedItems.Count = 1 Then LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                If bsTestContaminatorsListView.SelectedItems.Count = 1 Then LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CancelEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1475,7 +1475,7 @@ Public Class IProgTestContaminations
 
                     originalSelectedIndex = bsTestContaminatorsListView.SelectedIndices(0)
                     ReadOnlyMode()
-                    LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                    LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
 
                 Else 'Multi selection
                     CancelEdition()
@@ -1512,7 +1512,7 @@ Public Class IProgTestContaminations
             If (ShowMessage(Name, GlobalEnumerates.Messages.DELETE_CONTAMINATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 Dim hasError As Boolean = False
                 For i As Integer = 0 To bsTestContaminatorsListView.SelectedItems.Count - 1
-                    hasError = DeleteAllContaminationsByTest(bsTestContaminatorsListView.SelectedItems(i).Name, i)
+                    hasError = DeleteAllContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(i).Name), i)
                     If hasError Then Exit For
                 Next
             End If
@@ -1712,8 +1712,8 @@ Public Class IProgTestContaminations
     Private Sub ProgTestContaminations_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             ''TR 23/04/2012 get the current user level
-            'Dim MyGlobalBase As New GlobalBase
-            'CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            ''Dim myGlobalbase As New GlobalBase
+            'CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ''TR 23/04/2012 -END.
 
             ScreenLoad()
@@ -1877,15 +1877,15 @@ Public Class IProgTestContaminations
                 If Not EditionMode Then Return
 
                 If dgv.Columns(myColumn).Name = "Selected" Then
-                    dgv.Rows(myRow).Cells("Selected").Value = Not dgv.Rows(myRow).Cells("Selected").Value
-                    dgv.Rows(myRow).Cells("WashingSolution").ReadOnly = Not dgv.Rows(myRow).Cells("Selected").Value
+                    dgv.Rows(myRow).Cells("Selected").Value = Not CBool(dgv.Rows(myRow).Cells("Selected").Value)
+                    dgv.Rows(myRow).Cells("WashingSolution").ReadOnly = Not CBool(dgv.Rows(myRow).Cells("Selected").Value)
                     ChangesMade = True
-                    If Not dgv.Rows(myRow).Cells("Selected").Value Then
+                    If Not CBool(dgv.Rows(myRow).Cells("Selected").Value) Then
                         dgv.Rows(myRow).Cells("WashingSolution").Value = ""
                     End If
 
                 ElseIf dgv.Columns(myColumn).Name = "WashingSolution" Then
-                    If dgv.Rows(myRow).Cells("Selected").Value Then
+                    If CBool(dgv.Rows(myRow).Cells("Selected").Value) Then
                         ChangesMade = True
                     Else
                         dgv.Rows(myRow).Cells("WashingSolution").Value = ""

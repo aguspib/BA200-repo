@@ -253,12 +253,12 @@ Public Class IQCResultsReview
                 If (myHistoryTestSampleDS.tqcHistoryTestSamples.Count > 0) Then
                     '** Bind Calculation Mode, Number of Series and Rejection Criteria...
                     bsCalculationModeCombo.SelectedValue = myHistoryTestSampleDS.tqcHistoryTestSamples(0).CalculationMode
-                    If (bsCalculationModeCombo.SelectedValue = "MANUAL") Then
+                    If (CStr(bsCalculationModeCombo.SelectedValue) = "MANUAL") Then
                         bsNumberOfSeriesNumeric.ResetText()
                     Else
-                        bsNumberOfSeriesNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).NumberOfSeries
+                        bsNumberOfSeriesNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).NumberOfSeries.ToString
                     End If
-                    bsRejectionNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).RejectionCriteria
+                    bsRejectionNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).RejectionCriteria.ToString
 
                     'Bind Multirules...
                     BindMultirulesControls(pQCTestSampleID)
@@ -862,9 +862,9 @@ Public Class IQCResultsReview
 
                     'Add the Test/Sample Type to the ListView
                     bsTestSampleListView.Items.Add(historyTestSampRow.TestName, myIconNameVar).SubItems.Add(historyTestSampRow.SampleType)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(CStr(historyTestSampRow.TestID))
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(CStr(historyTestSampRow.DecimalsAllowed))
                     bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestType)
 
                     myIndex += 1
@@ -1057,8 +1057,8 @@ Public Class IQCResultsReview
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             PrepareButtons(currentLanguage)
@@ -1151,8 +1151,8 @@ Public Class IQCResultsReview
 
             If (pInitialScreenLoad) Then
                 'TR 20/04/2012 - Get level of the connected User
-                Dim myGlobalBase As New GlobalBase
-                CurrentUserLevel = myGlobalBase.GetSessionInfo().UserLevel
+                'Dim myGlobalbase As New GlobalBase
+                CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             End If
 
             If (bsTestSampleListView.Items.Count = 0) Then
@@ -2119,7 +2119,7 @@ Public Class IQCResultsReview
                 myIQCGraph.DecimalAllowed = LocalDecimalAllow
                 myIQCGraph.TestName = bsTestSampleListView.SelectedItems(0).SubItems(0).Text
                 myIQCGraph.SampleType = bsTestSampleListView.SelectedItems(0).SubItems(1).Text
-                myIQCGraph.RejectionCriteria = Me.bsRejectionNumeric.Value.ToString()
+                myIQCGraph.RejectionCriteria = Me.bsRejectionNumeric.Value
 
                 myIQCGraph.ShowDialog()
 

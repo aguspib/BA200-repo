@@ -153,8 +153,8 @@ Namespace Biosystems.Ax00.BL
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.ExportXLS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.ExportXLS", EventLogEntryType.Error, False)
 
             Finally
                 Me.CloseProcess(DateIniProcess, myTypeExcel, myExcel, myBook)
@@ -295,8 +295,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "GetReadingAbsorbancesByExecution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "GetReadingAbsorbancesByExecution", EventLogEntryType.Error, False)
             End Try
 
             Return resultData
@@ -380,8 +380,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.NewExcelFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.NewExcelFile", EventLogEntryType.Error, False)
             End Try
 
             Return resultdata
@@ -575,8 +575,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.SheetBaseLinebyWell", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.SheetBaseLinebyWell", EventLogEntryType.Error, False)
             End Try
 
             Return resultdata
@@ -791,8 +791,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.SheetBaseLine", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.SheetBaseLine", EventLogEntryType.Error, False)
             End Try
 
             Return resultdata
@@ -1058,8 +1058,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.SheetCount", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.SheetCount", EventLogEntryType.Error, False)
             End Try
 
             Return resultdata
@@ -1387,8 +1387,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.SheetAbsorbance", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.SheetAbsorbance", EventLogEntryType.Error, False)
             End Try
 
             Return resultdata
@@ -1786,8 +1786,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.SheetComplete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.SheetComplete", EventLogEntryType.Error, False)
             End Try
 
             Return resultdata
@@ -1821,8 +1821,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.LoadExecutionsResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.LoadExecutionsResults", EventLogEntryType.Error, False)
 
             End Try
 
@@ -1979,8 +1979,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportCalculations.SheetResultsByReplicates", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportCalculations.SheetResultsByReplicates", EventLogEntryType.Error, False)
 
             End Try
 
@@ -2413,8 +2413,8 @@ Namespace Biosystems.Ax00.BL
                 ' end dl 10/03/2011
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ResultsFileDelegate.SetPositionsArrays", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ResultsFileDelegate.SetPositionsArrays", EventLogEntryType.Error, False)
             End Try
 
             Return pArray
@@ -2459,8 +2459,8 @@ Namespace Biosystems.Ax00.BL
             Catch ex As Exception
                 resultdata = New GlobalDataTO()
                 resultdata.HasError = True
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ResultsFileDelegate.GetWaveLength", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ResultsFileDelegate.GetWaveLength", EventLogEntryType.Error, False)
             End Try
 
             resultdata.SetDatos = myWaveLength
@@ -2648,8 +2648,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ResultsFileDelegate.GetDataForAbsCurve", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ResultsFileDelegate.GetDataForAbsCurve", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2859,8 +2859,8 @@ Namespace Biosystems.Ax00.BL
                 resultdata.ErrorCode = "SYSTEM_ERROR"
                 resultdata.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ResultsFileDelegate.GetReadingAbsorbances", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ResultsFileDelegate.GetReadingAbsorbances", EventLogEntryType.Error, False)
             End Try
 
             Return resultdata

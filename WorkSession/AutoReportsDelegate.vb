@@ -21,7 +21,7 @@ Namespace Biosystems.Ax00.BL
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones1 As New ApplicationLogManager()
+            'Dim myLogAcciones1 As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Try
@@ -108,7 +108,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones1.CreateLogActivity("ManageAutoReportCreationExecutions (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("ManageAutoReportCreationExecutions (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                  "AutoReportsDelegate.ManageAutoReportCreationExecutions", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Catch ex As Exception
@@ -116,8 +116,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AutoReportsDelegate.ManageAutoReportCreationExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AutoReportsDelegate.ManageAutoReportCreationExecutions", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -130,7 +130,7 @@ Namespace Biosystems.Ax00.BL
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones1 As New ApplicationLogManager()
+            'Dim myLogAcciones1 As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Try
@@ -192,7 +192,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones1.CreateLogActivity("ManageAutoRepoManageAutoReportCreationOFFSys (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("ManageAutoRepoManageAutoReportCreationOFFSys (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                  "AutoReportsDelegate.ManageAutoReportCreationOFFSys", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Catch ex As Exception
@@ -200,8 +200,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AutoReportsDelegate.ManageAutoReportCreationOFFSys", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AutoReportsDelegate.ManageAutoReportCreationOFFSys", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -247,8 +247,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AutoReportsDelegate.GetAutoReportValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AutoReportsDelegate.GetAutoReportValues", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()

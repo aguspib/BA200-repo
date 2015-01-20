@@ -38,8 +38,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessCONTAMINATIONS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessCONTAMINATIONS", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -123,8 +123,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessDELContaminationsR1", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessDELContaminationsR1", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -197,8 +197,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessDELContaminationsR1", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessDELContaminationsR1", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -296,8 +296,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessNEWorUPDContaminationsR1", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessNEWorUPDContaminationsR1", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -375,8 +375,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessNEWorUPDContaminationsCUVETTES", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("STD Test Update Error", "ContaminationsUpdateData.ProcessNEWorUPDContaminationsCUVETTES", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -416,8 +416,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 pUpdateVersionChangesList.TestContaminations.AddTestContaminationsRow(myUpdateVersionContaminationsRow)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("SDT Test Update Error", "ContaminationsUpdateData.AddContaminationToChangesStructure", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("SDT Test Update Error", "ContaminationsUpdateData.AddContaminationToChangesStructure", EventLogEntryType.Error, False)
                 Throw
             End Try
         End Sub
@@ -495,8 +495,8 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "ContaminationsDelegate.SaveContaminations", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "ContaminationsDelegate.SaveContaminations", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -546,8 +546,8 @@ End Namespace
 '        End If
 '        myGlobalDataTO.SetDatos = myContaminationDS
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateData.GetDataInFactoryDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -607,8 +607,8 @@ End Namespace
 '        End If
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateData.GetDataInLocalDB", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -643,8 +643,8 @@ End Namespace
 '        End If
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateData.IsFactoryDefinedItem", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateData.IsFactoryDefinedItem", EventLogEntryType.Error, False)
 '    End Try
 
 '    Return myResult
@@ -707,8 +707,8 @@ End Namespace
 '        End If
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateDataDoCreateNewElement", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity("Contaminations Update Error.", "ContaminationsUpdateDataDoCreateNewElement", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -777,8 +777,8 @@ End Namespace
 '        End If
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("Test Update Error.", "ContaminationsUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity("Test Update Error.", "ContaminationsUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
@@ -872,8 +872,8 @@ End Namespace
 '        End If
 
 '    Catch ex As Exception
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity("Test Update Error.", "ContaminationsUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity("Test Update Error.", "ContaminationsUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
 '        myGlobalDataTO.HasError = True
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message

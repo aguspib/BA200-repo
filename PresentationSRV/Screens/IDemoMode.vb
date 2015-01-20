@@ -597,8 +597,8 @@ Public Class IDemoMode
             MyClass.myScreenDelegate = New DemoModeDelegate(MyBase.myServiceMDI.ActiveAnalyzer, myFwScriptDelegate)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -768,7 +768,7 @@ Public Class IDemoMode
     Private Sub PrepareTestButton()
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
@@ -790,7 +790,7 @@ Public Class IDemoMode
             '    Dim myImage As Image
             '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myNewImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else

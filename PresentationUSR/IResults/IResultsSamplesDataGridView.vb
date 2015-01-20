@@ -456,7 +456,7 @@ Partial Class IResults
     Private Sub UpdateSamplesXtraGrid()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             If isClosingFlag Then Exit Sub ' XB 24/02/2014 - #1496 No refresh if screen is closing
@@ -868,7 +868,7 @@ Partial Class IResults
 
         End Try
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IResults UpdateSamplesXtraGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+        GlobalBase.CreateLogActivity("IResults UpdateSamplesXtraGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                         " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                         "IResults.UpdateSamplesXtraGrid", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

@@ -807,8 +807,8 @@ Public Class FormXavi
 
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1372,8 +1372,8 @@ Public Class FormXavi
             'End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -3809,7 +3809,7 @@ Public Class FormXavi
             'End With
             'myInstruction.Add(myPar4)
 
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
 
             'myGlobal = myAnalyzerManager.ProcessRecivedISEResult(myInstruction)
             'Dim myISEResultData As New ISEResultsDataTO

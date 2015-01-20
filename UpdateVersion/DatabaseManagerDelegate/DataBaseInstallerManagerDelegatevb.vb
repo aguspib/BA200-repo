@@ -22,7 +22,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                                    ByVal DBLogin As String, ByVal DBPassword As String) As GlobalDataTO
             Dim myGlobalDataTO = New GlobalDataTO
             Dim MyDabaseManagerDelegate As New DataBaseManagerDelegate()
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 'TR 25/01/2011 -Replace by corresponding value on global base.
@@ -42,7 +42,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorMessage = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
                 myGlobalDataTO.SetDatos = False
-                myLogAcciones.CreateLogActivity(ex.Message, "DataBaseInstallerManagerDelegate.InstallApplicationDataBase", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "DataBaseInstallerManagerDelegate.InstallApplicationDataBase", EventLogEntryType.Error, False)
             Finally
                 'TR 21/01/2013 v1.0.1 -Remove Ax00.bak file from temporal folder.
                 RemoveDBBackupFile(GlobalBase.TemporalDirectory & GlobalBase.DBBakupFileName)
@@ -86,8 +86,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "DataBaseUpdateManager.CopyBackupToTEMPDirectory", EventLogEntryType.Error, False)
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity(ex.Message, "DataBaseUpdateManager.CopyBackupToTEMPDirectory", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -109,8 +109,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
             Catch ex As Exception
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message & " --- " & ex.InnerException.ToString(), _
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message & " --- " & ex.InnerException.ToString(), _
                                                 "DataBaseUpdateManager.RemoveDBBackupFile", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO

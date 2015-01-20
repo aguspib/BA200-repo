@@ -1639,7 +1639,7 @@ Public Class IProgOffSystemTest
                 'Get from the User Control of Reference Ranges the defined ones
                 SelectedTestRefRangesDS = DirectCast(bsTestRefRanges.DefinedTestRangesDS, TestRefRangesDS) 'bsTestRefRanges.DefinedTestRangesDS
 
-                'Dim myGlobalBase As New GlobalBase
+                ''Dim myGlobalbase As New GlobalBase
                 ''Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
                 'Dim myTestRefRanges As List(Of TestRefRangesDS.tparTestRefRangesRow)
 
@@ -1650,7 +1650,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1665,7 +1665,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1718,7 +1718,7 @@ Public Class IProgOffSystemTest
         Try
             'Gets from the Session the Username of the connected User
             Dim currentSession As New ApplicationSessionManager
-            Dim currentUser As String = currentSession.GetSessionInfo().UserName
+            Dim currentUser As String = GlobalBase.GetSessionInfo().UserName
 
             'Fill OffSystem Test basic data
             Dim offSystemTestData As New OffSystemTestsDS
@@ -1815,8 +1815,8 @@ Public Class IProgOffSystemTest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -2074,8 +2074,8 @@ Public Class IProgOffSystemTest
     Private Sub ProgOffSystemTest_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'TR 20/04/2012 - Get the Level of the Current User
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             ScreenLoad()
         Catch ex As Exception

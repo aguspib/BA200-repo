@@ -733,7 +733,7 @@ Partial Public Class IAx00MainMDI
     ''' Modified by XB 04/02/2013 - Upper conversions must use Invariant Culture Info (Bugs tracking #1112)
     ''' </remarks>
     Private Sub HideBIOSYSTEMSOnlyMenuOptions()
-        Dim UserName As String = New GlobalBase().GetSessionInfo().UserName.ToUpperBS()   ' ToUpper()
+        Dim UserName As String = GlobalBase.GetSessionInfo().UserName.ToUpperBS()   ' ToUpper()
         Dim NewValue As Boolean = String.Equals(UserName, "BIOSYSTEMS")
 
         BorrameToolStripMenuItem.Visible = NewValue
@@ -763,8 +763,8 @@ Partial Public Class IAx00MainMDI
     ''' </remarks>
     Private Sub MenuOptionsByUserLevel()
         Try
-            Dim CurrentUserLevel As String = New GlobalBase().GetSessionInfo().UserLevel    '.ToUpper()
-            Dim currentUserName As String = New GlobalBase().GetSessionInfo().UserName
+            Dim CurrentUserLevel As String = GlobalBase.GetSessionInfo().UserLevel    '.ToUpper()
+            Dim currentUserName As String = GlobalBase.GetSessionInfo().UserName
 
             'Me.Text = "BA400 User Sw" & " - " & CurrentUserLevel 'DL 15/05/2012
             Me.Text = "BA400 User Sw" & " - " & currentUserName 'AG 22/05/2012
@@ -887,8 +887,8 @@ Partial Public Class IAx00MainMDI
                 Dim numOfFiles As Integer = 0
                 Dim dirs As String() = Directory.GetFiles(LISStorageDir)
                 If dirs.Count > 0 Then numOfFiles = dirs.Count
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("NUMBER of MSG files into LIS STORAGE (pending to sent to LIS) : " & numOfFiles.ToString(), _
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("NUMBER of MSG files into LIS STORAGE (pending to sent to LIS) : " & numOfFiles.ToString(), _
                          Name & ".Ax00MainMDI_Load ", EventLogEntryType.Information, False)
             End If
 
@@ -1290,7 +1290,7 @@ Partial Public Class IAx00MainMDI
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'BT #1360 - Write in Application Log the start of this function
@@ -1449,10 +1449,10 @@ Partial Public Class IAx00MainMDI
                                 resultData = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
                                 If (Not resultData.HasError) Then myLogMaxDays = CInt(resultData.SetDatos)
 
-                                resultData = myLogAcciones.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
+                                resultData = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
                                 If (Not resultData.HasError) Then
                                     'If expor to xml OK then delete all records on Application log Table
-                                    resultData = myLogAcciones.DeleteAll()
+                                    resultData = ApplicationLogManager.DeleteAll()
                                 Else
                                     'AG 30/05/2013 - Reset WS process must ignore errors in previous subprocesses (the warning will show later)
                                     existsErrorFlag = True
@@ -1572,7 +1572,7 @@ Partial Public Class IAx00MainMDI
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("TOTAL TIME WorkSession RESET + EXPORT + MENU + OPEN MONITOR SCREEN " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("TOTAL TIME WorkSession RESET + EXPORT + MENU + OPEN MONITOR SCREEN " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "ResetSessionButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1923,8 +1923,8 @@ Partial Public Class IAx00MainMDI
                     End While
 
                     'SG 07/11/2012 - Inform the Application is closing in the LOG
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "IAx00MainMDI_FormClosing", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "IAx00MainMDI_FormClosing", EventLogEntryType.Information, False)
 
                     'TR 10/07/2013 - Shrink the Database before close the application
                     Dim myDataBaseUpdateManagerDelegate As New DataBaseUpdateManagerDelegate
@@ -3033,7 +3033,7 @@ Partial Public Class IAx00MainMDI
     ''' <remarks>JV + AG revision 18/10/2013 New Button Play/Pause/Continue event task # 1341</remarks>
     Private Sub bsTSMultiFunctionSessionButton_Click(sender As Object, e As EventArgs) Handles bsTSMultiFunctionSessionButton.Click
         Try
-            'Dim myLogAcciones As New ApplicationLogManager()
+            ''Dim myLogAcciones As New ApplicationLogManager()
             If showSTARTWSiconFlag Then
                 CreateLogActivity("Btn Start WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
                 PlaySessionActions()
@@ -3737,8 +3737,8 @@ Partial Public Class IAx00MainMDI
         Try
             If automateProcessCurrentState = LISautomateProcessSteps.subProcessDownloadOrders Then
                 SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessCreatinsWS)
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: Before orders downloading", "IAx00MainMDI.CreateAutomaticWSWithLIS", EventLogEntryType.Information, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("AutoCreate WS with LIS: Before orders downloading", "IAx00MainMDI.CreateAutomaticWSWithLIS", EventLogEntryType.Information, False)
 
                 'Execute the orders download process
 
@@ -3894,8 +3894,8 @@ Partial Public Class IAx00MainMDI
                         'If autoWSCreationWithLISModeAttribute AndAlso Not pSkipAutomaticWSWithLISChekings Then
                         If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso Not pSkipAutomaticWSWithLISChekings Then
                             'XB 23/07/2013
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: Start process", "IAx00MainMDI.StartSession", EventLogEntryType.Information, False)
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("AutoCreate WS with LIS: Start process", "IAx00MainMDI.StartSession", EventLogEntryType.Information, False)
 
                             autoProcessUserAnswer = CheckForExceptionsInAutoCreateWSWithLISProcess(1, Nothing, 0, True) 'AG 22/07/2013 - Skip alarm sound because this message is inmediate
                             If autoProcessUserAnswer = DialogResult.Yes Then
@@ -4247,8 +4247,8 @@ Partial Public Class IAx00MainMDI
 
                         '    MDIAnalyzerManager.ISE_Manager.WorkSessionIsRunning = True
 
-                        '    'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
-                        '    'myLogAcciones.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                        '    ''Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
+                        '    'GlobalBase.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                         '    ' Update date for the ISE test executed while running
                         '    MDIAnalyzerManager.ISE_Manager.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
                         '    'end SGM 01/10/2012
@@ -5022,8 +5022,8 @@ Partial Public Class IAx00MainMDI
                     If userAnswer = Windows.Forms.DialogResult.Yes Then ' XB 23/05/2014
                         MDIAnalyzerManager.ISE_Manager.WorkSessionIsRunning = True
 
-                        'Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
-                        'myLogAcciones.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                        ''Dim myLogAcciones As New ApplicationLogManager()    ' TO COMMENT !!!
+                        'GlobalBase.CreateLogActivity("Update Consumptions - Update Last Date WS ISE Operation [ " & DateTime.Now.ToString & "]", "Ax00MainMDI.StartSession", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                         ' Update date for the ISE test executed while running
                         MDIAnalyzerManager.ISE_Manager.UpdateISEInfoSetting(ISEModuleSettings.LAST_OPERATION_WS_DATE, DateTime.Now.ToString, True)
                     End If
@@ -5509,14 +5509,14 @@ Partial Public Class IAx00MainMDI
                     'If (System.IO.File.Exists(OldXmlFile)) Then
                     '    Rename(OldXmlFile, NewXmlFile)
 
-                    '    Dim myUtil As New Utilities
+                    '    'Dim myUtil As New Utilities.
                     '    If (System.IO.File.Exists(sourcePath & "Temp")) Then
-                    '        myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+                    '        myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
                     '    End If
 
-                    '    myGlobal = myUtil.CreateFolder(sourcePath & "Temp")
+                    '    myGlobal = Utilities.CreateFolder(sourcePath & "Temp")
                     '    If (Not myGlobal.HasError) Then
-                    '        myGlobal = myUtil.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
+                    '        myGlobal = Utilities.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
 
                     '        If (Not myGlobal.HasError) Then
                     '            If (System.IO.File.Exists(sourcePath & fileZip)) Then
@@ -5530,20 +5530,20 @@ Partial Public Class IAx00MainMDI
                     '                    If (System.IO.File.Exists(sourcePath & fileZip)) Then Rename(sourcePath & fileZip, sourcePath & "PreviousLog " & Format(Now, "yyyyMMdd hhmmss") & ".zip")
                     '                End If
 
-                    '                myGlobal = myUtil.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
+                    '                myGlobal = Utilities.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
 
                     '                If (Not myGlobal.HasError) Then Kill(sourcePath & fileZip)
                     '            End If
 
                     '            '' dl 14/06/2011
                     '            'If GenerateResultsExcel Then
-                    '            '    myGlobal = myUtil.MoveFiles(ExcelPath, sourcePath & "Temp\", "*.xls")
+                    '            '    myGlobal = Utilities.MoveFiles(ExcelPath, sourcePath & "Temp\", "*.xls")
                     '            'End If
                     '            '' dl 14/06/2011
 
-                    '            myGlobal = myUtil.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
+                    '            myGlobal = Utilities.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
                     '            If (Not myGlobal.HasError) Then
-                    '                myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+                    '                myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
                     '            End If
                     '        End If
                     '    End If
@@ -6179,8 +6179,8 @@ Partial Public Class IAx00MainMDI
             ' XBC 07/06/2012
             'myGlobalDataTO = myAnalyzerDelegate.GetAnalyzer(Nothing)
 
-            Dim myLogAccionesAux As New ApplicationLogManager()
-            myLogAccionesAux.CreateLogActivity("(Analyzer Change) Check Analyzer ", Name & ".GetAnalyzerInfo ", EventLogEntryType.Information, False)
+            'Dim myLogAccionesAux As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity("(Analyzer Change) Check Analyzer ", Name & ".GetAnalyzerInfo ", EventLogEntryType.Information, False)
 
             myGlobalDataTO = myAnalyzerDelegate.CheckAnalyzer(Nothing)
             ' XBC 07/06/2012
@@ -7397,8 +7397,8 @@ Partial Public Class IAx00MainMDI
                         'AG 05/11/2013
 
                         'Open popup the HostQuery screen 
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: HostQuery monitor screen opening (on RUNNING)", "IAx00MainMDI.StartEnterInRunningMode", EventLogEntryType.Information, False)
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("AutoCreate WS with LIS: HostQuery monitor screen opening (on RUNNING)", "IAx00MainMDI.StartEnterInRunningMode", EventLogEntryType.Information, False)
                         Dim myOriginalStatus As String = bsAnalyzerStatus.Text
                         ShowStatus(Messages.AUTOLIS_WAITING_ORDERS)
 
@@ -7430,7 +7430,7 @@ Partial Public Class IAx00MainMDI
                         bsAnalyzerStatus.Text = myOriginalStatus
 
                         If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
-                            myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: HostQuery monitor screen closed (on RUNNING)", "IAx00MainMDI.StartEnterInRunningMode", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("AutoCreate WS with LIS: HostQuery monitor screen closed (on RUNNING)", "IAx00MainMDI.StartEnterInRunningMode", EventLogEntryType.Information, False)
 
                             'Check if there is something received from LIS pending to be add to WS (see conditions instead of button status)
                             Dim myESRulesDlg As New ESBusiness
@@ -7857,8 +7857,8 @@ Partial Public Class IAx00MainMDI
 
             'TRAZA DE APERTURA DE FORMULARIO
             If Not pFormToOpen Is Nothing AndAlso Not ActiveMdiChild Is Nothing Then
-                Dim myApplicationLogMang As New ApplicationLogManager
-                myApplicationLogMang.CreateLogActivity(ActiveMdiChild.Name & " ---> " & pFormToOpen.Name, "OpenMDIChildForm", EventLogEntryType.Information, False)
+                'Dim myApplicationLogMang As New ApplicationLogManager
+                GlobalBase.CreateLogActivity(ActiveMdiChild.Name & " ---> " & pFormToOpen.Name, "OpenMDIChildForm", EventLogEntryType.Information, False)
             End If
             'TRAZA DE APERTURA DE FORMULARIO
 
@@ -8120,8 +8120,8 @@ Partial Public Class IAx00MainMDI
 
             '    If String.IsNullOrEmpty(CurrentLanguage) Then
             '        CurrentLanguage = "ENG"
-            '        Dim myLogAcciones As New ApplicationLogManager()
-            '        myLogAcciones.CreateLogActivity("Unable to load App Current Language", "MultilanguageResourcesDelegate.UpdateCurrentLanguage", EventLogEntryType.Error, False)
+            '        'Dim myLogAcciones As New ApplicationLogManager()
+            '        GlobalBase.CreateLogActivity("Unable to load App Current Language", "MultilanguageResourcesDelegate.UpdateCurrentLanguage", EventLogEntryType.Error, False)
             '    End If
 
             '    MultilanguageResourcesDelegate.SetCurrentLanguage(CurrentLanguage)
@@ -8196,8 +8196,8 @@ Partial Public Class IAx00MainMDI
 
                             'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
                             If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                                Dim myLogAcciones As New ApplicationLogManager()
-                                myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
+                                'Dim myLogAcciones As New ApplicationLogManager()
+                                GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenRotorPositionsForm", EventLogEntryType.Error, False)
                             End If
                         End If
                     End If
@@ -8271,8 +8271,7 @@ Partial Public Class IAx00MainMDI
         Try
             'TRAZA DE APERTURA DE FORMULARIO
             If Not FormToClose Is Nothing Then
-                Dim myApplicationLogMang As New ApplicationLogManager
-                myApplicationLogMang.CreateLogActivity(FormToClose.Name & "---> IMonitor", "OpenMDIChildForm", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity(FormToClose.Name & "---> IMonitor", "OpenMDIChildForm", EventLogEntryType.Information, False)
             End If
             'TRAZA DE APERTURA DE FORMULARIO
 
@@ -8310,8 +8309,8 @@ Partial Public Class IAx00MainMDI
 
                         'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
                         If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenMonitorForm", EventLogEntryType.Error, False)
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenMonitorForm", EventLogEntryType.Error, False)
                         End If
 
                         'Inform WorkSession and Analyzer in the global object Analyzer Manager
@@ -8444,8 +8443,8 @@ Partial Public Class IAx00MainMDI
 
                         'If there was an existing WS and the adding of a new Empty one was stopped, write the Warning in the Application LOG
                         If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenMonitorForm", EventLogEntryType.Error, False)
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", "IAx00MainMDI.OpenMonitorForm", EventLogEntryType.Error, False)
                         End If
 
                         'Inform WorkSession and Analyzer in the global object Analyzer Manager
@@ -8575,8 +8574,8 @@ Partial Public Class IAx00MainMDI
     Public Sub InitializeAnalyzerAndWorkSession(ByVal pStartingApplication As Boolean)
         Try
             ''Get the current application Language to set the correspondent attribute and prepare all menu options
-            'Dim currentLanguageGlobal As New GlobalBase
-            'CurrentLanguageAttribute = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            ''Dim currentLanguageGlobal As New GlobalBase
+            'CurrentLanguageAttribute = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             ShowStatus(SaveStatusMessageID) 'RH 21/03/2012
 
@@ -8643,8 +8642,8 @@ Partial Public Class IAx00MainMDI
 
             ' XBC 15/06/2012
             Dim isReportSATLoading As Boolean = Not pStartingApplication
-            Dim myLogAccionesAux As New ApplicationLogManager()
-            myLogAccionesAux.CreateLogActivity("(Analyzer Change) calling function ManageAnalyzerConnected ... - ReportSAT loading [" & isReportSATLoading & "] ", Name & ".InitializeAnalyzerAndWorkSession ", EventLogEntryType.Information, False)
+            'Dim myLogAccionesAux As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity("(Analyzer Change) calling function ManageAnalyzerConnected ... - ReportSAT loading [" & isReportSATLoading & "] ", Name & ".InitializeAnalyzerAndWorkSession ", EventLogEntryType.Information, False)
 
             ManageAnalyzerConnected(False, isReportSATLoading)
             ' XBC 15/06/2012
@@ -9031,8 +9030,8 @@ Partial Public Class IAx00MainMDI
                         auxStr = "OK. Go to Running!!!"
                     End If
                 End If
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: Evaluate conditions before go Running. Result: " & auxStr, "IAx00MainMDI.FinishAutomaticWSWithLIS", EventLogEntryType.Information, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("AutoCreate WS with LIS: Evaluate conditions before go Running. Result: " & auxStr, "IAx00MainMDI.FinishAutomaticWSWithLIS", EventLogEntryType.Information, False)
 
                 If conditionsOK AndAlso Not pausingAutomateProcessFlag AndAlso Not HQProcessByUserFlag Then
                     SetAutomateProcessStatusValue(LISautomateProcessSteps.subProcessEnterRunning)
@@ -9555,9 +9554,9 @@ Partial Public Class IAx00MainMDI
                     addUserAnswerText &= " User answers: Continue and go to Running"
                 End If
             End If
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             addUserAnswerText &= " " & messageType 'AG 27/01/2014 - #1475 add the messsagetype
-            myLogAcciones.CreateLogActivity(addUserAnswerText, _
+            GlobalBase.CreateLogActivity(addUserAnswerText, _
                        "IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess", EventLogEntryType.Information, False)
 
         Catch ex As Exception
@@ -9915,7 +9914,7 @@ Partial Public Class IAx00MainMDI
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
 
             If Not ProcessingLISManagerObject Then
@@ -9957,7 +9956,7 @@ Partial Public Class IAx00MainMDI
                         End SyncLock
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495 
-                        myLogAcciones.CreateLogActivity("Move row from pendingUpload to InCourseUpload (FOR_EACH): " & Now.Subtract(StartTime2).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Move row from pendingUpload to InCourseUpload (FOR_EACH): " & Now.Subtract(StartTime2).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Information, False)
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495 
 
@@ -9976,8 +9975,8 @@ Partial Public Class IAx00MainMDI
                             Dim confmappdlg As New LISMappingsDelegate
                             Dim confMappingDS As New LISMappingsDS
                             If Not resultData.HasError Then
-                                Dim MyGlobalBase As New GlobalBase
-                                resultData = confmappdlg.ReadAll(Nothing, MyGlobalBase.GetSessionInfo().ApplicationLanguage)
+                                'Dim myGlobalbase As New GlobalBase
+                                resultData = confmappdlg.ReadAll(Nothing, GlobalBase.GetSessionInfo().ApplicationLanguage)
                                 If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                     confMappingDS = CType(resultData.SetDatos, LISMappingsDS)
                                 End If
@@ -10094,7 +10093,7 @@ Partial Public Class IAx00MainMDI
 
                                 'AG 30/09/2014 - BA-1440 - Message has to be shown using the presentation Thread
                                 If Not pAutoExportFlag AndAlso showMsg Then
-                                    myLogAcciones.CreateLogActivity("Show message to user when there are results that CANNOT be sent (invalid LIS mapping) ", Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("Show message to user when there are results that CANNOT be sent (invalid LIS mapping) ", Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Information, False)
                                     Me.UIThread(Function() ShowMessage(Me.Name, GlobalEnumerates.Messages.RESULTS_CANNOT_BE_SENT.ToString, , Me))
                                 End If
                                 'AG 30/09/2014 - BA-1440
@@ -10115,7 +10114,7 @@ Partial Public Class IAx00MainMDI
             End If 'If Not ProcessingLISManagerObject Then
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
-            myLogAcciones.CreateLogActivity("SynchronousLISManagerUploadResults TOTAL method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("SynchronousLISManagerUploadResults TOTAL method: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                              Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
 
@@ -10252,7 +10251,7 @@ Partial Public Class IAx00MainMDI
             If (Not MDILISManager Is Nothing) Then
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim TotalStartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 'TR 05/04/2013 - Variable used to indicate which screen has to be opened 
@@ -10379,7 +10378,7 @@ Partial Public Class IAx00MainMDI
                 resultData.SetDatos = myExistPositionedElement
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             End If
@@ -10888,8 +10887,8 @@ Partial Public Class IAx00MainMDI
             'end SG 15/05/2013
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageNewLISNotification", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageNewLISNotification", EventLogEntryType.Error, False)
         End Try
 
         Return True
@@ -10944,7 +10943,7 @@ Partial Public Class IAx00MainMDI
             End Select
 
             ' XB 06/03/2014 - Print state LIS changes also on Log
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim TextToPrint As String = ""
             Select Case pStatus.ToUpperBS()
                 Case GlobalEnumerates.LISStatus.noconnectionEnabled.ToString.ToUpperBS()
@@ -10972,14 +10971,14 @@ Partial Public Class IAx00MainMDI
                     'Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") & " - LIS STATUS : unknow connection status")
                     TextToPrint = " - LIS STATUS : unknow connection status"
             End Select
-            myLogAcciones.CreateLogActivity(TextToPrint, "ManageNewLISNotification", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity(TextToPrint, "ManageNewLISNotification", EventLogEntryType.Information, False)
             ' XB 06/03/2014
 
         ElseIf pStorageValue <> "" Then
             ' XB 06/03/2014 - Print state LIS changes also on Log
             'Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") & " - STORAGE value : " & pStorageValue, "ManageNewLISNotification")
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(" - STORAGE value : " & pStorageValue, "ManageNewLISNotification", EventLogEntryType.Information, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(" - STORAGE value : " & pStorageValue, "ManageNewLISNotification", EventLogEntryType.Information, False)
             ' XB 06/03/2014 
             Select Case pStorageValue
                 Case "0"
@@ -11092,8 +11091,8 @@ Partial Public Class IAx00MainMDI
             'AG 22/07/2013
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageNewLISMessage", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageNewLISMessage", EventLogEntryType.Error, False)
         End Try
 
         Return True
@@ -11111,7 +11110,7 @@ Partial Public Class IAx00MainMDI
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim TotalStartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             CreateLogActivity("QAll button in MDI horizontal bar", Me.Name & ".bsTSQueryAllButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
@@ -11130,12 +11129,12 @@ Partial Public Class IAx00MainMDI
 
             End If
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             Me.Name & "." & (New System.Diagnostics.StackTrace()).GetFrame(0).GetMethod().Name, EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsTSQueryAllButton_Click", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsTSQueryAllButton_Click", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -11207,8 +11206,8 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsTSHostQueryButton_Click", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsTSHostQueryButton_Click", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -11234,7 +11233,7 @@ Partial Public Class IAx00MainMDI
         '        'Close current screen
         '        Dim closedFlag As Boolean = CloseActiveMdiChild(True) 'AG 10/07/2013 - optional parameter to TRUE
         '        If closedFlag Then
-        '            Dim myLogAcciones As New ApplicationLogManager()
+        '            'Dim myLogAcciones As New ApplicationLogManager()
 
         '            'Order download and add to worksession
         '            '1- Disable UI
@@ -11361,7 +11360,7 @@ Partial Public Class IAx00MainMDI
         '                        'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
         '                        If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
         '                            'XB 23/07/2013 
-        '                            myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
+        '                            GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
         '                            Dim autoProcessUserAnswer As DialogResult = DialogResult.Yes
         '                            autoProcessUserAnswer = CheckForExceptionsInAutoCreateWSWithLISProcess(7)
         '                            If autoProcessUserAnswer = DialogResult.Yes Then
@@ -11387,7 +11386,7 @@ Partial Public Class IAx00MainMDI
         '                            If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then 'Inform the automatic process send to position + create executions
         '                                'XB 23/07/2013
         '                                IWSSampleRequest.OpenByAutomaticProcess = True
-        '                                myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest + auto send to positioning", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
+        '                                GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest + auto send to positioning", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
         '                            End If
         '                            IWSSampleRequest.SaveWSWithPositioning()
         '                        Else
@@ -11398,7 +11397,7 @@ Partial Public Class IAx00MainMDI
         '                                'XB 23/07/2013
         '                                OpenRotorPositionsForm(Nothing)
         '                            Else 'Automatic
-        '                                myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download open Rotor positions screen", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
+        '                                GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download open Rotor positions screen", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
         '                                OpenRotorPositionsForm(Nothing, False, True) 'Inform new parameters for inform close automatically screen in order to generate executions
         '                            End If
         '                            'AG 10/07/2013
@@ -11414,7 +11413,7 @@ Partial Public Class IAx00MainMDI
         '                        'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
         '                        If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
         '                            'XB 23/07/2013
-        '                            myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download nothing added to Work Session", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
+        '                            GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download nothing added to Work Session", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
         '                            Dim autoProcessUserAnswer As DialogResult = DialogResult.OK
         '                            autoProcessUserAnswer = CheckForExceptionsInAutoCreateWSWithLISProcess(8)
         '                            If autoProcessUserAnswer = DialogResult.Yes Then
@@ -11447,8 +11446,8 @@ Partial Public Class IAx00MainMDI
         '        End If
         '    End If
         'Catch ex As Exception
-        '    Dim myLogAcciones As New ApplicationLogManager()
-        '    myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsTSOrdersDownloadButton_Click", EventLogEntryType.Error, False)
+        '    'Dim myLogAcciones As New ApplicationLogManager()
+        '    GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "bsTSOrdersDownloadButton_Click", EventLogEntryType.Error, False)
         'End Try
         'ScreenWorkingProcess = False
         'Cursor = Cursors.Default
@@ -11476,7 +11475,7 @@ Partial Public Class IAx00MainMDI
                 'Close current screen
                 Dim closedFlag As Boolean = CloseActiveMdiChild(True) 'AG 10/07/2013 - optional parameter to TRUE
                 If closedFlag Then
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
 
                     'Order download and add to worksession
                     '1- Disable UI
@@ -11603,7 +11602,7 @@ Partial Public Class IAx00MainMDI
                                 'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                                 If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                                     'XB 23/07/2013 
-                                    myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
                                     Dim autoProcessUserAnswer As DialogResult = DialogResult.Yes
                                     autoProcessUserAnswer = CheckForExceptionsInAutoCreateWSWithLISProcess(7)
                                     'AG 07/04/20014 - Also set flag pausingAutomateProcessFlag to his default value (otherwise some actions do not activate the START WS button)
@@ -11646,7 +11645,7 @@ Partial Public Class IAx00MainMDI
                                         'AG 07/04/20014
 
                                         IWSSampleRequest.OpenByAutomaticProcess = True
-                                        myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest + auto send to positioning", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest + auto send to positioning", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
                                     End If
                                     IWSSampleRequest.SaveWSWithPositioning()
                                 Else
@@ -11657,7 +11656,7 @@ Partial Public Class IAx00MainMDI
                                         'XB 23/07/2013
                                         OpenRotorPositionsForm(Nothing)
                                     Else 'Automatic
-                                        myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download open Rotor positions screen", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download open Rotor positions screen", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
                                         OpenRotorPositionsForm(Nothing, False, True) 'Inform new parameters for inform close automatically screen in order to generate executions
                                     End If
                                     'AG 10/07/2013
@@ -11673,7 +11672,7 @@ Partial Public Class IAx00MainMDI
                                 'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                                 If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                                     'XB 23/07/2013
-                                    myLogAcciones.CreateLogActivity("AutoCreate WS with LIS: After orders download nothing added to Work Session", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download nothing added to Work Session", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
                                     Dim autoProcessUserAnswer As DialogResult = DialogResult.OK
                                     autoProcessUserAnswer = CheckForExceptionsInAutoCreateWSWithLISProcess(8)
                                     If autoProcessUserAnswer = DialogResult.Yes Then
@@ -11724,8 +11723,8 @@ Partial Public Class IAx00MainMDI
                 End If
             End If
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrdersDownload", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OrdersDownload", EventLogEntryType.Error, False)
         End Try
         ScreenWorkingProcess = False
         Cursor = Cursors.Default

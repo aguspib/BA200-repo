@@ -324,8 +324,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateISEAverageValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateISEAverageValue", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -380,8 +380,8 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.GetAverageConcentrationValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.GetAverageConcentrationValue", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -488,8 +488,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ValidateISERefRanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ValidateISERefRanges", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -566,8 +566,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeAcceptedResultNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeAcceptedResultNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -649,8 +649,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeInUseFlagReplicateNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.ChangeInUseFlagReplicateNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -683,7 +683,7 @@ Namespace Biosystems.Ax00.Calculations
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 Dim maxMultiItemNumber As Integer = pExecToRecalculateRow.MultiItemNumber
@@ -708,7 +708,7 @@ Namespace Biosystems.Ax00.Calculations
                         End If
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        myLogAcciones.CreateLogActivity("Recalculate selected result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Recalculate selected result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                         StartTime = Now
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -736,7 +736,7 @@ Namespace Biosystems.Ax00.Calculations
                                     Next
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Recalculate affected CALIBs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Recalculate affected CALIBs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -763,7 +763,7 @@ Namespace Biosystems.Ax00.Calculations
                                         Next
 
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        myLogAcciones.CreateLogActivity("Recalculate affected CTRLs and PATIENTs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                        GlobalBase.CreateLogActivity("Recalculate affected CTRLs and PATIENTs: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                         "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                                         StartTime = Now
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -787,7 +787,7 @@ Namespace Biosystems.Ax00.Calculations
                     ' XB 28/11/2014 - BA-1867
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("Recalculate selected ISE result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("Recalculate selected ISE result: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "RecalculateResultsDelegate.RecalculateResults NEW", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 End If
@@ -797,8 +797,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateResultsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.RecalculateResultsNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -861,8 +861,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.UpdateManualCalibrationFactorNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.UpdateManualCalibrationFactorNEW", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -923,8 +923,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.InitNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "RecalculateResultsDelegate.InitNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

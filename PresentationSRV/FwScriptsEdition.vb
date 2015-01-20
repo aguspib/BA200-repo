@@ -416,7 +416,7 @@ Public Class FwScriptsEdition
         'Dim auxIconName As String = ""
         'Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             Dim auxIconName As String = ""
@@ -3242,8 +3242,8 @@ Public Class FwScriptsEdition
     Private Sub FormScriptsManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             Me.Location = New Point(0, 0)
 

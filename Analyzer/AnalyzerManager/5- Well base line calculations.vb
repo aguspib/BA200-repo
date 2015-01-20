@@ -1,12 +1,14 @@
 ﻿Option Explicit On
 Option Strict On
 
+Imports System.ComponentModel
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Calculations
 Imports System.Data
+Imports System.Data.SqlClient
 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
@@ -21,7 +23,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 12/06/2012 - Changed completely the worker now process the biochemical and well base line readings
         '''                 old method is commented, renamed as wellBaseLineWorker_DoWork_AG12062012 and moved to '9- Temporal Testing and Old Methods.vb'
         ''' </remarks>
-        Private Sub wellBaseLineWorker_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
+        Private Sub wellBaseLineWorker_DoWork(ByVal sender As Object, ByVal e As DoWorkEventArgs)
             Dim resultData As New GlobalDataTO
 
             Try
@@ -33,7 +35,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 28/06/2012 - old code
                 'Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                'Dim myLogAcciones As New ApplicationLogManager()
+                ''Dim myLogAcciones As New ApplicationLogManager()
 
                 ''1) Get the argument
                 'Dim InstructionReceived As New List(Of InstructionParameterTO)
@@ -41,7 +43,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ''2) Call the biochemical readings treatment
                 'resultData = ProcessBiochemicalReadings(Nothing, InstructionReceived)
-                'myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Information, False) 'AG 28/06/2012
+                'GlobalBase.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Information, False) 'AG 28/06/2012
                 'StartTime = Now
 
                 ''3) Call the well base line and well rejection control
@@ -64,7 +66,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '    'End If
                 'End If
 
-                'myLogAcciones.CreateLogActivity("Treat readings (Wells Rejections): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("Treat readings (Wells Rejections): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Information, False)
                 'AG 28/06/2012
 
 
@@ -73,8 +75,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.wellBaseLineWorker_DoWork", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -83,7 +85,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' 
         ''' </summary>
         ''' <remarks></remarks>
-        Private Sub wellBaseLineWorker_RunWorkerCompleted(ByVal sender As System.Object, ByVal e As System.ComponentModel.RunWorkerCompletedEventArgs)
+        Private Sub wellBaseLineWorker_RunWorkerCompleted(ByVal sender As Object, ByVal e As RunWorkerCompletedEventArgs)
             Try
 
                 'AG 03/07/2012 - 
@@ -108,8 +110,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     processingLastANSPHRInstructionFlag = False 'Inform NO readings received are in process
                 End SyncLock
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.wellBaseLineWorker_RunWorkerCompleted", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.wellBaseLineWorker_RunWorkerCompleted", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -127,15 +129,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim resultData As New GlobalDataTO
             Try
                 Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 Dim myReadingCycleStatus As Boolean = False
 
                 'AG 02/06/2014 #1644 - Set the semaphore to busy value (before process ANSPHR)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore Then
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                     GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
                     GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                 End If
 
                 '2) Call the biochemical readings treatment
@@ -144,14 +146,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'AG 21/05/2014 activate code: TR 06/05/2014 BT#1612, #1634 -**UNCOMMENT Version 3.0.1**-
                 If resultData.HasError AndAlso resultData.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString() Then
-                    myLogAcciones.CreateLogActivity("Try saving the reading again... ", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("Try saving the reading again... ", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                     'Try to save the reading one more time 
                     resultData = ProcessBiochemicalReadingsNEW(Nothing, pInstructionReceived, myReadingCycleStatus)
 
                     If resultData.HasError Then
-                        myLogAcciones.CreateLogActivity("2º attempt saving readings FAILED!!!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("2º attempt saving readings FAILED!!!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                     Else
-                        myLogAcciones.CreateLogActivity("2º attempt saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("2º attempt saving the reading SUCCESS!. " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                     End If
                 End If
                 'TR 06/05/2014 BT#1612, #1634 -END
@@ -160,10 +162,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If GlobalConstants.CreateWSExecutionsWithSemaphore Then
                     GlobalSemaphores.createWSExecutionsSemaphore.Release()
                     GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
                 End If
 
-                myLogAcciones.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012
+                GlobalBase.CreateLogActivity("Treat Readings (biochemical): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False) 'AG 28/06/2012
                 StartTime = Now
 
                 '3) Call the well base line and well rejection control
@@ -187,15 +189,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '    RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
                 'End If
 
-                myLogAcciones.CreateLogActivity("Treat readings (Wells Rejections): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("Treat readings (Wells Rejections): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Information, False)
 
             Catch ex As Exception
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessANSPHRInstruction", EventLogEntryType.Error, False)
             End Try
 
             'AG 02/07/2012 - moved to wellBaseLineWorker_RunWorkerCompleted
@@ -219,9 +221,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' AG 12/06/2012 - created (copied from wellBaseLineWorker_DoWork (v0.4.3)
         ''' </remarks>
-        Private Function ProcessWellBaseLineReadings(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
+        Private Function ProcessWellBaseLineReadings(ByVal pDBConnection As SqlConnection, ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 'AG 29/06/2012 - Running Cycles lost - Solution!
@@ -235,13 +237,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'InstructionReceived = CType(e.Argument, List(Of InstructionParameterTO))
 
                 '2) Get instruction parameters
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 ' Get BLW (base line well) field (parameter index 3)
                 Dim myBaseLineWell As Integer = 0
                 Dim newID As Integer = 0
-                resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(resultData.SetDatos, InstructionParameterTO)
                     myBaseLineWell = CType(myInstParamTO.ParameterValue, Integer)
@@ -273,7 +275,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         newRow.SetIsMeanNull()  'This field is informed after base line by well calculations
 
                         'WaveLenght
-                        resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
+                        resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
                         If Not resultData.HasError Then
                             newRow.Wavelength = CInt(CType(resultData.SetDatos, InstructionParameterTO).ParameterValue)
                         Else
@@ -281,7 +283,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         'Main light counts
-                        resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
+                        resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
                         If Not resultData.HasError Then
                             newRow.MainLight = CInt(CType(resultData.SetDatos, InstructionParameterTO).ParameterValue)
                         Else
@@ -289,7 +291,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         'Ref light counts
-                        resultData = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
+                        resultData = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
                         If Not resultData.HasError Then
                             newRow.RefLight = CInt(CType(resultData.SetDatos, InstructionParameterTO).ParameterValue)
                         Else
@@ -330,8 +332,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Else
                                     Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
                                     resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                    Dim myLogAcciones As New ApplicationLogManager()
-                                    myLogAcciones.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 End If
                             Else
                                 ''If no alarm items in list ... inform presentation the reactions rotor is good!!
@@ -364,8 +366,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Error, False)
                 'Finally
                 'If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 29/06/2012 - Running Cycles lost - Solution!
             End Try
@@ -396,18 +398,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                              the insert in DAO)
         ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
         ''' </remarks>
-        Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlConnection, _
                                                        ByVal pInstructionReceived As List(Of InstructionParameterTO), _
                                                        ByRef pReadingCycleStatus As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
             Dim instructionSavedFlag As Boolean = False 'AG 21/05/2014 BT#1612, #1634 (update TR initial design)
 
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
                 Dim StartTimeAux As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 Dim calculationsPerformedFlag As Boolean
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -442,7 +444,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End SyncLock
 
                 'Process all Readings received
-                Dim myUtility As New Utilities()
+                'Dim Utilities As New Utilities()
 
                 Dim myExecutionDS As New ExecutionsDS
                 Dim allExecutionsDS As New ExecutionsDS
@@ -467,7 +469,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'TR 10/10/2013 declare variable to get the ST (Status Photimetric Reading)
                 Dim myPause As Boolean = False
-                myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, 47)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 47)
                 If Not (myGlobal.HasError) Then
                     myPause = CBool(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
                 End If
@@ -488,28 +490,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'AG 25/09/2012
 
                     'Read the PreparationID using ParameterIndex = 48 + (i - 1) * 6
-                    myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (49 + (i - 1) * myOffset)) '48 +1 TR 10/10/2013 
+                    myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (49 + (i - 1) * myOffset)) '48 +1 TR 10/10/2013 
                     If (myGlobal.HasError) Then Exit For
 
                     myPreparationID = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
                     If (myPreparationID <> 0) Then   'Ignore DUMMY Readings
                         'Read the ReadingNumber using ParameterIndex = 47 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (48 + (i - 1) * myOffset)) '47+1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (48 + (i - 1) * myOffset)) '47+1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myReadingNumber = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                         'Read the LedPosition using ParameterIndex = 50 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (51 + (i - 1) * myOffset)) '50+1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (51 + (i - 1) * myOffset)) '50+1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myLedPosition = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                         'Read the MainCounts using ParameterIndex = 51 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (52 + (i - 1) * myOffset)) '51+1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (52 + (i - 1) * myOffset)) '51+1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myMainCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                         'Read the RefCounts using ParameterIndex = 52 + (i - 1) * 6
-                        myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (53 + (i - 1) * myOffset)) '52 + 1 TR 10/10/2013 
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (53 + (i - 1) * myOffset)) '52 + 1 TR 10/10/2013 
                         If (myGlobal.HasError) Then Exit For
                         myRefCounts = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
@@ -528,7 +530,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myExecutionDS.twksWSExecutions(0).IsAdjustBaseLineIDNull) Then
 
                                 'Read the ReadingNumber using ParameterIndex = 49 + (i - 1) * 6
-                                myGlobal = myUtility.GetItemByParameterIndex(pInstructionReceived, (50 + (i - 1) * myOffset)) '49 + 1 TR 10/10/2013 
+                                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, (50 + (i - 1) * myOffset)) '49 + 1 TR 10/10/2013 
                                 If (myGlobal.HasError) Then Exit For
                                 myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
@@ -555,7 +557,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'AG 28/05/2014 - #1644 - When 1st reading is received remove all previous readings linked with this execution
 
                                 If myReadingNumber = 1 Then
-                                    myLogAcciones.CreateLogActivity("Call myReadingsDelegate.Delete ", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("Call myReadingsDelegate.Delete ", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                                     myGlobal = myReadingsDelegate.Delete(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myExecutionDS)
                                 End If
                                 'AG 28/05/2014
@@ -673,7 +675,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'Open a DB Transaction to UPDATE all affected Executions and INSERT the group of Readings
                     myGlobal = DAOBase.GetOpenDBTransaction(pDBConnection)
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                        dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+                        dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
                         If (Not dbConnection Is Nothing) Then
                             'Update all affected Executions....and if not error, then insert the group of Readings
                             If (myToUpdateExecDS.twksWSExecutions.Rows.Count > 0) Then myGlobal = myExecutionDlg.UpdateReadingsFieldsNEW(dbConnection, myToUpdateExecDS)
@@ -686,7 +688,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'Recovery results during pause mode scenario
                                 If (Not myGlobal.HasError) Then myGlobal = myReadingsDelegate.SaveReadings(dbConnection, myReadingDS)
                             Else
-                                myLogAcciones.CreateLogActivity("Call myReadingsDelegate.SaveReadingsNEW", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Call myReadingsDelegate.SaveReadingsNEW", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
 
                                 'Normal scenario
                                 If (Not myGlobal.HasError) Then myGlobal = myReadingsDelegate.SaveReadingsNEW(dbConnection, myReadingDS)
@@ -705,7 +707,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("Decode and Save Readings: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("Decode and Save Readings: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                 StartTime = Now
                 calculationsPerformedFlag = False
@@ -768,7 +770,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 delayedR2Cycles = DirectCast(myGlobal.SetDatos, Integer)
                             End If
 
-                            myLogAcciones.CreateLogActivity("Task #1347 - New rules before call calculations, delayed R2 cycles = " & delayedR2Cycles, "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("Task #1347 - New rules before call calculations, delayed R2 cycles = " & delayedR2Cycles, "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
 
                             'Apply offset to the test reading number in order to add the R2 delayed cycles
                             myTestReadingNumber += delayedR2Cycles
@@ -777,7 +779,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'Continue only if this is the last Reading for the Test; if not go to process the next Reading
                         If (readingsRow.ReadingNumber = myTestReadingNumber) Then
-                            myLogAcciones.CreateLogActivity("Task #1347 - Rules for calculations triggers", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("Task #1347 - Rules for calculations triggers", "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
 
                             'For Multipoint Calibrators, verify if the point in process is the last point of the Calibration Kit
                             'For the rest of Sample Classes, it is always the last MultiItem because there is the only one
@@ -943,7 +945,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             AddIntoLastExportedResults(myExportedExecutionsDS) 'AG 19/03/2013
 
                                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                            myLogAcciones.CreateLogActivity("Total time Export and Refresh OT = " & myExecutionRow.First.OrderTestID & ": " & _
+                                            GlobalBase.CreateLogActivity("Total time Export and Refresh OT = " & myExecutionRow.First.OrderTestID & ": " & _
                                                                             Now.Subtract(StartTimeAux).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                             "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                                             StartTimeAux = Now
@@ -960,7 +962,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             End If
 
                                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                            myLogAcciones.CreateLogActivity("Auto-Report OrdersID = " & myExecutionRow.First.OrderTestID & ": " & _
+                                            GlobalBase.CreateLogActivity("Auto-Report OrdersID = " & myExecutionRow.First.OrderTestID & ": " & _
                                                                             Now.Subtract(StartTimeAux).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                             "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                                             StartTimeAux = Now
@@ -979,7 +981,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                     If (calculationsPerformedFlag) Then
-                        myLogAcciones.CreateLogActivity("Calculate Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Calculate Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                     End If
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -995,8 +997,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
 
@@ -1004,8 +1006,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If Not instructionSavedFlag Then
                     myGlobal.ErrorCode = GlobalEnumerates.Messages.READING_NOT_SAVED.ToString()
                     myGlobal.HasError = True
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("There was an error and the ANSPHR instruction had not been saved. Set error code = READING_NOT_SAVED! ", _
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("There was an error and the ANSPHR instruction had not been saved. Set error code = READING_NOT_SAVED! ", _
                                 "AnalyzerManager.ProcessBiochemicalReadingsNEW", EventLogEntryType.Information, False)
                 End If
                 'TR 06/05/2014 BT#1612 -END

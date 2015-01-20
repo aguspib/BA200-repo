@@ -1,5 +1,6 @@
 ﻿
 'Imports Biosystems.Ax00.Global
+Imports System.Runtime.InteropServices.ComTypes
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global
 Imports System.Threading
@@ -23,20 +24,20 @@ Public NotInheritable Class StartupUSER
         ' Add any initialization after the InitializeComponent() call.
 
         'SGM 09/01/2012 - activation of compatibility between Framework 4.5 and Mixed Mode Assemblies
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
 
         'AG 21/02/2014 - #1516 at this point services can be stopped (move to the Load event)
         'IMPORTANT!!! Leave the call to x because otherwise some processes like load rsat fails
         If RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully Then
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
         Else
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupUSER.New", EventLogEntryType.Error, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupUSER.New", EventLogEntryType.Error, False)
         End If
         'end SGM 09/01/2012
 
         ''SGM 07/11/2012 - log Application Startup
-        'Dim myLogAcciones As New ApplicationLogManager()
-        'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
+        ''Dim myLogAcciones As New ApplicationLogManager()
+        'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupUSER.New", EventLogEntryType.Information, False)
         ''end SGM 07/11/2012
 
     End Sub
@@ -98,7 +99,7 @@ Public NotInheritable Class StartupUSER
                             .WaitText = "", _
                             .Background = ""}
 
-                Dim myBackForm As New IBackground(IAx00MainMDI, Ax00StartUp)
+                Dim myBackForm As New IBackground(TryCast(IAx00MainMDI, Form), TryCast(Ax00StartUp, Form))
                 Application.DoEvents()
 
                 myBackForm.TopMost = True 'IT 18/11/2014: BA-2025
@@ -110,8 +111,8 @@ Public NotInheritable Class StartupUSER
         End Using
 
         'AG 21/02/2014 - #1516 at this point services are running. Do not use here the method RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully because fails
-        Dim myLogAcciones As New ApplicationLogManager()
-        myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationUSR STARTUP", "Startup_Load (User)", EventLogEntryType.Information, False)
+        'Dim myLogAcciones As New ApplicationLogManager()
+        GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationUSR STARTUP", "Startup_Load (User)", EventLogEntryType.Information, False)
 
         If Not Ax00StartUp Is Nothing Then
             Ax00StartUp.Close()

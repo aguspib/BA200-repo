@@ -59,9 +59,9 @@ Public Class ApplicationLogView
     Private Sub GenerateLogXml()
         Try
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myApplicationLogManager As New ApplicationLogManager
+            'Dim MyApplicationLogManager As New ApplicationLogManager
 
-            myGlobalDataTO = myApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, 90)
+            myGlobalDataTO = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, 90)
 
             If (myGlobalDataTO.HasError) Then
                 ShowMessage(Me.Name, myGlobalDataTO.ErrorMessage)

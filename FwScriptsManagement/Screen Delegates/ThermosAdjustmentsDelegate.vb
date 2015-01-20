@@ -1776,8 +1776,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -1850,8 +1850,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentsDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentsDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2002,8 +2002,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2024,8 +2024,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -2045,8 +2045,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2072,8 +2072,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendWASH_STATION_CTRL", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2099,8 +2099,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendWASH_STATION_CTRL2", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendWASH_STATION_CTRL2", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2124,8 +2124,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendNEW_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2225,8 +2225,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForNeedleToParking", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForNeedleToParking", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -2329,8 +2329,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForNeedleToWashing", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForNeedleToWashing", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -2348,8 +2348,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.CalculateThermoCorrection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.CalculateThermoCorrection", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2366,8 +2366,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.CalculateThermoSetPoint", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.CalculateThermoSetPoint", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -2415,7 +2415,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim text1 As String
                 Dim text As String = ""
 
@@ -2433,7 +2433,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Filling option used for the test
@@ -2443,7 +2443,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MANUALLY_FILL", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2455,7 +2455,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' SetPoint temperature test
@@ -2467,7 +2467,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 text += Environment.NewLine
@@ -2482,10 +2482,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP_POINT", pcurrentLanguage) + (i + 1).ToString + ": "
 
                                         ' alignment...
-                                        text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                        text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                         text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                        text += myUtility.FormatLineHistorics(text1)
+                                        text += Utilities.FormatLineHistorics(text1)
                                     End If
                                     j += 5
                                 Next
@@ -2495,20 +2495,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MeanTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Sensor Temperature received
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                             Case "REG1_TER", "REG2_TER"
 
@@ -2520,7 +2520,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Selected Arm
@@ -2530,7 +2530,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2542,7 +2542,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' SetPoint temperature test
@@ -2554,7 +2554,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2568,10 +2568,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2579,10 +2579,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                                 ' XBC 22/11/2011 - register Counter into Historics
                                 j += 5
@@ -2591,10 +2591,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumDispensations", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
                                 text1 += CSng(pData.Substring(j, 2)).ToString()
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 2
                                 ' XBC 22/11/2011 - register Counter into Historics
 
@@ -2608,7 +2608,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2620,7 +2620,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' SetPoint temperature test
@@ -2632,7 +2632,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2646,10 +2646,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2657,10 +2657,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                         End Select
 
@@ -2678,7 +2678,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' New Assigned values
@@ -2688,7 +2688,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Filling option used for the test
@@ -2698,7 +2698,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MANUALLY_FILL", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2710,7 +2710,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 text += Environment.NewLine
@@ -2725,10 +2725,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP_POINT", pcurrentLanguage) + (i + 1).ToString + ": "
 
                                         ' alignment...
-                                        text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                        text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                         text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                        text += myUtility.FormatLineHistorics(text1)
+                                        text += Utilities.FormatLineHistorics(text1)
                                     End If
                                     j += 5
                                 Next
@@ -2738,30 +2738,30 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_MeanTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Sensor Temperature received
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Final Correction Adjustment
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CorrectionAdj", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 6)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                             Case "REG1_TER", "REG2_TER"
 
@@ -2773,7 +2773,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Selected Arm
@@ -2783,7 +2783,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Reagent2", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' New Assigned values
@@ -2793,7 +2793,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2805,7 +2805,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2819,10 +2819,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2830,20 +2830,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Final Correction Adjustment
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CorrectionAdj", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 6)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                                 ' XBC 22/11/2011 - register Counter into Historics
                                 j += 6
@@ -2852,10 +2852,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumDispensations", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 2)).ToString().Length)
                                 text1 += CSng(pData.Substring(j, 2)).ToString()
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 2
                                 ' XBC 22/11/2011 - register Counter into Historics
 
@@ -2869,7 +2869,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_RES_KO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' New Assigned values
@@ -2879,7 +2879,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NO", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Conditioning option executed
@@ -2891,7 +2891,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Else
                                     text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NotExecuted", pcurrentLanguage)
                                 End If
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 1
 
                                 ' Check if temperature has been measured
@@ -2905,10 +2905,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                     text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TEMP", pcurrentLanguage) + ": "
 
                                     ' alignment...
-                                    text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                    text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                     text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                    text += myUtility.FormatLineHistorics(text1)
+                                    text += Utilities.FormatLineHistorics(text1)
                                 End If
                                 j += 5
 
@@ -2916,20 +2916,20 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_SensorTemp", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 5)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 5
 
                                 ' Final Correction Adjustment
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_CorrectionAdj", pcurrentLanguage) + ": "
 
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
+                                text1 += Utilities.SetSpaces(40 - text1.Length - 1 - CSng(pData.Substring(j, 6)).ToString("00.00").Length)
                                 text1 += CSng(pData.Substring(j, 6)).ToString("00.00")
 
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
 
                         End Select
 
@@ -2942,8 +2942,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3204,8 +3204,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForCONDIGIONING_SYSTEM", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForCONDIGIONING_SYSTEM", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -3306,8 +3306,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '            myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
         '        End If
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForMEASURE_TEMPERATURE", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForMEASURE_TEMPERATURE", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -3405,8 +3405,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForTEST_ADJUSTMENT", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForTEST_ADJUSTMENT", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3492,8 +3492,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForPRIME", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForPRIME", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3619,8 +3619,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForDISPENSE_NEEDLE", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForDISPENSE_NEEDLE", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3692,8 +3692,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForWS_HEATER_TEST", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForWS_HEATER_TEST", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -3761,8 +3761,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForROTATE_ROTOR", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForROTATE_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -4070,8 +4070,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForCONDITIONING_ROTOR", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendQueueForCONDITIONING_ROTOR", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -4106,8 +4106,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendSOUND", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseFwScriptDelegate.SendSOUND", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -4134,8 +4134,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendENDSOUND", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.SendENDSOUND", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -4146,8 +4146,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 MyClass.SendENDSOUND()
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.waitingTimer_Timer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.waitingTimer_Timer", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -4196,8 +4196,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -4613,8 +4613,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ThermosAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function

@@ -62,8 +62,8 @@ Public Class XRManager
             Dim resultData As GlobalDataTO
             Dim myResultsDelegate As New ResultsDelegate
 
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
@@ -133,8 +133,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintPatientsFinalReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.PrintPatientsFinalReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -160,8 +160,8 @@ Public Class XRManager
         Try
             Dim resultData As GlobalDataTO
             Dim myResultsDelegate As New ResultsDelegate
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'AG 23/09/2014 - BA-1940 Merge manual and auto print business in one method not in 2 duplicates methods with few changes
@@ -234,8 +234,8 @@ Public Class XRManager
             End Using
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.PrintCompactPatientsReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.PrintCompactPatientsReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -283,16 +283,16 @@ Public Class XRManager
                 reportPrintTool.AutoShowParametersPanel = False
                 reportPrintTool.Print()
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "XRManager.SendToPrinter", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "XRManager.SendToPrinter", EventLogEntryType.Error, False)
             Finally
                 If reportPrintTool IsNot Nothing Then
                     reportPrintTool.Dispose()
                 End If
             End Try
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.SilentReportPrinting", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.SilentReportPrinting", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -306,8 +306,8 @@ Public Class XRManager
     ''' <remarks></remarks>
     Public Shared Sub ShowRotorContentByPositionReport(ByVal pCellPositionsInformation As CellPositionInformationDS)
         Try
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             If pCellPositionsInformation Is Nothing OrElse pCellPositionsInformation.Tables.Count = 0 OrElse pCellPositionsInformation.Tables("ReportTable").Rows.Count = 0 Then
@@ -346,8 +346,8 @@ Public Class XRManager
 
             End Using
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowRotorContentByPositionReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowRotorContentByPositionReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -388,8 +388,8 @@ Public Class XRManager
             mtPortrait = Nothing
             mtPortraitPath = String.Empty
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.LoadDefaultPortraitTemplate", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.LoadDefaultPortraitTemplate", EventLogEntryType.Error, False)
         End Try
 
         Return False
@@ -432,8 +432,8 @@ Public Class XRManager
             mtLandscape = Nothing
             mtLandscapePath = String.Empty
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.LoadDefaultLandscapeTemplate", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.LoadDefaultLandscapeTemplate", EventLogEntryType.Error, False)
         End Try
 
         Return False
@@ -445,8 +445,8 @@ Public Class XRManager
             Dim myUserConfigurationDelegate As New UserConfigurationDelegate
 
             'DL 13/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'Multilanguage. Get texts from DB.
@@ -493,8 +493,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowUsersReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowUsersReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -505,8 +505,8 @@ Public Class XRManager
             Dim myTestProfileTestsDelegate As New TestProfileTestsDelegate
 
             'DL 13/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'Multilanguage. Get texts from DB.
@@ -550,8 +550,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowTestProfilesReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowTestProfilesReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -562,8 +562,8 @@ Public Class XRManager
             Dim myPatientsDelegate As New PatientDelegate
 
             'DL 13/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'Multilanguage. Get texts from DB.
@@ -633,8 +633,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowPatientsReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowPatientsReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -645,8 +645,8 @@ Public Class XRManager
 
 
             'DL 27/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'Multilanguage. Get texts from DB.
@@ -721,8 +721,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowISEReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowISEReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -733,8 +733,8 @@ Public Class XRManager
             Dim myCalibratorsDelegate As New CalibratorsDelegate
 
             'DL 13/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'Multilanguage. Get texts from DB.
@@ -783,8 +783,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowCalibratorsReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowCalibratorsReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -795,8 +795,8 @@ Public Class XRManager
             Dim myContaminationsDelegate As New ContaminationsDelegate
 
             'DL 14/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             resultData = myContaminationsDelegate.GetContaminationsForReport(Nothing, CurrentLanguage)
@@ -828,23 +828,23 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowContaminationsReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowContaminationsReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
 
     Public Shared Sub ShowResultsByPatientSampleReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String)
         Try
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 13/06/2012 - time estimation
 
             Dim myGlobalDataTO As GlobalDataTO
             Dim myResultsDelegate As New ResultsDelegate
 
             'DL 14/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             myGlobalDataTO = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID)
@@ -895,11 +895,11 @@ Public Class XRManager
                 'ToDo: Try the error
             End If
 
-            myLogAcciones.CreateLogActivity("Patients Report (current results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowResultsByPatientSampleReport", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Patients Report (current results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowResultsByPatientSampleReport", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowResultsByPatientSampleReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowResultsByPatientSampleReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -914,12 +914,12 @@ Public Class XRManager
     Public Shared Sub ShowHistoricResultsByPatientSampleReport(ByVal pHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow))
 
         Try
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now
             Dim myGlobalDataTO As GlobalDataTO
             Dim myHisWSResultsDelegate As New HisWSResultsDelegate
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             'ShowHistoricByCompactPatientsSamplesResult(pHisWSResults)
             myGlobalDataTO = myHisWSResultsDelegate.GetHistoricResultsByPatientSampleForReport(Nothing, pHisWSResults)
@@ -978,11 +978,11 @@ Public Class XRManager
                 'ToDo: Try the error
             End If
 
-            myLogAcciones.CreateLogActivity("Patients Report (historic results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowHistoricResultsByPatientSampleReport", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Patients Report (historic results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowHistoricResultsByPatientSampleReport", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowHistoricResultsByPatientSampleReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowHistoricResultsByPatientSampleReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -995,12 +995,12 @@ Public Class XRManager
     ''' </remarks>
     Public Shared Sub ShowHistoricByCompactPatientsSamplesResult(ByVal pHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow))
         Try
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now
             Dim myGlobalDataTO As GlobalDataTO
             Dim myHisWSResultsDelegate As New HisWSResultsDelegate
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             myGlobalDataTO = myHisWSResultsDelegate.GetHistoricResultsByPatientSampleForReport(Nothing, pHisWSResults)
@@ -1055,11 +1055,11 @@ Public Class XRManager
                 'ToDo: Try the error
             End If
 
-            myLogAcciones.CreateLogActivity("Patients Compact Report (historic results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowHistoricByCompactPatientsSamplesResult", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Patients Compact Report (historic results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowHistoricByCompactPatientsSamplesResult", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowHistoricByCompactPatientsSamplesResult", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowHistoricByCompactPatientsSamplesResult", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -1069,8 +1069,8 @@ Public Class XRManager
             Dim resultData As GlobalDataTO
             Dim myResultsDelegate As New ResultsDelegate
 
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             resultData = myResultsDelegate.GetResultsByPatientSampleForReport(Nothing, pAnalyzerID, pWorkSessionID, False)
@@ -1128,23 +1128,23 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowPatientsFinalReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowPatientsFinalReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
 
     Public Shared Sub ShowResultsByTestReport(ByVal pAnalyzerID As String, ByVal pWorkSessionID As String)
         Try
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 13/06/2012 - time estimation
 
             Dim resultData As GlobalDataTO
             Dim myResultsDelegate As New ResultsDelegate
 
             'DL 14/01/2012. Begin
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             resultData = myResultsDelegate.GetResultsByTestForReport(Nothing, pAnalyzerID, pWorkSessionID)
@@ -1195,11 +1195,11 @@ Public Class XRManager
                 'ToDo: Try the error
             End If
 
-            myLogAcciones.CreateLogActivity("Tests Report (current results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowResultsByTestReport", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Tests Report (current results): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "XRManager.ShowResultsByTestReport", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowResultsByTestReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowResultsByTestReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -1252,8 +1252,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowSummaryResultsReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowSummaryResultsReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -1275,8 +1275,8 @@ Public Class XRManager
             Dim resultData As GlobalDataTO
             Dim myResultsDelegate As New ResultsDelegate
 
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             resultData = myResultsDelegate.GetResultsCalibCurveForReport(Nothing, pAnalyzerID, pWorkSessionID, TestName, AcceptedRerunNumber)
@@ -1463,8 +1463,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowResultsByTestReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowResultsByTestReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -1511,8 +1511,8 @@ Public Class XRManager
                 End If
             End If
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowQCIndividualResultsByTestReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowQCIndividualResultsByTestReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1556,8 +1556,8 @@ Public Class XRManager
                 End If
             End If
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowQCAccumulatedResultsByTestReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowQCAccumulatedResultsByTestReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1575,8 +1575,8 @@ Public Class XRManager
             Dim resultData As GlobalDataTO
             Dim myResultsDelegate As New HisWSResultsDelegate
 
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             Dim myDecimalsAllowed As String = "0"
             Dim myTestLongName As String = ""
@@ -1767,8 +1767,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowHISTResultsCalibCurveReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowHISTResultsCalibCurveReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -1789,8 +1789,8 @@ Public Class XRManager
             Dim myHisResultsDelegate As New HisWSResultsDelegate
             Dim myResultsDelegate As New ResultsDelegate
 
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             Dim xtraReport As XtraReport = Nothing
@@ -1808,8 +1808,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowControlsCompactReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowControlsCompactReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1830,8 +1830,8 @@ Public Class XRManager
             Dim myHisResultsDelegate As New HisWSResultsDelegate
             Dim myResultsDelegate As New ResultsDelegate
 
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             Dim xtraReport As XtraReport = Nothing
@@ -1846,8 +1846,8 @@ Public Class XRManager
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.ShowBlanksAndCalibratorsReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.ShowBlanksAndCalibratorsReport", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1889,8 +1889,8 @@ Public Class XRManager
     '        If (lstAgeUnit.Count = 1) Then ageUnitDesc = String.Format("{0} {1}", patientAge, lstAgeUnit.First())
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "XRManager.GetAgeUnits", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, "XRManager.GetAgeUnits", EventLogEntryType.Error, False)
 
     '    End Try
 
@@ -2011,8 +2011,8 @@ Public Class XRManager
             End Using
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.GetResultsByTestForReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.GetResultsByTestForReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -2062,8 +2062,8 @@ Public Class XRManager
             End Using
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "XRManager.GetResultsByTestForReport", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "XRManager.GetResultsByTestForReport", EventLogEntryType.Error, False)
 
         End Try
     End Sub
@@ -2305,8 +2305,8 @@ Public Class XRManager
     '''</remarks>
     Private Shared Function CreateSummaryResultsReport(ByVal pWorkSessionID As String, ByVal dsReport As DataSet) As SummaryResultsReport
 
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         Dim Report As New SummaryResultsReport
@@ -2614,8 +2614,8 @@ Public Class XRManager
     ''' </remarks>
     Private Shared Function CreateControlsCompactReport(ByVal pWorkSessionID As String, ByVal dsReport As DataSet) As ControlsCompactReport
 
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         Dim Report As New ControlsCompactReport
@@ -2743,8 +2743,8 @@ Public Class XRManager
     ''' </remarks>
     Private Shared Function CreateBlanksAndCalibratorsReport(ByVal reporDate As DateTime, ByVal dsReport As ReportsDS) As BlanksAndCalibratorsReport
 
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         Dim Report As New BlanksAndCalibratorsReport

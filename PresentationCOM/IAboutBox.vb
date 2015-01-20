@@ -63,8 +63,8 @@ Public NotInheritable Class IAboutBox
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim LanguageIDGlobal As New GlobalBase
-            LanguageID = LanguageIDGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim LanguageIDGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()
@@ -113,10 +113,10 @@ Public NotInheritable Class IAboutBox
             Me.RightLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RightsReserved", LanguageID)
 
             'Get the Application Version from the assembly information
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim myGlobalDataTO As GlobalDataTO
 
-            myGlobalDataTO = myUtil.GetSoftwareVersion()
+            myGlobalDataTO = Utilities.GetSoftwareVersion()
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Me.LabelVersion.Text = String.Format("{0}: {1}", LabelVersion.Text, myGlobalDataTO.SetDatos)
             Else

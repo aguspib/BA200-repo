@@ -4,6 +4,7 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports System.Windows.Forms
 Imports System.IO
+Imports System.Threading
 Imports System.Xml.Serialization
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
@@ -54,8 +55,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobalDataTO As New GlobalDataTO
 
             Try
-                Dim myGlobalbase As New GlobalBase
-                Dim XMLFactoryFwScriptFileNamePath As String = Application.StartupPath & myGlobalbase.FactoryXmlFwScripts
+                'Dim myGlobalbase As New GlobalBase
+                Dim XMLFactoryFwScriptFileNamePath As String = Application.StartupPath & GlobalBase.FactoryXmlFwScripts
                 Dim XMLFwScriptFileNamePath As String = Application.StartupPath & GlobalBase.XmlFwScripts
 
 
@@ -93,10 +94,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'end SGM 19/12/2011
                 End If
 
-                myGlobalDataTO = MyClass.GetFwScriptData()
+                myGlobalDataTO = GetFwScriptData()
 
                 If Not myGlobalDataTO.HasError And Not myGlobalDataTO Is Nothing Then
-                    MyClass.FwScriptsData = CType(myGlobalDataTO.SetDatos, FwScriptsDataTO)
+                    FwScriptsData = CType(myGlobalDataTO.SetDatos, FwScriptsDataTO)
                 End If
 
                 If myGlobalDataTO.ErrorCode IsNot Nothing Then
@@ -111,8 +112,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.New", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.New", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -127,15 +128,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim resultData As New GlobalDataTO
             Try
                 Dim OriginalFwScriptsData As New FwScriptsDataTO
-                Dim myGlobalbase As New GlobalBase
-                Dim XMLFactoryFwScriptFileNamePath As String = Application.StartupPath & myGlobalbase.FactoryXmlFwScripts
+                'Dim myGlobalbase As New GlobalBase
+                Dim XMLFactoryFwScriptFileNamePath As String = Application.StartupPath & GlobalBase.FactoryXmlFwScripts
 
-                resultData = MyClass.ImportFwScriptsDataFromXML(OriginalFwScriptsData.GetType, XMLFactoryFwScriptFileNamePath, True)
+                resultData = ImportFwScriptsDataFromXML(OriginalFwScriptsData.GetType, XMLFactoryFwScriptFileNamePath, True)
 
                 If Not resultData.HasError And Not resultData Is Nothing Then
                     Dim myFwScriptsData As New FwScriptsDataTO
                     myFwScriptsData = CType(resultData.SetDatos, FwScriptsDataTO)
-                    resultData = MyClass.CheckFwScriptData(myFwScriptsData)
+                    resultData = CheckFwScriptData(myFwScriptsData)
                     If Not resultData.HasError And Not resultData Is Nothing Then
                         resultData.SetDatos = myFwScriptsData
                     End If
@@ -146,8 +147,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.GetFactoryFwScriptData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.GetFactoryFwScriptData", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -161,7 +162,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>SG 06/11/10</remarks>
         Public Function GetFwScriptData(Optional ByVal pPath As String = "") As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             Try
                 Dim OriginalFwScriptsData As New FwScriptsDataTO
                 Dim XMLFwScriptFileNamePath As String
@@ -172,9 +173,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     XMLFwScriptFileNamePath = pPath
 
                     'make a backup of the current Scripts data file
-                    File.Copy(Application.StartupPath & GlobalBase.XmlFwScripts, Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting, True)
+                    File.Copy(Application.StartupPath & GlobalBase.XmlFwScripts, Application.StartupPath & GlobalBase.XmlFwScriptsWhileDecrypting, True)
 
-                    System.Threading.Thread.Sleep(1)
+                    Thread.Sleep(1)
                     'import the file
                     File.Copy(pPath, Application.StartupPath & GlobalBase.XmlFwScripts, True)
                 End If
@@ -196,10 +197,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pPath.Length > 0 Then
                     If resultData.HasError Then
                         'restore the backup
-                        File.Copy(Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting, Application.StartupPath & GlobalBase.XmlFwScripts, True)
+                        File.Copy(Application.StartupPath & GlobalBase.XmlFwScriptsWhileDecrypting, Application.StartupPath & GlobalBase.XmlFwScripts, True)
                     End If
 
-                    'File.Delete(Application.StartupPath & myGlobalbase.XmlScriptsWhileImporting)
+                    'File.Delete(Application.StartupPath & GlobalBase.XmlScriptsWhileImporting)
                 End If
 
             Catch ex As Exception
@@ -207,11 +208,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.GetFwScriptsData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.GetFwScriptsData", EventLogEntryType.Error, False)
             Finally
-                If File.Exists(Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting) Then
-                    File.Delete(Application.StartupPath & myGlobalbase.XmlFwScriptsWhileDecrypting)
+                If File.Exists(Application.StartupPath & GlobalBase.XmlFwScriptsWhileDecrypting) Then
+                    File.Delete(Application.StartupPath & GlobalBase.XmlFwScriptsWhileDecrypting)
                 End If
             End Try
             Return resultData
@@ -229,17 +230,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function SetFwScriptData(ByVal pNewFwScriptsData As FwScriptsDataTO) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
-            'Dim myGlobalbase As New GlobalBase
+            ''Dim myGlobalbase As New GlobalBase
             Dim XMLFwScriptFileNamePath As String = Application.StartupPath & GlobalBase.XmlFwScripts
             Dim XMLCopyFwScriptFileNamePath As String = Application.StartupPath & "\temp.xml"
             Dim CopyOfFwScriptsData As New FwScriptsDataTO
 
             Try
                 'first make a safety copy
-                CopyOfFwScriptsData = MyClass.FwScriptsData.Clone
+                CopyOfFwScriptsData = FwScriptsData.Clone
 
                 'second update the Application's ScriptsData
-                MyClass.FwScriptsData = pNewFwScriptsData.Clone
+                FwScriptsData = pNewFwScriptsData.Clone
 
                 'third update the Scripts Data XML File
                 'make a safety copy of the file
@@ -267,8 +268,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 File.Copy(XMLCopyFwScriptFileNamePath, XMLFwScriptFileNamePath)
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.SetFwScriptsData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.SetFwScriptsData", EventLogEntryType.Error, False)
 
             Finally
                 'delete the temp safety copy file
@@ -366,8 +367,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.GenerateFwScriptInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.GenerateFwScriptInstruction", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -445,8 +446,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.GenerateFwScriptInstruction 2", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.GenerateFwScriptInstruction 2", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -525,8 +526,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CheckSyntaxDelegate.CheckInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CheckSyntaxDelegate.CheckInstruction", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -552,8 +553,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.CheckTextFwScriptSequence", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.CheckTextFwScriptSequence", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -582,8 +583,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.CheckFwScriptSequence", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.CheckFwScriptSequence", EventLogEntryType.Error, False)
             End Try
             Return myglobal
         End Function
@@ -602,7 +603,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pFwScriptID <> "" Then
                     Dim myFwScript As New List(Of FwScriptTO)
 
-                    myFwScript = (From s In MyClass.FwScriptsDataAttribute.FwScripts _
+                    myFwScript = (From s In FwScriptsDataAttribute.FwScripts _
                                                Where s.ActionID = pFwScriptID _
                                                Select s).ToList()
 
@@ -621,8 +622,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.GetInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.GetInstructions", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -639,8 +640,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim resultData As New GlobalDataTO
 
             'SG 30/11/10
-            Dim myGlobalbase As New GlobalBase
-            Dim myTempFile As String = Application.StartupPath & myGlobalbase.XmlFwScriptsTempFile
+            'Dim myGlobalbase As New GlobalBase
+            Dim myTempFile As String = Application.StartupPath & GlobalBase.XmlFwScriptsTempFile
             Try
                 'delete if previously exists
                 If File.Exists(myTempFile) Then
@@ -653,7 +654,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If pFwScriptsData IsNot Nothing Then
                     myFwScriptsData = pFwScriptsData.Clone
                 Else
-                    myFwScriptsData = MyClass.FwScriptsDataAttribute.Clone
+                    myFwScriptsData = FwScriptsDataAttribute.Clone
                 End If
                 Dim FS As FileStream
 
@@ -673,8 +674,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'encrypt the file
                     If File.Exists(myTempFile) Then
 
-                        Dim myUtil As New Utilities
-                        resultData = myUtil.EncryptFile(myTempFile, pFilePath)
+                        ''Dim myUtil As New Utilities.
+                        resultData = Utilities.EncryptFile(myTempFile, pFilePath)
 
                     Else
                         Throw New Exception(GlobalEnumerates.Messages.SYSTEM_ERROR.ToString)
@@ -687,8 +688,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.ExportFwScriptsDataToXML", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.ExportFwScriptsDataToXML", EventLogEntryType.Error, False)
             Finally
                 'delete the temp file
                 If File.Exists(myTempFile) Then
@@ -711,7 +712,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </remarks>
         Private Function ImportFwScriptsDataFromXML(ByVal pFwScriptsDataType As Type, ByVal pFilePath As String, ByVal pDecrypt As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim myUtil As New Utilities 'PG 26/11/2010 
+            ''Dim myUtil As New Utilities. 'PG 26/11/2010 
             ' 
             Dim FS As FileStream = Nothing
             Dim myTempFilePath As String = ""
@@ -720,14 +721,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim serializer As New XmlSerializer(pFwScriptsDataType)
 
                 If pDecrypt Then
-                    Dim myGlobalBase As New GlobalBase
-                    myTempFilePath = Application.StartupPath & myGlobalBase.XmlFwScriptsTempFile
+                    'Dim myGlobalbase As New GlobalBase
+                    myTempFilePath = Application.StartupPath & GlobalBase.XmlFwScriptsTempFile
 
                     If File.Exists(myTempFilePath) Then
                         File.Delete(myTempFilePath)
                     End If
 
-                    resultData = myUtil.DecryptFile(pFilePath, myTempFilePath)
+                    resultData = Utilities.DecryptFile(pFilePath, myTempFilePath)
 
                     If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                         If File.Exists(myTempFilePath) Then
@@ -755,8 +756,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.ImportFwScriptsDataFromXML", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.ImportFwScriptsDataFromXML", EventLogEntryType.Error, False)
             Finally
                 If Not FS Is Nothing Then
                     FS.Close()
@@ -823,7 +824,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'Dim myAppVersion() As String
                 Dim myScriptsVersion() As String
                 Dim isVersionOK As Boolean = True
-                'Dim myUtil As New Utilities
+                ''Dim myUtil As New Utilities.
 
                 ' XBC 08/05/2012
                 Dim myVersionsDelegate As New VersionsDelegate
@@ -848,7 +849,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
                 End If
 
-                'resultData = myUtil.GetSoftwareVersion
+                'resultData = Utilities.GetSoftwareVersion
                 'If Not pSkipVersion Then
                 '    If Not resultData.HasError And Not resultData Is Nothing Then
                 '        myAppVersion = CType(resultData.SetDatos, String).Split(CChar("."))
@@ -893,8 +894,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.CheckFwScriptData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.CheckFwScriptData", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -912,7 +913,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim resultData As New GlobalDataTO
             Try
                 Dim OriginalFwScriptsData As New FwScriptsDataTO
-                'Dim myGlobalbase As New GlobalBase
+                ''Dim myGlobalbase As New GlobalBase
                 Dim XMLFwScriptFileNamePath As String
 
                 XMLFwScriptFileNamePath = pPath
@@ -936,8 +937,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.ReadFwScriptDataForCreating", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.ReadFwScriptDataForCreating", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -952,7 +953,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function WriteFwScriptDataForCreating(ByVal pFwScriptsData As FwScriptsDataTO, ByVal pPath As String, ByVal pEncrypt As Boolean) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
-            'Dim myGlobalbase As New GlobalBase
+            ''Dim myGlobalbase As New GlobalBase
 
             Try
                 If pFwScriptsData IsNot Nothing Then
@@ -968,8 +969,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "FwScripts.WriteFwScriptDataForCreating", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "FwScripts.WriteFwScriptDataForCreating", EventLogEntryType.Error, False)
 
             End Try
             Return resultData

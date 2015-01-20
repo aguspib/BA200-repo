@@ -78,29 +78,22 @@ Public Class BSBaseForm
 #End Region
 
 #Region "Constructor" 'SG 03/12/10
-
+    Private Shared skinsLoaded As Boolean = False
     Protected Friend Sub New()
+
+
+        'Set it BEFORE adding controls, so they're created with the appropriate skin settings, instead of creating them and modifying them later
+        If Not skinsLoaded Then
+            DevExpress.Skins.SkinManager.EnableFormSkins()
+            DevExpress.Skins.SkinManager.EnableMdiFormSkins()
+            skinsLoaded = True
+        End If
+
 
         ' This call is required by the Windows Form Designer.
         InitializeComponent()
 
-        ' Add any initialization after the InitializeComponent() call.
 
-        'RH 06/05/2011 Enable Forms child and MDI Forms child skin feature in Title bar
-        DevExpress.Skins.SkinManager.EnableFormSkins()
-        DevExpress.Skins.SkinManager.EnableMdiFormSkins()
-
-        'MsgBoxLookAndFeel = New DevExpress.LookAndFeel.UserLookAndFeel(Me)
-        'MsgBoxLookAndFeel.SkinName = "DevExpress Style" '"iMaginary"
-        'MsgBoxLookAndFeel.Style = Me.LookAndFeel.Style
-        'MsgBoxLookAndFeel.UseDefaultLookAndFeel = Me.LookAndFeel.UseDefaultLookAndFeel
-        'MsgBoxLookAndFeel.UseWindowsXPTheme = Me.LookAndFeel.UseWindowsXPTheme
-
-        '#If DEBUG Then
-        '        Me.TopMost = False
-        '#Else
-        '        Me.TopMost =True 
-        '#End If
     End Sub
 
 #End Region
@@ -243,8 +236,8 @@ Public Class BSBaseForm
     Public Sub CreateLogActivity(ByVal Message As String, ByVal LogModule As String, ByVal LogType As EventLogEntryType, _
                                  ByVal InformSystem As Boolean)
         Try
-            Dim myGlobalBase As New GlobalBase
-            myGlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
+            'Dim myGlobalbase As New GlobalBase
+            GlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -260,8 +253,8 @@ Public Class BSBaseForm
     ''' </remarks>
     Public Sub ShowExceptionDetails(ByVal pException As Exception)
         Try
-            Dim myGlobalBase As New GlobalBase
-            myGlobalBase.ShowExceptionDetails(pException)
+            'Dim myGlobalbase As New GlobalBase
+            GlobalBase.ShowExceptionDetails(pException)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
@@ -512,7 +505,7 @@ Public Class BSBaseForm
             End If 'AG 15/03/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+            CreateLogActivity(ex.Message, Me.Name & ".ShowMessage", EventLogEntryType.Error, False)
 
         End Try
 
@@ -771,7 +764,7 @@ Public Class BSBaseForm
         myApplicationInfoSession = Nothing
         Try
             Dim myApplicationSessionManager As New ApplicationSessionManager
-            myApplicationInfoSession = myApplicationSessionManager.GetSessionInfo()
+            myApplicationInfoSession = GlobalBase.GetSessionInfo()
         Catch ex As Exception
             CreateLogActivity(ex.Message, "BSBaseForm.GetApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
@@ -1150,8 +1143,8 @@ Public Class BSBaseForm
 
             Dim formType As Type = sender.GetType()
             Dim form As IPermissionLevel = CType(sender, IPermissionLevel)
-            Dim myGlobalBase As New GlobalBase
-            form.ValidatePermissionLevel(myGlobalBase.GetSessionInfo.UserLevelEnum)
+            'Dim myGlobalbase As New GlobalBase
+            form.ValidatePermissionLevel(GlobalBase.GetSessionInfo.UserLevelEnum)
 
         End If
 

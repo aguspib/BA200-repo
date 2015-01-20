@@ -26,8 +26,8 @@ Namespace Biosystems.Ax00.BL.Framework
             Try
                 result = (Not AppDomain.CurrentDomain.GetData("ApplicationInfoSession") Is Nothing)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.SessionExist", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.SessionExist", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -50,8 +50,8 @@ Namespace Biosystems.Ax00.BL.Framework
                     result = True 'change the result value to true because operation was OK.
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -112,8 +112,8 @@ Namespace Biosystems.Ax00.BL.Framework
                 'IT 18/09/2014 #BA-1946 - FIN
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.FillApplicationInfoSessionTO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.FillApplicationInfoSessionTO", EventLogEntryType.Error, False)
             End Try
             Return myApplicationInfoSession
         End Function
@@ -133,8 +133,8 @@ Namespace Biosystems.Ax00.BL.Framework
                     result = True
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function

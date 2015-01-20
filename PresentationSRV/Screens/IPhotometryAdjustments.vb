@@ -552,7 +552,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareButtons()
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -629,8 +629,8 @@ Public Class IPhotometryAdjustments
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -638,8 +638,8 @@ Public Class IPhotometryAdjustments
             ''BASELINE TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsTestButton.Image = myImage
             '    BsTestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -647,8 +647,8 @@ Public Class IPhotometryAdjustments
             ''CHANGE IT REFERENCES Button
             'auxIconName = GetIconName("EDIT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1DacsReferenceButton.Image = myImage
             '    BsStep1DacsReferenceButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -656,8 +656,8 @@ Public Class IPhotometryAdjustments
             ''IT REFERENCES SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITSaveButton.Image = myImage
             '    BsStep1ITSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -665,8 +665,8 @@ Public Class IPhotometryAdjustments
             ''IT REFERENCES CANCEL Button
             'auxIconName = GetIconName("UNDO")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITExitButton.Image = myImage
             '    BsStep1ITExitButton.ImageAlign = ContentAlignment.MiddleCenter
             '    'BsStep1ITExitButton.BackgroundImageLayout = ImageLayout.Stretch
@@ -693,7 +693,7 @@ Public Class IPhotometryAdjustments
 
             Dim myNewNGImage As Bitmap = Nothing
             Dim myNGImage As Image = Nothing
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Dim myGlobal As New GlobalDataTO
 
             ' Icons used to informate about warning Limits into ListViews PhMain & PhRef and also Intesities of the LEDs
@@ -704,7 +704,7 @@ Public Class IPhotometryAdjustments
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myClearImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -718,7 +718,7 @@ Public Class IPhotometryAdjustments
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myWarningImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -732,8 +732,8 @@ Public Class IPhotometryAdjustments
             '' XBC 20/02/2012
             'auxIconName = GetIconName("UPDOWN") ' UPDOWNROW
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myImage = CType(myGlobal.SetDatos, Image)
             '    End If
@@ -879,7 +879,7 @@ Public Class IPhotometryAdjustments
     ''' <remarks>Created by XBC 23/02/2011</remarks>
     Private Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPhotometryDataTO As PhotometryDataTO
         Try
             DisableAll()
@@ -1068,7 +1068,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareTestedMode()
         Dim myResultData As New GlobalDataTO
         'Dim myPhotometryDataTO As PhotometryDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPath As String
         Try
             Select Case Me.SelectedPage
@@ -3314,11 +3314,11 @@ Public Class IPhotometryAdjustments
 
     Private Sub PhotometryAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -3330,7 +3330,7 @@ Public Class IPhotometryAdjustments
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -4383,8 +4383,8 @@ Public Class IPhotometryAdjustments
     '    Dim myGlobal As New GlobalDataTO
     '    Try
     '        ' Save BLDC Test
-    '        Dim myGlobalbase As New GlobalBase
-    '        Dim myPathBLFile As String = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+    '        'Dim myGlobalbase As New GlobalBase
+    '        Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
     '        myGlobal = myScreenDelegate.SaveBLDCFile(myPathBLFile)
     '        If myGlobal.HasError Then
     '            PrepareErrorMode()

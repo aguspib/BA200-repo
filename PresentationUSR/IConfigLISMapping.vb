@@ -48,8 +48,8 @@ Public Class IConfigLISMapping
         Get
             Dim res As Boolean = False
 
-            Dim myGlobalbase As New GlobalBase
-            If myGlobalbase.GetSessionInfo.UserLevel = "OPERATOR" Then
+            'Dim myGlobalbase As New GlobalBase
+            If GlobalBase.GetSessionInfo.UserLevel = "OPERATOR" Then
                 res = True
             End If
 
@@ -357,8 +357,8 @@ Public Class IConfigLISMapping
             ScreenIsLoading = True
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) ' Use the same AnalyzerManager as the MDI
@@ -1250,7 +1250,7 @@ Public Class IConfigLISMapping
     ''' <remarks>
     ''' Created by SGM 02/05/2013
     ''' </remarks>
-    Private Function CheckCalcTestIsMultiSampleType(ByRef pDataRow As DataGridViewRow)
+    Private Function CheckCalcTestIsMultiSampleType(ByRef pDataRow As DataGridViewRow) As Boolean
         Dim ReadOnlyRow As Boolean
         Try
             Dim resultData As New GlobalDataTO
@@ -1302,8 +1302,8 @@ Public Class IConfigLISMapping
 
             MyClass.InitialModeScreenStatus()
 
-            Dim myGlobalbase As New GlobalBase
-            CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             ScreenStatusByUserLevel()
 
         Catch ex As Exception

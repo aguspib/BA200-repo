@@ -8,6 +8,8 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports System.Data
+Imports System.Data.SqlClient
+Imports System.Text
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
@@ -15,7 +17,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #Region "Level1 Private Methods"
 
-      
+
         ''' <summary>
         ''' 
         ''' </summary>
@@ -32,7 +34,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Dim query As New List(Of InstructionParameterTO)
                 Dim myOffset As Integer = -1
-                Dim myUtility As New Utilities()
+                'Dim myUtility As New Utilities()
                 Dim myInstructionType As String = ""
                 Dim myWell As Integer = 0
                 Dim myTotalResults As Integer = 0
@@ -46,11 +48,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XBC 30/10/2012
 
                 'AG 03/01/2011 - Get the instruction type value. to set the offset.
-                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 2)
+                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 2)
 
                 If Not myGlobalDataTO.HasError Then
                     myInstructionType = DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue
-                    If myInstructionType = GlobalEnumerates.AppLayerInstrucionReception.ANSBLD.ToString Then baseLineWithAdjust = True
+                    If myInstructionType = AppLayerInstrucionReception.ANSBLD.ToString Then baseLineWithAdjust = True
                 Else
                     Exit Try
                 End If
@@ -78,7 +80,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'Get the Position Led
                         Dim PositionLed As Integer
-                        myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
+                        myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
                         If Not myGlobalDataTO.HasError Then
                             PositionLed = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
                         Else
@@ -89,7 +91,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If AppLayer.PhotometryData.PositionLed(j) = PositionLed Then
 
                                 'MainLine
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         AppLayer.PhotometryData.CountsMainBaseline(j) = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -99,7 +101,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'RefLight
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         AppLayer.PhotometryData.CountsRefBaseline(j) = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -109,7 +111,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'MainDark
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         AppLayer.PhotometryData.CountsMainDarkness(j) = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -119,7 +121,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'RefDark
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         AppLayer.PhotometryData.CountsRefDarkness(j) = CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue)
@@ -129,7 +131,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                                 'IT
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         AppLayer.PhotometryData.IntegrationTimes(j) = CType(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -139,7 +141,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     Exit For
                                 End If
                                 'DAC
-                                myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
+                                myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
                                 If Not myGlobalDataTO.HasError Then
                                     If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                                         AppLayer.PhotometryData.LEDsIntensities(j) = CType(DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single)
@@ -154,7 +156,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Next
 
                         ''Get the Position Led
-                        'myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
+                        'myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 4 + (myIteration - 1) * myOffset)
                         'If Not myGlobalDataTO.HasError Then
                         '    AppLayer.PhotometryData.PositionLed.Add(CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue))
                         'Else
@@ -162,7 +164,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'End If
 
                         ''MainLine
-                        'myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
+                        'myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 5 + (myIteration - 1) * myOffset)
                         'If Not myGlobalDataTO.HasError Then
                         '    If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                         '        AppLayer.PhotometryData.CountsMainBaseline.Add(CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue))
@@ -172,7 +174,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'End If
 
                         ''RefLight
-                        'myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
+                        'myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 6 + (myIteration - 1) * myOffset)
                         'If Not myGlobalDataTO.HasError Then
                         '    If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                         '        AppLayer.PhotometryData.CountsRefBaseline.Add(CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue))
@@ -182,7 +184,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'End If
 
                         ''MainDark
-                        'myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
+                        'myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 7 + (myIteration - 1) * myOffset)
                         'If Not myGlobalDataTO.HasError Then
                         '    If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                         '        AppLayer.PhotometryData.CountsMainDarkness.Add(CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue))
@@ -192,7 +194,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'End If
 
                         ''RefDark
-                        'myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
+                        'myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 8 + (myIteration - 1) * myOffset)
                         'If Not myGlobalDataTO.HasError Then
                         '    If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                         '        AppLayer.PhotometryData.CountsRefDarkness.Add(CInt(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue))
@@ -202,7 +204,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'End If
 
                         ''IT
-                        'myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
+                        'myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 9 + (myIteration - 1) * myOffset)
                         'If Not myGlobalDataTO.HasError Then
                         '    If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                         '        AppLayer.PhotometryData.IntegrationTimes.Add(CType(CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single))
@@ -212,7 +214,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         '    Exit For
                         'End If
                         ''DAC
-                        'myGlobalDataTO = myUtility.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
+                        'myGlobalDataTO = Utilities.GetItemByParameterIndex(pInstructionReceived, 10 + (myIteration - 1) * myOffset)
                         'If Not myGlobalDataTO.HasError Then
                         '    If CType(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue <> "" Then
                         '        AppLayer.PhotometryData.LEDsIntensities.Add(CType(DirectCast(myGlobalDataTO.SetDatos, InstructionParameterTO).ParameterValue, Single))
@@ -230,8 +232,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBaseLineReceived_SRV", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessBaseLineReceived_SRV", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -255,14 +257,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then
-                    MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                    MyClass.ClearStartTaskQueueToSend()
+                    InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                    ClearStartTaskQueueToSend()
                 End If
                 ' XBC 28/10/2011 - timeout limit repetitions for Start Tasks
 
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions = GlobalEnumerates.AnalyzerManagerAx00Actions.COMMAND_END
+                Dim myActionValue As AnalyzerManagerAx00Actions = AnalyzerManagerAx00Actions.COMMAND_END
                 Me.OpticCenterResultsAttr = New OpticCenterDataTO
 
                 ' XBC 25/10/2012 - is need not clear queue because is posible there are any pending operation (INFO;Q:2) to execute due Alarms (E:99)
@@ -271,7 +273,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XBC 25/10/2012
 
                 ' Get Status fields (parameter index 3)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -284,7 +286,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 ' Get Ph Main Read Counts values in case its exists
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -295,7 +297,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 ' Get Ph Ref Read Counts values in case its exists
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -307,7 +309,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ' XBC 21/12/2011 - Add Encoder functionality
                 'Encoder
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
@@ -320,14 +322,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'PENDING TO SPEC
                 'Level Detection
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                 Else
                     Exit Try
                 End If
                 If IsNumeric(myInstParamTO.ParameterValue) Then
-                    MyClass.LevelDetectedAttr = CInt(myInstParamTO.ParameterValue)
+                    LevelDetectedAttr = CInt(myInstParamTO.ParameterValue)
                 End If
 
 
@@ -339,8 +341,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwCommandAnswerReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwCommandAnswerReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -357,10 +359,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </remarks>
         Private Function ProcessFwAdjustmentsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             ' XBC 25/10/2011 - place here to make sure on exit try to commit or rollback transaction.
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 ' Set Waiting Timer Current Instruction OFF
@@ -370,7 +372,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 'obtain Master Data Adjustments DS
                 Dim readAdjustmentsDS As New SRVAdjustmentsDS
-                myGlobal = MyClass.ReadFwAdjustmentsDS()
+                myGlobal = ReadFwAdjustmentsDS()
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     readAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                     If readAdjustmentsDS Is Nothing Then
@@ -380,11 +382,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'instantiate the delegate
                     Dim myAdjustmentDelegate As New FwAdjustmentsDelegate(readAdjustmentsDS)
 
-                    
+
 
                     'convert the data reeived to the DS
                     For i As Integer = 2 To pInstructionReceived.Count - 1
-                        myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, i + 1)
+                        myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, i + 1)
                         If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                             myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
 
@@ -422,16 +424,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
 
                         If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                            dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                            dbConnection = CType(myGlobal.SetDatos, SqlConnection)
                             If (Not dbConnection Is Nothing) Then
 
                                 Dim myAdjustmentsDelegate As New DBAdjustmentsDelegate
-                                myGlobal = myAdjustmentsDelegate.ReadAdjustmentsFromDB(dbConnection, MyClass.AnalyzerIDAttribute)
+                                myGlobal = myAdjustmentsDelegate.ReadAdjustmentsFromDB(dbConnection, AnalyzerIDAttribute)
                                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                                     readAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                                     If readAdjustmentsDS.srv_tfmwAdjustments.Count > 0 Then
                                         ' 1st step : delete previous adj. readings
-                                        myGlobal = myAdjustmentsDelegate.DeleteAdjustmentsDB(dbConnection, MyClass.AnalyzerIDAttribute)
+                                        myGlobal = myAdjustmentsDelegate.DeleteAdjustmentsDB(dbConnection, AnalyzerIDAttribute)
 
                                         If myGlobal.HasError Then
                                             Exit Try
@@ -439,7 +441,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
 
                                     ' 2on step : insert adjustment values with its AnalyzerID
-                                    myGlobal = myAdjustmentsDelegate.InsertAdjustmentsDB(dbConnection, MyClass.AnalyzerIDAttribute, MyClass.FwVersionAttribute)
+                                    myGlobal = myAdjustmentsDelegate.InsertAdjustmentsDB(dbConnection, AnalyzerIDAttribute, FwVersionAttribute)
                                     If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                                         readAdjustmentsDS = CType(myGlobal.SetDatos, SRVAdjustmentsDS)
                                     End If
@@ -473,12 +475,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'updates the system's adjustments dataset
-                    myGlobal = MyClass.UpdateFwAdjustmentsDS(readAdjustmentsDS)
+                    myGlobal = UpdateFwAdjustmentsDS(readAdjustmentsDS)
                     If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                         myAdjustmentDelegate = New FwAdjustmentsDelegate(readAdjustmentsDS)
-                        myGlobal = myAdjustmentDelegate.ExportDSToFile(MyClass.AnalyzerIDAttribute)
+                        myGlobal = myAdjustmentDelegate.ExportDSToFile(AnalyzerIDAttribute)
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-                            MyClass.AdjustmentsFilePath = CStr(myGlobal.SetDatos)
+                            AdjustmentsFilePath = CStr(myGlobal.SetDatos)
                         End If
                     End If
 
@@ -488,25 +490,25 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                     'SGM 17/02/2012 Initialization of ISE Manager
-                    If MyClass.ISE_Manager IsNot Nothing AndAlso MyClass.ISE_Manager.IsAnalyzerDisconnected Then
-                        'MyClass.ISE_Manager.Dispose() 'SGM 13/09/2012 clear all resources 
-                        MyClass.ISE_Manager = Nothing 'kill instance of when disconnected mode
+                    If ISE_Manager IsNot Nothing AndAlso ISE_Manager.IsAnalyzerDisconnected Then
+                        'ISE_Manager.Dispose() 'SGM 13/09/2012 clear all resources 
+                        ISE_Manager = Nothing 'kill instance of when disconnected mode
                     End If
 
-                    If MyClass.ISE_Manager Is Nothing Then
-                        MyClass.ISE_Manager = New ISEManager(Me, MyClass.AnalyzerIDAttribute, MyClass.myAnalyzerModel)
+                    If ISE_Manager Is Nothing Then
+                        ISE_Manager = New ISEManager(Me, AnalyzerIDAttribute, myAnalyzerModel)
                     End If
 
                     'update ISE is installed
-                    If MyClass.ISE_Manager IsNot Nothing Then
+                    If ISE_Manager IsNot Nothing Then
                         Dim myISEInstalled As Boolean = False
-                        myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByCode(GlobalEnumerates.Ax00Adjustsments.ISEINS.ToString)
+                        myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByCode(Ax00Adjustsments.ISEINS.ToString)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             Dim res As String = CStr(myGlobal.SetDatos)
                             If IsNumeric(res) Then
                                 myISEInstalled = (CInt(res) > 0)
                             End If
-                            MyClass.ISE_Manager.IsISEModuleInstalled = myISEInstalled
+                            ISE_Manager.IsISEModuleInstalled = myISEInstalled
                         Else
                             Exit Try
                         End If
@@ -534,12 +536,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
                     With rowBarCode
                         .RotorType = "SAMPLES"
-                        .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
+                        .Action = Ax00CodeBarAction.CONFIG
                         .Position = 0
                     End With
                     BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                     BarCodeDS.AcceptChanges()
-                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
                     ' XBC 13/02/2012 - CODEBR Configuration instruction
                 Else
 
@@ -548,7 +550,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'myGlobal = myAdjustmentsDelegate.UpdateAdjustmentsDB(Nothing, readAdjustmentsDS)
 
                     'User Sw
-                    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
+                    If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
 
                         '' XB 17/09/2013 - Additional protection - commented by now
                         '' - Additional protection to ensure ANSFCP reach to Presentation layer
@@ -573,12 +575,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
                         With rowBarCode
                             .RotorType = "SAMPLES"
-                            .Action = GlobalEnumerates.Ax00CodeBarAction.CONFIG
+                            .Action = Ax00CodeBarAction.CONFIG
                             .Position = 0
                         End With
                         BarCodeDS.barCodeRequests.AddbarCodeRequestsRow(rowBarCode)
                         BarCodeDS.AcceptChanges()
-                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
+                        myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.BARCODE_REQUEST, True, Nothing, BarCodeDS)
                         ' XBC 13/02/2012 - CODEBR Configuration instruction
 
                         If Not myGlobal.HasError AndAlso ConnectedAttribute Then
@@ -616,8 +618,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwAdjustmentsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwAdjustmentsReceived", EventLogEntryType.Error, False)
             End Try
 
             ' XBC 25/10/2011 - place here to make sure on exit try to commit or rollback transaction.
@@ -659,8 +661,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwCyclesReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwCyclesReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -675,22 +677,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessStressModeReceived_SRV(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim myActionValue As GlobalEnumerates.AnalyzerManagerAx00Actions = GlobalEnumerates.AnalyzerManagerAx00Actions.NO_ACTION
+                Dim myActionValue As AnalyzerManagerAx00Actions = AnalyzerManagerAx00Actions.NO_ACTION
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-               
+
                 ' Status
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        AppLayer.StressModeData.Status = DirectCast(CInt(myInstParamTO.ParameterValue), GlobalEnumerates.STRESS_STATUS)
+                        AppLayer.StressModeData.Status = DirectCast(CInt(myInstParamTO.ParameterValue), STRESS_STATUS)
 
                         ' XBC 16/05/2012 - reactivate sensors AnsInf when initate into Stressing mode
                         If AppLayer.StressModeData.Status = STRESS_STATUS.FINISHED_OK Or _
@@ -705,7 +707,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Num Cycles
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
@@ -715,7 +717,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Num Cycles completed
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
@@ -725,7 +727,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Start Hour
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
@@ -735,7 +737,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Start Minute
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
@@ -745,7 +747,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Start Second
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
@@ -769,17 +771,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'AppLayer.StressModeData.StartDatetime.AddSeconds(-pStressStartSecond)
 
                 ' Stress Type Element
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 11)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 11)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        AppLayer.StressModeData.Type = DirectCast(CInt(myInstParamTO.ParameterValue), GlobalEnumerates.STRESS_TYPE)
+                        AppLayer.StressModeData.Type = DirectCast(CInt(myInstParamTO.ParameterValue), STRESS_TYPE)
                     End If
                 Else
                     Exit Try
                 End If
                 ' Num Resets
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 12)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 12)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
@@ -789,7 +791,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Cycles Resets  PDT !!! (list of...)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 13)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 13)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     AppLayer.StressModeData.CyclesResets = New List(Of Long)
@@ -800,7 +802,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Num Errors
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 14)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 14)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
@@ -810,12 +812,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Exit Try
                 End If
                 ' Codes Errors  PDT !!! (list of...)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 15)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 15)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    AppLayer.StressModeData.CodeErrors = New List(Of GlobalEnumerates.STRESS_ERRORS)
+                    AppLayer.StressModeData.CodeErrors = New List(Of STRESS_ERRORS)
                     If IsNumeric(myInstParamTO.ParameterValue) Then
-                        AppLayer.StressModeData.CodeErrors.Add(DirectCast(CInt(myInstParamTO.ParameterValue), GlobalEnumerates.STRESS_ERRORS))
+                        AppLayer.StressModeData.CodeErrors.Add(DirectCast(CInt(myInstParamTO.ParameterValue), STRESS_ERRORS))
                     End If
                 Else
                     Exit Try
@@ -827,8 +829,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessStressModeReceived_SRV", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessStressModeReceived_SRV", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -837,11 +839,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                ByVal pElementID As Object) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim myUtilities As New Utilities
-            Dim myCpuItem As GlobalEnumerates.CPU_ELEMENTS
-            Dim myManifoldItem As GlobalEnumerates.MANIFOLD_ELEMENTS
-            Dim myFluidicsItem As GlobalEnumerates.FLUIDICS_ELEMENTS
-            Dim myPhotometricsItem As GlobalEnumerates.PHOTOMETRICS_ELEMENTS
+            'Dim myUtilities As New Utilities
+            Dim myCpuItem As CPU_ELEMENTS
+            Dim myManifoldItem As MANIFOLD_ELEMENTS
+            Dim myFluidicsItem As FLUIDICS_ELEMENTS
+            Dim myPhotometricsItem As PHOTOMETRICS_ELEMENTS
             Dim myInstParamTO As New InstructionParameterTO
 
             Try
@@ -855,11 +857,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                     'CPU
-                    If TypeOf pElementID Is GlobalEnumerates.CPU_ELEMENTS Then
-                        myCpuItem = CType(pElementID, GlobalEnumerates.CPU_ELEMENTS)
+                    If TypeOf pElementID Is CPU_ELEMENTS Then
+                        myCpuItem = CType(pElementID, CPU_ELEMENTS)
                         If myCpuItem <> Nothing Then
                             myParIndex = 3 + CInt(myCpuItem)
-                            myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
+                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                             Else
@@ -873,11 +875,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'MANIFOLD
-                    If TypeOf pElementID Is GlobalEnumerates.MANIFOLD_ELEMENTS Then
-                        myManifoldItem = CType(pElementID, GlobalEnumerates.MANIFOLD_ELEMENTS)
+                    If TypeOf pElementID Is MANIFOLD_ELEMENTS Then
+                        myManifoldItem = CType(pElementID, MANIFOLD_ELEMENTS)
                         If myManifoldItem <> Nothing Then
                             myParIndex = 3 + CInt(myManifoldItem)
-                            myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
+                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                             Else
@@ -891,11 +893,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'FLUIDICS
-                    If TypeOf pElementID Is GlobalEnumerates.FLUIDICS_ELEMENTS Then
-                        myFluidicsItem = CType(pElementID, GlobalEnumerates.FLUIDICS_ELEMENTS)
+                    If TypeOf pElementID Is FLUIDICS_ELEMENTS Then
+                        myFluidicsItem = CType(pElementID, FLUIDICS_ELEMENTS)
                         If myFluidicsItem <> Nothing Then
                             myParIndex = 3 + CInt(myFluidicsItem)
-                            myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
+                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                             Else
@@ -909,11 +911,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'PHOTOMETRICS
-                    If TypeOf pElementID Is GlobalEnumerates.PHOTOMETRICS_ELEMENTS Then
-                        myPhotometricsItem = CType(pElementID, GlobalEnumerates.PHOTOMETRICS_ELEMENTS)
+                    If TypeOf pElementID Is PHOTOMETRICS_ELEMENTS Then
+                        myPhotometricsItem = CType(pElementID, PHOTOMETRICS_ELEMENTS)
                         If myPhotometricsItem <> Nothing Then
                             myParIndex = 3 + CInt(myPhotometricsItem)
-                            myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
+                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                             Else
@@ -933,8 +935,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateHwElement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateHwElement", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -943,8 +945,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function PDT_UpdateHwCycles(ByVal pInstructionReceived As List(Of InstructionParameterTO), _
                                               ByVal pElementID As Object) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim myUtilities As New Utilities
-            Dim myCycleItem As GlobalEnumerates.CYCLE_ELEMENTS
+            'Dim myUtilities As New Utilities
+            Dim myCycleItem As CYCLE_ELEMENTS
             Dim myInstParamTO As New InstructionParameterTO
 
             Try
@@ -958,11 +960,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If GlobalBase.IsServiceAssembly Then
 
                     'CPU
-                    If TypeOf pElementID Is GlobalEnumerates.CYCLE_ELEMENTS Then
-                        myCycleItem = CType(pElementID, GlobalEnumerates.CYCLE_ELEMENTS)
+                    If TypeOf pElementID Is CYCLE_ELEMENTS Then
+                        myCycleItem = CType(pElementID, CYCLE_ELEMENTS)
                         If myCycleItem <> Nothing Then
                             myParIndex = 3 + CInt(myCycleItem)
-                            myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
+                            myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, myParIndex)
                             If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                 myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                             Else
@@ -983,17 +985,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateHwCycles", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.UpdateHwCycles", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
 
         End Function
 
-        
 
-      
+
+
 
         ''' <summary>
         ''' SW has received and ANSCPU instruction for real time monitoring
@@ -1019,54 +1021,54 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myParIndex As Integer = 0
 
                 'Board temperature------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_TEMP)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_TEMP)
 
                 'CAN Status ------------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN)
 
                 'CAN Diagnostic ARMS ---------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_BM1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_BR1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_BR2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_AG1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_AG2)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_BM1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_BR1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_BR2)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_AG1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_AG2)
 
                 'CAN Diagnostic PROBES ---------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_DM1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_DR1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_DR2)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_DM1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_DR1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_DR2)
 
                 'CAN Diagnostic ROTORS ---------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_RR1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_RM1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_RR1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_RM1)
 
                 'CAN Diagnostic PHOTOMETRIC-----------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_GLF)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_GLF)
 
                 'CAN Diagnostic MANIFOLD -------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_JE1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_JE1)
 
                 'CAN Diagnostic FLUIDICS -------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_CAN_SF1)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_CAN_SF1)
 
 
                 ' MAIN COVER -------------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_MC)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_MC)
 
                 ' BUZZ STATUS ------------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_BUZ)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_BUZ)
 
                 ' FW FLASH MEMORY --------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_FWFM)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_FWFM)
 
                 ' BLACK BOX --------------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_BBFM)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_BBFM)
 
                 ' ISE STATUS -------------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_ISE)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_ISE)
 
                 ' ISE ERROR --------------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.CPU_ELEMENTS.CPU_ISEE)
+                myGlobal = UpdateHwElement(pInstructionReceived, CPU_ELEMENTS.CPU_ISEE)
 
 
             Catch ex As Exception
@@ -1074,8 +1076,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwCpuUStatusReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwCpuUStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1105,90 +1107,90 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myParIndex As Integer = 0
 
                 'Board temperature------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_TEMP)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_TEMP)
 
                 'Reagent1 Motor------------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1H)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR1A)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MR1)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MR1H)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MR1A)
 
                 'Reagent2  Motor---------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2H)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MR2A)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MR2)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MR2H)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MR2A)
 
                 'Samples  Motor-------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MS)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_MSA)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MS)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MSH)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_MSA)
 
 
                 'Samples Dosing Pump-------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B1D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_B1)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_B1D)
 
                 'Reagent 1 Dosing Pump-------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B2D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_B2)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_B2D)
 
 
                 'Reagent 2 Dosing Pump-------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_B3D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_B3)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_B3D)
 
 
                 'Samples Dosing Valve-------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV1D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV1)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV1D)
 
 
 
                 'Reagent 1 Dosing Valve--------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV2D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV2)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV2D)
 
 
 
 
                 'Reagent 2 Dosing Valve-------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV3D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV3)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV3D)
 
 
                 'Air OR Washing Solution Valve------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV4D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV4)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV4D)
 
 
 
                 'Air/Washing OR Purified Water Solution Valve-----------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV5D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV5)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV5D)
 
 
                 'EV6-----------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_EV6D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV6)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_EV6D)
 
 
                 'GE1-----------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE1D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_GE1)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_GE1D)
 
 
                 'GE2-----------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE2D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_GE2)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_GE2D)
 
 
                 'GE3-----------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_GE3D)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_GE3)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_GE3D)
 
 
                 'Clot detection---------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLT)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.MANIFOLD_ELEMENTS.JE1_CLTD)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_CLT)
+                myGlobal = UpdateHwElement(pInstructionReceived, MANIFOLD_ELEMENTS.JE1_CLTD)
 
 
 
@@ -1197,8 +1199,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwManifoldStatusReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwManifoldStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1229,110 +1231,110 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Board temperature------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_TEMP)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_TEMP)
 
                 'Washing Station Motor---------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MS)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_MSA)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_MS)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_MSH)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_MSA)
+
 
                 'Samples Arm Pump-----------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B1D)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B1)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B1D)
+
 
                 'Reagent1/Mixer2 Arm Pump------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B2D)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B2)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B2D)
 
                 'Reagent2/Mixer1 Arm Pump------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B3D)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B3)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B3D)
 
                 'Purified Water (from external tank) Pump-----------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B4D)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B4)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B4D)
 
                 'Low Contamination Pump---------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B5D)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B5)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B5D)
 
                 'Washing Station needle 2,3 Pump-----------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B6D)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B6)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B6D)
 
                 'Washing Station needle 4,5 Pump--------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B7D)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B7)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B7D)
+
 
                 'Washing Station needle 6 Pump---------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B8D)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B8)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B8D)
 
                 'Washing Station needle 7 Pump--------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B9D)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B9)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B9D)
+
                 'Washing Station needle 1 Pump-----------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_B10D)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B10)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_B10D)
+
 
                 ''Dispensation ElectroValves Group-----------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_GE1D)
-               
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_GE1)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_GE1D)
+
 
                 'Purified Water (from external source) Valve---------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV1D)
-               
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_EV1)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_EV1D)
+
 
                 'Purified Water (from external tank) Valve----------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV2D)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_EV2)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_EV2D)
+
                 'EV3----------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV3)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_EV3D)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_EV3)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_EV3D)
 
                 ''Washing Station Thermistor-------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSTH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSTHD)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WSTH)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WSTHD)
 
                 'Washing Station Heater---------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSHD)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WSH)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WSHD)
+
                 'Washing Solution Weight----------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSW)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WSWD)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WSW)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WSWD)
 
                 'High Contamination Weight------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_HCW)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_HCWD)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_HCW)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_HCWD)
+
 
                 'Waste sensor (boyas)----------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WAS)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WAS)
 
                 'operation state
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_WTS)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_WTS)
 
                 'System liquid sensor (boyas)-----------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_SLS)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_SLS)
+
                 'operation state
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_STS)
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_STS)
 
                 'stirrer 1-------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_ST1)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_ST1)
+
                 'stirrer 2-------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.FLUIDICS_ELEMENTS.SF1_ST2)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, FLUIDICS_ELEMENTS.SF1_ST2)
+
 
 
 
@@ -1341,8 +1343,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwFluidicsStatusReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwFluidicsStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1373,69 +1375,69 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myValue As String = ""
 
                 'Board temperature------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_TEMP)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_TEMP)
+
 
                 'Reactions Rotor Motor------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MR)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MRH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MRA)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MRE)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MRED)
-               
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MR)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MRH)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MRA)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MRE)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MRED)
+
 
 
                 'Washing Station Vertical Motor (Pinta)---------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MW)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MWH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_MWA)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MW)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MWH)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_MWA)
+
 
 
                 'Washing Station Collision Detector-----------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_CD)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_CD)
+
 
 
                 'Rotor Thermistor--------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PTH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PTHD)
-               
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PTH)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PTHD)
+
 
                 'Rotor Peltier------------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PH)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PHD)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PH)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PHD)
+
 
                 'Peltier Fan 1--------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF1)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF1D)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF1)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF1D)
+
 
                 'Peltier Fan 2--------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF2)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF2D)
-               
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF2)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF2D)
+
 
                 'Peltier Fan 3--------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF3)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF3D)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF3)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF3D)
+
 
                 'Peltier Fan 4--------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF4)
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PF4D)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF4)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PF4D)
 
                 'Rotor Cover---------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_RC)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_RC)
+
 
                 'Photometry------------------------------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PHT)
-                
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PHT)
+
 
                 'Photometry Flash Memory State----------------------------------------
-                myGlobal = UpdateHwElement(pInstructionReceived, GlobalEnumerates.PHOTOMETRICS_ELEMENTS.GLF_PHFM)
+                myGlobal = UpdateHwElement(pInstructionReceived, PHOTOMETRICS_ELEMENTS.GLF_PHFM)
 
 
             Catch ex As Exception
@@ -1443,8 +1445,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwPhotometricsStatusReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwPhotometricsStatusReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1453,71 +1455,71 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetFWInfoData(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
                 Dim FwVersion As String = ""
                 Dim AnalyzerID As String = ""
 
                 'Get Ientificator value (parameter index 3)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.ID, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.ID, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Board serial number (parameter index 4)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.SMC, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.SMC, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Firmware Version (parameter index 5)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Repository CRC32 result (OK,NOK) (parameter index 6)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWCRC, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWCRC, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Repository CRC32 value  (parameter index 7)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWCRCV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWCRCV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Repository CRC32 size (parameter index 8)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWCRCS, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWCRCS, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Hardware version(parameter index 13)
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.HWV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.HWV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
@@ -1529,8 +1531,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetFWInfoData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFWInfoData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1544,119 +1546,119 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function GetFWCPUInfoData(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
                 Dim FwVersion As String = ""
                 Dim AnalyzerID As String = ""
 
                 'Get Ientificator value (parameter index 3) 
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.ID, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.ID, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Board serial number (parameter index 4)'Hexadecimal
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.SMC, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.SMC, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'FIRMWARE VERSION FOR VALIDATING SW-FW COMPATIBILITY
                 'Get Repository Version (parameter index 5) 'Float
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.RV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.RV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Repository CRC32 result (OK,NOK) (parameter index 6)'string
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.CRC, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.CRC, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Repository CRC32 value  (parameter index 7)'Hexadecimal
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.CRCV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.CRCV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Repository CRC32 size (parameter index 8)'int32
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.CRCS, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.CRCS, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Fw version (CPU Board) (parameter index 9) float
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get CPU CRC32 result (OK,NOK) (parameter index 10) string
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWCRC, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWCRC, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get CPU CRC32 value (parameter index 11) hexadecimal
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 11)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 11)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWCRCV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWCRCV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get CPU CRC32 size (parameter index 12) int32
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 12)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 12)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.FWCRCS, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.FWCRCS, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
                 'Get Hardware version(parameter index 13) float
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 13)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 13)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.FW_INFO.HWV, DirectCast(myInstParamTO.ParameterValue, String))
+                    myElements.Add(FW_INFO.HWV, DirectCast(myInstParamTO.ParameterValue, String))
                 Else
                     Exit Try
                 End If
 
 
                 'Analyzer Serial number (parameter index 14)string
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 14)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 14)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     AnalyzerID = DirectCast(myInstParamTO.ParameterValue, String)
-                    myElements.Add(GlobalEnumerates.FW_INFO.ASN, AnalyzerID)
+                    myElements.Add(FW_INFO.ASN, AnalyzerID)
                 Else
                     Exit Try
                 End If
@@ -1668,8 +1670,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetFWCPUInfoData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFWCPUInfoData", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1685,11 +1687,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </remarks>
         Private Function ProcessFwCPUDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             ' XBC 25/10/2011 - place here to make sure on exit try to commit or rollback transaction.
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                'Dim myUtilities As New Utilities
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
                 'Dim myInstParamTO As New InstructionParameterTO
                 Dim SwVersion As String = ""
                 Dim FwVersion As String = ""
@@ -1700,15 +1702,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                myGlobal = MyClass.GetFWCPUInfoData(pInstructionReceived)
+                myGlobal = GetFWCPUInfoData(pInstructionReceived)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
 
-                    myElements = CType(myGlobal.SetDatos, Dictionary(Of GlobalEnumerates.FW_INFO, String))
+                    myElements = CType(myGlobal.SetDatos, Dictionary(Of FW_INFO, String))
 
                     AnalyzerID = myElements(FW_INFO.ASN)
                     FwVersion = myElements(FW_INFO.RV)
 
-                    MyClass.ReadedFwVersion = FwVersion
+                    ReadedFwVersion = FwVersion
 
                     ' XBC 06/06/2012
                     Dim confAnalyzers As New AnalyzersDelegate
@@ -1717,30 +1719,30 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myAnalyzersRow = myAnalyzersDS.tcfgAnalyzers.NewtcfgAnalyzersRow
 
                     myAnalyzersRow.AnalyzerID = AnalyzerID
-                    myAnalyzersRow.AnalyzerModel = MyClass.GetModelValue(AnalyzerID)
+                    myAnalyzersRow.AnalyzerModel = GetModelValue(AnalyzerID)
                     myAnalyzersRow.FirmwareVersion = FwVersion
 
-                    MyClass.IsFwReaded = True 'SGM 21/06/2012
+                    IsFwReaded = True 'SGM 21/06/2012
 
                     'Validate the SW-FW Compatibility
-                    myGlobal = myUtilities.GetSoftwareVersion()
+                    myGlobal = Utilities.GetSoftwareVersion()
                     If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
 
                         SwVersion = myGlobal.SetDatos.ToString
-                        myGlobal = MyClass.ValidateFwSwCompatibility(FwVersion, SwVersion)
+                        myGlobal = ValidateFwSwCompatibility(FwVersion, SwVersion)
                         If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
 
-                            MyClass.IsFwSwCompatible = CBool(myGlobal.SetDatos)
+                            IsFwSwCompatible = CBool(myGlobal.SetDatos)
 
                             myGlobal = DAOBase.GetOpenDBTransaction(Nothing)
                             If (Not myGlobal.HasError) Then
-                                dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                                dbConnection = CType(myGlobal.SetDatos, SqlConnection)
                                 If (Not dbConnection Is Nothing) Then
 
-                                    If MyClass.IsFwSwCompatible Then
+                                    If IsFwSwCompatible Then
 
-                                        Dim myLogAccionesAux As New ApplicationLogManager()
-                                        myLogAccionesAux.CreateLogActivity("(Analyzer Change) Check Analyzer ", "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Information, False)
+                                        'Dim myLogAccionesAux As New ApplicationLogManager()
+                                        GlobalBase.CreateLogActivity("(Analyzer Change) Check Analyzer ", "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Information, False)
 
                                         myGlobal = confAnalyzers.CheckAnalyzer(dbConnection, myAnalyzersRow)
 
@@ -1749,18 +1751,18 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                             If Not myTmpConnectedAnalyzerDS Is Nothing Then
                                                 If myTmpConnectedAnalyzerDS.tcfgAnalyzers.Count > 0 Then
-                                                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Temp Connected Analyzer [" & myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID & "] ", "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Information, False)
+                                                    GlobalBase.CreateLogActivity("(Analyzer Change) Temp Connected Analyzer [" & myTmpConnectedAnalyzerDS.tcfgAnalyzers(0).AnalyzerID & "] ", "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Information, False)
                                                 End If
                                             End If
 
-                                            MyClass.TemporalAnalyzerConnectedAttr = AnalyzerID
-                                            MyClass.ActiveFwVersion = FwVersion
+                                            TemporalAnalyzerConnectedAttr = AnalyzerID
+                                            ActiveFwVersion = FwVersion
 
                                             'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
                                             'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                                             If Not GlobalBase.IsServiceAssembly Then
                                                 'User Sw
-                                                MyClass.IsAnalyzerIDNotLikeWSAttr = False
+                                                IsAnalyzerIDNotLikeWSAttr = False
                                                 Dim myWSAnalyzersDelegate As New WSAnalyzersDelegate()
                                                 Dim myWSStatus As String = ""
                                                 Dim myWSAnalyzerID As String = ""
@@ -1774,10 +1776,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                         If myWSStatus = "EMPTY" Or myWSStatus = "OPEN" Then
                                                             ' Nothing to do
                                                         Else
-                                                            If myWSAnalyzerID = MyClass.TemporalAnalyzerConnected Then
+                                                            If myWSAnalyzerID = TemporalAnalyzerConnected Then
                                                                 ' Nothing to do
                                                             Else
-                                                                MyClass.IsAnalyzerIDNotLikeWSAttr = True
+                                                                IsAnalyzerIDNotLikeWSAttr = True
                                                             End If
                                                         End If
                                                     End If
@@ -1785,7 +1787,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             End If
 
                                         Else
-                                            myLogAccionesAux.CreateLogActivity("(Analyzer Change) Error into Check Analyzer method ! ", "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Error, False)
+                                            GlobalBase.CreateLogActivity("(Analyzer Change) Error into Check Analyzer method ! ", "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Error, False)
                                         End If
                                     Else
                                         ' FW Not compatible with SW !!!
@@ -1812,19 +1814,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Generate UI_Refresh event FWCPUVALUE_CHANGED
-                    If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.FWCPUVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.FWCPUVALUE_CHANGED)
+                    If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.FWCPUVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.FWCPUVALUE_CHANGED)
 
 
-                    If MyClass.IsFwSwCompatible Then
+                    If IsFwSwCompatible Then
                         'SEND READADJ
                         ' XBC 05/06/2012
                         'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
                         'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                         If Not GlobalBase.IsServiceAssembly Then
                             'User Sw
-                            If Not MyClass.IsAnalyzerIDNotLikeWSAttr Then
-                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.READADJ, True, Nothing, GlobalEnumerates.Ax00Adjustsments.ALL)
+                            If Not IsAnalyzerIDNotLikeWSAttr Then
+                                If mySessionFlags(AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" Then
+                                    myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.READADJ, True, Nothing, Ax00Adjustsments.ALL)
                                     If Not myGlobal.HasError AndAlso ConnectedAttribute Then
                                         SetAnalyzerNotReady()
                                     End If
@@ -1842,8 +1844,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwCPUDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             ' XBC 25/10/2011 - place here to make sure on exit try to commit or rollback transaction.
@@ -1872,16 +1874,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 'Dim myUtilities As New Utilities
                 'Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                myGlobal = MyClass.GetFWInfoData(pInstructionReceived)
+                myGlobal = GetFWInfoData(pInstructionReceived)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    myElements = CType(myGlobal.SetDatos, Dictionary(Of GlobalEnumerates.FW_INFO, String))
+                    myElements = CType(myGlobal.SetDatos, Dictionary(Of FW_INFO, String))
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
@@ -1891,7 +1893,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Generate UI_Refresh event FWARMVALUE_CHANGED
-                    If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.FWARMVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.FWARMVALUE_CHANGED)
+                    If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.FWARMVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.FWARMVALUE_CHANGED)
 
                 End If
 
@@ -1900,8 +1902,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwARMDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwARMDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1920,16 +1922,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 'Dim myUtilities As New Utilities
                 'Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                myGlobal = MyClass.GetFWInfoData(pInstructionReceived)
+                myGlobal = GetFWInfoData(pInstructionReceived)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    myElements = CType(myGlobal.SetDatos, Dictionary(Of GlobalEnumerates.FW_INFO, String))
+                    myElements = CType(myGlobal.SetDatos, Dictionary(Of FW_INFO, String))
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
@@ -1941,7 +1943,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Generate UI_Refresh event FWPROBEVALUE_CHANGED
-                    If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.FWPROBEVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.FWPROBEVALUE_CHANGED)
+                    If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.FWPROBEVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.FWPROBEVALUE_CHANGED)
 
                 End If
 
@@ -1950,8 +1952,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwPROBEDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwPROBEDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1970,16 +1972,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 'Dim myUtilities As New Utilities
                 'Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                myGlobal = MyClass.GetFWInfoData(pInstructionReceived)
+                myGlobal = GetFWInfoData(pInstructionReceived)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    myElements = CType(myGlobal.SetDatos, Dictionary(Of GlobalEnumerates.FW_INFO, String))
+                    myElements = CType(myGlobal.SetDatos, Dictionary(Of FW_INFO, String))
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
@@ -1991,7 +1993,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Generate UI_Refresh event FWROTORVALUE_CHANGED
-                    If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.FWROTORVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.FWROTORVALUE_CHANGED)
+                    If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.FWROTORVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.FWROTORVALUE_CHANGED)
 
                 End If
 
@@ -2000,8 +2002,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwROTORDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwROTORDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2020,16 +2022,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 'Dim myUtilities As New Utilities
                 'Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                myGlobal = MyClass.GetFWInfoData(pInstructionReceived)
+                myGlobal = GetFWInfoData(pInstructionReceived)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    myElements = CType(myGlobal.SetDatos, Dictionary(Of GlobalEnumerates.FW_INFO, String))
+                    myElements = CType(myGlobal.SetDatos, Dictionary(Of FW_INFO, String))
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
@@ -2041,7 +2043,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Generate UI_Refresh event FWPHOTOMETRICVALUE_CHANGED
-                    If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.FWPHOTOMETRICVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.FWPHOTOMETRICVALUE_CHANGED)
+                    If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.FWPHOTOMETRICVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.FWPHOTOMETRICVALUE_CHANGED)
 
                 End If
 
@@ -2050,8 +2052,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwPHOTOMETRICDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwPHOTOMETRICDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2070,16 +2072,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 'Dim myUtilities As New Utilities
                 'Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                myGlobal = MyClass.GetFWInfoData(pInstructionReceived)
+                myGlobal = GetFWInfoData(pInstructionReceived)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    myElements = CType(myGlobal.SetDatos, Dictionary(Of GlobalEnumerates.FW_INFO, String))
+                    myElements = CType(myGlobal.SetDatos, Dictionary(Of FW_INFO, String))
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
@@ -2091,7 +2093,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Generate UI_Refresh event FWMANIFOLDVALUE_CHANGED
-                    If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.FWMANIFOLDVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.FWMANIFOLDVALUE_CHANGED)
+                    If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.FWMANIFOLDVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.FWMANIFOLDVALUE_CHANGED)
 
                 End If
 
@@ -2100,8 +2102,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwMANIFOLDDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwMANIFOLDDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2120,16 +2122,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Try
                 'Dim myUtilities As New Utilities
                 'Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.FW_INFO, String) 'Local structure
+                Dim myElements As New Dictionary(Of FW_INFO, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                myGlobal = MyClass.GetFWInfoData(pInstructionReceived)
+                myGlobal = GetFWInfoData(pInstructionReceived)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    myElements = CType(myGlobal.SetDatos, Dictionary(Of GlobalEnumerates.FW_INFO, String))
+                    myElements = CType(myGlobal.SetDatos, Dictionary(Of FW_INFO, String))
                     'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                     'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                     If GlobalBase.IsServiceAssembly Then
@@ -2141,7 +2143,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
 
                     'Generate UI_Refresh event FWFLUIDICSVALUE_CHANGED
-                    If Not myUI_RefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.FWFLUIDICSVALUE_CHANGED) Then myUI_RefreshEvent.Add(GlobalEnumerates.UI_RefreshEvents.FWFLUIDICSVALUE_CHANGED)
+                    If Not myUI_RefreshEvent.Contains(UI_RefreshEvents.FWFLUIDICSVALUE_CHANGED) Then myUI_RefreshEvent.Add(UI_RefreshEvents.FWFLUIDICSVALUE_CHANGED)
 
                 End If
 
@@ -2150,8 +2152,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwFLUIDICSDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFwFLUIDICSDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2166,9 +2168,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessHwARMDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.ARMS_ELEMENTS, String) 'Local structure
+                Dim myElements As New Dictionary(Of ARMS_ELEMENTS, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -2176,73 +2178,73 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
                 'Arm Identifier
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.ID, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.ID, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Board temperature
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.TMP, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.TMP, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Horizontal Motor
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.MH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.MH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Home Horizontal Motor
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.MHH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.MHH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Horizontal current Position
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.MHA, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.MHA, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Vertical Motor
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.MV, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.MV, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Home Vertical Motor
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.MVH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.MVH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Vertical current Position
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ARMS_ELEMENTS.MVA, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ARMS_ELEMENTS.MVA, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
@@ -2263,8 +2265,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwARMDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwARMDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2279,9 +2281,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessHwPROBEDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.PROBES_ELEMENTS, String) 'Local structure
+                Dim myElements As New Dictionary(Of PROBES_ELEMENTS, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -2289,100 +2291,100 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
                 'Identifier
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.ID, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.ID, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Board temperature
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.TMP, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.TMP, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Detection status
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.DST, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.DST, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Detection Base Frequency
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.DFQ, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.DFQ, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Detection
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.D, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.D, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Internal Rate of Change in last detection
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.DCV, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.DCV, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Probe Thermistor Value
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.PTH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.PTH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Probe Thermistor Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.PTHD, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.PTHD, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Probe Heater state
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 11)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 11)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.PH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.PH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Probe Heater Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 12)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 12)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.PHD, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.PHD, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Collision Detector
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 13)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 13)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.PROBES_ELEMENTS.CD, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(PROBES_ELEMENTS.CD, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
@@ -2401,8 +2403,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwPROBEDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwPROBEDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2417,9 +2419,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessHwROTORDetailsReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
-                Dim myElements As New Dictionary(Of GlobalEnumerates.ROTORS_ELEMENTS, String) 'Local structure
+                Dim myElements As New Dictionary(Of ROTORS_ELEMENTS, String) 'Local structure
 
                 ' Set Waiting Timer Current Instruction OFF
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
@@ -2427,217 +2429,217 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
                 'Identifier
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.ID, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.ID, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Board temperature
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.TMP, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.TMP, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Rotor Motor
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.MR, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.MR, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Home Motor Rotor
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.MRH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.MRH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Motor Position
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.MRA, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.MRA, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Fridge Thermistor Value
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FTH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FTH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Fridge Thermistor Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 9)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 9)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FTHD, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FTHD, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Fridge Peltiers state
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 10)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 10)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FH, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FH, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Fridge Peltiers Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 11)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 11)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FHD, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FHD, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 1 Speed
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 12)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 12)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF1, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF1, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 1 Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 13)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 13)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF1D, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF1D, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 2 Speed
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 14)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 14)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF2, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF2, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 2 Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 15)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 15)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF2D, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF2D, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 3 Speed
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 16)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 16)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF3, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF3, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 3 Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 17)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 17)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF3D, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF3D, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 4 Speed
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 18)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 18)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF4, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF4, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Peltier Fan 4 Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 19)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 19)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.PF4D, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.PF4D, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Frame Fan 1 Speed
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 20)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 20)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FF1, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FF1, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Frame Fan 1 Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 21)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 21)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FF1D, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FF1D, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Frame Fan 2 Speed
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 22)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 22)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FF2, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FF2, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Frame Fan 2 Diagnostic
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 23)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 23)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.FF2D, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.FF2D, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Rotor Cover
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 24)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 24)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.RC, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.RC, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Codebar Reader state
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 25)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 25)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.CB, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.CB, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
 
                 'Codebar Reader error
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 26)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 26)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myElements.Add(GlobalEnumerates.ROTORS_ELEMENTS.CBE, myInstParamTO.ParameterValue.ToString)
+                    myElements.Add(ROTORS_ELEMENTS.CBE, myInstParamTO.ParameterValue.ToString)
                 Else
                     Exit Try
                 End If
@@ -2656,14 +2658,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwROTORDetailsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessHwROTORDetailsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
         End Function
 
-       
+
 
         ''' <summary>
         ''' SW has received ANSUTIL
@@ -2676,7 +2678,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
+                'Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 Dim myUTILType As UTILInstructionTypes = UTILInstructionTypes.None
@@ -2685,16 +2687,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim mySNSavingResult As UTILSNSavedResults = UTILSNSavedResults.None
 
                 'Action
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myUTILType = CType(CInt(myInstParamTO.ParameterValue), GlobalEnumerates.UTILInstructionTypes)
+                    myUTILType = CType(CInt(myInstParamTO.ParameterValue), UTILInstructionTypes)
                 Else
                     Exit Try
                 End If
 
                 'Tanks Test result
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     myTanksTestResult = CType(CInt(myInstParamTO.ParameterValue), Integer)
@@ -2707,28 +2709,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Collision Test result
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     myCollisionTestResult = CType(CInt(myInstParamTO.ParameterValue), UTILCollidedNeedles)
-                    MyClass.TestingCollidedNeedleAttribute = myCollisionTestResult
+                    TestingCollidedNeedleAttribute = myCollisionTestResult
                     If myCollisionTestResult <> UTILCollidedNeedles.None Then
                         'Activate sensor
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.TESTING_NEEDLE_COLLIDED, 1, True)
+                        UpdateSensorValuesAttribute(AnalyzerSensors.TESTING_NEEDLE_COLLIDED, 1, True)
                     End If
                 Else
                     Exit Try
                 End If
 
                 'Save Serial number result
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     mySNSavingResult = CType(CInt(myInstParamTO.ParameterValue), UTILSNSavedResults)
-                    MyClass.SaveSNResultAttribute = mySNSavingResult
+                    SaveSNResultAttribute = mySNSavingResult
                     If mySNSavingResult <> UTILSNSavedResults.None Then
                         'Activate sensor
-                        UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.SERIAL_NUMBER_SAVED, 1, True)
+                        UpdateSensorValuesAttribute(AnalyzerSensors.SERIAL_NUMBER_SAVED, 1, True)
                     End If
                 Else
                     Exit Try
@@ -2739,8 +2741,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFirmwareEventsReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFirmwareEventsReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2757,14 +2759,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                Dim myUtilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
 
                 'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
                 'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
                 If GlobalBase.IsServiceAssembly Then ClearQueueToSend()
 
-                Dim myAction As GlobalEnumerates.FwUpdateActions = FwUpdateActions.None
+                Dim myAction As FwUpdateActions = FwUpdateActions.None
                 Dim myResult As FW_GENERIC_RESULT = FW_GENERIC_RESULT.OK
                 Dim myCRC As String = ""
                 Dim myCPU As FW_GENERIC_RESULT = FW_GENERIC_RESULT.OK
@@ -2772,16 +2773,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myMAN As FW_GENERIC_RESULT = FW_GENERIC_RESULT.OK
 
                 'Action
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
-                    myAction = CType(CInt(myInstParamTO.ParameterValue), GlobalEnumerates.FwUpdateActions)
+                    myAction = CType(CInt(myInstParamTO.ParameterValue), FwUpdateActions)
                 Else
                     Exit Try
                 End If
 
                 'Result
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 4)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 4)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Dim myResultStr As String = myInstParamTO.ParameterValue
@@ -2794,7 +2795,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'CRC
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 5)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 5)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     myCRC = CStr(myInstParamTO.ParameterValue)
@@ -2803,7 +2804,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'CPU
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 6)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 6)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Dim myCPUStr As String = myInstParamTO.ParameterValue
@@ -2816,7 +2817,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Peripherals file
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 7)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 7)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Dim myPERStr As String = myInstParamTO.ParameterValue
@@ -2829,7 +2830,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'Maneuver file
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 8)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 8)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     Dim myMANStr As String = myInstParamTO.ParameterValue
@@ -2857,8 +2858,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFirmwareUtilReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessFirmwareUtilReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2873,20 +2874,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function CalculateFwFileCRC32(ByVal pFileStringData As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                'Dim myUtil As New Utilities
+                ''Dim myUtil As New Utilities.
                 Dim myFileBytes As Byte()
 
-                myFileBytes = System.Text.ASCIIEncoding.ASCII.GetBytes(pFileStringData)
+                myFileBytes = ASCIIEncoding.ASCII.GetBytes(pFileStringData)
 
-                myGlobal = MyClass.CalculateFwFileCRC32(myFileBytes)
+                myGlobal = CalculateFwFileCRC32(myFileBytes)
 
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CalculateFwFileCRC32", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CalculateFwFileCRC32", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2900,19 +2901,19 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Public Function CalculateFwFileCRC32(ByVal pFileBytes As Byte()) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myFileBytes As Byte()
                 'Dim FWFileCRC32Hex As String
 
                 myFileBytes = pFileBytes
 
-                myGlobal = myUtil.CalculateCRC32(myFileBytes)
+                myGlobal = Utilities.CalculateCRC32(myFileBytes)
                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 
                     Dim myCRCResult As UInt32 = CType(myGlobal.SetDatos, UInt32)
 
                     If myCRCResult <> &HFFFFFFFFUI Then
-                        myGlobal = myUtil.ConvertUint32ToHex(myCRCResult)
+                        myGlobal = Utilities.ConvertUint32ToHex(myCRCResult)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             myGlobal.SetDatos = "0x" & CStr(myGlobal.SetDatos)
                         End If
@@ -2925,14 +2926,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CalculateFwFileCRC32", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CalculateFwFileCRC32", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
-       
+
         ''' <summary>
         ''' Validates compatibility between Software and Firmware
         ''' </summary>
@@ -2943,7 +2944,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
 
             Try
-                'MyClass.ActiveFwVersion
+                'ActiveFwVersion
 
                 ' PENDING : is necesary the compatibility check
                 ' to implement when version package table's design has been created !
@@ -2972,10 +2973,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ValidateFwSwCompatibility", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ValidateFwSwCompatibility", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3016,10 +3017,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
             Catch ex As Exception
                 myGlobal.HasError = True
-                myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetFwVersionNeeded", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetFwVersionNeeded", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -3036,7 +3037,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private Function ProcessSerialNumberReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
-                Dim myUtilities As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myInstParamTO As New InstructionParameterTO
                 Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
@@ -3049,7 +3050,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myLastWSAnalyzerID As String = ""
 
                 'Serial Number
-                myGlobal = myUtilities.GetItemByParameterIndex(pInstructionReceived, 3)
+                myGlobal = Utilities.GetItemByParameterIndex(pInstructionReceived, 3)
                 If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                     myInstParamTO = DirectCast(myGlobal.SetDatos, InstructionParameterTO)
                     AnalyzerID = CStr(myInstParamTO.ParameterValue)
@@ -3065,15 +3066,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myAnalyzersRow = myAnalyzersDS.tcfgAnalyzers.NewtcfgAnalyzersRow
 
                 myAnalyzersRow.AnalyzerID = AnalyzerID
-                myAnalyzersRow.AnalyzerModel = MyClass.GetModelValue(AnalyzerID)
+                myAnalyzersRow.AnalyzerModel = GetModelValue(AnalyzerID)
                 myAnalyzersRow.FirmwareVersion = ""
 
                 Dim myConnectedAnalyzerDS As New AnalyzersDS
 
                 ' Get the last Analyzer ID connected with Software
 
-                Dim myLogAccionesAux As New ApplicationLogManager()
-                myLogAccionesAux.CreateLogActivity("(Analyzer Change) Check Analyzer ", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
+                'Dim myLogAccionesAux As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("(Analyzer Change) Check Analyzer ", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
 
                 myGlobal = confAnalyzers.CheckAnalyzer(Nothing, myAnalyzersRow)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
@@ -3095,44 +3096,44 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Dim AbortWS As Boolean = False
                                 If AnalyzerID <> myLastWSAnalyzerID Then
                                     ' Different Analyzer ID than Last connected
-                                    myLogAccionesAux.CreateLogActivity("Different Analyzer ID than Last connected ! (" & AnalyzerID & ") vs (" & myLastWSAnalyzerID & ")", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("Different Analyzer ID than Last connected ! (" & AnalyzerID & ") vs (" & myLastWSAnalyzerID & ")", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
                                     AbortWS = True
-                                    MyClass.DifferentWSTypeAtrr = "1"
+                                    DifferentWSTypeAtrr = "1"
                                 Else
                                     ' Same Analyzer ID than Last connected
 
-                                    If MyClass.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING) = "INPROCESS" Then
+                                    If SessionFlag(AnalyzerManagerFlags.ReportSATonRUNNING) = "INPROCESS" Then
                                         ' Comming from ReportSAT
-                                        myLogAccionesAux.CreateLogActivity("Comming from ReportSAT !", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity("Comming from ReportSAT !", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
                                         AbortWS = True
-                                        MyClass.DifferentWSTypeAtrr = "2"
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING, "CLOSED")
+                                        DifferentWSTypeAtrr = "2"
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.ReportSATonRUNNING, "CLOSED")
 
                                         ' XB 09/01/2014 - Task #1445
-                                        'ElseIf myWSStatus = "INPROCESS" AndAlso MyClass.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SoftwareWSonRUNNING) = "INPROCESS" Then
+                                        'ElseIf myWSStatus = "INPROCESS" AndAlso SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SoftwareWSonRUNNING) = "INPROCESS" Then
                                     ElseIf (myWSStatus = "INPROCESS" OrElse myWSStatus = "ABORTED" OrElse myWSStatus = "CLOSED") AndAlso _
-                                           (MyClass.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.SoftwareWSonRUNNING) = "INPROCESS") Then
+                                           (SessionFlag(AnalyzerManagerFlags.SoftwareWSonRUNNING) = "INPROCESS") Then
                                         ' XB 09/01/2014
 
-                                        myLogAccionesAux.CreateLogActivity("RECOVERY RESULTS is Comming !", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity("RECOVERY RESULTS is Comming !", "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
 
                                         'AG 03/09/2012 correction, this flag must be updated to closed when the recovery results starts
                                         '' current Work Session in Software data is RUNNING
                                         'UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.SoftwareWSonRUNNING, "CLOSED")
 
                                         ' XBC 30/07/2012: RECOVERY RESULTS !!!
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess, "INPROCESS")
+                                        UpdateSessionFlags(myAnalyzerFlagsDS, AnalyzerManagerFlags.RESULTSRECOVERProcess, "INPROCESS")
                                         endRunAlreadySentFlagAttribute = True 'AG 25/09/2012 - When resultsrecover process starts the Fw implements an automatic END, so add protection in order Sw do not sent this instruction again
 
                                         'AG 07/01/2013 - BT #1436 - If running connection while analyzer is entering in pause mode ... do not execute the IF code
-                                        If (mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.PAUSEprocess.ToString) <> "INPROCESS") Then
+                                        If (mySessionFlags(AnalyzerManagerFlags.PAUSEprocess.ToString) <> "INPROCESS") Then
                                             'AG 28/11/2013 - BT #1397 - Add this If. Open the recover results screen only if no pause mode
                                             If AnalyzerCurrentAction = AnalyzerManagerAx00Actions.PAUSE_END AndAlso Not AllowScanInRunningAttribute Then
                                                 SetAllowScanInRunningValue(True)
                                             End If
                                             If Not AllowScanInRunningAttribute Then
                                                 'AG 17/09/2012 - Activate final code for v052. Temporally commented for setup 051
-                                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERY_RESULTS_STATUS, 1, True) 'AG 27/08/2012 - Update sensors for UI refresh - recovery results starts
+                                                UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERY_RESULTS_STATUS, 1, True) 'AG 27/08/2012 - Update sensors for UI refresh - recovery results starts
                                             End If
 
                                         Else
@@ -3141,15 +3142,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             'Exception: User has clicked the PAUSE button but the comms are lost before the PAUSE instruction has been sent
                                             'Flag indicates PAUSE is in process but the action won't be never indicate pause mode
                                             If AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.PAUSE_START AndAlso AnalyzerCurrentAction <> AnalyzerManagerAx00Actions.PAUSE_END Then
-                                                UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERY_RESULTS_STATUS, 1, True) 'AG 27/08/2012 - Update sensors for UI refresh - recovery results starts
+                                                UpdateSensorValuesAttribute(AnalyzerSensors.RECOVERY_RESULTS_STATUS, 1, True) 'AG 27/08/2012 - Update sensors for UI refresh - recovery results starts
                                             End If
                                         End If
 
                                     Else
                                         ' Current Work Session in Software data is NO RUNNING (by Reset or by Load ReportSAT)
-                                        myLogAccionesAux.CreateLogActivity("Current WS in Software data is NO RUNNING ! - myWSStatus = " & myWSStatus & "; Flags.ReportSATonRUNNING = " & GlobalEnumerates.AnalyzerManagerFlags.ReportSATonRUNNING, "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity("Current WS in Software data is NO RUNNING ! - myWSStatus = " & myWSStatus & "; Flags.ReportSATonRUNNING = " & AnalyzerManagerFlags.ReportSATonRUNNING, "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Information, False)
                                         AbortWS = True
-                                        MyClass.DifferentWSTypeAtrr = "2"
+                                        DifferentWSTypeAtrr = "2"
                                     End If
                                 End If
 
@@ -3177,20 +3178,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessSerialNumberReceived", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
         End Function
 
 
-      
+
 #End Region
 
 #Region "Level2 Private Methods"
 
-       
+
         ''' <summary>
         ''' Prepare the data for the UI refreh due a cpu instruction reception
         ''' </summary>
@@ -3202,22 +3203,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by XBC 08/06/2011
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventCpu(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
-                                              ByVal pCpuId As GlobalEnumerates.CPU_ELEMENTS, ByVal pCpuValue As String) As GlobalDataTO
+        Private Function PrepareUIRefreshEventCpu(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
+                                              ByVal pCpuId As CPU_ELEMENTS, ByVal pCpuValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myglobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
                         eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
-                        If pUI_EventType = GlobalEnumerates.UI_RefreshEvents.CPUVALUE_CHANGED Then
+                        If pUI_EventType = UI_RefreshEvents.CPUVALUE_CHANGED Then
                             'This case prepare DS 
                             'NOTE it's not necessary due the values are available using method AnalyzerManager.GetSensorValue
 
@@ -3244,11 +3245,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventCpu", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventCpu", EventLogEntryType.Error, False)
             Finally
 
             End Try
@@ -3269,22 +3270,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by SGM 24/05/2011
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventManifold(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
-                                              ByVal pManifoldId As GlobalEnumerates.MANIFOLD_ELEMENTS, ByVal pManifoldValue As String) As GlobalDataTO
+        Private Function PrepareUIRefreshEventManifold(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
+                                              ByVal pManifoldId As MANIFOLD_ELEMENTS, ByVal pManifoldValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myglobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
                         eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
-                        If pUI_EventType = GlobalEnumerates.UI_RefreshEvents.MANIFOLDVALUE_CHANGED Then
+                        If pUI_EventType = UI_RefreshEvents.MANIFOLDVALUE_CHANGED Then
                             'This case prepare DS 
                             'NOTE it's not necessary due the values are available using method AnalyzerManager.GetSensorValue
 
@@ -3311,11 +3312,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventManifold", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventManifold", EventLogEntryType.Error, False)
             Finally
 
             End Try
@@ -3336,22 +3337,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by SGM 24/05/2011
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventFluidics(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
-                                                        ByVal pFluidicsId As GlobalEnumerates.FLUIDICS_ELEMENTS, ByVal pFluidicsValue As String) As GlobalDataTO
+        Private Function PrepareUIRefreshEventFluidics(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
+                                                        ByVal pFluidicsId As FLUIDICS_ELEMENTS, ByVal pFluidicsValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myglobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
                         eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
-                        If pUI_EventType = GlobalEnumerates.UI_RefreshEvents.FLUIDICSVALUE_CHANGED Then
+                        If pUI_EventType = UI_RefreshEvents.FLUIDICSVALUE_CHANGED Then
                             'This case prepare DS 
                             'NOTE it's not necessary due the values are available using method AnalyzerManager.GetSensorValue
 
@@ -3380,11 +3381,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventFluidics", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventFluidics", EventLogEntryType.Error, False)
             Finally
 
             End Try
@@ -3405,22 +3406,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by SGM 24/05/2011
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventPhotometrics(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
-                                                        ByVal pPhotometricsId As GlobalEnumerates.PHOTOMETRICS_ELEMENTS, ByVal pPhotometricsValue As String) As GlobalDataTO
+        Private Function PrepareUIRefreshEventPhotometrics(ByVal pDBConnection As SqlConnection, ByVal pUI_EventType As UI_RefreshEvents, _
+                                                        ByVal pPhotometricsId As PHOTOMETRICS_ELEMENTS, ByVal pPhotometricsValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myglobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
                         eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
-                        If pUI_EventType = GlobalEnumerates.UI_RefreshEvents.PHOTOMETRICSVALUE_CHANGED Then
+                        If pUI_EventType = UI_RefreshEvents.PHOTOMETRICSVALUE_CHANGED Then
                             'This case prepare DS 
                             'NOTE it's not necessary due the values are available using method AnalyzerManager.GetSensorValue
 
@@ -3449,11 +3450,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventPhotometrics", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventPhotometrics", EventLogEntryType.Error, False)
             Finally
 
             End Try
@@ -3472,26 +3473,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>Created by SGM 24/05/2011
         ''' AG 22/05/2014 - #1637 Remove old commented code + use exclusive lock (multithread protection) + AcceptChanges in the datatable with changes, not in the whole dataset
         ''' </remarks>
-        Private Function PrepareUIRefreshEventCycles(ByVal pDBConnection As SqlClient.SqlConnection, _
-                                                     ByVal pUI_EventType As GlobalEnumerates.UI_RefreshEvents, _
-                                              ByVal pCycleItemId As GlobalEnumerates.CYCLE_ELEMENTS, _
-                                              ByVal pCycleSubSystemID As GlobalEnumerates.SUBSYSTEMS, _
-                                              ByVal pCycleUnits As GlobalEnumerates.CYCLE_UNITS, _
+        Private Function PrepareUIRefreshEventCycles(ByVal pDBConnection As SqlConnection, _
+                                                     ByVal pUI_EventType As UI_RefreshEvents, _
+                                              ByVal pCycleItemId As CYCLE_ELEMENTS, _
+                                              ByVal pCycleSubSystemID As SUBSYSTEMS, _
+                                              ByVal pCycleUnits As CYCLE_UNITS, _
                                               ByVal pCyclesValue As String) As GlobalDataTO
             Dim myglobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 myglobal = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not myglobal.HasError And Not myglobal.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(myglobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(myglobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
 
                         eventDataPendingToTriggerFlag = True 'AG 07/10/2011 - exists information in UI_RefreshDS pending to be send to the event
                         If Not myUI_RefreshEvent.Contains(pUI_EventType) Then myUI_RefreshEvent.Add(pUI_EventType)
 
-                        If pUI_EventType = GlobalEnumerates.UI_RefreshEvents.HWCYCLES_CHANGED Then
+                        If pUI_EventType = UI_RefreshEvents.HWCYCLES_CHANGED Then
                             'This case prepare DS 
                             'NOTE it's not necessary due the values are available using method AnalyzerManager.GetSensorValue
 
@@ -3522,11 +3523,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Catch ex As Exception
                 myglobal.HasError = True
-                myglobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+                myglobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
                 myglobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventCycles", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.PrepareUIRefreshEventCycles", EventLogEntryType.Error, False)
             Finally
 
             End Try

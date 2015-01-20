@@ -111,7 +111,7 @@ Public Class IQCCumulatedReview
                     Dim myCumulateResultsRow As CumulatedResultsDS.tqcCumulatedResultsRow
 
                     For Each SelQCResult As DataGridViewRow In bsResultsDetailsGridView.SelectedRows
-                        myCumulateResultsRow = myCumulateResultsDS.tqcCumulatedResults.NewRow
+                        myCumulateResultsRow = CType(myCumulateResultsDS.tqcCumulatedResults.NewRow, CumulatedResultsDS.tqcCumulatedResultsRow)
 
                         myCumulateResultsRow.QCTestSampleID = CInt(SelQCResult.Cells("QCTestSampleID").Value)
                         myCumulateResultsRow.QCControlLotID = CInt(SelQCResult.Cells("QCControlLotID").Value)
@@ -199,10 +199,10 @@ Public Class IQCCumulatedReview
 
                     'Add the Test/Sample Type to the ListView
                     bsTestSampleListView.Items.Add(historyTestSampRow.TestName, myIconNameVar).SubItems.Add(historyTestSampRow.SampleType)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample.ToString)
                     bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestType)
 
                     myIndex += 1
@@ -357,10 +357,10 @@ Public Class IQCCumulatedReview
                             bsResultControlLotGridView.DataSource = LocalQCCumulateResultsDS.QCCumulatedSummaryTable.DefaultView
 
                             'Get the current Language from the current Application Session and get the text for the Button in the DataGridView
-                            Dim currentLanguageGlobal As New GlobalBase
+                            'Dim currentLanguageGlobal As New GlobalBase
                             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+                            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
                             Dim myButtonText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CumReview_SaveAsTarget", currentLanguage)
 
                             'For each Control/Lot, verify if Button for Save values as Target has to be enabled or disabled
@@ -526,8 +526,8 @@ Public Class IQCCumulatedReview
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             GetLegendsLabels(currentLanguage)
@@ -579,8 +579,9 @@ Public Class IQCCumulatedReview
                         bsFirstCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsFirstCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber.ToString
+
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 2) Then
@@ -590,8 +591,8 @@ Public Class IQCCumulatedReview
                         bsSecondCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsSecondCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 3) Then
@@ -601,8 +602,8 @@ Public Class IQCCumulatedReview
                         bsThirdCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsThirdCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
                     End If
 
@@ -1261,8 +1262,8 @@ Public Class IQCCumulatedReview
     ''' </remarks>
     Private Sub IQCCumulatedReview_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             InitializeScreen()
             FillTestSampleListView()

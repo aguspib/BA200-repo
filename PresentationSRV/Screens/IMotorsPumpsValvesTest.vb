@@ -750,7 +750,6 @@ Public Class IMotorsPumpsValvesTest
 
             Try
                 Dim myGlobal As New GlobalDataTO
-                Dim myUtil As New Utilities
                 Dim auxIconName As String = String.Empty
                 Dim iconPath As String = MyBase.IconsPath
                 Dim myStartStopButtonImage As Image
@@ -764,7 +763,7 @@ Public Class IMotorsPumpsValvesTest
                         Dim myImage As Image
                         myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                        myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+                        myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myStopImage = CType(myGlobal.SetDatos, Bitmap)
                         Else
@@ -799,7 +798,7 @@ Public Class IMotorsPumpsValvesTest
                         Dim myImage As Image
                         myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                        myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+                        myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myStartImage = CType(myGlobal.SetDatos, Bitmap)
                         Else
@@ -1005,7 +1004,7 @@ Public Class IMotorsPumpsValvesTest
     Private Sub PrepareButtons()
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
 
@@ -1055,7 +1054,7 @@ Public Class IMotorsPumpsValvesTest
             '    Dim myImage As Image
             '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(28, 28))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(28, 28))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myStartImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -1080,7 +1079,7 @@ Public Class IMotorsPumpsValvesTest
             '    Dim myImage As Image
             '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myStopImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -7116,8 +7115,8 @@ Public Class IMotorsPumpsValvesTest
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels(LanguageID)

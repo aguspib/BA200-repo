@@ -29,8 +29,8 @@ Namespace Biosystems.Ax00.BL
             '    'result = CType(myGlobalDataTO.SetDatos, ScreenBlockDS)
 
             'Catch ex As Exception
-            '    Dim myLogAcciones As New ApplicationLogManager()
-            '    myLogAcciones.CreateLogActivity(ex.Message, "ScreenBlockDelegate.GetBlocksByScreen", EventLogEntryType.Error, False)
+            '    'Dim myLogAcciones As New ApplicationLogManager()
+            '    GlobalBase.CreateLogActivity(ex.Message, "ScreenBlockDelegate.GetBlocksByScreen", EventLogEntryType.Error, False)
             '    Throw ex
             'End Try
             'Return myGlobalDataTO
@@ -55,8 +55,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ScreenBlockDelegate.GetBlocksByScreen", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ScreenBlockDelegate.GetBlocksByScreen", EventLogEntryType.Error, False)
             Finally
                 If (pDbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

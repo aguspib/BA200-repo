@@ -30,8 +30,8 @@ Public Class QCCumulatedResultsByTestControlReport
         If Me.DesignMode Then Exit Sub
 
         'Multilanguage support
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         mLabelMEAN = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Mean", mCurrentLanguage)

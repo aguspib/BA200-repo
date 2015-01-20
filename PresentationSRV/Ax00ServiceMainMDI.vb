@@ -311,8 +311,8 @@ Public Class Ax00ServiceMainMDI
                 myVersion = .FileMajorPart & "." & .FileMinorPart & "." & .FileBuildPart & "." & .FilePrivatePart
             End With
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "Utilities.GetApplicationVersion", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "Utilities.GetApplicationVersion", EventLogEntryType.Error, False)
         End Try
         Return myVersion
     End Function
@@ -1451,8 +1451,8 @@ Public Class Ax00ServiceMainMDI
 
                                         'obtain needed fw version SGM 22/06/2012
                                         Dim mySwVersion As String
-                                        Dim myUtil As New Utilities
-                                        myGlobal = myUtil.GetSoftwareVersion()
+                                        ''Dim myUtil As New Utilities.
+                                        myGlobal = Utilities.GetSoftwareVersion()
                                         If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                                             mySwVersion = myGlobal.SetDatos.ToString
 
@@ -2121,8 +2121,8 @@ Public Class Ax00ServiceMainMDI
             MyClass.isWaitingForSleep = False
             MyClass.isWaitingForCloseApp = False
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
 
         'MDIAnalyzerManager.IsDisplayingServiceData = False 'allows to update again the UIRefreshDS
@@ -2203,14 +2203,14 @@ Public Class Ax00ServiceMainMDI
             '    If mySWParametersDS.tfmwSwParameters.Count > 0 Then
             '        myParameterValue = mySWParametersDS.tfmwSwParameters(0).ValueNumeric
 
-            '        Dim myLogAcciones As New ApplicationLogManager()
+            '        'Dim myLogAcciones As New ApplicationLogManager()
             '        myGlobalDataTO = myLogAcciones.DeleteByDate(Nothing, myParameterValue.ToString)
 
             '        If Not myGlobalDataTO.HasError Then
             '            Dim myAffectedRecords As Integer = myGlobalDataTO.AffectedRecords
             '            If myAffectedRecords > 0 Then
-            '                Dim myLogAcciones2 As New ApplicationLogManager()
-            '                myLogAcciones2.CreateLogActivity("Trace Log Records deleted [" & myAffectedRecords.ToString & "]", Name & ".CleanApplicationLog ", EventLogEntryType.Information, False)
+            '                'Dim myLogAcciones2 As New ApplicationLogManager()
+            '                GlobalBase.CreateLogActivity("Trace Log Records deleted [" & myAffectedRecords.ToString & "]", Name & ".CleanApplicationLog ", EventLogEntryType.Information, False)
             '            End If
             '        End If
             '    End If
@@ -2218,16 +2218,16 @@ Public Class Ax00ServiceMainMDI
 
             ' XB 04/12/2013 - Use the same functionality to Export Logs to XML that is used by User Sw - BT #171 SERVICE
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myLogMaxDays As Integer = 30
             Dim myParams As New SwParametersDelegate
 
             myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.MAX_DAYS_IN_PREVIOUSLOG.ToString(), Nothing)
             If Not myGlobalDataTO.HasError Then myLogMaxDays = CInt(myGlobalDataTO.SetDatos)
 
-            myGlobalDataTO = myLogAcciones.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
+            myGlobalDataTO = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, myLogMaxDays)
             'If expor to xml OK then delete all records on Application log Table
-            If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = myLogAcciones.DeleteAll()
+            If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = ApplicationLogManager.DeleteAll()
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".CleanApplicationLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2427,8 +2427,8 @@ Public Class Ax00ServiceMainMDI
             ' XB 05/11/2014 - BA-1872
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & "ManageSentEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & "ManageSentEvent", EventLogEntryType.Error, False)
         End Try
     End Function
 
@@ -2523,8 +2523,8 @@ Public Class Ax00ServiceMainMDI
     '        'End If
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, Me.Name & "OnManageSentEvent", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & "OnManageSentEvent", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -3039,8 +3039,8 @@ Public Class Ax00ServiceMainMDI
             End With
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".GetMonitorScreenLabels", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetMonitorScreenLabels", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -3087,8 +3087,8 @@ Public Class Ax00ServiceMainMDI
             End With
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".SetMonitorScreenLimits", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SetMonitorScreenLimits", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -3259,7 +3259,7 @@ Public Class Ax00ServiceMainMDI
         Dim myOffset As Single
         Dim myTempValue As Single
 
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
             'Me.BsMonitor.DisableAllSensors()
 
@@ -3282,7 +3282,7 @@ Public Class Ax00ServiceMainMDI
                                 max = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.WASHING_SOLUTION, AXIS.FULL)
                             End If
 
-                            myGlobal = myUtil.CalculatePercent(S.Value, min, max)
+                            myGlobal = Utilities.CalculatePercent(S.Value, min, max)
                             If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                                 myPercentValue = CType(myGlobal.SetDatos, Single)
 
@@ -3302,7 +3302,7 @@ Public Class Ax00ServiceMainMDI
                                 max = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.HIGH_CONTAMINATION, AXIS.FULL)
                             End If
 
-                            myGlobal = myUtil.CalculatePercent(S.Value, min, max)
+                            myGlobal = Utilities.CalculatePercent(S.Value, min, max)
                             If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                                 myPercentValue = CType(myGlobal.SetDatos, Single)
 
@@ -3322,7 +3322,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_FRIDGE, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_FRIDGE, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf S.SensorID = AnalyzerSensors.TEMPERATURE_REACTIONS.ToString Then
@@ -3337,7 +3337,7 @@ Public Class Ax00ServiceMainMDI
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_PHOTOMETRY, AXIS.TARGET)
                                 ' XBC 07/05/2012
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf S.SensorID = AnalyzerSensors.TEMPERATURE_R1.ToString Then
@@ -3348,7 +3348,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT1, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT1, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf S.SensorID = AnalyzerSensors.TEMPERATURE_R2.ToString Then
@@ -3359,7 +3359,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT2, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_REAGENT2, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                         ElseIf String.Compare(S.SensorID, AnalyzerSensors.TEMPERATURE_WASHINGSTATION.ToString, False) = 0 Then
@@ -3370,7 +3370,7 @@ Public Class Ax00ServiceMainMDI
                                 mySetpoint = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_WS_HEATER, AXIS.SETPOINT)
                                 myTarget = MyClass.ReadSensorAdjustmentValue(ADJUSTMENT_GROUPS.THERMOS_WS_HEATER, AXIS.TARGET)
                             End If
-                            myTempValue = myUtil.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
+                            myTempValue = Utilities.MakeSensorValueCorrection(S.Value, mySetpoint, myTarget)
                             myGlobal = Me.BsMonitor.RefreshSensorValue(S.SensorID, myTempValue, True)
 
                             '    'end SGM 19/02/2012
@@ -3397,8 +3397,8 @@ Public Class Ax00ServiceMainMDI
             End If
             'Me.BsMonitor.Enabled = True
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, Me.Name & ".RefreshMonitorPanel", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RefreshMonitorPanel", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -3423,8 +3423,8 @@ Public Class Ax00ServiceMainMDI
     '        Me.BsMonitor.Enabled = True
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.OnSensorValuesChanged", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, "SendFwScriptsDelegate.OnSensorValuesChanged", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
     ' XBC 17/05/2011
@@ -4356,7 +4356,7 @@ Public Class Ax00ServiceMainMDI
     Private Function ReadSensorAdjustmentValue(ByVal pAdjType As ADJUSTMENT_GROUPS, ByVal pSubType As AXIS) As Single
         Dim myGlobal As New GlobalDataTO
         Dim myResult As Single = -99999
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
             Dim myDecimalSeparator As String = SystemInfoManager.OSDecimalSeparator
             Dim myAdjustmentRowData As New AdjustmentRowData("")
@@ -4378,7 +4378,7 @@ Public Class Ax00ServiceMainMDI
                 'And a.AxisID.Trim.ToUpper = mySubType.Trim.ToUpper _
 
                 If myAdjustmentRows.Count > 0 Then
-                    myResult = myUtil.FormatToSingle(myAdjustmentRows.First.Value)
+                    myResult = Utilities.FormatToSingle(myAdjustmentRows.First.Value)
                     'Dim myValueStr As String = myAdjustmentRows.First.Value
                     'If IsNumeric(Trim(myValueStr.Replace(".", myDecimalSeparator))) Then
                     '    myResult = CSng(myValueStr.Replace(".", myDecimalSeparator))
@@ -5806,19 +5806,19 @@ Public Class Ax00ServiceMainMDI
     '            If FileSize > MAX_SIZE_LOG Then
     '                Rename(OldXmlFile, NewXmlFile)
 
-    '                Dim myUtil As New Utilities
+    '                'Dim myUtil As New Utilities.
     '                If (System.IO.File.Exists(sourcePath & "Temp")) Then
-    '                    myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+    '                    myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
     '                End If
 
-    '                myGlobal = myUtil.CreateFolder(sourcePath & "Temp")
+    '                myGlobal = Utilities.CreateFolder(sourcePath & "Temp")
     '                If (Not myGlobal.HasError) Then
-    '                    myGlobal = myUtil.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
+    '                    myGlobal = Utilities.MoveFiles(sourcePath, sourcePath & "Temp\", "AX00Log*.xml")
 
     '                    Dim fileZip As String = "PreviousLog.zip"
     '                    If (Not myGlobal.HasError) Then
     '                        If (System.IO.File.Exists(sourcePath & fileZip)) Then
-    '                            myGlobal = myUtil.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
+    '                            myGlobal = Utilities.ExtractFromZip(sourcePath & fileZip, sourcePath & "Temp\")
 
     '                            If (Not myGlobal.HasError) Then
     '                                Kill(sourcePath & fileZip)
@@ -5826,9 +5826,9 @@ Public Class Ax00ServiceMainMDI
     '                        End If
 
 
-    '                        myGlobal = myUtil.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
+    '                        myGlobal = Utilities.CompressToZip(sourcePath & "Temp\", sourcePath & fileZip)
     '                        If (Not myGlobal.HasError) Then
-    '                            myGlobal = myUtil.RemoveFolder(sourcePath & "Temp")
+    '                            myGlobal = Utilities.RemoveFolder(sourcePath & "Temp")
     '                        End If
     '                    End If
     '                End If
@@ -6164,15 +6164,15 @@ Public Class Ax00ServiceMainMDI
             Static isLogged As Boolean
 
             If Not isLogged Then
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Information, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Information, False)
                 isLogged = True
             End If
 
             'end SGM 07/11/2012
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "Ax00ServiceMainMDI_FormClosed", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -6256,7 +6256,7 @@ Public Class Ax00ServiceMainMDI
     ''' </remarks>
     Private Sub Ax00ServiceMainMDI_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             Me.Text = My.Application.Info.ProductName 'SGM 22/02/2012
 
@@ -6266,7 +6266,7 @@ Public Class Ax00ServiceMainMDI
             'Search the current user level
             Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.Yes
             Dim CurrentUserLevel As String = ""
-            CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'AG 13/01/2010 - Once we have the current user level we need found his numerical level
             Dim myUsersLevel As New UsersLevelDelegate
             Me.CurrentUserLevelAttribute = -1   'Initial value when NO userlevel exists
@@ -6313,8 +6313,8 @@ Public Class Ax00ServiceMainMDI
             'PrepareButtons()
 
             'Get the current application Language to set the correspondent attribute and prepare all menu options
-            Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguageAttribute = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            CurrentLanguageAttribute = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareMenuOptions()    'AG 17/06/2010
 
@@ -7431,9 +7431,9 @@ Public Class Ax00ServiceMainMDI
     Private Sub Login_Closed() Handles myLogin.FormClosed
         Try
             Dim myGlobal As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
             Dim myUsersLevel As New UsersLevelDelegate
-            MyClass.CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            MyClass.CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
             If Not myGlobal.HasError Then
                 Me.CurrentUserLevelAttribute = CType(myGlobal.SetDatos, Integer)
@@ -7522,7 +7522,7 @@ Public Class Ax00ServiceMainMDI
         Dim myGlobal As New GlobalDataTO
         Dim AnalyzerSensorNumericalValues As New Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)
         Dim myPercentValue As Single
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Try
             Dim Rnd As New Random()
@@ -7582,7 +7582,7 @@ Public Class Ax00ServiceMainMDI
 
                     If mySensorId = AnalyzerSensors.BOTTLE_WASHSOLUTION Or _
                        mySensorId = AnalyzerSensors.BOTTLE_HIGHCONTAMINATION_WASTE Then
-                        myGlobal = myUtil.CalculatePercent(AnalyzerSensorNumericalValues(mySensorId), min, max)
+                        myGlobal = Utilities.CalculatePercent(AnalyzerSensorNumericalValues(mySensorId), min, max)
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myPercentValue = CType(myGlobal.SetDatos, Single)
 

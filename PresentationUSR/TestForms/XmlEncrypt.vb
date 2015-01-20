@@ -17,9 +17,9 @@ Public Class XmlEncrypt
         Dim results As String = String.Empty
 
         Try
-            Dim myUtilities As New Utilities
+            'Dim Utilities As New Utilities
             Dim myGlobalDataTO As New GlobalDataTO
-            myGlobalDataTO = myUtilities.EncryptFile(pFileToEncript, pEncriptedFile)
+            myGlobalDataTO = Utilities.EncryptFile(pFileToEncript, pEncriptedFile)
 
             If myGlobalDataTO.HasError Then
                 MessageBox.Show(myGlobalDataTO.ErrorMessage)
@@ -35,9 +35,9 @@ Public Class XmlEncrypt
         Dim results As String = String.Empty
 
         Try
-            Dim myUtilities As New Utilities
+            'Dim Utilities As New Utilities
             Dim myGlobalDataTO As New GlobalDataTO
-            myGlobalDataTO = myUtilities.DecryptFile(pFileCript, pDecriptFile)
+            myGlobalDataTO = Utilities.DecryptFile(pFileCript, pDecriptFile)
 
             If Not myGlobalDataTO.HasError Then
                 MessageBox.Show(myGlobalDataTO.ErrorMessage)

@@ -1,4 +1,7 @@
-﻿
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -288,8 +291,8 @@ Public Class Historycal
 
     Private Sub Monitor_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         'Get the current Language from the current Application Session
-        Dim currentLanguageGlobal As New GlobalBase
-        LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
         InitializeAlarmsTab()
 

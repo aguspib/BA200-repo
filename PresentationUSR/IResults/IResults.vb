@@ -313,16 +313,16 @@ Public Class IResults
             'startTime = Now 'AG 04/06/2012
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 16/05/2012 -Get the current level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 16/05/2012 -END
 
             'TR 11/07/2012 -Get the current Language from the current Application Session
-            LanguageID = MyGlobalBase.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
 
             WorkSessionIDField = IAx00MainMDI.ActiveWorkSession
@@ -353,7 +353,7 @@ Public Class IResults
             CollapseAll(bsExperimentalsDataGridView) 'dl 23/07/2013 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ResultForm_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1028,13 +1028,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowPatientsFinalReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1054,14 +1054,14 @@ Public Class IResults
     Private Sub PrintCompactReportButton_Click(sender As Object, e As EventArgs) Handles PrintCompactReportButton.Click
         Try
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Stub
             XRManager.PrintCompactPatientsReport(ActiveAnalyzer, ActiveWorkSession, Nothing, False)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintCompactReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1081,13 +1081,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowResultsByTestReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1106,13 +1106,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestBlankButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1132,13 +1132,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False) 'IT 01/10/2014 - #BA-1864
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Ctrl Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Ctrl Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestCtrlButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1184,7 +1184,7 @@ Public Class IResults
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'SGM 17/04/2013
@@ -1225,7 +1225,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1334,7 +1334,7 @@ Public Class IResults
 
         ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         'Dim StartTime As DateTime = Now
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
         ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         'Try
 
@@ -1482,7 +1482,7 @@ Public Class IResults
         '    'TR 04/08/2011 -END.
 
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '    myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        '    GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                    "IResults.ExportButton_Click", EventLogEntryType.Information, False)
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1517,7 +1517,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Dim mySendManRepButton As BSButton = TryCast(sender, BSButton)
@@ -1593,7 +1593,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.SendmanRepButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -2469,7 +2469,7 @@ Public Class IResults
     Private Sub PrepareButtons()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             Dim preloadedDataConfig As New PreloadedMasterDataDelegate
@@ -2814,7 +2814,7 @@ Public Class IResults
 
         End Try
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+        GlobalBase.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                         " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                         "IResults.PrepareButtons", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -3189,93 +3189,6 @@ Public Class IResults
     End Sub
 
     ''' <summary>
-    ''' Creates the structure for the PatientListDataGridView for the Final Report Printing
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: RH - 28/09/2010
-    ''' </remarks>
-    Private Function GetNewPatientListDataGridView() As DataGridView
-        Dim PatientListDataGridView As DataGridView = Nothing
-
-        Try
-            PatientListDataGridView = New DataGridView()
-
-            Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle
-            'Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle
-            Dim DataGridViewCellStyle3 As DataGridViewCellStyle = New DataGridViewCellStyle
-
-            PatientListDataGridView.BackgroundColor = System.Drawing.Color.LightGray
-            PatientListDataGridView.BorderStyle = BorderStyle.Fixed3D
-            PatientListDataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
-            PatientListDataGridView.ColumnHeadersHeight = 20
-            PatientListDataGridView.EnableHeadersVisualStyles = True
-            PatientListDataGridView.GridColor = System.Drawing.Color.Silver
-            PatientListDataGridView.Name = "PatientListDataGridView"
-            'PatientListDataGridView.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.[Single]
-            PatientListDataGridView.RowHeadersVisible = False
-
-            DataGridViewCellStyle1.BackColor = System.Drawing.Color.DarkGray
-            DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 7.25!)
-            DataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black
-            DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-            DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-            DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-            PatientListDataGridView.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
-
-            'DataGridViewCellStyle2.BackColor = System.Drawing.Color.DarkGray
-            'DataGridViewCellStyle2.Font = New System.Drawing.Font("Verdana", 7.25!)
-            'DataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black
-            'DataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.LightSlateGray
-            'DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White
-            'DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-            'PatientListDataGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle2
-
-            DataGridViewCellStyle3.BackColor = System.Drawing.Color.White
-            DataGridViewCellStyle3.Font = New System.Drawing.Font("Verdana", 7.25!)
-            DataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black
-            DataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.White
-            DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black
-            PatientListDataGridView.RowsDefaultCellStyle = DataGridViewCellStyle3
-            PatientListDataGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle3
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("PatientName", "Patient Name")
-            PatientListDataGridView.Columns("PatientName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("TestName", "Test")
-            PatientListDataGridView.Columns("TestName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Concentration", "Concentration")
-            PatientListDataGridView.Columns("Concentration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("Concentration").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Unit", "Unit")
-            PatientListDataGridView.Columns("Unit").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("ReferenceRanges", "Ref. Ranges")
-            PatientListDataGridView.Columns("ReferenceRanges").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("ReferenceRanges").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Remarks", "Remarks")
-            PatientListDataGridView.Columns("Remarks").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("Remarks").DefaultCellStyle.WrapMode = DataGridViewTriState.True
-
-        Catch ex As Exception
-            PatientListDataGridView = Nothing
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetNewPatientListDataGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        End Try
-
-        Return PatientListDataGridView
-    End Function
-
-    ''' <summary>
     ''' Release elements not handle by the GC.
     ''' </summary>
     ''' <remarks>
@@ -3440,8 +3353,8 @@ Public Class IResults
             'GC.Collect() 
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
 #End Region
@@ -5305,8 +5218,8 @@ Public Class IResults
                     resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField)
 
                     If resultData.HasError Then
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
 
                         'DL 15/05/2013
                         'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me)
@@ -5583,7 +5496,7 @@ Public Class IResults
     Private Sub ExportResultsToLIS()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Try
@@ -5690,7 +5603,7 @@ Public Class IResults
             ActivateDeactivateAllButtons(True)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ExportResultsToLIS", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -5711,7 +5624,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Select Case (bsTestDetailsTabControl.SelectedTab.Name)
@@ -5763,7 +5676,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                             " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                             "IResults.TestDetailsTabSelectedEvent", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -5785,7 +5698,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'BA-1927: The ExportButton will be visible if the Selected Tab is Controls or Patients
@@ -5800,7 +5713,7 @@ Public Class IResults
             UpdateCurrentResultsGrid()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
                                             & " OPEN TAB: " & bsResultsTabControl.SelectedTab.Name, _
                                             "IResults.ResultsTabControlSelectedEvent", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

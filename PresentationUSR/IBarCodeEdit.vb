@@ -168,8 +168,8 @@ Public Class IBarCodeEdit
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase()
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase()
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for Screen Buttons
             PrepareButtons()

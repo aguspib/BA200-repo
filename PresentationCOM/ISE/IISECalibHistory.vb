@@ -228,9 +228,9 @@ Public Class IISECalibHistory
 
                     If Exists Then
                         If System.IO.File.Exists(iconPath & auxIconName) Then
-                            Dim myUtil As New Utilities
+                            'Dim myUtil As New Utilities.
                             Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-                            myGlobalDataTO = myUtil.ResizeImage(myImage, New Size(20, 20))
+                            myGlobalDataTO = Utilities.ResizeImage(myImage, New Size(20, 20))
                             If Not myGlobalDataTO.HasError And myGlobalDataTO.SetDatos IsNot Nothing Then
                                 Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             Else
@@ -283,7 +283,7 @@ Public Class IISECalibHistory
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
 
@@ -294,7 +294,7 @@ Public Class IISECalibHistory
                 Dim myImage As Image
                 myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
+                myGlobal = Utilities.ResizeImage(myImage, New Size(pWidth, pHeight))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myButtonImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -396,8 +396,8 @@ Public Class IISECalibHistory
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
         End Try
         Return myResultData
     End Function
@@ -568,7 +568,7 @@ Public Class IISECalibHistory
         Try
 
             'Dim myGlobal As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             'Get an instance of the ISE manager class
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -577,10 +577,10 @@ Public Class IISECalibHistory
             End If
 
             'Get the current user level SGM 07/06/2012
-            MyBase.CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            MyBase.CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             Me.GetScreenLabels()

@@ -87,8 +87,8 @@ Public Class IConfigLIS
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
                 mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) ' Use the same ESWrapper as the MDI
@@ -179,8 +179,8 @@ Public Class IConfigLIS
             bsAcceptButton.Enabled = True
 
             'Load level permissions
-            Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = myGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             ScreenStatusByUserLevel()
 
             ' Prepare Screen fields

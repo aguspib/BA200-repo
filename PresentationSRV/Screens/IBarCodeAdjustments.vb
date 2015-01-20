@@ -494,7 +494,7 @@ Public Class IBarCodeAdjustments
     Private Sub PrepareButtons()
         'Dim auxIconName As String = ""
         'Dim iconPath As String = MyBase.IconsPath
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             MyBase.SetButtonImage(AdjustButton, "ADJUSTMENT")
@@ -509,8 +509,8 @@ Public Class IBarCodeAdjustments
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    AdjustButton.Image = myImage
             '    AdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -518,8 +518,8 @@ Public Class IBarCodeAdjustments
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    SaveButton.Image = myImage
             '    SaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -527,8 +527,8 @@ Public Class IBarCodeAdjustments
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    CancelButton.Image = myImage
             '    CancelButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -536,8 +536,8 @@ Public Class IBarCodeAdjustments
             ''START READING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    StartReadingButton.Image = myImage
             '    StartReadingButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -545,8 +545,8 @@ Public Class IBarCodeAdjustments
             ''STOP READING Button
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    StopButton.Image = myImage
             '    StopButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -554,8 +554,8 @@ Public Class IBarCodeAdjustments
             ''TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    TestButton.Image = myImage
             '    TestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -563,8 +563,8 @@ Public Class IBarCodeAdjustments
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1319,12 +1319,12 @@ Public Class IBarCodeAdjustments
     End Sub
 
     Private Sub PopulateEditionValues()
-        Dim myUtilities As New Utilities
+        'Dim myUtilities As New Utilities
         Try
             Dim value As String
             With Me.EditedValue
                 value = ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ROTOR).Value
-                .LastValue = myUtilities.FormatToSingle(value)
+                .LastValue = Utilities.FormatToSingle(value)
                 .CurrentValue = .LastValue
                 .NewValue = .LastValue
             End With
@@ -1952,14 +1952,14 @@ Public Class IBarCodeAdjustments
 
     Private Sub IBarCodeAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             MyBase.MyBase_Load(sender, e)
 
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Screen delegate
             MyClass.myScreenDelegate = New BarCodeAdjustmentDelegate(MyBase.myServiceMDI.ActiveAnalyzer, MyBase.myFwScriptDelegate)

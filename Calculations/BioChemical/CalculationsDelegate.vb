@@ -15,8 +15,8 @@ Namespace Biosystems.Ax00.Calculations
             Try
                 'myAnalyzerModel = pAnalyzerModel
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.New", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.New", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -434,8 +434,8 @@ Namespace Biosystems.Ax00.Calculations
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateStdDeviation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateStdDeviation", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -464,8 +464,8 @@ Namespace Biosystems.Ax00.Calculations
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateVariationCoefficient", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateVariationCoefficient", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -483,8 +483,8 @@ Namespace Biosystems.Ax00.Calculations
             Try
                 If (dbl1 = 0) Or (dbl2 = 0) Then Return 0 Else Return dbl1 / dbl2
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.SafeDivide", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.SafeDivide", EventLogEntryType.Error, False)
             End Try
         End Function
 
@@ -507,8 +507,8 @@ Namespace Biosystems.Ax00.Calculations
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateThermoCorrection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateThermoCorrection", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -535,8 +535,8 @@ Namespace Biosystems.Ax00.Calculations
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateThermoSetPoint", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateThermoSetPoint", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -574,8 +574,8 @@ Namespace Biosystems.Ax00.Calculations
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateTemperatureToMonitor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateTemperatureToMonitor", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -603,8 +603,8 @@ Namespace Biosystems.Ax00.Calculations
                 Return returnValue
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateOpticalCorrection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.CalculateOpticalCorrection", EventLogEntryType.Error, False)
             End Try
         End Function
 
@@ -677,8 +677,8 @@ Namespace Biosystems.Ax00.Calculations
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.SaveWaterResults", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.SaveWaterResults", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -745,8 +745,8 @@ Namespace Biosystems.Ax00.Calculations
                 myClassGlobalResult.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myClassGlobalResult.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.SaveExecutionResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.SaveExecutionResults", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1290,8 +1290,8 @@ Namespace Biosystems.Ax00.Calculations
                 'resultData.ErrorCode = "SYSTEM_ERROR"
                 'resultData.ErrorMessage = ex.Message
                 '
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.InitCommon", EventLogEntryType.Error, False)
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.InitCommon", EventLogEntryType.Error, False)
                 Me.CatchLaunched("InitTest", ex)
             End Try
 
@@ -4732,15 +4732,15 @@ Namespace Biosystems.Ax00.Calculations
                 myClassGlobalResult.ErrorCode = GlobalEnumerates.AbsorbanceErrors.SYSTEM_ERROR.ToString
                 myClassGlobalResult.ErrorMessage = pmyEx.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(pmyEx.Message, "Calculations." & pFunctionName.ToString, EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(pmyEx.Message, "Calculations." & pFunctionName.ToString, EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 myClassGlobalResult.HasError = True
                 myClassGlobalResult.ErrorCode = GlobalEnumerates.AbsorbanceErrors.SYSTEM_ERROR.ToString
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Calculations.CatchLaunched", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Calculations.CatchLaunched", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -6579,8 +6579,8 @@ Namespace Biosystems.Ax00.Calculations
                 'resultData.ErrorCode = "SYSTEM_ERROR"
                 'resultData.ErrorMessage = ex.Message
                 '
-                'Dim myLogAcciones As New ApplicationLogManager()
-                'myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.InitCommon", EventLogEntryType.Error, False)
+                ''Dim myLogAcciones As New ApplicationLogManager()
+                'GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.InitCommon", EventLogEntryType.Error, False)
                 Me.CatchLaunched("InitTest", ex)
             End Try
 
@@ -6618,7 +6618,7 @@ Namespace Biosystems.Ax00.Calculations
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 'Dim StartTime As DateTime = Now
-                'Dim myLogAcciones As New ApplicationLogManager()
+                ''Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 Dim myExecutionsDS As New ExecutionsDS
@@ -6713,7 +6713,7 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                'myLogAcciones.CreateLogActivity("Calculate Execution NEW: Id [" & pExecutionID.ToString & "] " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "CalculationsDelegate.CalculateExecutionNEW", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("Calculate Execution NEW: Id [" & pExecutionID.ToString & "] " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "CalculationsDelegate.CalculateExecutionNEW", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Catch ex As Exception
                 Me.CatchLaunched("CalculateExecutionNEW", ex)
@@ -6824,8 +6824,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationsDelegate.InitNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationsDelegate.InitNEW", EventLogEntryType.Error, False)
             End Try
             Return myClassGlobalResult
         End Function

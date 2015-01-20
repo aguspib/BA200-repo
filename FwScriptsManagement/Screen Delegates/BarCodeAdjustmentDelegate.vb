@@ -336,8 +336,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ScreenReceptionLastFwScriptEvent", EventLogEntryType.Error, False)
             End Try
         End Sub
 #End Region
@@ -384,8 +384,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendFwScriptsQueueList", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -420,8 +420,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetParameters", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -442,8 +442,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendLOAD_ADJUSTMENTS", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -464,8 +464,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendBARCODE_REQUEST", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendBARCODE_REQUEST", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -504,8 +504,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.RefreshDelegate", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -525,8 +525,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.BcResultsAdd", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.BcResultsAdd", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -543,14 +543,14 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Dim myResultData As New GlobalDataTO
             Try
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-                Dim myUtility As New Utilities()
+                'Dim Utilities As New Utilities()
                 Dim text1 As String
                 Dim text As String = ""
 
                 'myResultData = MyClass.GetCultureInfo()
                 'If myResultData.HasError Then
-                '    Dim myLogAcciones As New ApplicationLogManager()
-                '    myLogAcciones.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                '    'Dim myLogAcciones As New ApplicationLogManager()
+                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
                 '    Exit Try
                 'End If
 
@@ -562,33 +562,33 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "GRID_SRV_ROTOR", pcurrentLanguage) + ": "
                         If pData.Substring(j, 1) = "1" Then
                             ' alignment...
-                            text1 += myUtility.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", pcurrentLanguage).Length)
+                            text1 += Utilities.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", pcurrentLanguage).Length)
                             ' content
                             text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", pcurrentLanguage)
                         Else
                             ' alignment...
-                            text1 += myUtility.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", pcurrentLanguage).Length)
+                            text1 += Utilities.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", pcurrentLanguage).Length)
                             ' content
                             text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", pcurrentLanguage)
                         End If
-                        text += myUtility.FormatLineHistorics(text1)
+                        text += Utilities.FormatLineHistorics(text1)
                         j += 1
 
                         ' Barcode point value
                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_MENU_BarCode", pcurrentLanguage) + ": "
                         ' alignment...
-                        text1 += myUtility.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("##,##0").Length)
+                        text1 += Utilities.SetSpaces(22 - text1.Length - 1 - CSng(pData.Substring(j, 5)).ToString("##,##0").Length)
                         ' content
                         text1 += CSng(pData.Substring(j, 5)).ToString("##,##0")
-                        text += myUtility.FormatLineHistorics(text1)
+                        text += Utilities.FormatLineHistorics(text1)
                         j += 5
 
                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUSTED", pcurrentLanguage) + ":"
                         ' alignment...
-                        text1 += myUtility.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_YES", pcurrentLanguage).Length)
+                        text1 += Utilities.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_YES", pcurrentLanguage).Length)
                         ' content
                         text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_YES", pcurrentLanguage)
-                        text += myUtility.FormatLineHistorics(text1)
+                        text += Utilities.FormatLineHistorics(text1)
 
                     Case "TEST"
 
@@ -596,22 +596,22 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "GRID_SRV_ROTOR", pcurrentLanguage) + ": "
                         If pData.Substring(j, 1) = "1" Then
                             ' alignment...
-                            text1 += myUtility.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", pcurrentLanguage).Length)
+                            text1 += Utilities.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", pcurrentLanguage).Length)
                             ' content
                             text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Samples", pcurrentLanguage)
                         Else
                             ' alignment...
-                            text1 += myUtility.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", pcurrentLanguage).Length)
+                            text1 += Utilities.SetSpaces(22 - text1.Length - 1 - myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", pcurrentLanguage).Length)
                             ' content
                             text1 += myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Reagents", pcurrentLanguage)
                         End If
-                        text += myUtility.FormatLineHistorics(text1)
+                        text += Utilities.FormatLineHistorics(text1)
                         j += 1
 
                         text += Environment.NewLine
                         ' detected tubes
                         text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TubesDetected", pcurrentLanguage) + ": "
-                        text += myUtility.FormatLineHistorics(text1)
+                        text += Utilities.FormatLineHistorics(text1)
 
                         Dim detectedTubes As Integer
                         If IsNumeric(pData.Substring(j, 3)) Then
@@ -623,10 +623,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 ' tube position
                                 text1 = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_TUBE_POSITION", pcurrentLanguage) + ": "
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 3).Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - pData.Substring(j, 3).Length)
                                 ' content
                                 text1 += pData.Substring(j, 3)
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += 3
 
                                 ' barcode value (searching #%# character...)
@@ -637,10 +637,10 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                                 Dim k As Integer
                                 k = tmptext.IndexOf("#%#")
                                 ' alignment...
-                                text1 += myUtility.SetSpaces(22 - text1.Length - 1 - tmptext.Substring(0, k).Length)
+                                text1 += Utilities.SetSpaces(22 - text1.Length - 1 - tmptext.Substring(0, k).Length)
                                 ' content
                                 text1 += tmptext.Substring(0, k)
-                                text += myUtility.FormatLineHistorics(text1)
+                                text += Utilities.FormatLineHistorics(text1)
                                 j += k + 3
 
                             Next
@@ -659,8 +659,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.DecodeDataReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -707,8 +707,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForLOADING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForLOADING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -750,8 +750,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTEST_EXITING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -897,8 +897,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUST_PREPARING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -988,8 +988,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUSTING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForADJUSTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1107,8 +1107,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                     myFwScriptDelegate.CurrentFwScriptsQueue.Clear()
                 End If
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.SendQueueForTESTING", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1132,8 +1132,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ManageSavingBC", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.ManageSavingBC", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1163,8 +1163,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         '        myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myResultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetCultureInfo", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GetCultureInfo", EventLogEntryType.Error, False)
         '    End Try
         '    Return myResultData
         'End Function
@@ -1218,8 +1218,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myResultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.InsertReport", EventLogEntryType.Error, False)
             End Try
             Return myResultData
         End Function
@@ -1249,8 +1249,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
             Try
                 'myResultData = MyClass.GetCultureInfo()
                 'If myResultData.HasError Then
-                '    Dim myLogAcciones As New ApplicationLogManager()
-                '    myLogAcciones.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                '    'Dim myLogAcciones As New ApplicationLogManager()
+                '    GlobalBase.CreateLogActivity(myResultData.ErrorMessage, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
                 '    Exit Try
                 'End If
 
@@ -1306,8 +1306,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 End Select
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BarCodeAdjustmentDelegate.GenerateDataReport", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function

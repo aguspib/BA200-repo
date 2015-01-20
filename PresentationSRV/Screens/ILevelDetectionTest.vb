@@ -1155,7 +1155,7 @@ Public Class ILevelDetectionTest
 
     Private Sub IlevelDetectionTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
 
             MyBase.MyBase_Load(sender, e)
@@ -1163,7 +1163,7 @@ Public Class ILevelDetectionTest
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            MyClass.currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            MyClass.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             MyClass.GetScreenLabels()

@@ -166,13 +166,14 @@ Partial Public Class XPSViewer
 
     Public Function GetHorizontalPageMargin() As Integer
         Try
-            Return MyClass.DocumentViewer1.HorizontalPageSpacing
+            'TODO: Make this tool support double precission values, as defined in the XPS APIS
+            Return CInt(Math.Round(MyClass.DocumentViewer1.HorizontalPageSpacing, 0))
         Catch ex As Exception
             Throw ex
         End Try
     End Function
 
-    Public Function GetVerticalPageMargin() As Integer
+    Public Function GetVerticalPageMargin() As Double
         Try
             Return MyClass.DocumentViewer1.VerticalPageSpacing
         Catch ex As Exception
@@ -274,7 +275,7 @@ Partial Public Class XPSViewer
 
 #Region "popup Menu Events"
 
-    Private Sub OnPopupPrintMenuItem_Click()
+    Private Sub OnPopupPrintMenuItem_Click(sender As Object, e As Windows.RoutedEventArgs)
         Try
             MyClass.DocumentViewer1.Print()
         Catch ex As Exception
@@ -282,7 +283,7 @@ Partial Public Class XPSViewer
         End Try
     End Sub
 
-    Private Sub OnPopupZoomInMenuItem_Click()
+    Private Sub OnPopupZoomInMenuItem_Click(sender As Object, e As Windows.RoutedEventArgs)
         Try
             MyClass.DocumentViewer1.IncreaseZoom()
         Catch ex As Exception
@@ -290,7 +291,7 @@ Partial Public Class XPSViewer
         End Try
     End Sub
 
-    Private Sub OnPopupZoomOutMenuItem_Click()
+    Private Sub OnPopupZoomOutMenuItem_Click(sender As Object, e As Windows.RoutedEventArgs)
         Try
             MyClass.DocumentViewer1.DecreaseZoom()
         Catch ex As Exception
@@ -298,7 +299,7 @@ Partial Public Class XPSViewer
         End Try
     End Sub
 
-    Private Sub OnPopupFitToWidthMenuItem_Click()
+    Private Sub OnPopupFitToWidthMenuItem_Click(sender As Object, e As Windows.RoutedEventArgs)
         Try
             MyClass.DocumentViewer1.FitToWidth()
         Catch ex As Exception
@@ -306,7 +307,7 @@ Partial Public Class XPSViewer
         End Try
     End Sub
 
-    Private Sub OnPopupFitToHeightMenuItem_Click()
+    Private Sub OnPopupFitToHeightMenuItem_Click(sender As Object, e As Windows.RoutedEventArgs)
         Try
             MyClass.DocumentViewer1.FitToHeight()
         Catch ex As Exception
@@ -314,7 +315,7 @@ Partial Public Class XPSViewer
         End Try
     End Sub
 
-    Private Sub OnPopupWholePageMenuItem_Click()
+    Private Sub OnPopupWholePageMenuItem_Click(sender As Object, e As Windows.RoutedEventArgs)
         Try
             MyClass.DocumentViewer1.FitToMaxPagesAcross()
         Catch ex As Exception

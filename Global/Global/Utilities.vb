@@ -14,7 +14,8 @@ Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by 
 Imports Microsoft.Win32
 
 Namespace Biosystems.Ax00.Global
-    Public Class Utilities
+
+    Public Module Utilities
 
 #Region "Constants"
         'PG 23/11/2010. Add the CrypKey
@@ -130,8 +131,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertSecondsToDatetime", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertSecondsToDatetime", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -160,8 +161,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertDatetimeToSeconds", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertDatetimeToSeconds", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -205,8 +206,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertHexToUInt32", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertHexToUInt32", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -232,8 +233,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertHexToUInt32", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertHexToUInt32", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -262,8 +263,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertHexToString", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertHexToString", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -304,8 +305,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertHexToBinary", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertHexToBinary", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -335,8 +336,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertBinaryStringToDecimal", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertBinaryStringToDecimal", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -371,8 +372,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertDecimalToHex", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertDecimalToHex", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -408,8 +409,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertUint32ToHex", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertUint32ToHex", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -448,8 +449,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertUint64ToHex", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertUint64ToHex", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -480,8 +481,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertDecimalToBinaryString", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertDecimalToBinaryString", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -512,8 +513,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertIntegerToBinaryString", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertIntegerToBinaryString", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -535,7 +536,7 @@ Namespace Biosystems.Ax00.Global
                 Dim lenToConvert As Integer = pLax00Instruction.Length
                 ReDim buffAscii(lenToConvert - 1)
 
-                buffAscii = Me.AscB(pLax00Instruction)
+                buffAscii = AscB(pLax00Instruction)
 
                 'AG 28/10/2010 - Comment this Ax5 code. RPM say electronics dont implement it by now
                 'He is not sure to do it or define other protocol for send fractional data (for instance load Firmware)
@@ -551,8 +552,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertStringToAscii", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertStringToAscii", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -572,8 +573,8 @@ Namespace Biosystems.Ax00.Global
                 bool = (pInteger > 0)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertIntegerToBoolean", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertIntegerToBoolean", EventLogEntryType.Error, False)
             End Try
 
             Return bool
@@ -596,8 +597,8 @@ Namespace Biosystems.Ax00.Global
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertBooleanToInteger", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertBooleanToInteger", EventLogEntryType.Error, False)
             End Try
 
             Return int
@@ -649,8 +650,8 @@ Namespace Biosystems.Ax00.Global
                 Else
                     'Special case --> function has been called for the RSAT generation process launched from ServiceSW. In this case, the value
                     '                 to return has to be the Application Version of the UserSW (different code is needed to get it)
-                    Dim myGlobalBase As New GlobalBase
-                    Dim userSwExeFullPath As String = myGlobalBase.UserSwExeFullPath()
+                    'Dim myGlobalbase As New GlobalBase
+                    Dim userSwExeFullPath As String = GlobalBase.UserSwExeFullPath()
                     Dim fvi As FileVersionInfo = FileVersionInfo.GetVersionInfo(userSwExeFullPath)
 
                     If (fvi.FilePrivatePart = 0 OrElse pIgnoreRevision) Then
@@ -666,8 +667,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.GetSoftwareVersion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.GetSoftwareVersion", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -698,8 +699,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.GetItemByParameterIndex", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.GetItemByParameterIndex", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -741,8 +742,8 @@ Namespace Biosystems.Ax00.Global
                     myGlobal.SetDatos = pAppVersion
                 Else
                     'Function has been called for SAT Report Generation ==> The SW Version is obtained from the DLL
-                    Dim myUtil As New Utilities
-                    myGlobal = myUtil.GetSoftwareVersion(False, pForRSATFromServiceSW)
+                    ''Dim myUtil As New Utilities.
+                    myGlobal = Utilities.GetSoftwareVersion(False, pForRSATFromServiceSW)
                 End If
 
                 'Write the SW Version in the Version.txt file
@@ -763,8 +764,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.CreateVersionFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.CreateVersionFile", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -809,8 +810,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.MoveFiles", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.MoveFiles", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -842,8 +843,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.MoveFiles", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.MoveFiles", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -864,8 +865,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.CreateFolder", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.CreateFolder", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
 
@@ -889,8 +890,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.RemoveFolder", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.RemoveFolder", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
 
@@ -909,7 +910,7 @@ Namespace Biosystems.Ax00.Global
                     If Directory.GetDirectories(pFullPath).Length > 0 Then
                         Dim myDirectories() As String = Directory.GetDirectories(pFullPath)
                         For D As Integer = 0 To myDirectories.Length - 1
-                            MyClass.RemoveFolderAndContents(myDirectories(D))
+                            Utilities.RemoveFolderAndContents(myDirectories(D))
                         Next
                     End If
                     If Directory.GetFiles(pFullPath).Length > 0 Then
@@ -926,8 +927,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.RemoveFolderAndContents", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.RemoveFolderAndContents", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
 
@@ -965,14 +966,14 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "IO_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.CompressToZip", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.CompressToZip", EventLogEntryType.Error, False)
             Catch ex As Exception
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.CompressToZip", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.CompressToZip", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1001,8 +1002,8 @@ Namespace Biosystems.Ax00.Global
                     myGlobal.HasError = False
                     myGlobal.ErrorCode = GlobalEnumerates.Messages.ZIP_ERROR.ToString
                     myGlobal.ErrorMessage = ex.Message
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ExtractFromZip", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity(ex.Message, "Utilities.ExtractFromZip", EventLogEntryType.Error, False)
                 End Try
                 'DL 31/05/2013
 
@@ -1014,8 +1015,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ExtractFromZip", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ExtractFromZip", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -1037,7 +1038,7 @@ Namespace Biosystems.Ax00.Global
             Dim fsread As FileStream = Nothing
             Dim fsDecrypted As StreamWriter = Nothing
             Try
-                Dim myGlobalbase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
                 Dim DES As New Cryptography.DESCryptoServiceProvider()
 
                 DES.Key() = ASCIIEncoding.ASCII.GetBytes(CryptKey)
@@ -1055,8 +1056,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.DecryptFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.DecryptFile", EventLogEntryType.Error, False)
             Finally
                 '// Close the files
                 If Not fsDecrypted Is Nothing Then
@@ -1092,7 +1093,7 @@ Namespace Biosystems.Ax00.Global
             Dim fsInput As FileStream = Nothing
             Dim fsEncrypted As FileStream = Nothing
             Try
-                Dim myGlobalbase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
 
                 If File.Exists(DecryptFile) Then
                     fsInput = New FileStream(DecryptFile, FileMode.Open, FileAccess.Read)
@@ -1121,8 +1122,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.EncryptFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.EncryptFile", EventLogEntryType.Error, False)
                 fsInput.Close()
                 fsEncrypted.Close()
             End Try
@@ -1151,8 +1152,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ClearWindowsApplicationLog", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ClearWindowsApplicationLog", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1185,8 +1186,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.SerializeDataset", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.SerializeDataset", EventLogEntryType.Error, False)
 
             Finally
                 If myStreamWriter IsNot Nothing Then
@@ -1220,8 +1221,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.DeserializeDataset", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.DeserializeDataset", EventLogEntryType.Error, False)
 
             Finally
                 If myStringReader IsNot Nothing Then
@@ -1256,8 +1257,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.Serialize", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.Serialize", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1281,8 +1282,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.DeSerialize", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.DeSerialize", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1308,8 +1309,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ResizeImage", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ResizeImage", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1364,8 +1365,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.SetImageBW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.SetImageBW", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -1412,8 +1413,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.CalculatePercent", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.CalculatePercent", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1437,8 +1438,8 @@ Namespace Biosystems.Ax00.Global
                     myResult = String.Format("{0}", pValue.ToString(myFormat))
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ToStringWithFormat", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ToStringWithFormat", EventLogEntryType.Error, False)
             End Try
             Return myResult
         End Function
@@ -1462,8 +1463,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ReadBinaryFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ReadBinaryFile", EventLogEntryType.Error, False)
             End Try
 
             input.Dispose()
@@ -1491,8 +1492,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.WriteBinaryFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.WriteBinaryFile", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -1522,8 +1523,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.WriteTextFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.WriteTextFile", EventLogEntryType.Error, False)
             End Try
 
             myFileStream.Dispose()
@@ -1555,8 +1556,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.OverWriteTextFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.OverWriteTextFile", EventLogEntryType.Error, False)
             End Try
 
             myFileStream.Dispose()
@@ -1609,8 +1610,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ReadTextFile", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ReadTextFile", EventLogEntryType.Error, False)
             End Try
 
 
@@ -1644,8 +1645,8 @@ Namespace Biosystems.Ax00.Global
                 returnValue += Environment.NewLine
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utils.FormatLine", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utils.FormatLine", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -1688,8 +1689,8 @@ Namespace Biosystems.Ax00.Global
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utils.FormatLineHistorics", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utils.FormatLineHistorics", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -1707,8 +1708,8 @@ Namespace Biosystems.Ax00.Global
                     returnValue += " "
                 Next
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utils.SetSpaces", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utils.SetSpaces", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -1733,8 +1734,8 @@ Namespace Biosystems.Ax00.Global
                 returnValue = hours.ToString("00") + ":" + minutes.ToString("00") + ":" + seconds.ToString("00")
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utils.FormatToHHmmss", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utils.FormatToHHmmss", EventLogEntryType.Error, False)
             End Try
             Return returnValue
         End Function
@@ -1763,8 +1764,8 @@ Namespace Biosystems.Ax00.Global
         '        'myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        'myGlobal.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
         '    End Try
         '    'Return myGlobal
         '    Return returnValue
@@ -1817,14 +1818,14 @@ Namespace Biosystems.Ax00.Global
                     End If
                     'AG 13/12/2011
                 Else
-                    Dim myLogAcciones2 As New ApplicationLogManager()
-                    myLogAcciones2.CreateLogActivity("Input parameter is not numeric", "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones2 As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Input parameter is not numeric", "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
                     returnValue = 0
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.FormatToSingle ", EventLogEntryType.Error, False)
             End Try
 
             Return returnValue
@@ -1967,8 +1968,8 @@ Namespace Biosystems.Ax00.Global
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.ConvertAdjustmentsTextToDS ", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.ConvertAdjustmentsTextToDS ", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -1990,8 +1991,8 @@ Namespace Biosystems.Ax00.Global
                 Return pFwValue - myOffSet
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.MakeSensorValueCorrection ", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.MakeSensorValueCorrection ", EventLogEntryType.Error, False)
             End Try
         End Function
 
@@ -2003,7 +2004,7 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by: SA 02/08/2012 - Added code to calculate correctly the Patient age: if the Patient Birthday has not still passed,
         '''                              decrement the calculate age by one
         ''' </remarks>
-        Public Shared Function GetAgeUnits(ByVal pDateOfBirth As Date, ByVal AgeUnitsListDS As PreloadedMasterDataDS) As String
+        Public Function GetAgeUnits(ByVal pDateOfBirth As Date, ByVal AgeUnitsListDS As PreloadedMasterDataDS) As String
             Dim ageUnitDesc As String = String.Empty
 
             Try
@@ -2044,8 +2045,8 @@ Namespace Biosystems.Ax00.Global
                 If (lstAgeUnit.Count = 1) Then ageUnitDesc = String.Format("{0} {1}", patientAge, lstAgeUnit.First())
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.GetAgeUnits", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.GetAgeUnits", EventLogEntryType.Error, False)
             End Try
             Return ageUnitDesc
         End Function
@@ -2088,7 +2089,7 @@ Namespace Biosystems.Ax00.Global
                 '----------------------------------------------------
 
                 '1-Se obtiene el valor binario
-                myGlobal = MyClass.ConvertIntegerToBinaryString(N)
+                myGlobal = Utilities.ConvertIntegerToBinaryString(N)
                 Dim Nstr As String = CStr(myGlobal.SetDatos)
                 Dim Nstr2 As String = Nstr
 
@@ -2120,7 +2121,7 @@ Namespace Biosystems.Ax00.Global
                 '4-se realiza la suma final
                 Dim Sum As UInt64
                 For Each s As String In Sumatory2
-                    myGlobal = MyClass.ConvertBinaryStringToDecimal(s)
+                    myGlobal = Utilities.ConvertBinaryStringToDecimal(s)
                     Dim D As UInt64 = Convert.ToUInt64(myGlobal.SetDatos)
                     Sum += D
                 Next
@@ -2131,8 +2132,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.PowUint64To2", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.PowUint64To2", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -2157,8 +2158,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.GetNewGUID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.GetNewGUID", EventLogEntryType.Error, False)
 
             End Try
             Return myGlobal
@@ -2241,8 +2242,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.SaveSynapseEventLog", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.SaveSynapseEventLog", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2302,8 +2303,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.SetLISTraceLevel", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.SetLISTraceLevel", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2357,8 +2358,8 @@ Namespace Biosystems.Ax00.Global
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utilities.GetLISTraceLevel", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utilities.GetLISTraceLevel", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -2386,8 +2387,8 @@ Namespace Biosystems.Ax00.Global
                 AscB = b
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utils.AscB", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utils.AscB", EventLogEntryType.Error, False)
                 Throw ex
             End Try
 
@@ -2435,8 +2436,8 @@ Namespace Biosystems.Ax00.Global
                 GenerateSignFrame = FirstByte
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "Utils.GenerateSignFrame", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "Utils.GenerateSignFrame", EventLogEntryType.Error, False)
 
                 Throw ex
             End Try
@@ -2595,14 +2596,14 @@ Namespace Biosystems.Ax00.Global
 
                 'Process 32-bits, 4 at a time, or 8 rounds
 
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28)) ' Assumes 32-bit reg, masking index to 4-bits
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28)) '  0x04C11DB7 Polynomial used in STM32
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
-                pCRC = (pCRC << 4) Xor MyClass.CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28)) ' Assumes 32-bit reg, masking index to 4-bits
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28)) '  0x04C11DB7 Polynomial used in STM32
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
+                pCRC = (pCRC << 4) Xor CrcTable(CInt(pCRC >> 28))
 
                 Return pCRC
 
@@ -2651,7 +2652,7 @@ Namespace Biosystems.Ax00.Global
 
                                     'FinalData = Convert.ToInt32((DataLowLow << 24) Or (DataMediumLow << 16) Or (DataMediumHigh << 8) Or (DataHighHigh)) '// El micro de st tracta la posicio del bytes al reves
 
-                                    myCRCResult = MyClass.CRC32Fast(myCRCResult, FinalData) '// Per calcular el CRC igual que el STM32
+                                    myCRCResult = CRC32Fast(myCRCResult, FinalData) '// Per calcular el CRC igual que el STM32
 
                                 End If
                             End If
@@ -2661,13 +2662,6 @@ Namespace Biosystems.Ax00.Global
 
                 myGlobal.SetDatos = myCRCResult
 
-                'If myCRCResult <> &HFFFFFFFFUI Then
-                '    MyClass.CRC32DecimalAttr = myCRCResult
-                '    MyClass.CRC32HexAttr = MyClass.ConvertUint32ToHex(MyClass.CRC32DecimalAttr)
-                'Else
-                '    MyClass.CRC32DecimalAttr = 0
-                '    MyClass.CRC32HexAttr = "0x00000000"
-                'End If
 
             Catch ex As Exception
                 Throw ex
@@ -2681,7 +2675,7 @@ Namespace Biosystems.Ax00.Global
 
 #Region "FOR TESTING"
 
-        Public Shared Sub GetExceptionData(ByVal ex As Exception, ByRef pModule As String, ByRef pMethod As String, ByRef pLine As Integer, ByRef pColumn As Integer)
+        Public Sub GetExceptionData(ByVal ex As Exception, ByRef pModule As String, ByRef pMethod As String, ByRef pLine As Integer, ByRef pColumn As Integer)
             If ex IsNot Nothing Then
                 Dim ExTrace As System.Diagnostics.StackTrace = New System.Diagnostics.StackTrace(ex, True)
                 If ExTrace.GetFrames.Count > 0 Then
@@ -2695,5 +2689,6 @@ Namespace Biosystems.Ax00.Global
 
 #End Region
 
-    End Class
+    End Module
+
 End Namespace

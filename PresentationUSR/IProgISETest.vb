@@ -1756,7 +1756,7 @@ Public Class IProgISETest
                 'SelectedTestRefRangesDS.Clear()
                 SelectedTestRefRangesDS = DirectCast(bsTestRefRanges.DefinedTestRangesDS, TestRefRangesDS) 'bsTestRefRanges.DefinedTestRangesDS
 
-                Dim myGlobalBase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
                 'Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
                 Dim myTestRefRanges As List(Of TestRefRangesDS.tparTestRefRangesRow)
 
@@ -1767,7 +1767,7 @@ Public Class IProgISETest
 
                 For i As Integer = 0 To myTestRefRanges.Count - 1
                     myTestRefRanges(0).BeginEdit()
-                    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                     myTestRefRanges(0).TS_DateTime = Now
                     myTestRefRanges(0).EndEdit()
 
@@ -1782,7 +1782,7 @@ Public Class IProgISETest
 
                 For i As Integer = 0 To myTestRefRanges.Count - 1
                     myTestRefRanges(0).BeginEdit()
-                    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                     myTestRefRanges(0).TS_DateTime = Now
                     myTestRefRanges(0).EndEdit()
 
@@ -1838,8 +1838,8 @@ Public Class IProgISETest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -4202,8 +4202,8 @@ Public Class IProgISETest
     Private Sub ProgISETest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
             ScreenLoad()
             ScreenStatusByUserLevel() 'TR 23/04/2012

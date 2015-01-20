@@ -32,7 +32,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
 
                         'AG 08/10/2010
                         'cmdText = " SELECT UserLevel, FixedUserLevelDesc,  NumericLevel, InternalUseFlag " & _
@@ -42,7 +42,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText = " SELECT UL.UserLevel, MR.ResourceText AS FixedUserLevelDesc, UL.NumericLevel, UL.InternalUseFlag " & _
                                   " FROM   tfmwUsersLevel UL INNER JOIN tfmwMultiLanguageResources MR ON UL.ResourceID = MR.ResourceID " & _
                                   " WHERE  UL.UserLevel = '" & pUserLevel & "'" & _
-                                  " AND    MR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' "
+                                  " AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' "
                         'END AG 08/10/2010
 
                         Dim dbCmd As New SqlClient.SqlCommand
@@ -64,8 +64,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwUsersLevelDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwUsersLevelDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -97,7 +97,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dbConnection = CType(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim cmdText As String = ""
-                        Dim myLocalBase As New GlobalBase
+                        'Dim myLocalBase As New GlobalBase
                         Dim internalUse As Integer = CType(IIf(pInternalUse, 1, 0), Integer)
 
                         'AG 08/10/2010
@@ -109,7 +109,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText = " SELECT UL.UserLevel, MR.ResourceText AS FixedUserLevelDesc " & _
                                   " FROM   tfmwUsersLevel UL INNER JOIN tfmwMultiLanguageResources MR ON UL.ResourceID = MR.ResourceID " & _
                                   " WHERE  UL.InternalUseFlag = " & internalUse & _
-                                  " AND    MR.LanguageID = '" & myLocalBase.GetSessionInfo.ApplicationLanguage & "' " & _
+                                  " AND    MR.LanguageID = '" & GlobalBase.GetSessionInfo.ApplicationLanguage & "' " & _
                                   " ORDER BY NumericLevel DESC "
                         'END AG 08/10/2010
 
@@ -132,8 +132,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwUsersLevelDAO.ReadByInternalUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwUsersLevelDAO.ReadByInternalUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

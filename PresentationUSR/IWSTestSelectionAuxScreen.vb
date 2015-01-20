@@ -325,8 +325,8 @@ Public Class IWSTestSelectionAuxScreen
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Multilanguage Texts for all Screen Controls
             GetScreenLabels(currentLanguage)
@@ -4147,8 +4147,8 @@ Public Class IWSTestSelectionAuxScreen
     Private Sub InitializeScreenModel2()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Multilanguage Texts for all Screen Controls
             GetScreenLabelsModel2(currentLanguage)

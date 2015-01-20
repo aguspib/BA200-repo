@@ -68,8 +68,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.InsertResult", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.InsertResult", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return resultData
@@ -129,8 +129,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.UpdateResults", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.UpdateResults", EventLogEntryType.Error, False)
         '    End Try
 
         '    Return resultData
@@ -177,8 +177,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.ExistsResult", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.ExistsResult", EventLogEntryType.Error, False)
 
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -228,8 +228,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tcalcExecutionsPartialResultsDAO.ResetWS", EventLogEntryType.Error, False)
             End Try
 
             Return resultData

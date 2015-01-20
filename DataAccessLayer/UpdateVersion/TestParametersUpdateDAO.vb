@@ -47,8 +47,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNewFactoryTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNewFactoryTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -97,8 +97,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -150,8 +150,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryReagentsByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryReagentsByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -213,8 +213,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestSamplesByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestSamplesByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -272,8 +272,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestCalibValuesByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestCalibValuesByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -334,8 +334,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetReagentsVolumesByTesIDAndSampleType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetReagentsVolumesByTesIDAndSampleType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -393,8 +393,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestCalibratorByTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetFactoryTestCalibratorByTestID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -441,8 +441,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDeletedPreloadedSTDTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDeletedPreloadedSTDTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -491,8 +491,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDeletedPreloadedSTDTestSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDeletedPreloadedSTDTestSamples", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -541,8 +541,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -587,8 +587,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNewFactoryTestSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetNewFactoryTestSamples", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -651,8 +651,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTestSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTestSamples", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -712,8 +712,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTestReagentsVolumes", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetUpdatedFactoryTestReagentsVolumes", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -788,8 +788,8 @@ End Namespace
 '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        dataToReturn.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetAffectedItemsFromFactory", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetAffectedItemsFromFactory", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -856,8 +856,8 @@ End Namespace
 '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        dataToReturn.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetAffectedItemsFromFactory", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetAffectedItemsFromFactory", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -902,8 +902,8 @@ End Namespace
 '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        dataToReturn.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -958,8 +958,8 @@ End Namespace
 '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        dataToReturn.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "TestParametersUpdateDAO.GetDataInFactoryDB", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -1010,8 +1010,8 @@ End Namespace
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "tparTestSamplesDAO.Read", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "tparTestSamplesDAO.Read", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -1060,8 +1060,8 @@ End Namespace
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "tparTestReagentsDAO.GetTestReagents", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "tparTestReagentsDAO.GetTestReagents", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -1109,8 +1109,8 @@ End Namespace
 '        resultData.ErrorCode = "SYSTEM_ERROR"
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "tparReagentsDAO.GetFactoryReagent", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "tparReagentsDAO.GetFactoryReagent", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -1166,8 +1166,8 @@ End Namespace
 '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        resultData.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, "tparCalibratorsDAO.GetFactoryCalibrator", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, "tparCalibratorsDAO.GetFactoryCalibrator", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try
@@ -1210,8 +1210,8 @@ End Namespace
 '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        Dim myLogAcciones As New ApplicationLogManager()
-'        myLogAcciones.CreateLogActivity(ex.Message, " tparTestCalibratorsDAO.ReadByTestCalibratorID ", EventLogEntryType.Error, False)
+'        'Dim myLogAcciones As New ApplicationLogManager()
+'        GlobalBase.CreateLogActivity(ex.Message, " tparTestCalibratorsDAO.ReadByTestCalibratorID ", EventLogEntryType.Error, False)
 '    Finally
 '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
 '    End Try

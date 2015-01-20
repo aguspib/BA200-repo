@@ -481,8 +481,8 @@ Partial Public Class IMonitor
             Dim myGlobalDataTO As New GlobalDataTO
 
             If (LanguageID Is Nothing) Then
-                Dim currentLanguageGlobal As New GlobalBase
-                LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                'Dim currentLanguageGlobal As New GlobalBase
+                LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
                 myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate
             End If

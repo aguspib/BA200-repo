@@ -703,8 +703,8 @@ Public Class ISettings
             If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
                 myVersionsDS = CType(myGlobal.SetDatos, VersionsDS)
 
-                Dim myUtil As New Utilities
-                myGlobal = myUtil.GetSoftwareVersion()
+                'Dim myUtil As New Utilities.
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim SwVersion As String = myGlobal.SetDatos.ToString
 
@@ -742,8 +742,8 @@ Public Class ISettings
             Cursor = Cursors.WaitCursor
             '
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'DL 09/09/2011
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then

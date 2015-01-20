@@ -126,7 +126,7 @@ Public Class ICreateRestorePoint
     Private Function CreateRestorePoint() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 
@@ -331,8 +331,8 @@ Public Class ICreateRestorePoint
             PrepareButtons()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(CurrentLanguage)

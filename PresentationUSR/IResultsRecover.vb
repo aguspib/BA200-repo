@@ -29,8 +29,8 @@ Public Class IResultsRecover
         Try
             'Get the current Language from the current Application Session
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RESULTS_RECOVER_TITLE", currentLanguage)
             bsRecoverLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RESULTS_RECOVERING", currentLanguage)
