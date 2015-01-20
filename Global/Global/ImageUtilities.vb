@@ -5,11 +5,11 @@ Namespace Biosystems.Ax00.Global
 
     Public Class ImageUtilities
 
-        Public Shared Function ImageFromFile(path As String) As Bitmap
+        Public Shared Function ImageFromFile(path As String) As Image
 
             Dim fs = New FileStream(path, FileMode.Open, FileAccess.Read)
             Dim img = Image.FromStream(fs)
-            fs.close()
+            fs.Close()
 
             Return img
 
