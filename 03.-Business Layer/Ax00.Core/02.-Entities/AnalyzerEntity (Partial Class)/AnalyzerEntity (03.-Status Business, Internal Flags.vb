@@ -2026,6 +2026,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by: DL 21/06/2012 - 
         '''              AG 19/07/2012 -review and modify
         '''              XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
+        '''              AG 19/01/2015 BA-2216
         ''' </remarks>
         Private Function RecoverStableSetup(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -2034,13 +2035,6 @@ Namespace Biosystems.Ax00.Core.Entities
             '                                          /False means that some actions to reach stable setup has been started
 
             Try
-                'AG 19/07/2012
-                'resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                '    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-                'AG 19/07/2012
-
                 'DL 21/06/2012. Begin 
                 Dim myGlobal As GlobalDataTO
 
@@ -2049,33 +2043,11 @@ Namespace Biosystems.Ax00.Core.Entities
                     '1.	StartInstrument = 'INI'
                     '2.	Washing         = 'INI'
                     '3.	BaseLine        = 'INI'
+                    '4. DynamicBL_Fill  = 'INI'
+                    '5. DynamicBL_Read  = 'INI'
+                    '6. DynamicBL_Empty = 'INI'
 
-
-
-                    'If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "INI" Then
-                    '    '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
-                    '    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                    '        stableSetupAchieved = False
-                    '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
-                    '    End If
-
-                    'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "INI" Then
-                    '    '2.	Re-send WASH instruction. Requires analyzer status STANDBY
-                    '    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                    '        stableSetupAchieved = False
-                    '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
-                    '    End If
-
-                    'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
-                    '    '3.	Re-send ALIGHT instruction (well CurrentWellAttribute). Requires analyzer status STANDBY
-                    '    If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                    '        stableSetupAchieved = False
-                    '        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                    '    End If
-
-                    'End If
                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
-
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "INI" Then
                         '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
@@ -2098,22 +2070,23 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "")
                             ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine)
                         End If
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
 
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                        '3.	Re-send FLIGHT instruction in mode fill
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
                             ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
                         End If
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-
+                        '3.	Re-send FLIGHT instruction in mode read
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
                             ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
                         End If
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
-
+                        '3.	Re-send FLIGHT instruction in mode empty
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
@@ -2186,7 +2159,10 @@ Namespace Biosystems.Ax00.Core.Entities
                     'New rotor in course
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
                     '1.	NewRotor = 'INI'
-                    '2.	BaseLine = 'INI'	
+                    '2.	BaseLine = 'INI'
+                    '3. DynamicBL_Fill  = 'INI'
+                    '4. DynamicBL_Read  = 'INI'
+                    '5. DynamicBL_Empty = 'INI'
 
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NewRotor.ToString) = "INI" Then
                         '1.	Re-send NROTOR instruction. Requires analyzer status STANDBY
@@ -2201,6 +2177,33 @@ Namespace Biosystems.Ax00.Core.Entities
                             stableSetupAchieved = False
                             myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
                         End If
+
+                        'AG 19/01/2015 BA-2216
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                        'Re-send FLIGHT instruction in mode fill
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            CurrentInstructionAction = InstructionActions.FlightFilling
+                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
+                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                        End If
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                        'Re-send FLIGHT instruction in mode read
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            CurrentInstructionAction = InstructionActions.FlightReading
+                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                        End If
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
+                        'Re-send FLIGHT instruction in mode empty
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            CurrentInstructionAction = InstructionActions.FlightReading
+                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
+                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+                        End If
+                        'AG 19/01/2015 BA-2216
 
                     End If
 
@@ -2299,7 +2302,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
                     End If
 
-                    'AG 27/08/2012 -Recovery results in course
+                    'AG 27/08/2012 -Recovery results in course ... NOT APPLY!!
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" Then
                     'AG 03/09/2012 - comment, this method is called only in STANDBY and these subprocesses requires Running
                     ''1.	ResRecoverPrepProblems = 'INI'
@@ -2332,9 +2335,6 @@ Namespace Biosystems.Ax00.Core.Entities
                 If Not stableSetupAchieved AndAlso Not resultData.HasError AndAlso ConnectedAttribute Then
                     SetAnalyzerNotReady()
                 End If
-
-                'End If'AG 19/07/2012
-                'End If'AG 19/07/2012
 
             Catch ex As Exception
                 resultData = New GlobalDataTO()
