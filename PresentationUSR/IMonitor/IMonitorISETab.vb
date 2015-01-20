@@ -50,7 +50,7 @@ Partial Public Class IMonitor
             'OK Icon
             auxIconName = GetIconName("STUS_FINISH")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Ok.ToString, myImage)
                 End If
@@ -59,7 +59,7 @@ Partial Public Class IMonitor
             'Warning Icon
             auxIconName = GetIconName("STUS_WITHERRS")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Warning.ToString, myImage)
                 End If
@@ -68,7 +68,7 @@ Partial Public Class IMonitor
             'Lock Icon
             auxIconName = GetIconName("STUS_LOCKED")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Locked.ToString, myImage)
                 End If
@@ -77,7 +77,7 @@ Partial Public Class IMonitor
             'Error Icon
             auxIconName = GetIconName("WARNINGSMALL")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     myImageList.Images.Add(BSISEMonitorPanel.IconImages.Error_.ToString, myImage)
                 End If

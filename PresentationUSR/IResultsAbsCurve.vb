@@ -1701,51 +1701,51 @@ Public Class IResultsAbsCurve
             ' close Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCloseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCloseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' print button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' next button
             auxIconName = GetIconName("RIGHT")
             If auxIconName <> "" Then
-                bsNextButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNextButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' previous button
             auxIconName = GetIconName("LEFT")
             If auxIconName <> "" Then
-                bsPreviousButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPreviousButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Last Button
             auxIconName = GetIconName("FORWARDL")
             If auxIconName <> "" Then
-                bsLastButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsLastButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'First Button
             auxIconName = GetIconName("BACKWARDL")
             If auxIconName <> "" Then
-                bsFirstButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsFirstButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Expand Button
             auxIconName = GetIconName("FORWARD")
             If auxIconName <> "" Then
-                bsExpandButton.Image = Image.FromFile(iconPath & auxIconName)
-                ExpandImage = Image.FromFile(iconPath & auxIconName)
+                bsExpandButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                ExpandImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Collapse Button
             auxIconName = GetIconName("BACKWARD")
             If auxIconName <> "" Then
-                bsCollapseButton.Image = Image.FromFile(iconPath & auxIconName)
-                CollapseImage = Image.FromFile(iconPath & auxIconName)
+                bsCollapseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                CollapseImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             PATIENT_IconName = GetIconName("ROUTINES")

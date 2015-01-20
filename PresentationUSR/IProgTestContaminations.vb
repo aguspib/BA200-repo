@@ -68,43 +68,43 @@ Public Class IProgTestContaminations
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SUMMARY BY TEST Button
             auxIconName = GetIconName("GRID")
             If (auxIconName <> "") Then
-                bsSummaryByTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSummaryByTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -298,17 +298,17 @@ Public Class IProgTestContaminations
 
             'Get the Icons defined for Preloaded Standard Tests that are inuse/not inuse in the current Work Session
             Dim iconName As String = GetIconName("TESTICON")
-            If (iconName <> "") Then myIcons.Images.Add("TESTICON", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("TESTICON", ImageUtilities.ImageFromFile(IconsPath & iconName))
 
             iconName = GetIconName("INUSETEST")
-            If (iconName <> "") Then myIcons.Images.Add("INUSETEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("INUSETEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
 
             'Get the Icon defined for User Defined Standard Tests that are not inuse/not inuse in the current Work Session
             iconName = GetIconName("USERTEST")
-            If (iconName <> "") Then myIcons.Images.Add("USERTEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("USERTEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
             'TR 10/01/2013 -Correct the icon name.
             iconName = GetIconName("INUSUSTEST")
-            If (iconName <> "") Then myIcons.Images.Add("INUSUSEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("INUSUSEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
             'TR 10/01/2013 -END.
             'Assign the Icons to the Contaminator Tests List View
             bsTestContaminatorsListView.Items.Clear()

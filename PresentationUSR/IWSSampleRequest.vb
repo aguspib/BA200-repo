@@ -5197,45 +5197,45 @@ Public Class IWSSampleRequest
 
             'LOAD SAVED WS Button
             auxIconName = GetIconName("OPEN")
-            If Not String.Equals(auxIconName, String.Empty) Then bsLoadWSButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsLoadWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE WS Button
             auxIconName = GetIconName("SAVE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsSaveWSButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsSaveWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DELETE Buttons (Patient Samples, Controls, Blanks&Calibrators)
             auxIconName = GetIconName("REMOVE")
             If Not String.Equals(auxIconName, String.Empty) Then
-                bsDelPatientsButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsDelCalibratorsButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsDelControlsButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDelPatientsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsDelCalibratorsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsDelControlsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'OFF SYSTEM TESTS RESULTS Button
             auxIconName = GetIconName("OFFSYSTEMBUT") 'auxIconName = GetIconName("TOFF_SYS")
             If Not String.Equals(auxIconName, String.Empty) Then
-                bsOffSystemResultsButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsOffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'POSITIONING Button
             auxIconName = GetIconName("SENDTOPOS")
-            If Not String.Equals(auxIconName, String.Empty) Then bsOpenRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsOpenRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SCANNING SAMPLES Rotor
             auxIconName = GetIconName("BARCODE")
-            If Not String.Equals(auxIconName, String.Empty) Then bsScanningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsScanningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'BARCODE WARNINGS Button
             auxIconName = GetIconName("BCWARNING")
-            If Not String.Equals(auxIconName, String.Empty) Then bsBarcodeWarningButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsBarcodeWarningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'IMPORT FROM LIMS Button
             auxIconName = GetIconName("LIMSIMPORT")
-            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSImportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSImportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SHOW LIMS ERRORS Button
             auxIconName = GetIconName("STUS_WITHERRS") ' "WARNING") dl 23/03/2012
-            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSErrorsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsLIMSErrorsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'If the LIS is working with ES, these buttons are not visible
             If (Not LISWithFilesMode) Then
@@ -5246,7 +5246,7 @@ Public Class IWSSampleRequest
 
             'SAVE & EXIT Button
             auxIconName = GetIconName("ACCEPT1")
-            If Not String.Equals(auxIconName, String.Empty) Then bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

@@ -135,7 +135,7 @@ Public Class XRDesignMasterForm
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> String.Empty) Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception

@@ -525,12 +525,12 @@ Public Class IStressModeTest
         Try
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
@@ -545,28 +545,28 @@ Public Class IStressModeTest
             ' ''ADJUST Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsAdjustButtonTODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsAdjustButtonTODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsAdjustButtonTODELETE.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ' ''SAVE Button
             ''auxIconName = GetIconName("SAVE")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsTestButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsTestButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsTestButton.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ' ''CANCEL Button
             ''auxIconName = GetIconName("UNDO") 'CANCEL
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsAbortTestButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsAbortTestButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsAbortTestButton.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -574,14 +574,14 @@ Public Class IStressModeTest
             ' ''TEST Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsTestButton_TODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsTestButton_TODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsTestButton_TODELETE.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ''TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsTestButton.BackgroundImageLayout = ImageLayout.Center
             'End If
             '' XBC 24/11/2011 - Unify buttons Start and Stop Test Stress
@@ -589,7 +589,7 @@ Public Class IStressModeTest
             ''Info Button
             'auxIconName = GetIconName("RIGHT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -1548,14 +1548,14 @@ Public Class IStressModeTest
                 auxIconName = GetIconName("ADJUSTMENT")
             End If
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Dim myNewImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             '    myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then

@@ -397,9 +397,9 @@ Public Class IHisAlarms
         auxIconName = GetIconName(pKey)
         If Not String.IsNullOrEmpty(auxIconName) Then
             If mImageDict.ContainsKey(pKey) Then
-                mImageDict.Item(pKey) = Image.FromFile(iconPath & auxIconName)
+                mImageDict.Item(pKey) = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             Else
-                mImageDict.Add(pKey, Image.FromFile(iconPath & auxIconName))
+                mImageDict.Add(pKey, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         End If
 

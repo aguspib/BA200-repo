@@ -4454,22 +4454,22 @@ Public Class Ax00ServiceMainMDI
 
             'Analyzer Configuration Button
             'auxIconName = GetIconName("ANALYZER")
-            'If (auxIconName <> "") Then bsTSAnalysersButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSAnalysersButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Alarms button
             'auxIconName = GetIconName("ALARM")
-            'If (auxIconName <> "") Then bsTSAlarmsButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSAlarmsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ' XBC 18/05/2012 - IS USED ???
 
             ' XBC 23/02/2012 - IS USED ???
             ''Alarm Utilities button
             'auxIconName = GetIconName("UTILITIES")
-            'If (auxIconName <> "") Then bsTSUtilitiesButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSUtilitiesButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ' XBC 23/02/2012 - IS USED ???
 
             'Emergency Stop button
             'auxIconName = GetIconName("EMERGENCY")
-            'If (auxIconName <> "") Then bsTSEmergencyButton.Image = Image.FromFile(iconPath & auxIconName)
+            'If (auxIconName <> "") Then bsTSEmergencyButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
         Catch ex As Exception
             'Write Error in the Application Log and show the message

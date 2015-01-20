@@ -48,19 +48,19 @@ Public Class IChangeRotorSRV
             'New rotor button
             auxIconName = GetIconName("ADJUSTMENT") 'CONTINUESEB")
             If (auxIconName <> "") Then
-                bsNewRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CHANGE ROTOR Button
             auxIconName = GetIconName("CHANGEROTORB")
             If (auxIconName <> "") Then
-                bsWSUpDownButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsWSUpDownButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'icons for result
@@ -239,7 +239,7 @@ Public Class IChangeRotorSRV
                 End If
                 ScreenWorkingProcess = False
                 MyBase.ActivateMDIMenusButtons(True)
-                Me.bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
                 Me.bsStatusImage.Visible = True
 
                 Me.BsNewRotorProcessTimer.Stop()
@@ -497,9 +497,9 @@ Public Class IChangeRotorSRV
             MyBase.ActivateMDIMenusButtons(True)
 
             If MyBase.myServiceMDI.MDIAnalyzerManager.ErrorCodes.Contains("550") Then 'Reactions rotor missing
-                Me.bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
             Else
-                Me.bsStatusImage.Image = Image.FromFile(OKIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(OKIconName)
             End If
             Me.BsProgressBar.Value = Me.BsProgressBar.Maximum
             Me.BsNewRotorProcessTimer.Stop()

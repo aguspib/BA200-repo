@@ -90,19 +90,19 @@ Public Class ISATReportLoad
             'OK Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsOKButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsOKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL AcceptButton
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 11/01/2011 -Path Button.
             auxIconName = GetIconName("OPEN")
             If (auxIconName <> "") Then
-                bsBrowseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsBrowseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 

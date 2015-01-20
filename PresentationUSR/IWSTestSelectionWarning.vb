@@ -79,7 +79,7 @@ Public Class IWSTestSelectionWarning
             'EXIT Button
             auxIconName = GetIconName("ACCEPT1")
             If auxIconName <> "" Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'For Tooltips...

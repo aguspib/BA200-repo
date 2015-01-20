@@ -297,7 +297,7 @@ Public Class ICycleCountScreen
             'Info Button
             auxIconName = GetIconName("RIGHT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             End If
 

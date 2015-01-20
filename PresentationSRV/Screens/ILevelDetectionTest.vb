@@ -386,21 +386,21 @@ Public Class ILevelDetectionTest
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsFrequencyButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsFrequencyButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Me.BsFrequencyButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''SAVE Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsDetectionButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsDetectionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Me.BsDetectionButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 

@@ -743,6 +743,7 @@
     <EmbeddedResource Include="My Project\licenses.licx" />
     <EmbeddedResource Include="IMonitor\IMonitor.resx">
       <DependentUpon>IMonitor.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="IProgControls.resx">
       <DependentUpon>IProgControls.vb</DependentUpon>
@@ -909,7 +910,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
-      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <Generator>PublicVbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>

@@ -29,19 +29,19 @@ Public Class ApplicationLogView
             'LOAD 
             auxIconName = GetIconName("OPEN")
             If (auxIconName <> "") Then
-                OpenFileDialogButton.Image = Image.FromFile(iconPath & auxIconName)
+                OpenFileDialogButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Export 
             auxIconName = GetIconName("EXPORTSCRIPT")
             If (auxIconName <> "") Then
-                GenerateXmlButton.Image = Image.FromFile(iconPath & auxIconName)
+                GenerateXmlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception

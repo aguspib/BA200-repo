@@ -1899,39 +1899,39 @@ Partial Public Class IMonitor
             auxIconName = GetIconName("STUS_FINISH")
             If Not String.IsNullOrEmpty(auxIconName) Then
                 FinishedImage = preloadedDataConfig.GetIconImage("STUS_FINISH")
-                ResultsReadyImage.Image = Image.FromFile(iconPath & auxIconName)
+                ResultsReadyImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("STUS_WITHERRS")
             If Not String.IsNullOrEmpty(auxIconName) Then
                 FinishedWithErrorsImage = preloadedDataConfig.GetIconImage("STUS_WITHERRS")
-                ResultsWarningImage.Image = Image.FromFile(iconPath & auxIconName)
+                ResultsWarningImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("STUS_LOCKED")
             If Not String.IsNullOrEmpty(auxIconName) Then
                 LockedImage = preloadedDataConfig.GetIconImage("STUS_LOCKED")
-                LockedTestImage.Image = Image.FromFile(iconPath & auxIconName)
+                LockedTestImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("EXEC_PAUSED")
             If Not String.IsNullOrEmpty(auxIconName) Then
                 PausedImage = preloadedDataConfig.GetIconImage("EXEC_PAUSED")
-                PausePictureBox.Image = Image.FromFile(iconPath & auxIconName)
+                PausePictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("PRINTL")
             If Not String.IsNullOrEmpty(auxIconName) Then
                 PrintAvailableImage = preloadedDataConfig.GetIconImage("PRINTL")
-                PrintPictureBox.Image = Image.FromFile(iconPath & auxIconName)
-                FinalReportImage.Image = Image.FromFile(iconPath & auxIconName)
+                PrintPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                FinalReportImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("MANUAL_EXP")
             If Not String.IsNullOrEmpty(auxIconName) Then
                 HISSentImage = preloadedDataConfig.GetIconImage("MANUAL_EXP")
-                HISSentPictureBox.Image = Image.FromFile(iconPath & auxIconName)
-                ExportLISImage.Image = Image.FromFile(iconPath & auxIconName)
+                HISSentPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                ExportLISImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'AG 28/02/2014 - #1524 The test type images are not used
@@ -1975,28 +1975,28 @@ Partial Public Class IMonitor
             auxIconName = GetIconName("ABS_GRAPH") ' "CURVE"
             If (auxIconName <> "") Then
                 GraphImage = preloadedDataConfig.GetIconImage("ABS_GRAPH") ' CURVE
-                GraphPictureBox.Image = Image.FromFile(iconPath & auxIconName)
-                ResultsAbsImage.Image = Image.FromFile(iconPath & auxIconName)
+                GraphPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                ResultsAbsImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("EXEC_PAUSED") ' "CURVE"
             If (auxIconName <> "") Then
-                PausedTestImage.Image = Image.FromFile(iconPath & auxIconName)
+                PausedTestImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("MON_LEG_PENDIN") ' "CURVE"
             If (auxIconName <> "") Then
-                LegendPendingImage0.Image = Image.FromFile(iconPath & auxIconName)
+                LegendPendingImage0.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("MON_LEG_INPROG") ' "CURVE"
             If (auxIconName <> "") Then
-                LegendInProgressImage0.Image = Image.FromFile(iconPath & auxIconName)
+                LegendInProgressImage0.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("MON_LEG_FINISH") ' "CURVE"
             If (auxIconName <> "") Then
-                LegendFinishedImage0.Image = Image.FromFile(iconPath & auxIconName)
+                LegendFinishedImage0.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 

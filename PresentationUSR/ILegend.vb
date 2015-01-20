@@ -122,13 +122,13 @@ Public Class ILegend
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Dim imgStream As MemoryStream = New MemoryStream()
             'Dim img As Image
 
-            'img = Image.FromFile("C:\David Luna\LeftClick.png")
+            'img = ImageUtilities.ImageFromFile("C:\David Luna\LeftClick.png")
             'img.Save(imgStream, System.Drawing.Imaging.ImageFormat.Png)
 
             'imgStream.Close()

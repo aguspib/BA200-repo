@@ -133,13 +133,13 @@ Public Class IBarCodeEdit
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If Not String.IsNullOrEmpty(auxIconName) Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If Not String.IsNullOrEmpty(auxIconName) Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception

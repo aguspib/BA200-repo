@@ -263,7 +263,7 @@ Public Class ISortingTestsAux
                     Select Case preMasterRow.ItemID
                         Case "TESTICON", "USERTEST", "TCALC", "TISE_SYS", "TOFF_SYS", "TPROFILES"
                             If (IO.File.Exists(MyBase.IconsPath & preMasterRow.FixedItemDesc)) Then
-                                TestIconList.Images.Add(preMasterRow.ItemID, Image.FromFile(MyBase.IconsPath & preMasterRow.FixedItemDesc))
+                                TestIconList.Images.Add(preMasterRow.ItemID, ImageUtilities.ImageFromFile(MyBase.IconsPath & preMasterRow.FixedItemDesc))
                             End If
                             Exit Select
                         Case Else
@@ -379,44 +379,44 @@ Public Class ISortingTestsAux
 
             'MOVE UP SELECTED TESTS Button
             auxIconName = GetIconName("UPARROW")
-            If (auxIconName <> "") Then UpPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then UpPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MOVE DOWN SELECTED TESTS Button
             auxIconName = GetIconName("DOWNARROW")
-            If (auxIconName <> "") Then DownPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then DownPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MOVE SELECTED TESTS TO FIRST POSITION Button
             auxIconName = GetIconName("TOPARROW")
-            If (auxIconName <> "") Then FirstPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then FirstPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MOVE SELECTED TESTS TO LAST POSITION Button
             auxIconName = GetIconName("BOTTOMARROW")
-            If (auxIconName <> "") Then LastPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then LastPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DEFAULT SORTING RECOVERY Button
             'auxIconName = GetIconName("UPDOWNROW") 'DL 21/02/2012
             auxIconName = GetIconName("UNDO")       'DL 21/02/2012
-            If (auxIconName <> "") Then DefaultSortingButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then DefaultSortingButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE Button
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then CloseButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then CloseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'AG 04/09/2014 - BA-1869
             'CHECK icon in grid header
             auxIconName = GetIconName("CHECKL")
             If (auxIconName <> "") Then
-                checkImage = Image.FromFile(iconPath & auxIconName)
+                checkImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'UNCHECK icon in grid header
             auxIconName = GetIconName("UNCHECKL")
             If (auxIconName <> "") Then
-                uncheckImage = Image.FromFile(iconPath & auxIconName)
+                uncheckImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'AG 04/09/2014 - BA-1869
 

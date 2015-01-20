@@ -3,6 +3,7 @@ Option Explicit On
 
 Imports System.Drawing
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.Controls.UserControls
 
@@ -277,7 +278,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                                     End If
                                     'Add icon to imagelist with image key.
                                     leftImageList.Images.Add(CType(imageIndexLeftListView, String), _
-                                                             Image.FromFile(CStr(dsSelectableElements.Tables(0).Rows(d).Item("ElementIcon"))))
+                                                             ImageUtilities.ImageFromFile(CStr(dsSelectableElements.Tables(0).Rows(d).Item("ElementIcon"))))
                                     dbNullValue = False
                                 Else
                                     dbNullValue = True
@@ -335,7 +336,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                                     End If
                                     'Add icon to imagelist with image key.
                                     rightImageList.Images.Add(CType(imageIndexRightListView, String), _
-                                    Image.FromFile(CStr(dsSelectedElements.Tables(0).Rows(d).Item("ElementIcon"))))
+                                    ImageUtilities.ImageFromFile(CStr(dsSelectedElements.Tables(0).Rows(d).Item("ElementIcon"))))
                                     dbNullValue = False
                                 Else
                                     dbNullValue = True

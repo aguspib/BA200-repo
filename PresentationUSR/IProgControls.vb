@@ -993,13 +993,13 @@ Public Class IProgControls
             'Get the Icon defined for controls that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("CTRL")
             If (notInUseIcon <> "") Then
-                myIcons.Images.Add("CTRL", Image.FromFile(MyBase.IconsPath & notInUseIcon))
+                myIcons.Images.Add("CTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
             End If
 
             'Get the Icon defined for Controls that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSECTRL")
             If (inUseIcon <> "") Then
-                myIcons.Images.Add("INUSECTRL", Image.FromFile(MyBase.IconsPath & inUseIcon))
+                myIcons.Images.Add("INUSECTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & inUseIcon))
             End If
 
             'Assign the Icons to the Controls
@@ -1267,27 +1267,27 @@ Public Class IProgControls
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsNewLotButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsNewLotButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Buttons
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsDelTest.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsDelTest.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
@@ -1296,19 +1296,19 @@ Public Class IProgControls
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

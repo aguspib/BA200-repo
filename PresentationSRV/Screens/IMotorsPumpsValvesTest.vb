@@ -762,7 +762,7 @@ Public Class IMotorsPumpsValvesTest
                     If System.IO.File.Exists(iconPath & auxIconName) Then
 
                         Dim myImage As Image
-                        myImage = Image.FromFile(iconPath & auxIconName)
+                        myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                         myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -797,7 +797,7 @@ Public Class IMotorsPumpsValvesTest
                     If System.IO.File.Exists(iconPath & auxIconName) Then
 
                         Dim myImage As Image
-                        myImage = Image.FromFile(iconPath & auxIconName)
+                        myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                         myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -1036,14 +1036,14 @@ Public Class IMotorsPumpsValvesTest
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("HOME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsCancelButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -1053,7 +1053,7 @@ Public Class IMotorsPumpsValvesTest
             'Dim myStartImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             '    myGlobal = myUtil.ResizeImage(myImage, New Size(28, 28))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -1078,7 +1078,7 @@ Public Class IMotorsPumpsValvesTest
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             '    myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then

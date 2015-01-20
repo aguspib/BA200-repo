@@ -335,44 +335,44 @@ Public Class IQCGraphs
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
 
             'LEGEND Icons
             auxIconName = GetIconName("GREEN_CIRCLE")
-            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("BLUE_CIRCLE")
-            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VIOLET_CIRCLE")
-            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("ORANGE_CIRCLE")
-            If (auxIconName <> "") Then bsWarningPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsWarningPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("RED_DIAMOND")
-            If (auxIconName <> "") Then bsErrorPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsErrorPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("BLUE_START")
-            If (auxIconName <> "") Then bsLastRunPintImage.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsLastRunPintImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("1SD")
-            If (auxIconName <> "") Then bs1SDPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bs1SDPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("2SD")
-            If (auxIconName <> "") Then bs2SDPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bs2SDPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("3SD")
-            If (auxIconName <> "") Then bs3SDPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bs3SDPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)

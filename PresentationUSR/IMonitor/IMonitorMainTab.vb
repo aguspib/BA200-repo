@@ -3,6 +3,8 @@
 'Imports System.Text
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global
+Imports DevExpress.XtraEditors.Controls
+Imports System.IO
 
 Partial Public Class IMonitor
 
@@ -16,7 +18,7 @@ Partial Public Class IMonitor
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("STUS_LOCKED")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     Me.BsISELongTermDeactivated.BackgroundImage = myImage
                 End If
@@ -244,7 +246,7 @@ Partial Public Class IMonitor
 
                 If Not pEnable Then
                     'DL 17/05/2012. BEGIN
-                    'MainTab.Appearance.PageClient.Image = Image.FromFile(IconsPath & "Embedded\BackgroundMainMonitor-Start.png")
+                    'MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor-Start.png")
                     'CoverReagentsPicture.Visible = False
                     'CoverReactionsPicture.Visible = False
                     'CoverSamplesPicture.Visible = False
@@ -252,12 +254,12 @@ Partial Public Class IMonitor
                     'CoverOnPicture.Visible = False
 
                     MainTab.Appearance.PageClient.Image = Image.FromFile(IconsPath & "Embedded\BackgroundMainMonitor_DIS.png")
-
-                    CoverReagentsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReagents_DIS.png")
-                    CoverReactionsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReactions_DIS.png")
-                    CoverSamplesPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverSamples_DIS.png")
-                    CoverOffPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOff_DIS.png")
-                    CoverOnPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOn_DIS.png")
+                    'MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor_DIS.png")
+                    CoverReagentsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReagents_DIS.png")
+                    CoverReactionsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReactions_DIS.png")
+                    CoverSamplesPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverSamples_DIS.png")
+                    CoverOffPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOff_DIS.png")
+                    CoverOnPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOn_DIS.png")
 
                     CoverReagentsPicture.Visible = True
                     CoverReactionsPicture.Visible = True
@@ -265,15 +267,16 @@ Partial Public Class IMonitor
                     CoverOffPicture.Visible = True
                     CoverOnPicture.Visible = True
                     'DL 17/05/2012. END
+
                 Else
-                    MainTab.Appearance.PageClient.Image = Image.FromFile(IconsPath & "Embedded\BackgroundMainMonitor.png")
+                    MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor.png")
 
                     'DL 17/05/2012. BEGIN
-                    CoverReagentsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReagents.png")
-                    CoverReactionsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReactions.png")
-                    CoverSamplesPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverSamples.png")
-                    CoverOffPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOff.png")
-                    CoverOnPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOn.png")
+                    CoverReagentsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReagents.png")
+                    CoverReactionsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReactions.png")
+                    CoverSamplesPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverSamples.png")
+                    CoverOffPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOff.png")
+                    CoverOnPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOn.png")
                     'DL 17/05/2012. END
 
                     CoverReagentsPicture.Visible = True

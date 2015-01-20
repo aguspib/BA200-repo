@@ -970,7 +970,7 @@ Public Class ITankLevelsAdjustments
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsAdjustButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -979,16 +979,16 @@ Public Class ITankLevelsAdjustments
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
-            '    BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsCancelButton.Image = myImage
             '    BsCancelButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -997,9 +997,9 @@ Public Class ITankLevelsAdjustments
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
@@ -1008,7 +1008,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
 
             '    WSFullAdjustButton.Image = myImage
@@ -1029,24 +1029,24 @@ Public Class ITankLevelsAdjustments
             auxIconName = GetIconName("ACCEPTF")
             If System.IO.File.Exists(iconPath & auxIconName) Then
 
-                WSFullSavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                WSEmptySavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                HCFullSavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                HCEmptySavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                WSFullSavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                WSEmptySavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                HCFullSavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                HCEmptySavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             End If
 
             'Info Button
             auxIconName = GetIconName("RIGHT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             End If
 
             ''START TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStartTestButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -1055,7 +1055,7 @@ Public Class ITankLevelsAdjustments
             ''STOP Button
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myutil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    BsStopTestButton.Image = myImage
             '    BsStopTestButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -2810,7 +2810,7 @@ Public Class ITankLevelsAdjustments
 
             If System.IO.File.Exists(iconPath & NG_IconName) Then
 
-                Dim myNGImage As Image = Image.FromFile(iconPath & NG_IconName)
+                Dim myNGImage As Image = ImageUtilities.ImageFromFile(iconPath & NG_IconName)
 
 
                 Dim myUtil As New Utilities
@@ -3022,8 +3022,8 @@ Public Class ITankLevelsAdjustments
 
             If System.IO.File.Exists(iconPath & RUN_IconName) And System.IO.File.Exists(iconPath & OK_IconName) Then
 
-                Dim myRunImage As Image = Image.FromFile(iconPath & RUN_IconName)
-                Dim myOKImage As Image = Image.FromFile(iconPath & OK_IconName)
+                Dim myRunImage As Image = ImageUtilities.ImageFromFile(iconPath & RUN_IconName)
+                Dim myOKImage As Image = ImageUtilities.ImageFromFile(iconPath & OK_IconName)
 
 
                 Dim myUtil As New Utilities

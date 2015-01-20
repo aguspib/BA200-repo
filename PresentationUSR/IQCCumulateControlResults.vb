@@ -260,7 +260,7 @@ Public Class IQCCumulateControlResults
             Dim myIcons As New ImageList
             Dim notInUseIcon As String = GetIconName("CTRL")
             If (notInUseIcon <> "") Then
-                myIcons.Images.Add("CTRL", Image.FromFile(MyBase.IconsPath & notInUseIcon))
+                myIcons.Images.Add("CTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
             End If
 
             'Initialization of control List
@@ -460,31 +460,31 @@ Public Class IQCCumulateControlResults
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CUMULATE Button
             auxIconName = GetIconName("QCCUM")
             If (auxIconName <> "") Then
-                bsCumulateButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCumulateButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

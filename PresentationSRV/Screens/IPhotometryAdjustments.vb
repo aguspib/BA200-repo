@@ -572,33 +572,33 @@ Public Class IPhotometryAdjustments
             'DL 20/04/2012. Substitute icons
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                BsStep1DacsReferenceButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1DacsReferenceButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsStep1ITSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1ITSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                BsStep1ITExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1ITExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsStep1UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsStep2UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsStep2UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'DL 20/04/2012
 
@@ -608,28 +608,28 @@ Public Class IPhotometryAdjustments
             ''ADJUST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsAdjustButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsAdjustButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsAdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsSaveButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsCancelButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsCancelButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsCancelButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -638,7 +638,7 @@ Public Class IPhotometryAdjustments
             ''BASELINE TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsTestButton.Image = myImage
             '    BsTestButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -647,7 +647,7 @@ Public Class IPhotometryAdjustments
             ''CHANGE IT REFERENCES Button
             'auxIconName = GetIconName("EDIT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1DacsReferenceButton.Image = myImage
             '    BsStep1DacsReferenceButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -656,7 +656,7 @@ Public Class IPhotometryAdjustments
             ''IT REFERENCES SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITSaveButton.Image = myImage
             '    BsStep1ITSaveButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -665,7 +665,7 @@ Public Class IPhotometryAdjustments
             ''IT REFERENCES CANCEL Button
             'auxIconName = GetIconName("UNDO")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITExitButton.Image = myImage
             '    BsStep1ITExitButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -680,14 +680,14 @@ Public Class IPhotometryAdjustments
             'STEP2 TEST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStep2TestButtonTODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsStep2TestButtonTODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStep2TestButtonTODELETE.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''STEP3 TEST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStep3TestButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsStep3TestButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStep3TestButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -702,7 +702,7 @@ Public Class IPhotometryAdjustments
 
             auxIconName = GetIconName("FREECELL")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myNGImage = Image.FromFile(iconPath & auxIconName)
+                myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -716,7 +716,7 @@ Public Class IPhotometryAdjustments
 
             auxIconName = GetIconName("STUS_WITHERRS") 'WARNING") dl 23/03/2012
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myNGImage = Image.FromFile(iconPath & auxIconName)
+                myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -732,13 +732,13 @@ Public Class IPhotometryAdjustments
             '' XBC 20/02/2012
             'auxIconName = GetIconName("UPDOWN") ' UPDOWNROW
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myImage = CType(myGlobal.SetDatos, Image)
             '    End If
-            '    'Me.BsStep1UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
-            '    'Me.BsStep2UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    'Me.BsStep1UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+            '    'Me.BsStep2UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    Me.BsStep1UpDownWSButton.Image = myImage
             '    Me.BsStep1UpDownWSButton.ImageAlign = ContentAlignment.MiddleCenter
             '    Me.BsStep2UpDownWSButton.Image = myImage

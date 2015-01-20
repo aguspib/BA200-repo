@@ -1370,10 +1370,10 @@ Public Class BSAdjustmentBaseForm
                     If Exists Then
                         If System.IO.File.Exists(iconPath & auxIconName) Then
                             Dim myUtil As New Utilities
-                            Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                            Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             myGlobalDataTO = myUtil.ResizeImage(myImage, New Size(20, 20))
                             If Not myGlobalDataTO.HasError And myGlobalDataTO.SetDatos IsNot Nothing Then
-                                myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             Else
                                 myScreenLayout.MessagesPanel.Icon.BackgroundImage = myImage
                             End If
@@ -1470,10 +1470,10 @@ Public Class BSAdjustmentBaseForm
                         If Exists Then
                             If System.IO.File.Exists(iconPath & auxIconName) Then
                                 Dim myUtil As New Utilities
-                                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                                 myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
                                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-                                    myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobal.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                    myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobal.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                                 Else
                                     myScreenLayout.MessagesPanel.Icon.BackgroundImage = myImage
                                 End If
@@ -1557,7 +1557,7 @@ Public Class BSAdjustmentBaseForm
             auxIconName = GetIconName(pImageName)
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
@@ -2920,7 +2920,7 @@ Public Class BSAdjustmentBaseForm
                 End If
 
                 If System.IO.File.Exists(iconPath & auxIconName) Then
-                    pExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                    pExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                     pExpandButton.BackgroundImageLayout = ImageLayout.Stretch
                 End If
 

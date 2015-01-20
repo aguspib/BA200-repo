@@ -120,7 +120,7 @@ Public NotInheritable Class IInstrumentInfo
             Dim iconPath As String = IconsPath
 
             auxIconName = GetIconName("INFO")
-            If (auxIconName <> "") Then LogoPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then LogoPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadImageLogo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -140,7 +140,7 @@ Public NotInheritable Class IInstrumentInfo
             Dim iconPath As String = IconsPath
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then OKButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then OKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             bsScreenToolTips.SetToolTip(OKButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", LanguageID))

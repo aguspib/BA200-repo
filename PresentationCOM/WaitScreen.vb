@@ -1,3 +1,5 @@
+Imports Biosystems.Ax00.Global
+
 Public Class WaitScreen
     Inherits Windows.Forms.Form
 
@@ -33,7 +35,7 @@ Public Class WaitScreen
     Public WriteOnly Property Background() As String
         Set(ByVal value As String)
             If Not value Is String.Empty Then
-                Me.BackgroundImage = System.Drawing.Image.FromFile(value)
+                Me.BackgroundImage = ImageUtilities.ImageFromFile(value)
             End If
 
         End Set

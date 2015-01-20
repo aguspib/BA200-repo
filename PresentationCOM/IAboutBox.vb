@@ -148,7 +148,7 @@ Public NotInheritable Class IAboutBox
             End If
 
             If (auxIconName <> String.Empty) Then
-                LogoPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+                LogoPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -169,7 +169,7 @@ Public NotInheritable Class IAboutBox
             Dim iconPath As String = IconsPath
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then OKButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then OKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             bsScreenToolTips.SetToolTip(OKButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", LanguageID))

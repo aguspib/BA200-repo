@@ -1,3 +1,5 @@
+Imports Biosystems.Ax00.Global
+
 Public Class IAx00StartUp
     Inherits Windows.Forms.Form
 
@@ -34,6 +36,7 @@ Public Class IAx00StartUp
         Set(ByVal value As String)
             If Not value Is String.Empty Then
                 Me.BackgroundImage = System.Drawing.Image.FromFile(value)
+                'Me.BackgroundImage = ImageUtilities.ImageFromFile(value)
             End If
 
         End Set

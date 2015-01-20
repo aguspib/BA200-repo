@@ -509,7 +509,7 @@ Public Class IBarCodeAdjustments
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    AdjustButton.Image = myImage
             '    AdjustButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -518,7 +518,7 @@ Public Class IBarCodeAdjustments
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    SaveButton.Image = myImage
             '    SaveButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -527,7 +527,7 @@ Public Class IBarCodeAdjustments
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    CancelButton.Image = myImage
             '    CancelButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -536,7 +536,7 @@ Public Class IBarCodeAdjustments
             ''START READING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    StartReadingButton.Image = myImage
             '    StartReadingButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -545,7 +545,7 @@ Public Class IBarCodeAdjustments
             ''STOP READING Button
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    StopButton.Image = myImage
             '    StopButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -554,7 +554,7 @@ Public Class IBarCodeAdjustments
             ''TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    TestButton.Image = myImage
             '    TestButton.ImageAlign = ContentAlignment.MiddleCenter
@@ -563,7 +563,7 @@ Public Class IBarCodeAdjustments
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+            '    Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter

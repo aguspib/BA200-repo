@@ -761,40 +761,40 @@ Public Class IQCCumulatedReview
             'SEARCH Button
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                bsSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsSearchButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Search", pLanguageID))
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteCumulateSeries.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteCumulateSeries.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsDeleteCumulateSeries, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'ICONS for the Graph Legend GroupBox
             auxIconName = GetIconName("GREEN_CIRCLE")
-            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("BLUE_CIRCLE")
-            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VIOLET_CIRCLE")
-            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -1100,12 +1100,12 @@ Public Class IQCCumulatedReview
             Dim myTestIconList As New ImageList
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            myTestIconList.Images.Add("TESTICON", Image.FromFile(MyBase.IconsPath & GetIconName("TESTICON")))
-            myTestIconList.Images.Add("USERTEST", Image.FromFile(MyBase.IconsPath & GetIconName("USERTEST")))
-            myTestIconList.Images.Add("TISE_SYS", Image.FromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
-            myTestIconList.Images.Add("INUSETEST", Image.FromFile(MyBase.IconsPath & GetIconName("INUSETEST")))
-            myTestIconList.Images.Add("INUSUSTEST", Image.FromFile(MyBase.IconsPath & GetIconName("INUSUSTEST")))
-            myTestIconList.Images.Add("INUSETISE", Image.FromFile(MyBase.IconsPath & GetIconName("INUSETISE")))
+            myTestIconList.Images.Add("TESTICON", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TESTICON")))
+            myTestIconList.Images.Add("USERTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("USERTEST")))
+            myTestIconList.Images.Add("TISE_SYS", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
+            myTestIconList.Images.Add("INUSETEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSETEST")))
+            myTestIconList.Images.Add("INUSUSTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSUSTEST")))
+            myTestIconList.Images.Add("INUSETISE", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSETISE")))
 
             'Initialization of Tests/Sample Types list
             bsTestSampleListView.Items.Clear()

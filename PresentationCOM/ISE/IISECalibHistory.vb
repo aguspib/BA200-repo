@@ -229,10 +229,10 @@ Public Class IISECalibHistory
                     If Exists Then
                         If System.IO.File.Exists(iconPath & auxIconName) Then
                             Dim myUtil As New Utilities
-                            Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                            Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             myGlobalDataTO = myUtil.ResizeImage(myImage, New Size(20, 20))
                             If Not myGlobalDataTO.HasError And myGlobalDataTO.SetDatos IsNot Nothing Then
-                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             Else
                                 Me.BsMessageImage.BackgroundImage = myImage
                             End If
@@ -292,7 +292,7 @@ Public Class IISECalibHistory
             auxIconName = GetIconName(pImageName)
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then

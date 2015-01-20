@@ -860,7 +860,7 @@ Public Class IProgTestProfiles
                         If (myPreMasterDataDS.tfmwPreloadedMasterData.Rows.Count = 1) Then
                             If (IO.File.Exists(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc)) Then
                                 testProfIcon.Images.Add(myPreMasterDataDS.tfmwPreloadedMasterData(0).ItemID, _
-                                                        Image.FromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
+                                                        ImageUtilities.ImageFromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
                             End If
                         End If
                     End If
@@ -873,7 +873,7 @@ Public Class IProgTestProfiles
                         If (myPreMasterDataDS.tfmwPreloadedMasterData.Rows.Count = 1) Then
                             If (IO.File.Exists(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc)) Then
                                 testProfIcon.Images.Add(myPreMasterDataDS.tfmwPreloadedMasterData(0).ItemID, _
-                                                        Image.FromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
+                                                        ImageUtilities.ImageFromFile(IconsPath & myPreMasterDataDS.tfmwPreloadedMasterData(0).FixedItemDesc))
                             End If
                         End If
                     End If
@@ -1130,70 +1130,70 @@ Public Class IProgTestProfiles
             'ADD Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CUSTOMSORT Button 'AG 05/09/2014 - BA-1869
             auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
-                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'BSDoubleList Buttons
             auxIconName = GetIconName("FORWARDL")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.SelectAllButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.SelectAllButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("BACKWARDL")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.UnselectAllButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.UnselectAllButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("RIGHT")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.SelectChosenButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.SelectChosenButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("LEFT")
             If (auxIconName <> "") Then
-                bsTestsSelectionDoubleList.UnselectChosenButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestsSelectionDoubleList.UnselectChosenButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1218,27 +1218,27 @@ Public Class IProgTestProfiles
 
             auxIconName = GetIconName("TESTICON")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("USERTEST")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TCALC")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TISE_SYS")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TOFF_SYS")
             If (auxIconName <> "") Then
-                myTestTypeImageList.Images.Add(iconPath & auxIconName, Image.FromFile(iconPath & auxIconName))
+                myTestTypeImageList.Images.Add(iconPath & auxIconName, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareImageList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
