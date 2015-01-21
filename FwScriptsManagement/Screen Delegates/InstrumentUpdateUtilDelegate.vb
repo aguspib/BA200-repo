@@ -843,6 +843,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 #Region "Constants"
 
         Private Const FirmwareTag As String = " v"
+        Private Const ReleaseTag As String = "Release="     ' Tag to identify the Release info in the Firmware file (BA-1871).
         Private Const ChecksumTag As String = "CHECKSUM="
         Private Const SizeTag As String = "SIZE="
         Private Const StartTag As String = "START"
@@ -1173,11 +1174,13 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         ''' <returns></returns>
         ''' <remarks>
         ''' Modified by XB 04/02/2013 - Upper conversions redundants because the value is already in UpperCase must delete to avoid Regional Settings problems (Bugs tracking #1112)
+        '''             WE 21/01/2015 - BA-1871: extended with the ability to read the Release number in addition to the existing Version number.
         ''' </remarks>
         Private Function GetFWFileHeaderInfo(ByVal pStringData As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myVersion As String = ""
+                Dim myRelease As String = ""
                 Dim myCRC32Hex As String = ""
                 Dim mySize As Integer = -1
 
@@ -1186,13 +1189,18 @@ Namespace Biosystems.Ax00.FwScriptsManagement
 
                     Dim myLine As String = myLines(L)
                     If myLine.Length > 0 Then
-                        If myLine.Contains(MyClass.FirmwareTag) Then
-                            myVersion = myLine.Substring(myLine.IndexOf(MyClass.FirmwareTag) + 2).Trim
+                        If myLine.Contains(InstrumentUpdateUtilDelegate.FirmwareTag) Then
+                            ' Extract the Firmware version number (entire string directly after the Firmware tag).
+                            myVersion = myLine.Substring(myLine.IndexOf(InstrumentUpdateUtilDelegate.FirmwareTag) + 2).Trim
 
-                        ElseIf myLine.Contains(MyClass.ChecksumTag) Then
+                        ElseIf myLine.Contains(InstrumentUpdateUtilDelegate.ReleaseTag) Then
+                            ' Extract the Firmware release number (entire string directly after the Release tag).
+                            myRelease = myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim
+
+                        ElseIf myLine.Contains(InstrumentUpdateUtilDelegate.ChecksumTag) Then
                             myCRC32Hex = myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim    '.ToUpper
 
-                        ElseIf myLine.Contains(MyClass.SizeTag) Then
+                        ElseIf myLine.Contains(InstrumentUpdateUtilDelegate.SizeTag) Then
                             mySize = CInt(myLine.Substring(myLine.IndexOf("=") + 1).Replace(";", "").Trim)
                             'If mySize Mod 4 > 0 Then
                             '    myGlobal.HasError = True
@@ -1205,7 +1213,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 Next
 
                 If Not myGlobal.HasError Then
-                    MyClass.FWFileHeaderVersionAttr = myVersion
+                    'MyClass.FWFileHeaderVersionAttr = myVersion
+                    MyClass.FWFileHeaderVersionAttr = myVersion & "." & myRelease
                     MyClass.FWFileHeaderCRC32HexAttr = myCRC32Hex
                     MyClass.FWFileHeaderSizeAttr = mySize
                 End If
