@@ -2253,12 +2253,6 @@
     </StructureScript>
     <UpdateScript>
       UPDATE dbo.tfmwVersions SET UserSoftware = '3.0.5', ServiceSoftware = '1.2.4', FirmwareScripts = '1.1.0', Firmware = '0.20'
-      GO  
-
-      IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tcfgAnalyzers') = 1)
-      BEGIN
-      UPDATE [dbo].[tcfgAnalyzers]  SET Active = 0
-      END
       GO
 
       IF ((SELECT COUNT(*) FROM [dbo].[tcfgAnalyzers] WHERE [AnalyzerID] = 'SN0000099999_Ax200' ) = 0)
@@ -2267,7 +2261,6 @@
 
       END
       GO
-
 
       IF ((SELECT COUNT(*) FROM sys.sysobjects WHERE xtype = 'U' AND name = 'tfmwAnalyzerModelTubesByRing') = 1)
       BEGIN
