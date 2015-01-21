@@ -12,6 +12,7 @@ Imports System.Windows.Forms
 Imports System.Globalization
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Services
 
 Namespace Biosystems.Ax00.Core.Entities
     Partial Public Class AnalyzerEntity
@@ -2026,7 +2027,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Modified by: DL 21/06/2012 - 
         '''              AG 19/07/2012 -review and modify
         '''              XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
-        '''              AG 20 and 19/01/2015 BA-2216 add dynamic BL functionality and fix issues found!!!
+        '''              AG 20 and 19/01/2015 BA-2216 add dynamic BL functionality and fix issues found!!! (Start instrument process)
+        '''                                           use the new RotorChangeServices (Change rotor process)
         ''' </remarks>
         Private Function RecoverStableSetup(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -2089,7 +2091,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
                             ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
                         End If
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI"  Then
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
                         '3.	Re-send FLIGHT instruction in mode read
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
@@ -2175,49 +2177,8 @@ Namespace Biosystems.Ax00.Core.Entities
                     '4. DynamicBL_Read  = 'INI'
                     '5. DynamicBL_Empty = 'INI'
 
-                    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NewRotor.ToString) = "INI" Then
-                        '1.	Re-send NROTOR instruction. Requires analyzer status STANDBY
-                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.NROTOR)
-                        End If
-
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
-                        '2.	Re-send ALIGHT instruction (well 1). Requires analyzer status STANDBY
-                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
-                        End If
-
-                        'AG 19/01/2015 BA-2216
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
-                        'Re-send FLIGHT instruction in mode fill
-                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            CurrentInstructionAction = InstructionActions.FlightFilling
-                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
-                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-                        End If
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
-                        'Re-send FLIGHT instruction in mode read
-                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            CurrentInstructionAction = InstructionActions.FlightReading
-                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
-                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-                        End If
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
-                        'Re-send FLIGHT instruction in mode empty
-                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            CurrentInstructionAction = InstructionActions.FlightEmptying
-                            Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
-                            ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-                        End If
-                        'AG 19/01/2015 BA-2216
-
-                    End If
-
+                    Dim myRotorServices As New RotorChangeServices(Me)
+                    myRotorServices.RecoverProcess()
 
                     'Recover in course
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then

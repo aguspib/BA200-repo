@@ -130,6 +130,7 @@ Namespace Biosystems.Ax00.Core.Services
             If (_analyzer.Connected) Then 'AG 06/02/2012 - add AnalyzerController.Instance.Analyzer.Connected to the activation rule
 
                 resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True, Nothing, Nothing, Nothing)
+                _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
 
                 If Not resultData.HasError Then
                     _analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
@@ -173,6 +174,37 @@ Namespace Biosystems.Ax00.Core.Services
         Public Sub EmptyAndFinalizeProcess()
             _forceEmptyAndFinalize = True
         End Sub
+
+
+        ''' <summary>
+        ''' Recovers the system to a stable point after close and start application during change rotor process 'in course'
+        ''' </summary>
+        ''' <returns>TRUE process recovered | FALSE process could not be recovered</returns>
+        ''' <remarks>
+        ''' Modified by:  AG 20/01/2015 - BA-2216
+        ''' </remarks>
+        Public Function RecoverProcess() As Boolean
+            Dim valueToReturn As Boolean = True
+            Try
+
+                InitializeRecover() 'Initialize flags
+                Dim nextStep As RotorChangeStepsEnum
+                nextStep = GetNextStep()
+
+                If nextStep = RotorChangeStepsEnum.NewRotor Then
+                    ExecuteNewRotorStep()
+                Else
+                    'CheckIfCanContinue()
+                End If
+
+
+            Catch ex As Exception
+                valueToReturn = False
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "RotorChangeServices.RecoverProcess", EventLogEntryType.Error, False)
+            End Try
+            Return valueToReturn
+        End Function
 
 #End Region
 
@@ -233,12 +265,12 @@ Namespace Biosystems.Ax00.Core.Services
 
 
                 Case RotorChangeStepsEnum.DynamicBaseLineFill
-                        If (_analyzer.CheckIfWashingIsPossible()) Then
-                            RestartProcess()
-                            ExecuteDynamicBaseLineFillStep()
-                        Else
-                            CancelDynamicBaseLineFillStep()
-                        End If
+                    If (_analyzer.CheckIfWashingIsPossible()) Then
+                        RestartProcess()
+                        ExecuteDynamicBaseLineFillStep()
+                    Else
+                        CancelDynamicBaseLineFillStep()
+                    End If
 
                 Case RotorChangeStepsEnum.DynamicBaseLineRead
                         ExecuteDynamicBaseLineReadStep()
@@ -277,6 +309,11 @@ Namespace Biosystems.Ax00.Core.Services
         Private Function GetNextStep() As RotorChangeStepsEnum
 
             If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
+
+                'AG 20/01/2015 BA-2216
+                If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "") Then
+                    Return RotorChangeStepsEnum.NewRotor
+                End If
 
                 If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "END") Then
 
@@ -692,6 +729,53 @@ Namespace Biosystems.Ax00.Core.Services
             _dynamicBaseLineValid = _analyzer.ProcessFlightReadAction()
         End Sub
 
+        ''' <summary>
+        ''' Set the flags into a stable value for repeat last action and recover the process
+        ''' </summary>
+        ''' <remarks>AG 20/01/2015 BA-2216</remarks>
+        Private Sub InitializeRecover()
+
+            Initialize()
+
+            If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "INI") Then
+                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "" 'Re-send NROTOR
+
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "INI") Then
+                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Re-send ALIGHT
+
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "INI") Then
+                _staticBaseLineFinished = True
+                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "" 'Re-send FLIGHT mode fill
+
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "INI") Then
+                _staticBaseLineFinished = True
+                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "" 'Re-send FLIGHT mode read
+
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "INI") Then
+                _staticBaseLineFinished = True
+                _dynamicBaseLineValid = True
+                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "" 'Re-send FLIGHT mode empty
+            End If
+        End Sub
+
+        ''' <summary>
+        ''' Sends instruction NROTOR again
+        ''' </summary>
+        ''' <remarks>AG 20/01/2015 BA-2216</remarks>
+        Private Sub ExecuteNewRotorStep()
+            Dim resultData As New GlobalDataTO
+            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
+            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "INI")
+            resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True) 'Send a WASH instruction (Conditioning complete)
+
+            'Update analyzer session flags into DataBase
+            If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+            End If
+
+        End Sub
 
 #End Region
 
