@@ -1530,7 +1530,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             If wupManeuversFinishFlag Then
                                                 'Inform the presentation layer to activate the STOP wup button
                                                 UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WARMUP_MANEUVERS_FINISHED, 1, True)
-                                                MyClass.ISE_Manager.IsAnalyzerWarmUp = False 'AG 22/05/2012 - ISE alarms ready to be shown
+                                                Me.ISE_Manager.IsAnalyzerWarmUp = False 'AG 22/05/2012 - ISE alarms ready to be shown
 
                                                 'AG 23/05/2012 - Evaluate if Sw has to recommend to change reactions rotor (remember all alarms are remove when Start Instruments starts)
                                                 Dim analyzerReactRotor As New AnalyzerReactionsRotorDelegate
@@ -1554,7 +1554,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                 Dim tempISEAlarmList As New List(Of GlobalEnumerates.Alarms)
                                                 Dim tempISEAlarmStatusList As New List(Of Boolean)
-                                                myGlobalDataTO = MyClass.ISE_Manager.CheckAlarms(MyClass.Connected, tempISEAlarmList, tempISEAlarmStatusList)
+                                                myGlobalDataTO = Me.ISE_Manager.CheckAlarms(Me.Connected, tempISEAlarmList, tempISEAlarmStatusList)
 
                                                 AlarmList.Clear()
                                                 AlarmStatusList.Clear()
@@ -4434,6 +4434,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                                           version (ProcessISETESTResultsNEW) 
         '''               XB 30/09/2014 - Implement Start Task Timeout for ISE commands - Remove too restrictive limitations because timeouts - BA-1872
         '''               XB 19/11/2014 - Emplace the kind of errors derived of BA-1614 inside the management of timeouts and automatic instructions repetitions - BA-1872
+        '''               XB 21/01/2015 - Refresh Alarms about ISE calibrations and clean - BA-1873
         ''' </remarks>
         Public Function ProcessRecivedISEResult(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim myGlobalDataTO As New GlobalDataTO
@@ -4474,20 +4475,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 If myPreparationID = 0 Then
 
-                    MyClass.ISE_Manager.LastISEResult = New ISEResultTO
+                    Me.ISE_Manager.LastISEResult = New ISEResultTO
 
                     'ISECMD answer
-                    Dim myCurrentProcedure As ISEManager.ISEProcedures = MyClass.ISE_Manager.CurrentProcedure
-                    myGlobalDataTO = myISEResultsDelegate.ProcessISECMDResults(myISEResult, AnalyzerIDAttribute, MyClass.ISE_Manager.IsBiosystemsValidationMode)
+                    Dim myCurrentProcedure As ISEManager.ISEProcedures = Me.ISE_Manager.CurrentProcedure
+                    myGlobalDataTO = myISEResultsDelegate.ProcessISECMDResults(myISEResult, AnalyzerIDAttribute, Me.ISE_Manager.IsBiosystemsValidationMode)
                     If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
-                        MyClass.ISE_Manager.LastISEResult = CType(myGlobalDataTO.SetDatos, ISEResultTO)
+                        Me.ISE_Manager.LastISEResult = CType(myGlobalDataTO.SetDatos, ISEResultTO)
                         'SGM 17/02/2012 ISE Communications Ok
-                        If MyClass.ISE_Manager IsNot Nothing Then
-                            If MyClass.ISE_Manager.IsCommErrorDetected Then
-                                'MyClass.ISE_Manager.IsISECommsOk = False       ' XB 30/09/2014 - BA-1872
-                                MyClass.ISE_Manager.IsCommErrorDetected = False
+                        If Me.ISE_Manager IsNot Nothing Then
+                            If Me.ISE_Manager.IsCommErrorDetected Then
+                                'Me.ISE_Manager.IsISECommsOk = False       ' XB 30/09/2014 - BA-1872
+                                Me.ISE_Manager.IsCommErrorDetected = False
                             Else
-                                MyClass.ISE_Manager.IsISECommsOk = True
+                                Me.ISE_Manager.IsISECommsOk = True
                             End If
                         End If
                         'end SGM 17/02/2012
@@ -4495,22 +4496,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'SGM 11/05/2012
                         Dim myISEResultWithErrors As ISEResultTO = New ISEResultTO
                         myISEResultWithErrors.ISEResultType = ISEResultTO.ISEResultTypes.SwError
-                        MyClass.ISE_Manager.LastISEResult = myISEResultWithErrors
+                        Me.ISE_Manager.LastISEResult = myISEResultWithErrors
                     End If
 
                     'SGM 27/07/2012 - Activate alarmas related to ERC errors (or CALB results error)
-                    If Not MyClass.ISE_Manager.IsInUtilities Then
+                    If Not Me.ISE_Manager.IsInUtilities Then
                         If ISE_Manager.LastISEResult IsNot Nothing Then
                             If ISE_Manager.LastISEResult.IsCancelError Then
                                 Select Case ISE_Manager.LastISEResult.Errors(0).ErrorCycle
                                     Case ISEErrorTO.ErrorCycles.Calibration, ISEErrorTO.ErrorCycles.PumpCalibration, ISEErrorTO.ErrorCycles.BubbleDetCalibration
-                                        MyClass.ActivateAnalyzerISEAlarms(MyClass.ISE_Manager.LastISEResult)
+                                        Me.ActivateAnalyzerISEAlarms(Me.ISE_Manager.LastISEResult)
                                 End Select
                             ElseIf ISE_Manager.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.CAL Then
                                 If ISE_Manager.LastISEResult.Errors.Count > 0 Then
                                     For Each E As ISEErrorTO In ISE_Manager.LastISEResult.Errors
                                         If myCurrentProcedure = ISEManager.ISEProcedures.CalibrateElectrodes Then
-                                            MyClass.BlockISEPreparationByElectrode(dbConnection, MyClass.ISE_Manager.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
+                                            Me.BlockISEPreparationByElectrode(dbConnection, Me.ISE_Manager.LastISEResult, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                         End If
                                     Next
                                 End If
@@ -4533,21 +4534,21 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else
                         'USER SOFTWARE
                         If String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEClean.ToString), "INI") Then
-                            If Not MyClass.ISE_Manager.LastISEResult.IsCancelError Then
+                            If Not Me.ISE_Manager.LastISEResult.IsCancelError Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "END")
                             Else
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEClean, "CANCELED")
                             End If
 
                         ElseIf String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib.ToString), "INI") Then
-                            If Not MyClass.ISE_Manager.LastISEResult.IsCancelError Then
+                            If Not Me.ISE_Manager.LastISEResult.IsCancelError Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib, "END")
                             Else
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEPumpCalib, "CANCELED")
                             End If
 
                         ElseIf String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB.ToString), "INI") Then
-                            If Not MyClass.ISE_Manager.LastISEResult.IsCancelError Then
+                            If Not Me.ISE_Manager.LastISEResult.IsCancelError Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB, "END")
                             Else
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISECalibAB, "CANCELED")
@@ -4580,7 +4581,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         End If
 
-                        If MyClass.ISE_Manager.LastISEResult.IsCancelError Then
+                        If Me.ISE_Manager.LastISEResult.IsCancelError Then
                             'Mark ise auto conditioning process as finished
                             If String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess.ToString), "INPROCESS") Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConditioningProcess, "CLOSED")
@@ -4608,7 +4609,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 ElseIf myPreparationID > 0 Then
                     'ISETEST answer
-                    MyClass.ISE_Manager.LastISEResult = New ISEResultTO
+                    Me.ISE_Manager.LastISEResult = New ISEResultTO
 
                     'BT #1660 - Call the new version of function ProcessISETESTResults
                     myGlobalDataTO = myISEResultsDelegate.ProcessISETESTResultsNEW(dbConnection, myPreparationID, myISEResult, myISEMode, WorkSessionIDAttribute, AnalyzerIDAttribute)
@@ -4616,10 +4617,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     'UI refresh dataset (new results AND new rotor position status)
                     If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
 
-                        MyClass.ISE_Manager.LastISEResult = myISEResult 'SGM 12/01/2012
+                        Me.ISE_Manager.LastISEResult = myISEResult 'SGM 12/01/2012
                         'SGM 17/02/2012 ISE Communications Ok
-                        If MyClass.ISE_Manager IsNot Nothing Then
-                            MyClass.ISE_Manager.IsISECommsOk = True
+                        If Me.ISE_Manager IsNot Nothing Then
+                            Me.ISE_Manager.IsISECommsOk = True
                         End If
                         'end SGM 17/02/2012
 
@@ -4674,7 +4675,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'SGM 24/07/2012
                         'Block ISE Preparations in case of Cancel Error (ERC) more than 2 times
-                        If MyClass.ISE_Manager.ISEWSCancelErrorCounter >= 3 Then
+                        If Me.ISE_Manager.ISEWSCancelErrorCounter >= 3 Then
 
                             Dim exec_delg As New ExecutionsDelegate
 
@@ -4736,7 +4737,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                myGlobalDataTO = MyClass.ISE_Manager.CheckAlarms(MyClass.Connected, myAlarmListTmp, myAlarmStatusListTmp)
+                myGlobalDataTO = Me.ISE_Manager.CheckAlarms(Me.Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobalDataTO.HasError Then
 
                     ' Deactivates Alarm begin - BA-1872
@@ -4746,6 +4747,52 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     alarmID = GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR
                     alarmStatus = False
                     ISE_Manager.IsTimeOut = False
+
+                    ' XB 21/01/2015 - BA-1873
+                    If Me.ISE_Manager.IsISEModuleInstalled And Me.ISE_Manager.IsISEModuleReady Then
+                        ' Check if ISE Electrodes calibration is required
+                        Dim ElectrodesCalibrationRequired As Boolean = False
+                        myGlobalDataTO = Me.ISE_Manager.CheckElectrodesCalibrationIsNeeded()
+                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                            ElectrodesCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                        If ElectrodesCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Pumps calibration is required
+                        Dim PumpsCalibrationRequired As Boolean = False
+                        myGlobalDataTO = Me.ISE_Manager.CheckPumpsCalibrationIsNeeded
+                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                            PumpsCalibrationRequired = CType(myGlobalDataTO.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                        If PumpsCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Clean is required
+                        Dim CleanRequired As Boolean = False
+                        myGlobalDataTO = Me.ISE_Manager.CheckCleanIsNeeded
+                        If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
+                            CleanRequired = CType(myGlobalDataTO.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                        If CleanRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+                    End If
+                    ' XB 21/01/2015 - BA-1873
 
                     PrepareLocalAlarmList(alarmID, alarmStatus, myAlarmList, myAlarmStatusList)
                     ' Deactivates Alarm end - BA-1872
@@ -4780,12 +4827,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' XB 19/11/2014 - BA-1872
                 If ISE_Manager.FirmwareErrDetected Then
                     Debug.Print(DateTime.Now.ToString("HH:mm:ss:fff") + " - Set TimerStartTaskControl to [" & WAITING_TIME_FAST.ToString & "] seconds")
-                    MyClass.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
+                    Me.InitializeTimerStartTaskControl(WAITING_TIME_FAST, True)
                 Else
                     ISECMDLost = False
-                    MyClass.sendingRepetitions = False
-                    MyClass.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
-                    MyClass.ClearStartTaskQueueToSend()
+                    Me.sendingRepetitions = False
+                    Me.InitializeTimerStartTaskControl(WAITING_TIME_OFF)
+                    Me.ClearStartTaskQueueToSend()
                 End If
                 ' XB 19/11/2014 - BA-1872
 
@@ -5239,7 +5286,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Refreshes ISE alarms
         ''' </summary>
         ''' <returns></returns>
-        ''' <remarks>Created by SGM 07/06/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 07/06/2012
+        ''' Modified by XB 21/01/2015 - Refresh Alarms about ISE calibrations and clean - BA-1873
+        ''' </remarks>
         Public Function RefreshISEAlarms() As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Try
@@ -5250,6 +5300,52 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 myGlobal = MyClass.ISE_Manager.CheckAlarms(MyClass.Connected, myAlarmListTmp, myAlarmStatusListTmp)
                 If Not myGlobal.HasError Then
+
+                    ' XB 21/01/2015 - BA-1873
+                    If Me.ISE_Manager.IsISEModuleInstalled And Me.ISE_Manager.IsISEModuleReady Then
+                        ' Check if ISE Electrodes calibration is required
+                        Dim ElectrodesCalibrationRequired As Boolean = False
+                        myGlobal = Me.ISE_Manager.CheckElectrodesCalibrationIsNeeded()
+                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                            ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                        If ElectrodesCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Pumps calibration is required
+                        Dim PumpsCalibrationRequired As Boolean = False
+                        myGlobal = Me.ISE_Manager.CheckPumpsCalibrationIsNeeded
+                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                            PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                        If PumpsCalibrationRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+
+                        ' Check if ISE Clean is required
+                        Dim CleanRequired As Boolean = False
+                        myGlobal = Me.ISE_Manager.CheckCleanIsNeeded
+                        If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                            CleanRequired = CType(myGlobal.SetDatos, Boolean)
+                        End If
+
+                        myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                        If CleanRequired Then
+                            myAlarmStatusList.Add(True)
+                        Else
+                            myAlarmStatusList.Add(False)
+                        End If
+                    End If
+                    ' XB 21/01/2015 - BA-1873
 
                     For i As Integer = 0 To myAlarmListTmp.Count - 1
                         PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)

@@ -2057,6 +2057,9 @@ Public Class IMonitor
                 If Not mdiAnalyzerCopy.Connected Then mdiAnalyzerCopy.ISE_Manager.RefreshMonitorDataTO() 'refresh in case of disconnected SGM 03/04/2012
                 Me.BsIseMonitor.RefreshFieldsData(mdiAnalyzerCopy.ISE_Manager.MonitorDataTO)
             End If
+            ' XB 21/01/2015 - Refresh ISE Alarms when access to this tab - BA-1873
+        ElseIf MonitorTabs.SelectedTabPage.Name = MainTab.Name Then
+            mdiAnalyzerCopy.RefreshISEAlarms()
         End If
     End Sub
 

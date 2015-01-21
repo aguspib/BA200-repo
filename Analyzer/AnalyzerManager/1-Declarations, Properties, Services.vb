@@ -1511,7 +1511,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <summary>
         ''' Detects that the ISE has finished the initial data retrieving process (Ok or not)
         ''' </summary>
-        ''' <remarks>Created by SGM 15/03/2012</remarks>
+        ''' <remarks>
+        ''' Created by SGM 15/03/2012
+        ''' Modified by XB 21/01/2015 - Refresh Alarms about ISE calibrations and clean - BA-1873
+        ''' </remarks>
         Public Sub OnISEConnectionFinished(ByVal pOk As Boolean) Handles ISE_Manager.ISEConnectionFinished
             Try
                 Dim myGlobal As New GlobalDataTO
@@ -1522,7 +1525,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                myGlobal = MyClass.ISE_Manager.CheckAlarms(MyClass.Connected, myAlarmList, myAlarmStatusList)
+                myGlobal = Me.ISE_Manager.CheckAlarms(MyClass.Connected, myAlarmList, myAlarmStatusList)
 
                 If pOk Then
                     myValue = 1
@@ -1545,6 +1548,52 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myAlarmList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
                     myAlarmStatusList.Add(False)
                 End If
+
+                ' XB 21/01/2015 - BA-1873
+                If Me.ISE_Manager.IsISEModuleInstalled And Me.ISE_Manager.IsISEModuleReady Then
+                    ' Check if ISE Electrodes calibration is required
+                    Dim ElectrodesCalibrationRequired As Boolean = False
+                    myGlobal = Me.ISE_Manager.CheckElectrodesCalibrationIsNeeded()
+                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                        ElectrodesCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                    End If
+
+                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CALB_PDT_WARN)
+                    If ElectrodesCalibrationRequired Then
+                        myAlarmStatusList.Add(True)
+                    Else
+                        myAlarmStatusList.Add(False)
+                    End If
+
+                    ' Check if ISE Pumps calibration is required
+                    Dim PumpsCalibrationRequired As Boolean = False
+                    myGlobal = Me.ISE_Manager.CheckPumpsCalibrationIsNeeded
+                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                        PumpsCalibrationRequired = CType(myGlobal.SetDatos, Boolean)
+                    End If
+
+                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_PUMP_PDT_WARN)
+                    If PumpsCalibrationRequired Then
+                        myAlarmStatusList.Add(True)
+                    Else
+                        myAlarmStatusList.Add(False)
+                    End If
+
+                    ' Check if ISE Clean is required
+                    Dim CleanRequired As Boolean = False
+                    myGlobal = Me.ISE_Manager.CheckCleanIsNeeded
+                    If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing Then
+                        CleanRequired = CType(myGlobal.SetDatos, Boolean)
+                    End If
+
+                    myAlarmList.Add(GlobalEnumerates.Alarms.ISE_CLEAN_PDT_WARN)
+                    If CleanRequired Then
+                        myAlarmStatusList.Add(True)
+                    Else
+                        myAlarmStatusList.Add(False)
+                    End If
+                End If
+                ' XB 21/01/2015 - BA-1873
 
                 For i As Integer = 0 To myAlarmListTmp.Count - 1
                     PrepareLocalAlarmList(myAlarmListTmp(i), myAlarmStatusListTmp(i), myAlarmList, myAlarmStatusList)
