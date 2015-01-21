@@ -81,9 +81,12 @@ Public Class BSBaseForm
     Private Shared skinsLoaded As Boolean = False
     Protected Friend Sub New()
 
-
         'Set it BEFORE adding controls, so they're created with the appropriate skin settings, instead of creating them and modifying them later
         If Not skinsLoaded Then
+            'Register explicitly BonusSkins assembly and select Skin
+            DevExpress.UserSkins.BonusSkins.Register()
+            LookAndFeel.SkinName = "Blue"
+
             DevExpress.Skins.SkinManager.EnableFormSkins()
             DevExpress.Skins.SkinManager.EnableMdiFormSkins()
             skinsLoaded = True

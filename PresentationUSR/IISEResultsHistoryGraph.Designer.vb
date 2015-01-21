@@ -1,4 +1,6 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿Imports DevExpress.Utils
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class IISEResultsHistoryGraph
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
@@ -147,7 +149,7 @@ Partial Class IISEResultsHistoryGraph
         Me.bsISEResultChartControl.Name = "bsISEResultChartControl"
         Me.bsISEResultChartControl.PaletteName = "Nature Colors"
         Me.bsISEResultChartControl.SeriesSerializable = New DevExpress.XtraCharts.Series(-1) {}
-        SideBySideBarSeriesLabel1.LineVisible = True
+        SideBySideBarSeriesLabel1.LineVisibility = DefaultBoolean.True
         Me.bsISEResultChartControl.SeriesTemplate.Label = SideBySideBarSeriesLabel1
         Me.bsISEResultChartControl.Size = New System.Drawing.Size(669, 331)
         Me.bsISEResultChartControl.TabIndex = 5

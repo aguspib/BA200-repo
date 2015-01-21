@@ -249,60 +249,60 @@ Public Class QCIndividualResultsByTestReport
             series4.Points.Add(New SeriesPoint((pControl1Mean - pControl1SD), (pControl2Mean + pControl2SD)))
 
             myLineSeriesView = CType(series4.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series4.PointOptions.PointView = PointView.Values
+            series4.Label.TextPattern = "{V}"
             series4.ArgumentScaleType = ScaleType.Numerical
             series4.ValueScaleType = ScaleType.Numerical
-            series4.Label.Visible = False
+            series4.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series41 As New Series("SD1L2", ViewType.Line)
             series41.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), pControl2Mean + (pControl2SD)))
             series41.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), (pControl2Mean - (pControl2SD))))
 
             myLineSeriesView = CType(series41.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series41.PointOptions.PointView = PointView.Values
+            series41.Label.TextPattern = "{V}"
             series41.ArgumentScaleType = ScaleType.Numerical
             series41.ValueScaleType = ScaleType.Numerical
-            series41.Label.Visible = False
+            series41.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series42 As New Series("SD1L3", ViewType.Line)
             series42.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), pControl2Mean - (pControl2SD)))
             series42.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), (pControl2Mean - (pControl2SD))))
 
             myLineSeriesView = CType(series42.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series42.PointOptions.PointView = PointView.Values
+            series42.Label.TextPattern = "{V}"
             series42.ArgumentScaleType = ScaleType.Numerical
             series42.ValueScaleType = ScaleType.Numerical
-            series42.Label.Visible = False
+            series42.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series43 As New Series("SD1L4", ViewType.Line)
             series43.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), pControl2Mean - (pControl2SD)))
             series43.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), (pControl2Mean + (pControl2SD))))
 
             myLineSeriesView = CType(series43.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series43.PointOptions.PointView = PointView.Values
+            series43.Label.TextPattern = "{V}"
             series43.ArgumentScaleType = ScaleType.Numerical
             series43.ValueScaleType = ScaleType.Numerical
-            series43.Label.Visible = False
+            series43.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             '****************'
             '*  Square SD2  *'
@@ -312,60 +312,60 @@ Public Class QCIndividualResultsByTestReport
             series40.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), (pControl2Mean + 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series40.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series40.PointOptions.PointView = PointView.Values
+            series40.Label.TextPattern = "{V}"
             series40.ArgumentScaleType = ScaleType.Numerical
             series40.ValueScaleType = ScaleType.Numerical
-            series40.Label.Visible = False
+            series40.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series410 As New Series("SD2L2", ViewType.Line)
             series410.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), pControl2Mean + 2 * (pControl2SD)))
             series410.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), (pControl2Mean - 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series410.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series410.PointOptions.PointView = PointView.Values
+            series410.Label.TextPattern = "{V}"
             series410.ArgumentScaleType = ScaleType.Numerical
             series410.ValueScaleType = ScaleType.Numerical
-            series410.Label.Visible = False
+            series410.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series420 As New Series("SD2L3", ViewType.Line)
             series420.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), pControl2Mean - 2 * (pControl2SD)))
             series420.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), (pControl2Mean - 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series420.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series420.PointOptions.PointView = PointView.Values
+            series420.Label.TextPattern = "{V}"
             series420.ArgumentScaleType = ScaleType.Numerical
             series420.ValueScaleType = ScaleType.Numerical
-            series420.Label.Visible = False
+            series420.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series430 As New Series("SD2L4", ViewType.Line)
             series430.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), pControl2Mean - 2 * (pControl2SD)))
             series430.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), (pControl2Mean + 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series430.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series430.PointOptions.PointView = PointView.Values
+            series430.Label.TextPattern = "{V}"
             series430.ArgumentScaleType = ScaleType.Numerical
             series430.ValueScaleType = ScaleType.Numerical
-            series430.Label.Visible = False
+            series430.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             '****************'
             '*  Square SD3  *'
@@ -375,60 +375,60 @@ Public Class QCIndividualResultsByTestReport
             series50.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), (pControl2Mean + 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series50.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series50.PointOptions.PointView = PointView.Values
+            series50.Label.TextPattern = "{V}"
             series50.ArgumentScaleType = ScaleType.Numerical
             series50.ValueScaleType = ScaleType.Numerical
-            series50.Label.Visible = False
+            series50.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series51 As New Series("SD3L2", ViewType.Line)
             series51.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), pControl2Mean + 3 * (pControl2SD)))
             series51.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), (pControl2Mean - 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series51.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series51.PointOptions.PointView = PointView.Values
+            series51.Label.TextPattern = "{V}"
             series51.ArgumentScaleType = ScaleType.Numerical
             series51.ValueScaleType = ScaleType.Numerical
-            series51.Label.Visible = False
+            series51.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series52 As New Series("SD3L3", ViewType.Line)
             series52.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), pControl2Mean - 3 * (pControl2SD)))
             series52.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), (pControl2Mean - 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series52.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series52.PointOptions.PointView = PointView.Values
+            series52.Label.TextPattern = "{V}"
             series52.ArgumentScaleType = ScaleType.Numerical
             series52.ValueScaleType = ScaleType.Numerical
-            series52.Label.Visible = False
+            series52.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series53 As New Series("SD3L4", ViewType.Line)
             series53.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), pControl2Mean - 3 * (pControl2SD)))
             series53.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), (pControl2Mean + 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series53.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series53.PointOptions.PointView = PointView.Values
+            series53.Label.TextPattern = "{V}"
             series53.ArgumentScaleType = ScaleType.Numerical
             series53.ValueScaleType = ScaleType.Numerical
-            series53.Label.Visible = False
+            series53.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             '*******************'
             '*  Diagonal Line  *'
@@ -438,14 +438,14 @@ Public Class QCIndividualResultsByTestReport
             series60.Points.Add(New SeriesPoint(pControl1Mean + 7 * (pControl1SD), (pControl2Mean + 7 * (pControl2SD))))
 
             myLineSeriesView = CType(series60.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Gray   'Color.Red
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series60.PointOptions.PointView = PointView.Values
+            series60.Label.TextPattern = "{V}"
             series60.ArgumentScaleType = ScaleType.Numerical
             series60.ValueScaleType = ScaleType.Numerical
-            series60.Label.Visible = False
+            series60.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
 
             XrYoudenGraph.Series.AddRange(New Series() {series4, series41, series42, series43, series40, series410, _
@@ -473,7 +473,7 @@ Public Class QCIndividualResultsByTestReport
 
         'The Graph
         XrYoudenGraph.Series.Clear()
-        XrYoudenGraph.Legend.Visible = False
+        XrYoudenGraph.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
         XrYoudenGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
         XrYoudenGraph.BackColor = Color.White
 
@@ -519,8 +519,8 @@ Public Class QCIndividualResultsByTestReport
 
                 XrYoudenGraph.Series.Add(mySelectecControlLotList.First().ControlNameLotNum, ViewType.Point)
                 XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).ShowInLegend = True
-                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Label.Visible = False
-                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).PointOptions.PointView = PointView.Values
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
+                XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).Label.TextPattern = "{V}"
                 XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
                 XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                 XrYoudenGraph.Series(mySelectecControlLotList.First().ControlNameLotNum).View.Color = Color.Black
@@ -528,8 +528,10 @@ Public Class QCIndividualResultsByTestReport
                 Dim myDiagram As XYDiagram = CType(XrYoudenGraph.Diagram, XYDiagram)
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
-                myDiagram.AxisY.Range.Auto = False
-                myDiagram.AxisX.Range.Auto = False
+                myDiagram.AxisY.WholeRange.Auto = False
+                myDiagram.AxisX.WholeRange.Auto = False
+                myDiagram.AxisY.VisualRange.Auto = False
+                myDiagram.AxisX.VisualRange.Auto = False
 
                 Dim XResultValues As New List(Of Single)
                 If (numOfSelectedCtrls = 1) Then
@@ -550,18 +552,22 @@ Public Class QCIndividualResultsByTestReport
                                                Not a.Excluded _
                                          Select a.VisibleResultValue).ToList()
 
-                        myDiagram.AxisX.Range.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                        myDiagram.AxisX.WholeRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                                                                                      Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
+                        myDiagram.AxisX.VisualRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
                                                               Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
-                        myDiagram.AxisX.Title.Visible = True
+                        myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisX.Title.Antialiasing = False
                         myDiagram.AxisX.Title.TextColor = Color.Black
                         myDiagram.AxisX.Title.Alignment = StringAlignment.Center
                         myDiagram.AxisX.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
                         myDiagram.AxisX.Title.Text = mySelectecControlLotList.First().ControlName
 
-                        myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                        myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                                                                                      Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
+                        myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
                                                               Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
-                        myDiagram.AxisY.Title.Visible = True
+                        myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisY.Title.Antialiasing = False
                         myDiagram.AxisY.Title.TextColor = Color.Black
                         myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -613,8 +619,9 @@ Public Class QCIndividualResultsByTestReport
                         Dim MaxValue As Single = Convert.ToSingle(Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3))
                         If (MaxValue < XResultValues.Max) Then MaxValue = XResultValues.Max
 
-                        myDiagram.AxisX.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
-                        myDiagram.AxisX.Title.Visible = True
+                        myDiagram.AxisX.WholeRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisX.VisualRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisX.Title.Antialiasing = False
                         myDiagram.AxisX.Title.TextColor = Color.Black
                         myDiagram.AxisX.Title.Alignment = StringAlignment.Center
@@ -634,8 +641,9 @@ Public Class QCIndividualResultsByTestReport
                         MaxValue = Convert.ToSingle(Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MaxValue < YResultValues.Max) Then MaxValue = YResultValues.Max
 
-                        myDiagram.AxisY.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
-                        myDiagram.AxisY.Title.Visible = True
+                        myDiagram.AxisY.WholeRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisY.VisualRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisY.Title.Antialiasing = False
                         myDiagram.AxisY.Title.TextColor = Color.Black
                         myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -673,8 +681,8 @@ Public Class QCIndividualResultsByTestReport
                     myDiagram.AxisY.ConstantLines.Clear()
                     myDiagram.AxisX.ConstantLines.Clear()
 
-                    myDiagram.AxisY.Title.Visible = False
-                    myDiagram.AxisX.Title.Visible = False
+                    myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
+                    myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                 End If
             End If

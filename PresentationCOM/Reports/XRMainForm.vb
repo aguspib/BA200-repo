@@ -84,7 +84,7 @@ Public Class XRMainForm
             If Not Report Is Nothing Then
                 ' Bind the report's printing system to the print control. 
 
-                PrintControl1.PrintingSystem = Report.PrintingSystem
+                DocumentViewer1.PrintingSystem = Report.PrintingSystem
 
 
                 ' Generate the report's print document. 
@@ -95,7 +95,7 @@ Public Class XRMainForm
 
                 'PrintControl1.PrintingSystem.Watermark.Text = "Biosystems"
                 'PrintControl1.ShowPageMargins = False
-                PrintControl1.ShowPageMargins = True  'EF 29/08/2014 - BA-1917 -- Activar seleccion de margenes vista previa del informe
+                DocumentViewer1.ShowPageMargins = True  'EF 29/08/2014 - BA-1917 -- Activar seleccion de margenes vista previa del informe
 
                 Me.PreviewBar3.Visible = False
 
@@ -103,7 +103,7 @@ Public Class XRMainForm
 
                 'ShowHideVisibleElements()
 
-                If Report.Landscape Then PrintControl1.Zoom = 0.9
+                If Report.Landscape Then DocumentViewer1.Zoom = 0.9
             End If
 
         Catch ex As Exception
@@ -208,17 +208,19 @@ Public Class XRMainForm
         PrintPreviewBarItem26.Visibility = DevExpress.XtraBars.BarItemVisibility.Never
     End Sub
 
-    Private Sub PrintControl1_SelectedPageChanged(ByVal sender As System.Object, ByVal e As DevExpress.XtraPrinting.PageEventArgs) Handles PrintControl1.SelectedPageChanged
-        PrintPreviewStaticItem1.Caption = String.Format("Página {0} de {1}", e.Page.Index + 1, PrintControl1.PrintingSystem.Pages.Count)
+    Private Sub PrintControl1_SelectedPageChanged(sender As Object, e As EventArgs) Handles DocumentViewer1.SelectedPageChanged
+        Dim docvw As DevExpress.XtraPrinting.Preview.DocumentViewer = TryCast(sender, DevExpress.XtraPrinting.Preview.DocumentViewer)
+        PrintPreviewStaticItem1.Caption = String.Format("Página {0} de {1}", docvw.SelectedPageIndex + 1, docvw.PrintingSystem.Pages.Count)
     End Sub
+
 
     Private Sub XRForm_FormClosed(ByVal sender As System.Object, ByVal e As FormClosedEventArgs) Handles MyBase.FormClosed
         Try
             'JVV 01/10
             'If Report.Pages.Count > pagesPrinted Then MessageBox.Show("Printed: " & pagesPrinted & " / " & Report.Pages.Count)
             'JVV 01/10
-            PrintControl1.PrintingSystem.ClearContent()
-            PrintControl1.PrintingSystem = Nothing
+            DocumentViewer1.PrintingSystem.ClearContent()
+            DocumentViewer1.PrintingSystem = Nothing
             If Not Report Is Nothing Then
                 Report.ClosePreview()
                 Report = Nothing
@@ -317,7 +319,7 @@ Public Class XRMainForm
 
 #End Region
 
-    Private Sub PrintControl1_Load(sender As Object, e As EventArgs) Handles PrintControl1.Load
+    Private Sub PrintControl1_Load(sender As Object, e As EventArgs) Handles DocumentViewer1.Load
 
     End Sub
 End Class

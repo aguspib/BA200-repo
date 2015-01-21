@@ -2,7 +2,7 @@ Imports DevExpress.XtraReports.UI
 
 Public Class GenericTableReport
 
-    Private SaveProcessDuplicates As New Dictionary(Of String, DevExpress.XtraReports.UI.ValueSuppressType)
+    Private SaveProcessDuplicates As New Dictionary(Of String, DevExpress.XtraReports.UI.ProcessDuplicatesMode)
 
     Public Sub SetHeaderLabel(ByVal aText As String)
         XrHeaderLabel.Text = aText
@@ -34,7 +34,10 @@ Public Class GenericTableReport
 
         'Save Cell's ProcessDuplicates value
         For Each Cell As XRTableCell In Row.Cells
-            SaveProcessDuplicates(Cell.Name) = Cell.ProcessDuplicates
+            If (Cell.ProcessDuplicatesMode = ProcessDuplicatesMode.Merge) Then
+                Cell.ProcessDuplicatesMode = ProcessDuplicatesMode.Suppress
+            End If
+            SaveProcessDuplicates(Cell.Name) = Cell.ProcessDuplicatesMode
         Next
 
         Dim Index As Integer = Row.Report.CurrentRowIndex
@@ -48,7 +51,7 @@ Public Class GenericTableReport
 
 
             For Each Cell As XRTableCell In Row.Cells
-                If Cell.ProcessDuplicates = ValueSuppressType.Suppress Then
+                If Cell.ProcessDuplicatesMode = ProcessDuplicatesMode.Suppress Then
                     theListRow = theList(Index - 1).ToString()
                     DataMember = Cell.DataBindings.Item(0).DataMember
                     FormatString = String.Format("{0} = {1}", DataMember, Cell.Text)
@@ -64,7 +67,7 @@ Public Class GenericTableReport
                 Row.Borders = DevExpress.XtraPrinting.BorderSide.Top
 
                 For Each Cell As XRTableCell In Row.Cells
-                    Cell.ProcessDuplicates = ValueSuppressType.Leave
+                    Cell.ProcessDuplicatesMode = ProcessDuplicatesMode.Leave
                 Next
             Else
                 Row.Borders = DevExpress.XtraPrinting.BorderSide.None
@@ -77,7 +80,7 @@ Public Class GenericTableReport
 
         'Restore Cell's ProcessDuplicates value
         For Each Cell As XRTableCell In Row.Cells
-            Cell.ProcessDuplicates = SaveProcessDuplicates(Cell.Name)
+            Cell.ProcessDuplicatesMode = SaveProcessDuplicates(Cell.Name)
         Next
     End Sub
 

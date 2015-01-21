@@ -6,6 +6,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports DevExpress.XtraCharts
 Imports System.Globalization
+Imports DevExpress.Utils
 
 Public Class IISEResultsHistoryGraph
 
@@ -145,7 +146,7 @@ Public Class IISEResultsHistoryGraph
     ''' Created by: JB 31/07/2012
     ''' </remarks>
     Private Sub PrepareButtons()
-        Dim myToolTipsControl As New ToolTip
+        Dim myToolTipsControl As New Windows.Forms.ToolTip
         Try
             'EXIT Button
             bsExitButton.Image = GetImage("CANCEL")
@@ -170,13 +171,13 @@ Public Class IISEResultsHistoryGraph
 
         With pGraph.Series(serieName)
             .ShowInLegend = True
-            .Label.Visible = False
+            .LabelsVisibility = DefaultBoolean.False
             .ArgumentScaleType = ScaleType.Qualitative
             .View.Color = thisColor
         End With
 
         'AJG OJO!!!! TODAVÍA COMENTADA PORQUE NO ESTÁ ADAPTADA A DEVEXPRESS 14.2.3
-        'CType(pGraph.Series(serieName).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
+        CType(pGraph.Series(serieName).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
     End Sub
 
 
@@ -190,7 +191,7 @@ Public Class IISEResultsHistoryGraph
         Try
             pGraph.ClearCache()
             pGraph.Series.Clear()
-            pGraph.Legend.Visible = False
+            pGraph.Legend.Visibility = DefaultBoolean.False
             pGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
             pGraph.BackColor = Color.White
             pGraph.AppearanceName = "Light"
@@ -218,7 +219,7 @@ Public Class IISEResultsHistoryGraph
             myDiagram.Margins.Right = 5
 
             'Set the Title for each axis
-            myDiagram.AxisX.Title.Visible = True
+            myDiagram.AxisX.Title.Visibility = DefaultBoolean.True
             myDiagram.AxisX.Title.Antialiasing = False
             myDiagram.AxisX.Title.TextColor = Color.Black
             myDiagram.AxisX.Title.Alignment = StringAlignment.Center
@@ -230,7 +231,7 @@ Public Class IISEResultsHistoryGraph
             'myDiagram.AxisX.Label.Antialiasing = True
 
 
-            myDiagram.AxisY.Title.Visible = True
+            myDiagram.AxisY.Title.Visibility = DefaultBoolean.True
             myDiagram.AxisY.Title.Antialiasing = False
             myDiagram.AxisY.Title.TextColor = Color.Black
             myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -386,10 +387,10 @@ Public Class IISEResultsHistoryGraph
             Dim aux As Single
             For Each serie As Series In pGraph.Series
                 If serie.Visible Then
-                    aux = CSng((From p In serie.Points Select p.Values(0)).Min)
+                    aux = CSng((From p In serie.Points Select p.UserValues(0)).Min)
                     If Not minY.HasValue OrElse aux < minY Then minY = aux
 
-                    aux = CSng((From p In serie.Points Select p.Values(0)).Max)
+                    aux = CSng((From p In serie.Points Select p.UserValues(0)).Max)
                     If Not maxY.HasValue OrElse aux > maxY Then maxY = aux
                 End If
             Next
@@ -398,7 +399,8 @@ Public Class IISEResultsHistoryGraph
             Dim yExtra As Single = 1
             If maxY.HasValue AndAlso minY.HasValue Then
                 yExtra += (maxY.Value - minY.Value) * PERCENTAGE
-                myDiagram.AxisY.Range.SetMinMaxValues(minY - yExtra, maxY + yExtra)
+                myDiagram.AxisY.WholeRange.SetMinMaxValues(minY - yExtra, maxY + yExtra)
+                myDiagram.AxisY.VisualRange.SetMinMaxValues(minY - yExtra, maxY + yExtra)
             End If
 
         Catch ex As Exception
