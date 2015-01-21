@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("BioSystems")> 
 <Assembly: AssemblyProduct("ScriptsManagement")> 
-<Assembly: AssemblyCopyright("Copyright © BioSystems 2014")> 
+<Assembly: AssemblyCopyright("Copyright © BioSystems 2015")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>

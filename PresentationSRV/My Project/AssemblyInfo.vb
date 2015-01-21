@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("Service Application for BA400 Equipment")> 
 <Assembly: AssemblyCompany("BioSystems")> 
 <Assembly: AssemblyProduct("BA400 Service")> 
-<Assembly: AssemblyCopyright("Copyright© 2014 BioSystems, SA")> 
+<Assembly: AssemblyCopyright("Copyright© 2015 BioSystems, SA")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
