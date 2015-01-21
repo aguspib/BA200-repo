@@ -1609,14 +1609,20 @@ Public Class IPositionsAdjustments
                 ''end SGM 05/12/2012
 
                 If MyBase.SimulationMode Then
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MinValue = 0
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MaxValue = (AbsorbanceData.Max * 100000) + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = (AbsorbanceData.Max * 100000) + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = (AbsorbanceData.Max * 100000) + 200000
                 Else
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MinValue = 0
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MaxValue = AbsorbanceData.Max + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = AbsorbanceData.Max + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = AbsorbanceData.Max + 200000
                 End If
 
-
+                'ADDED THOSE INSTRUCTIONS TO AVOID AUTOGRID
+                CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = False
+                CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.DateTimeScaleOptions.AutoGrid = False
 
                 ' Generate a data table and bind the COUNTS serie to it.
                 AbsorbanceChart.Series(0).DataSource = MyClass.CreateChartDataCounts()
@@ -1836,8 +1842,17 @@ Public Class IPositionsAdjustments
             'CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = myMin
             'CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myMax
             ' Y Axis
-            CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisX.Range.MinValue = myMin
-            CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisX.Range.MaxValue = myMax
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.WholeRange.MinValue = myMin
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.WholeRange.MaxValue = myMax
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.VisualRange.MinValue = myMin
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.VisualRange.MaxValue = myMax
+
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            AbsorbanceChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            AbsorbanceChart.RuntimeHitTesting = True
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.VisualRange.SideMarginsValue = 0
 
             ' Constant lines x wall well
             'Dim myDiagram As SwiftPlotDiagram = CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram)

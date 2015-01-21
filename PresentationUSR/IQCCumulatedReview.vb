@@ -560,9 +560,14 @@ Public Class IQCCumulatedReview
 
             bsMeanChartControl.Series.Clear()
             bsMeanChartControl.ClearCache()
-            bsMeanChartControl.Legend.Visible = False
+            bsMeanChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
             bsMeanChartControl.BackColor = Color.White
             bsMeanChartControl.AppearanceName = "Light"
+
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            bsMeanChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            bsMeanChartControl.RuntimeHitTesting = True
+            CType(bsMeanChartControl.Diagram, XYDiagram).AxisX.VisualRange.SideMarginsValue = 0
 
             Dim myDiagram As New XYDiagram
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
@@ -572,8 +577,7 @@ Public Class IQCCumulatedReview
                     'Set up the series
                     bsMeanChartControl.Series.Add(qcCumResultRow.QCControlLotID.ToString(), ViewType.Line)
                     bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).ShowInLegend = False
-                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Label.Visible = False
-                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).PointOptions.PointView = PointView.ArgumentAndValues
+                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
                     'Set Serie Color
                     If (bsMeanChartControl.Series.Count = 1) Then
@@ -651,8 +655,8 @@ Public Class IQCCumulatedReview
                 'Remove all Constant lines
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
-                myDiagram.AxisX.Title.Visible = False
-                myDiagram.AxisY.Title.Visible = False
+                myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
+                myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                 'Create constans lines depending the number of selected controls
                 If ((From a In LocalQCCumulateResultsDS.QCCumulatedSummaryTable _
@@ -673,14 +677,17 @@ Public Class IQCCumulatedReview
                     CreateConstantLine("-1 " & LabelSD, myDiagram, myMean - (1 * mySD), Color.Black, DashStyle.Dash)
 
                     'Set limits for Axis Y
-                    myDiagram.AxisY.Range.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+                    myDiagram.AxisY.WholeRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+                                                          myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
+                    myDiagram.AxisY.VisualRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
                                                           myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
                 Else
                     'More than one control selected
                     CreateConstantLine("+1 " & LabelSD, myDiagram, 1, Color.Black, DashStyle.Dash)
                     CreateConstantLine(LabelMEAN, myDiagram, 0, Color.Black, DashStyle.Solid)
                     CreateConstantLine("-1 " & LabelSD, myDiagram, -1, Color.Black, DashStyle.Dash)
-                    myDiagram.AxisY.Range.SetMinMaxValues(-1.5, 1.5)
+                    myDiagram.AxisY.WholeRange.SetMinMaxValues(-1.5, 1.5)
+                    myDiagram.AxisY.VisualRange.SetMinMaxValues(-1.5, 1.5)
 
                     'Get the max value for X Axis
                     Dim MaxValue As Integer = (From a In LocalCumulateResultsDS.tqcCumulatedResults _
@@ -689,7 +696,8 @@ Public Class IQCCumulatedReview
                                             AndAlso b.Selected _
                                              Select a.CumResultsNum).Max
 
-                    myDiagram.AxisX.Range.SetMinMaxValues(0, MaxValue)
+                    myDiagram.AxisX.WholeRange.SetMinMaxValues(0, MaxValue)
+                    myDiagram.AxisX.VisualRange.SetMinMaxValues(0, MaxValue)
                 End If
             End If
 
@@ -1544,7 +1552,7 @@ Public Class IQCCumulatedReview
             'Clear Graphics controls
             bsMeanChartControl.Series.Clear()
             bsMeanChartControl.ClearCache()
-            bsMeanChartControl.Legend.Visible = False
+            bsMeanChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
             bsMeanChartControl.BackColor = Color.White
             bsMeanChartControl.AppearanceName = "Light"
         Catch ex As Exception

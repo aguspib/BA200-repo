@@ -1,4 +1,6 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿Imports DevExpress.Utils
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class IQCGraphs
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
@@ -189,7 +191,7 @@ Partial Class IQCGraphs
         Me.bsQCResultChartControl.Name = "bsQCResultChartControl"
         Me.bsQCResultChartControl.PaletteName = "Nature Colors"
         Me.bsQCResultChartControl.SeriesSerializable = New DevExpress.XtraCharts.Series(-1) {}
-        SideBySideBarSeriesLabel1.LineVisible = True
+        SideBySideBarSeriesLabel1.LineVisibility = DefaultBoolean.True
         Me.bsQCResultChartControl.SeriesTemplate.Label = SideBySideBarSeriesLabel1
         Me.bsQCResultChartControl.Size = New System.Drawing.Size(616, 377)
         Me.bsQCResultChartControl.TabIndex = 4

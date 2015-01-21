@@ -136,7 +136,7 @@ Public Class QCCumulatedResultsByTestControlReport
 
         'Clear Graphics controls
         XrLJGraph.Series.Clear()
-        XrLJGraph.Legend.Visible = False
+        XrLJGraph.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
         XrLJGraph.BackColor = Color.White
         XrLJGraph.AppearanceName = "Light"
 
@@ -148,8 +148,7 @@ Public Class QCCumulatedResultsByTestControlReport
         XrLJGraph.Series.Add(mControlsRow.QCControlLotID.ToString(), ViewType.Line)
         With XrLJGraph.Series(mControlsRow.QCControlLotID.ToString())
             .ShowInLegend = False
-            .Label.Visible = False
-            .PointOptions.PointView = PointView.ArgumentAndValues
+            .LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             .View.Color = Color.Black
             .Tag = mControlsRow.ControlName & Environment.NewLine & mControlsRow.LotNumber
@@ -172,8 +171,8 @@ Public Class QCCumulatedResultsByTestControlReport
             'Remove all Constant lines
             myDiagram.AxisY.ConstantLines.Clear()
             myDiagram.AxisX.ConstantLines.Clear()
-            myDiagram.AxisX.Title.Visible = False
-            myDiagram.AxisY.Title.Visible = False
+            myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
+            myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
 
             'Create constans lines
             Dim myMean As Single = 0
@@ -188,7 +187,9 @@ Public Class QCCumulatedResultsByTestControlReport
             CreateConstantLine("-1 " & mLabelSD, myDiagram, myMean - (1 * mySD), Color.Black, DashStyle.Dash)
 
             'Set limits for Axis Y
-            myDiagram.AxisY.Range.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+            myDiagram.AxisY.WholeRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+                                                  myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
+            myDiagram.AxisY.VisualRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
                                                   myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
         End If
     End Sub

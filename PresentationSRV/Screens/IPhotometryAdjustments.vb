@@ -1228,14 +1228,14 @@ Public Class IPhotometryAdjustments
                                                        myScreenDelegate.MeasuresRepeatabilityphRefCountsDKByLed(Me.BsStep2WLCombo.SelectedIndex))
                                     'myScreenDelegate.GetMaxValueRepeatabilityResult(0), _
                                     'myScreenDelegate.GetMinValueRepeatabilityResult(0))
-                                    Step2Chart.Legend.Visible = True
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
                                 ElseIf Me.BsStep2LightRadioButton.Checked Then
                                     ' LIGHT
                                     Me.BsStep2AbsCVResult.Visible = True
                                     Me.BsStep2CVevLabel.Visible = True
                                     PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                     PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                    Step2Chart.Legend.Visible = False
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                                 End If
 
                                 ' Write Results into output file
@@ -1325,14 +1325,14 @@ Public Class IPhotometryAdjustments
                                                        myScreenDelegate.MeasuresStabilityphRefCountsDKByLed(Me.BsStep2WLCombo.SelectedIndex))
                                     'myScreenDelegate.GetMaxValueStabilityResult(0), _
                                     'myScreenDelegate.GetMinValueStabilityResult(0))
-                                    Step2Chart.Legend.Visible = True
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
                                 ElseIf Me.BsStep2LightRadioButton.Checked Then
                                     ' LIGHT
                                     Me.BsStep2AbsCVResult.Visible = True
                                     Me.BsStep2CVevLabel.Visible = True
                                     PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                     PopulateStep2Chart(myScreenDelegate.MeasuresStabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                    Step2Chart.Legend.Visible = False
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                                 End If
                                 'End If
 
@@ -1412,7 +1412,7 @@ Public Class IPhotometryAdjustments
                                 PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                 ' Clear Chart
                                 PopulateStep2Chart(myScreenDelegate.GetAbsorbanceABSResult, True)
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                             End If
 
                     End Select
@@ -1983,6 +1983,10 @@ Public Class IPhotometryAdjustments
             If BSStep1BLChart.Series(1).Points.Count > 0 Then
                 BSStep1BLChart.Series(1).Points.RemoveRange(0, BSStep1BLChart.Series(1).Points.Count)
             End If
+
+            BSStep1BLChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            BSStep1BLChart.RuntimeHitTesting = True
+
             If Not pCountsphMain Is Nothing AndAlso Not pCountsphRef Is Nothing AndAlso pCountsphMain.Count > 0 AndAlso pCountsphRef.Count > 0 Then
                 ' Configure Ranges
 
@@ -1993,22 +1997,31 @@ Public Class IPhotometryAdjustments
                 Dim myMin As Single = 0
                 ' XBC 01/03/2012
 
-                If CLng(CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue) >= myMax Then
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MaxValue = myMax
+                If CLng(CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue) >= myMax Then
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myMax
                 Else
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myMax
                     If myMax = myMin Then
-                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin - 1
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin - 1
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin - 1
                     Else
-                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin
                     End If
                 End If
-                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.GridSpacingAuto = True
+
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                 'CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.Range.MaxValue = pCountsphMain.Count + 1
                 'CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.Range.MinValue = 0
-                CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.GridSpacingAuto = True
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = True
+
+                'IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
                 ' Populate new values
                 For i As Integer = 0 To pCountsphMain.Count - 1
@@ -2136,6 +2149,10 @@ Public Class IPhotometryAdjustments
                     Step2ChartAbs.Series(0).Points.RemoveRange(0, Step2ChartAbs.Series(0).Points.Count)
                 End If
 
+                'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+                Step2ChartAbs.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+                Step2ChartAbs.RuntimeHitTesting = True
+
                 If Not pCounts Is Nothing AndAlso pCounts.Count > 0 Then
                     ' Configure Ranges
                     If pCounts.Max = 0 And pCounts.Min = 0 Then
@@ -2143,26 +2160,35 @@ Public Class IPhotometryAdjustments
                     End If
 
                     ' Initializating...
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = -1000
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = 1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = -1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = 1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = -1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = 1000
+
                     ' Setting values...
                     If pCounts.Max = pCounts.Min Then
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = pCounts.Min - 1
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = pCounts.Min - 1
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = pCounts.Min - 1
                         If pCounts.Max = 99999 Then
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
                         Else
                         End If
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     Else
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = pCounts.Min
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = pCounts.Min
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = pCounts.Min
                         If pCounts.Max = 99999 Then
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
                         Else
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = pCounts.Max
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                         End If
                     End If
 
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.GridSpacingAuto = True
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                     ' Populate new values
                     For i As Integer = 0 To pCounts.Count - 1
@@ -2187,6 +2213,11 @@ Public Class IPhotometryAdjustments
                 If Step2Chart.Series(1).Points.Count > 0 Then
                     Step2Chart.Series(1).Points.RemoveRange(0, Step2Chart.Series(1).Points.Count)
                 End If
+
+                'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+                Step2Chart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+                Step2Chart.RuntimeHitTesting = True
+
                 If Not pCounts Is Nothing AndAlso pCounts.Count > 0 Then
                     ' Configure Ranges
                     If pCounts.Max = 0 And pCounts.Min = 0 Then
@@ -2194,16 +2225,24 @@ Public Class IPhotometryAdjustments
                     End If
 
                     ' Initializating...
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = -1000
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = 1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = -1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = 1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = -1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = 1000
+
                     ' Setting values...
                     If pCounts.Max = pCounts.Min Then
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min - 1
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = pCounts.Min - 1
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = pCounts.Min - 1
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     Else
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = pCounts.Min
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = pCounts.Min
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     End If
+
 
                     'If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue) >= pCounts.Max Then
                     '    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min
@@ -2217,7 +2256,7 @@ Public Class IPhotometryAdjustments
                     '    End If
                     'End If
 
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.GridSpacingAuto = True
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                     ' XBC 21/02/2012
                     'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = pCounts.Count + 1
@@ -2234,6 +2273,9 @@ Public Class IPhotometryAdjustments
 
             End If
 
+            'AJG IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.SideMarginsValue = 0
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2257,6 +2299,11 @@ Public Class IPhotometryAdjustments
             If Step2Chart.Series(1).Points.Count > 0 Then
                 Step2Chart.Series(1).Points.RemoveRange(0, Step2Chart.Series(1).Points.Count)
             End If
+
+            'AJG ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            Step2Chart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            Step2Chart.RuntimeHitTesting = True
+
             If Not pCountsphMain Is Nothing AndAlso Not pCountsphRef Is Nothing AndAlso pCountsphMain.Count > 0 AndAlso pCountsphRef.Count > 0 Then
                 ' Configure Ranges
                 Dim myMax As Single = Math.Max(pCountsphMain.Max, pCountsphRef.Max)
@@ -2264,14 +2311,18 @@ Public Class IPhotometryAdjustments
                 If myMax = 0 And myMin = 0 Then
                     Exit Sub
                 End If
-                If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue) >= myMax Then
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = myMin
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = myMax
+                If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue) >= myMax Then
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = myMax
                 Else
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = myMax
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = myMin
                 End If
-                CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.GridSpacingAuto = True
+                CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                 ' XBC 21/02/2012
                 'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = pCountsphMain.Count + 1
@@ -2285,6 +2336,10 @@ Public Class IPhotometryAdjustments
                     Step2Chart.Series(1).Points.Add(New SeriesPoint(i + 1, pCountsphRef(i)))
                 Next
             End If
+
+            'AJG IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.SideMarginsValue = 0
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2332,10 +2387,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 21/02/2012
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxRepeatability + 1
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = 0
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacing = 50
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacingAuto = True
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxRepeatability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxRepeatability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.GridSpacing = 50
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.AutoGrid = True
                             ' XBC 21/02/2012
 
                             If Me.BsStep2DarkRadioButton.Checked Then
@@ -2355,7 +2412,7 @@ Public Class IPhotometryAdjustments
                                 PopulatephRefStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityphMainCountsDKByLed(pLedpPosition), _
                                                    myScreenDelegate.MeasuresRepeatabilityphRefCountsDKByLed(pLedpPosition))
-                                Step2Chart.Legend.Visible = True
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumberCounts", currentLanguage)
@@ -2377,7 +2434,7 @@ Public Class IPhotometryAdjustments
 
                                 PopulateABSStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", currentLanguage) ' JB 01/10/2012 - Resource String unification
@@ -2389,10 +2446,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 21/02/2012
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxStability + 1
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = 0
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacing = 50
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacingAuto = True
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxStability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxStability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.GridSpacing = 50
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.AutoGrid = True
                             ' XBC 21/02/2012
 
                             If Me.BsStep2DarkRadioButton.Checked Then
@@ -2412,7 +2471,7 @@ Public Class IPhotometryAdjustments
                                 PopulatephRefStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresStabilityphMainCountsDKByLed(pLedpPosition), _
                                                    myScreenDelegate.MeasuresStabilityphRefCountsDKByLed(pLedpPosition))
-                                Step2Chart.Legend.Visible = True
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumberCounts", currentLanguage)
@@ -2434,7 +2493,7 @@ Public Class IPhotometryAdjustments
 
                                 PopulateABSStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresStabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", currentLanguage) ' JB 01/10/2012 - Resource String unification
@@ -2446,10 +2505,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 24/02/2012
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxWaveLengths
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.Range.MinValue = 1
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.GridSpacing = 1
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.GridSpacingAuto = False
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxWaveLengths
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.WholeRange.MinValue = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxWaveLengths
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.VisualRange.MinValue = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.NumericScaleOptions.GridSpacing = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = False
                             ' XBC 24/02/2012
 
                             Me.BsStep2phMainGroupBox.Visible = False
@@ -2474,7 +2535,7 @@ Public Class IPhotometryAdjustments
                             ' Populate results of the readed Absorbances to screen
                             PopulateABSStep2(pLedpPosition)
                             PopulateStep2Chart(myScreenDelegate.GetAbsorbanceABSResult, True)
-                            Step2Chart.Legend.Visible = False
+                            Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                             ' XBC 24/02/2012
                             'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Wavelength", currentLanguage)

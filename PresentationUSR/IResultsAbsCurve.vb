@@ -1424,13 +1424,14 @@ Public Class IResultsAbsCurve
             ResultChartControl.RefreshDataOnRepaint = False
             ResultChartControl.CacheToMemory = True
             ResultChartControl.RuntimeHitTesting = False
-            ResultChartControl.Legend.Visible = False
+            ResultChartControl.Legend.Visibility = DefaultBoolean.False
 
             ResultChartControl.ClearCache()
             ResultChartControl.Series.Clear()
             ResultChartControl.BackColor = Color.White
             ResultChartControl.AppearanceName = "Light"
 
+            ResultChartControl.CrosshairEnabled = DefaultBoolean.False
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateChartControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1451,8 +1452,7 @@ Public Class IResultsAbsCurve
         Try
             mySerie = New Series(pName, ViewType.Line)
             mySerie.Name = pName
-            mySerie.Label.Visible = False
-            mySerie.PointOptions.PointView = PointView.ArgumentAndValues
+            mySerie.LabelsVisibility = DefaultBoolean.False
             mySerie.ArgumentDataMember = "Cycle"
             mySerie.ArgumentScaleType = ScaleType.Numerical
             mySerie.ValueScaleType = ScaleType.Numerical
@@ -1463,6 +1463,7 @@ Public Class IResultsAbsCurve
             Dim myView As XtraCharts.LineSeriesView
             myView = TryCast(mySerie.View, XtraCharts.LineSeriesView)
             myView.LineMarkerOptions.Size = SizeMarker
+            myView.MarkerVisibility = DefaultBoolean.True
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateSerie ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1480,6 +1481,9 @@ Public Class IResultsAbsCurve
     ''' <remarks>DL 25/10/2011</remarks>
     Private Sub CreateDiagram(ByVal Min As Single, ByVal Max As Single)
         Try
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            ResultChartControl.CrosshairEnabled = DefaultBoolean.False
+            ResultChartControl.RuntimeHitTesting = True
 
             'Dim myDiagram As New XYDiagram
             Dim myDiagram As XYDiagram
@@ -1489,7 +1493,7 @@ Public Class IResultsAbsCurve
             With myDiagram
                 'my Customize the appearance of the Y-axis title.
                 .AxisY.Title.Text = LBL_ABS
-                .AxisY.Title.Visible = True
+                .AxisY.Title.Visibility = DefaultBoolean.True
                 .AxisY.Title.Alignment = StringAlignment.Center
                 .AxisY.Title.TextColor = Color.Black ' Color.Blue
                 .AxisY.Title.Antialiasing = True
@@ -1497,24 +1501,31 @@ Public Class IResultsAbsCurve
 
                 ' Customize the appearance of the X-axis title.
                 .AxisX.Title.Text = LBL_CYCLE
-                .AxisX.Title.Visible = True
+                .AxisX.Title.Visibility = DefaultBoolean.True
                 .AxisX.Title.Alignment = StringAlignment.Center
                 .AxisX.Title.TextColor = Color.Black 'Color.Red
                 .AxisX.Title.Antialiasing = True
                 .AxisX.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
                 '
                 If IntervalABS = -1 Then
-                    .AxisY.Range.Auto = True
+                    .AxisY.WholeRange.Auto = True
+                    .AxisY.VisualRange.Auto = True
                 Else
-                    .AxisY.Range.SetMinMaxValues(Min - IntervalABS, Max + IntervalABS)
+                    .AxisY.WholeRange.SetMinMaxValues(Min - IntervalABS, Max + IntervalABS)
+                    .AxisY.VisualRange.SetMinMaxValues(Min - IntervalABS, Max + IntervalABS)
                 End If
 
                 '//Changes for TASK + BUGS Tracking  #1331
                 '//14/10/2013 - cf - v3.0.0 -  Added the MaxValueForXAxis variable to adjust the graph's limits. 
 
-                .AxisX.Range.SetMinMaxValues(0, MaxValueForXAxis + 5)
+                .AxisX.WholeRange.SetMinMaxValues(0, MaxValueForXAxis + 5)
+                .AxisX.VisualRange.SetMinMaxValues(0, MaxValueForXAxis + 5)
 
-                .AxisY.Visible = True
+                .AxisY.Visibility = DefaultBoolean.True
+
+                'IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+                .AxisX.VisualRange.SideMarginsValue = 0
+                .AxisY.VisualRange.SideMarginsValue = 0
             End With
 
             ' Set some properties to get a nice-looking chart.

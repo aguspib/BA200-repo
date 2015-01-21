@@ -36,7 +36,7 @@ Public Class MASTERTEMPLATE
 
 
 
-    Private Sub XtraReport1_FilterControlProperties(ByVal sender As Object, ByVal e As DevExpress.XtraReports.UserDesigner.FilterControlPropertiesEventArgs) Handles Me.FilterControlProperties
+    Private Sub XtraReport1_FilterControlProperties(ByVal sender As Object, ByVal e As DevExpress.XtraReports.UserDesigner.FilterComponentPropertiesEventArgs) Handles Me.FilterComponentProperties
 
         Try
             If e.Properties.Count > 0 Then

@@ -1437,7 +1437,7 @@ Public Class XRManager
                                     r2 = Math.Pow(ResultsData.ReportCalibCurve(0).CurveCorrelation, 2).ToStringWithDecimals(4)
 
                                     Report.XrChart1.Titles(2).Text = String.Format("{0}{1}   r = {2}   r² = {3}", CurveSlope, CurveOffset, r, r2)
-                                    Report.XrChart1.Titles(2).Visible = True
+                                    Report.XrChart1.Titles(2).Visibility = DevExpress.Utils.DefaultBoolean.True
                                 End If
                             End If
 
@@ -1745,7 +1745,7 @@ Public Class XRManager
                                     r2 = Math.Pow(ResultsData.ReportCalibCurve(0).CurveCorrelation, 2).ToStringWithDecimals(4)
 
                                     Report.XrChart1.Titles(2).Text = String.Format("{0}{1}   r = {2}   r² = {3}", CurveSlope, CurveOffset, r, r2)
-                                    Report.XrChart1.Titles(2).Visible = True
+                                    Report.XrChart1.Titles(2).Visibility = DevExpress.Utils.DefaultBoolean.True
                                 End If
                             End If
 
@@ -1919,7 +1919,7 @@ Public Class XRManager
 
         Cell.DataBindings.Add(New XRBinding("Text", Nothing, dataMember))
 
-        If Merge Then Cell.ProcessDuplicates = ValueSuppressType.Suppress
+        If Merge Then Cell.ProcessDuplicatesMode = ProcessDuplicatesMode.Suppress
 
         If TextAlignment <> Nothing Then Cell.TextAlignment = TextAlignment
 
