@@ -3125,9 +3125,20 @@
   </IntegrityValidation>
   <IntegrityValidation>
     <Version>3.11</Version>
-    <Label>VALIDATE New Alarm Exist COMMS_TIMEOUT_ERR </Label>
+    <Label>VALIDATE New Alarm Exist COMMS_TIMEOUT_ERR</Label>
     <Script>
       IF ((SELECT COUNT(*) FROM tfmwAlarms WHERE AlarmID = 'COMMS_TIMEOUT_ERR') = 1 )
+      SELECT 'True'
+      ELSE
+      SELECT 'False'
+    </Script>
+    <Result>True</Result>
+  </IntegrityValidation> 
+  <IntegrityValidation>
+    <Version>3.11</Version>
+    <Label>VALIDATE New ISE Alarms Exists</Label>
+    <Script>
+      IF ((SELECT COUNT(*) FROM tfmwAlarms WHERE AlarmID = 'ISE_CALB_PDT_WARN' or AlarmID = 'ISE_PUMP_PDT_WARN' or AlarmID = 'ISE_CLEAN_PDT_WARN') = 3 )
       SELECT 'True'
       ELSE
       SELECT 'False'
