@@ -154,6 +154,8 @@ Public Class QCCumulatedResultsByTestControlReport
             .Tag = mControlsRow.ControlName & Environment.NewLine & mControlsRow.LotNumber
             .LegendText = mControlsRow.LotNumber
 
+            .ArgumentScaleType = ScaleType.Qualitative
+
             'Create points
             For Each cumResultRow As CumulatedResultsDS.tqcCumulatedResultsRow In From r In resultsDT _
                                                                                   Where r.QCControlLotID = mControlsRow.QCControlLotID AndAlso _
@@ -191,6 +193,8 @@ Public Class QCCumulatedResultsByTestControlReport
                                                   myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
             myDiagram.AxisY.VisualRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
                                                   myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
+
+            myDiagram.AxisY.VisualRange.SideMarginsValue = 0
         End If
     End Sub
 

@@ -685,6 +685,8 @@ Public Class QCIndividualResultsByTestReport
                     myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                 End If
+                myDiagram.AxisX.VisualRange.SideMarginsValue = 0
+                myDiagram.AxisY.VisualRange.SideMarginsValue = 0
             End If
 
         Catch ex As Exception
