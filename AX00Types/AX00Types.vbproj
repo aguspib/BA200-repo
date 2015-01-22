@@ -411,6 +411,7 @@
     <Compile Include="HisWSResultsDS.vb">
       <DependentUpon>HisWSResultsDS.xsd</DependentUpon>
     </Compile>
+    <Compile Include="FunctionalInterfaces\IMonitorCurveResultsRow.vb" />
     <Compile Include="ISEInformationDS.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

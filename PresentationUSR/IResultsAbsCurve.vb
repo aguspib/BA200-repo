@@ -2517,13 +2517,16 @@ Public Class IResultsAbsCurve
                     'Search in DS the source data
                     For i As Integer = 0 To Rows.Count - 1
 
-                        Dim castRow = TryCast(Rows(i), Biosystems.Ax00.Types.vwksWSAbsorbanceDS.vwksWSAbsorbanceRow())
-                        Dim castColumn = castRow(0)
+                        Dim castRow = TryCast(Rows(i), Global.System.Data.DataRow())
+                        If castRow Is Nothing Then Continue For
 
+                        Dim castColumn = TryCast(castRow(0), IMonitorCurveResultsRow)
                         Dim newRow As New strOrderTest
-                        newRow.OrderTestID = castColumn.OrderTestID 'castRow(0).OrderTestID
-                        newRow.MultiItemNumber = castColumn.MultiItemNumber '(Rows(i)(0)).MultiItemNumber
-                        newRow.RerunNumber = castColumn.RerunNumber '(Rows(i)(0)).RerunNumber
+                        If castColumn IsNot Nothing Then
+                            newRow.OrderTestID = castColumn.OrderTestID 'castRow(0).OrderTestID
+                            newRow.MultiItemNumber = castColumn.MultiItemNumber '(Rows(i)(0)).MultiItemNumber
+                            newRow.RerunNumber = castColumn.RerunNumber '(Rows(i)(0)).RerunNumber
+                        End If
 
                         OrderTestGrouped.Add(newRow)
 
