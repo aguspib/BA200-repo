@@ -1036,8 +1036,8 @@ Partial Public Class UiAx00MainMDI
                             End If
 
                             'AG 22/02/2012 - Update button in change rotor utility
-                        ElseIf (TypeOf ActiveMdiChild Is IChangeRotor) Then
-                            Dim CurrentMdiChild As IChangeRotor = CType(ActiveMdiChild, IChangeRotor)
+                        ElseIf (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                            Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
                             If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
                                 bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
                                 'AG 28/03/2012

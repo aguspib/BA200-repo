@@ -1788,8 +1788,8 @@ Partial Public Class UiAx00MainMDI
                     End If
                     'AG 16/03/2012 - If no reactions rotor alarm appears while the UI is disabled we must reactivated it
                     'Change rotor
-                ElseIf (TypeOf myCurrentMDIForm Is IChangeRotor AndAlso Not changeRotorTreated) Then
-                    Dim CurrentMdiChild As IChangeRotor = CType(myCurrentMDIForm, IChangeRotor)
+                ElseIf (TypeOf myCurrentMDIForm Is UiChangeRotor AndAlso Not changeRotorTreated) Then
+                    Dim CurrentMdiChild As UiChangeRotor = CType(myCurrentMDIForm, UiChangeRotor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         changeRotorTreated = True
@@ -1966,8 +1966,8 @@ Partial Public Class UiAx00MainMDI
                         monitorTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IChangeRotor AndAlso Not changeRotorTreated) Then
-                        Dim CurrentMdiChild As IChangeRotor = CType(myCurrentMDIForm, IChangeRotor)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiChangeRotor AndAlso Not changeRotorTreated) Then
+                        Dim CurrentMdiChild As UiChangeRotor = CType(myCurrentMDIForm, UiChangeRotor)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         changeRotorTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
@@ -2642,7 +2642,7 @@ Partial Public Class UiAx00MainMDI
                     'If current screen <> Change rotor add a new message line
                     Dim addMessageLine As Boolean = True
                     If Not ActiveMdiChild Is Nothing Then
-                        If (TypeOf ActiveMdiChild Is IChangeRotor) Then addMessageLine = False
+                        If (TypeOf ActiveMdiChild Is UiChangeRotor) Then addMessageLine = False
                     End If
 
                     If addMessageLine Then

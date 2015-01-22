@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class IChangeRotor
+Public Class UiChangeRotor
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constructor"
