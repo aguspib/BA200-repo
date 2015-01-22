@@ -2462,6 +2462,7 @@ Public Class IResultsAbsCurve
     ''' <remarks>
     ''' Created by: RH 24/02/2012 Optimization on a previous version by DL.
     ''' </remarks>
+
     Private Sub GetData()
         Try
             Dim myGlobalDataTO As GlobalDataTO
@@ -2519,7 +2520,6 @@ Public Class IResultsAbsCurve
 
                         Dim castRow = TryCast(Rows(i), Global.System.Data.DataRow())
                         If castRow Is Nothing Then Continue For
-
                         Dim castColumn = TryCast(castRow(0), IMonitorCurveResultsRow)
                         Dim newRow As New strOrderTest
                         If castColumn IsNot Nothing Then
@@ -2553,24 +2553,116 @@ Public Class IResultsAbsCurve
 
     End Sub
 
+
+
+    'Private Sub GetData()
+    '    Try
+    '        Dim myGlobalDataTO As GlobalDataTO
+    '        Dim myExecutionsDelegate As New ExecutionsDelegate
+
+    '        'Get all different order testid with executions closed
+    '        myGlobalDataTO = myExecutionsDelegate.GetOrderTestWithExecutionStatus( _
+    '                                Nothing, SourceFormAttribute, RerunAttribute, _
+    '                                OrderTestIDAttribute, AnalyzerIDAttribute, WorkSessionIDAttribute)
+
+    '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+    '            AbsDS = CType(myGlobalDataTO.SetDatos, vwksWSAbsorbanceDS)
+
+    '            If AbsDS.vwksWSAbsorbance.Count > 0 Then
+    '                'Group ds in lists by ordertestid, rerunnumber, multitemnumber
+
+    '                Dim Rows As IList = Nothing
+
+    '                Select Case SourceFormAttribute
+    '                    Case ScreenCallsGraphical.RESULTSFRM
+
+    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                    Case ScreenCallsGraphical.WS_STATES
+
+    '                        Rows = (From row As ExecutionsDS.vwksWSExecutionsMonitorRow In ExecutionsAttribute _
+    '                                Where row.ExecutionType = "PREP_STD" AndAlso row.TestType = "STD" _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                        'DL 15/05/2012
+    '                    Case ScreenCallsGraphical.CURVEFRM
+
+    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                        'DL 15/05/2012
+
+    '                    Case Else
+
+    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+    '                                Where row.OrderTestID = OrderTestIDAttribute _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                End Select
+
+    '                OrderTestGrouped = New List(Of strOrderTest)
+
+    '                'Search in DS the source data
+    '                For i As Integer = 0 To Rows.Count - 1
+
+    '                    Dim castRow = TryCast(Rows(i), Global.System.Data.DataRow())
+    '                    If castRow Is Nothing Then Continue For
+    '                    Dim castColumn = TryCast(castRow(0), IMonitorCurveResultsRow)
+    '                    Dim newRow As New strOrderTest
+    '                    If castColumn IsNot Nothing Then
+    '                        newRow.OrderTestID = castColumn.OrderTestID 'castRow(0).OrderTestID
+    '                        newRow.MultiItemNumber = castColumn.MultiItemNumber '(Rows(i)(0)).MultiItemNumber
+    '                        newRow.RerunNumber = castColumn.RerunNumber '(Rows(i)(0)).RerunNumber
+    '                    End If
+
+    '                    OrderTestGrouped.Add(newRow)
+
+    '                    If (newRow.OrderTestID = OrderTestIDAttribute) AndAlso _
+    '                       (newRow.MultiItemNumber = MultiItemNumberAttribute) AndAlso _
+    '                       (newRow.RerunNumber = RerunAttribute) Then
+
+    '                        CurrentID = OrderTestGrouped.Count - 1
+
+    '                    End If
+    '                Next
+
+    '                FindData()
+
+    '            Else
+    '                FindWithOutData()
+    '            End If
+    '        End If
+
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "GetData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+
+    'End Sub
+
 #End Region
 
     Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton2.Click
         'Simulate instruction reception
-        If TextBox5.Text.Trim <> "" Then
-            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                Dim myGlobal As New GlobalDataTO
+                            If TextBox5.Text.Trim <> "" Then
+                                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                                    Dim myGlobal As New GlobalDataTO
 
-                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                If myAnalyzerManager.CommThreadsStarted Then
-                    'Short instructions
-                    myGlobal = myAnalyzerManager.SimulateInstructionReception(TextBox5.Text.Trim)
+                                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+                                    If myAnalyzerManager.CommThreadsStarted Then
+                                        'Short instructions
+                                        myGlobal = myAnalyzerManager.SimulateInstructionReception(TextBox5.Text.Trim)
 
-                    'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
-                End If
-            End If
+                                        'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
+                                    End If
+                                End If
 
-        End If
+                            End If
     End Sub
 
     Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton3.Click
