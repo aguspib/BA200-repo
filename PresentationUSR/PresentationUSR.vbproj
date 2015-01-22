@@ -192,10 +192,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
-    <Compile Include="HQBarcode.Designer.vb">
-      <DependentUpon>HQBarcode.vb</DependentUpon>
+    <Compile Include="UiHQBarcode.Designer.vb">
+      <DependentUpon>UiHQBarcode.vb</DependentUpon>
     </Compile>
-    <Compile Include="HQBarcode.vb">
+    <Compile Include="UiHQBarcode.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IConfigLIS.Designer.vb">
@@ -685,8 +685,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HQBarcode.resx">
-      <DependentUpon>HQBarcode.vb</DependentUpon>
+    <EmbeddedResource Include="UiHQBarcode.resx">
+      <DependentUpon>UiHQBarcode.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="IConfigLIS.resx">
       <DependentUpon>IConfigLIS.vb</DependentUpon>

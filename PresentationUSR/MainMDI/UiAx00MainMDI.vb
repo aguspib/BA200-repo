@@ -2439,7 +2439,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IConfigLIS)
+            OpenMDIChildForm(UiConfigLIS)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LISConfigToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LISConfigToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")

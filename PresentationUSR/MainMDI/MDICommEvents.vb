@@ -2010,8 +2010,8 @@ Partial Public Class UiAx00MainMDI
                         'AG 16/03/2012
 
                         ' XB 24/04/2013
-                    ElseIf (TypeOf myCurrentMDIForm Is IConfigLIS AndAlso Not configSettingsLISTreated) Then
-                        Dim CurrentMdiChild As IConfigLIS = CType(myCurrentMDIForm, IConfigLIS)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiConfigLIS AndAlso Not configSettingsLISTreated) Then
+                        Dim CurrentMdiChild As UiConfigLIS = CType(myCurrentMDIForm, UiConfigLIS)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         configSettingsLISTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone

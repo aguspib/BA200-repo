@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Text
 
-Public Class IConfigLIS
+Public Class UiConfigLIS
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Attributes"
