@@ -35,24 +35,7 @@ Namespace My
         Private Sub MyApplication_UnhandledException(sender As Object, e As UnhandledExceptionEventArgs) _
             Handles Me.UnhandledException
 
-            Try
-                If e.Exception IsNot Nothing AndAlso e.Exception.TargetSite IsNot Nothing Then
-                    Dim sourceOfException = e.Exception.Source &
-                                            e.Exception.TargetSite.DeclaringType.ToString & "." &
-                                            e.Exception.TargetSite.Name
-                    GlobalBase.CreateLogActivity(
-                        e.Exception.ToString,
-                        sourceOfException,
-                        EventLogEntryType.Error,
-                        False)
-                    MsgBox(sourceOfException & vbCr & Environment.StackTrace)
-                Else
-                    GlobalBase.CreateLogActivity(
-                        "An Unhandled Exception has been occurred, but exception data is missing ",
-                        "MyApplication.ApplicationEvents", EventLogEntryType.Error, False)
-                End If
-            Catch
-            End Try
+            GlobalBase.CreateLogActivity(e.Exception)
 
             ' Display message to user and then exit.
             MessageBox.Show(GlobalConstants.UNHANDLED_EXCEPTION_ERR.ToString, Application.Info.Title,

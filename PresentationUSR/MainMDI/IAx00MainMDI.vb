@@ -11788,5 +11788,4 @@ Partial Public Class IAx00MainMDI
 
 #End Region
 
-
 End Class

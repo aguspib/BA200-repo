@@ -601,46 +601,59 @@ Namespace Biosystems.Ax00.Global
         End Sub
 
         ''' <summary>
-        ''' This function creates log activity for a given exception. This routine will fill all required data automatically, including method and class name where the exception occurred. Use this function instead to log excetions
+        ''' This function is used to create log activity for a runtime exception
         ''' </summary>
         ''' <param name="ex">A execption to be notified into the application log</param>
         ''' <remarks>Use this function to add exception to the application log when possible.</remarks>
         Public Shared Sub CreateLogActivity(ex As Exception)
 
+            ' ReSharper disable once InconsistentNaming
+            Const MAXIMUM_INNER_EXCEPTION_LEVELS = 10
+
             Try
                 If ex IsNot Nothing AndAlso ex.TargetSite IsNot Nothing Then
-                    Dim exeptionIterator = ex, exceptionDesc As New StringBuilder, count = 0
+                    Dim exceptionIterator = ex, exceptionDesc As New StringBuilder, count = 0
 
-                    '1.- We iterate the exception an all innerException data (up to 10 levels) to build a detailed explanation of the unhanled exception:
-                    While exeptionIterator IsNot Nothing And count < 10
-                        exceptionDesc.Append(exeptionIterator.ToString & " ((" & exeptionIterator.HResult & "))")
-                        exeptionIterator = exeptionIterator.InnerException
-                        If exeptionIterator IsNot Nothing Then
-                            exeptionIterator = exeptionIterator.InnerException
+                    '1.- We iterate the exception and all innerException data (up to 10 levels) to build a detailed explanation of the unhanled exception:
+                    While exceptionIterator IsNot Nothing And count < MAXIMUM_INNER_EXCEPTION_LEVELS
+                        exceptionDesc.Append(exceptionIterator.Message & " ((" & exceptionIterator.HResult & "))")
+                        exceptionIterator = exceptionIterator.InnerException
+                        If exceptionIterator IsNot Nothing Then
+                            exceptionIterator = exceptionIterator.InnerException
+                            If exceptionIterator IsNot Nothing Then
+                                exceptionDesc.Append("Additional inner exception found: ")
+                            End If
                         End If
                         count += 1    'Cross reference prevention
                     End While
+
+                    '2.- We append the call stack information, with delimiters (to make it a bit easier to read)
+                    exceptionDesc.Append(vbCr & vbCr & "<CallStack>")
+                    exceptionDesc.Append(ex.StackTrace)
+                    exceptionDesc.Append("</CallStack>" & vbCr & vbCr)
 
                     '2.- We inspect the exception origin by inspecing the target of main exception 
                     Dim sourceOfException = ex.Source &
                         ex.TargetSite.DeclaringType.ToString & "." &
                         ex.TargetSite.Name
 
-
-
                     Dim exceptionCompleteMessage = exceptionDesc.ToString
-                    GlobalBase.CreateLogActivity(
-                        exceptionCompleteMessage,
-                        sourceOfException,
-                        EventLogEntryType.Error,
-                        False)
-                    MsgBox(sourceOfException & vbCr & Environment.StackTrace)
+
+                    GlobalBase.CreateLogActivity(exceptionCompleteMessage, sourceOfException, EventLogEntryType.Error, False)
+
                 Else
                     GlobalBase.CreateLogActivity(
                         "An Unhandled Exception has been occurred, but exception data is missing ",
                         Environment.StackTrace, EventLogEntryType.Error, False)
                 End If
-            Catch
+
+#If config = "Debug" Then
+            Catch ex2 As Exception
+                MsgBox("The application has been unable to report an exception. This means the log system is failing too at some point." & vbCr & vbCr & "Happy debugging!", MsgBoxStyle.Critical, "Something went wrong")
+#Else
+                Catch
+#End If
+
             End Try
 
 
