@@ -1632,6 +1632,7 @@ Public Class IPositionsAdjustments
                 AbsorbanceChart.Series(0).ArgumentDataMember = "Argument"
                 AbsorbanceChart.Series(0).ValueScaleType = ScaleType.Numerical
                 AbsorbanceChart.Series(0).ValueDataMembers.AddRange(New String() {"Value"})
+                CType(AbsorbanceChart.Series(0).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
 
 
                 ' Generate a data table and bind the ENCODER serie to it.
@@ -1642,6 +1643,7 @@ Public Class IPositionsAdjustments
                 AbsorbanceChart.Series(1).ArgumentDataMember = "Argument"
                 AbsorbanceChart.Series(1).ValueScaleType = ScaleType.Numerical
                 AbsorbanceChart.Series(1).ValueDataMembers.AddRange(New String() {"Value"})
+                CType(AbsorbanceChart.Series(1).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
 
                 MyClass.CalculateDistances()
                 ' XBC 02/01/2012 - Add Encoder functionality
