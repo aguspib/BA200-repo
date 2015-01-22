@@ -192,16 +192,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="UiConfigLIS.Designer.vb">
+      <DependentUpon>UiConfigLIS.vb</DependentUpon>
+    </Compile>
+    <Compile Include="UiConfigLIS.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="UiHQBarcode.Designer.vb">
       <DependentUpon>UiHQBarcode.vb</DependentUpon>
     </Compile>
     <Compile Include="UiHQBarcode.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="IConfigLIS.Designer.vb">
-      <DependentUpon>IConfigLIS.vb</DependentUpon>
-    </Compile>
-    <Compile Include="IConfigLIS.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IConfigLISMapping.Designer.vb">
@@ -685,11 +685,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="UiConfigLIS.resx">
+      <DependentUpon>UiConfigLIS.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="UiHQBarcode.resx">
       <DependentUpon>UiHQBarcode.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="IConfigLIS.resx">
-      <DependentUpon>IConfigLIS.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="IConfigLISMapping.resx">
       <DependentUpon>IConfigLISMapping.vb</DependentUpon>
