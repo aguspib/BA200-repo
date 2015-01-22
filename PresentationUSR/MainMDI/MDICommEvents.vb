@@ -2455,7 +2455,7 @@ Partial Public Class UiAx00MainMDI
                             'bsAnalyzerStatus.Text = myAutoLISWaitingOrder
                             ShowStatus(Messages.AUTOLIS_WAITING_ORDERS)
 
-                            Using MyForm As New HQBarcode
+                            Using MyForm As New UiHQBarcode
                                 MyForm.AnalyzerID = AnalyzerIDAttribute
                                 MyForm.WorkSessionID = WorkSessionIDAttribute
                                 MyForm.WorkSessionStatus = WSStatusAttribute

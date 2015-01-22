@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports LIS.Biosystems.Ax00.LISCommunications
 
-Public Class HQBarcode
+Public Class UiHQBarcode
 
 #Region "Declarations"
     'Global variable to store value of General Setting containing the maximum number of Patient Order Tests that can be created

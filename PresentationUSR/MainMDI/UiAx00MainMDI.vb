@@ -7403,7 +7403,7 @@ Partial Public Class UiAx00MainMDI
                         Dim myOriginalStatus As String = bsAnalyzerStatus.Text
                         ShowStatus(Messages.AUTOLIS_WAITING_ORDERS)
 
-                        Using MyForm As New HQBarcode
+                        Using MyForm As New UiHQBarcode
                             MyForm.AnalyzerID = AnalyzerIDAttribute
                             MyForm.WorkSessionID = WorkSessionIDAttribute
                             MyForm.WorkSessionStatus = WSStatusAttribute
@@ -7866,7 +7866,7 @@ Partial Public Class UiAx00MainMDI
             'AG 24/02/2014 Leave only HQBarcode because we call counter at the end of the Load event in SampleReq, IResults and HisResults' XB 18/02/2014 BT #1499
             If (Not pFormToOpen Is Nothing) Then
                 'If TypeOf pFormToOpen Is IWSSampleRequest OrElse TypeOf pFormToOpen Is HQBarcode OrElse TypeOf pFormToOpen Is IResults OrElse TypeOf pFormToOpen Is IHisResults Then
-                If TypeOf pFormToOpen Is HQBarcode Then
+                If TypeOf pFormToOpen Is UiHQBarcode Then
 
                     'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not show message here!)
                     Dim PCounters As New AXPerformanceCounters(myApplicationMaxMemoryUsage, mySQLMaxMemoryUsage) 'AG 24/02/2014 - #1520 add parameter
@@ -10534,14 +10534,14 @@ Partial Public Class UiAx00MainMDI
             Dim found As Boolean = False
             Dim index As Integer
             For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
-                If NoMDIChildActiveFormsAttribute.Item(index).Name = HQBarcode.Name Then
+                If NoMDIChildActiveFormsAttribute.Item(index).Name = UiHQBarcode.Name Then
                     found = True
                     Exit For
                 End If
             Next index
             If found Then
-                Dim CurrentNoMdiChild As HQBarcode
-                CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), HQBarcode)
+                Dim CurrentNoMdiChild As UiHQBarcode
+                CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), UiHQBarcode)
                 CurrentNoMdiChild.CloseScreen()
             End If
 
@@ -10844,14 +10844,14 @@ Partial Public Class UiAx00MainMDI
                 Dim found As Boolean = False
                 Dim index As Integer
                 For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
-                    If NoMDIChildActiveFormsAttribute.Item(index).Name = HQBarcode.Name Then
+                    If NoMDIChildActiveFormsAttribute.Item(index).Name = UiHQBarcode.Name Then
                         found = True
                         Exit For
                     End If
                 Next index
                 If found Then
-                    Dim CurrentNoMdiChild As HQBarcode
-                    CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), HQBarcode)
+                    Dim CurrentNoMdiChild As UiHQBarcode
+                    CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), UiHQBarcode)
                     CurrentNoMdiChild.LIMSImportButtonEnabled()
                     CurrentNoMdiChild.RefreshScreen(Nothing, Nothing)
 
@@ -10876,9 +10876,9 @@ Partial Public Class UiAx00MainMDI
 
                 'HQBarcode
                 For index As Integer = 0 To NoMDIChildActiveFormsAttribute.Count - 1
-                    If NoMDIChildActiveFormsAttribute.Item(index).Name = HQBarcode.Name Then
-                        Dim CurrentNoMdiChild As HQBarcode
-                        CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), HQBarcode)
+                    If NoMDIChildActiveFormsAttribute.Item(index).Name = UiHQBarcode.Name Then
+                        Dim CurrentNoMdiChild As UiHQBarcode
+                        CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), UiHQBarcode)
                         CurrentNoMdiChild.RefreshScreen(Nothing, Nothing)
                         Exit For
                     End If

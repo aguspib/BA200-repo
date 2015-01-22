@@ -228,10 +228,10 @@
     <Compile Include="IHisResults.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IConditioning.Designer.vb">
-      <DependentUpon>IConditioning.vb</DependentUpon>
+    <Compile Include="UiConditioning.Designer.vb">
+      <DependentUpon>UiConditioning.vb</DependentUpon>
     </Compile>
-    <Compile Include="IConditioning.vb">
+    <Compile Include="UiConditioning.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IHisAlarms.Designer.vb">
@@ -704,8 +704,8 @@
     <EmbeddedResource Include="IHisResults.resx">
       <DependentUpon>IHisResults.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IConditioning.resx">
-      <DependentUpon>IConditioning.vb</DependentUpon>
+    <EmbeddedResource Include="UiConditioning.resx">
+      <DependentUpon>UiConditioning.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="IHisAlarms.resx">

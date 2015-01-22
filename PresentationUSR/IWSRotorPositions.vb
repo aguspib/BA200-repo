@@ -9106,7 +9106,7 @@ Public Class IWSRotorPositions
                         WorkSessionStatusAttribute = myForm.WorkSessionStatus
                     End Using
                 Else
-                    Using myForm As New HQBarcode()
+                    Using myForm As New UiHQBarcode()
                         myForm.AnalyzerID = AnalyzerIDAttribute
                         myForm.WorkSessionID = WorkSessionIDAttribute
                         myForm.WorkSessionStatus = WorkSessionStatusAttribute
