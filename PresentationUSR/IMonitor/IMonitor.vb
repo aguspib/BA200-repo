@@ -26,7 +26,7 @@ Public Class IMonitor
 
     Private LanguageID As String
     Private mdiAnalyzerCopy As AnalyzerManager
-    Private MainMDI As IAx00MainMDI
+    Private MainMDI As UiAx00MainMDI
     Private myMultiLangResourcesDelegate As MultilanguageResourcesDelegate
     Private Shared IsFirstLoading As Boolean = True
 
@@ -149,7 +149,7 @@ Public Class IMonitor
             'Dim remainingTime As Single = 0
             Dim resultData As New GlobalDataTO
             Dim myWSDelegate As New WorkSessionsDelegate
-            myWSDelegate.TotalSecElapsedTime = IAx00MainMDI.LocalTotalSecs2
+            myWSDelegate.TotalSecElapsedTime = UiAx00MainMDI.LocalTotalSecs2
 
             If (Not pRunningStatus) Then
                 Dim initialHour = (#12:00:00 AM#)   '"00:00:00"
@@ -163,7 +163,7 @@ Public Class IMonitor
 
                 Else
                     'TR & DL 20/09/2012 -Validate if reset session is launched.
-                    If Not IAx00MainMDI.isResetWorkSessionActive Then
+                    If Not UiAx00MainMDI.isResetWorkSessionActive Then
                         'Calculate the total WS remaining time including the waiting cycles before Running
                         resultData = myWSDelegate.CalculateTimeRemaining(Nothing, WorkSessionIDField, AnalyzerIDField, True)
                         If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -173,8 +173,8 @@ Public Class IMonitor
                             RemainingTimeTextEdit.Text = ConvertSecondsInHHmmss(remainingTime).ToString("HH:mm:ss")
                             'OverallTimeTextEdit.Text = RemainingTimeTextEdit.Text
                             'TR 14/11/2011 -Set the value into local variable.
-                            IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime)
-                            OverallTimeTextEdit.Text = IAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
+                            UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime)
+                            OverallTimeTextEdit.Text = UiAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
 
                             If remainingTime > 0 Then
                                 'Set tht maximum value to the progress bar.
@@ -186,12 +186,12 @@ Public Class IMonitor
                                 Dim myWSDataDS As WorkSessionsDS = DirectCast(resultData.SetDatos, WorkSessionsDS)
                                 If myWSDataDS.twksWorkSessions.Count > 0 AndAlso Not (myWSDataDS.twksWorkSessions.First.IsStartDateTimeNull) Then
                                     WSStartDateTime = myWSDataDS.twksWorkSessions.First().StartDateTime
-                                    ElapsedTimeTextEdit.Text = IAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
-                                    OverallTimeTextEdit.Text = ConvertSecondsInHHmmss(CSng(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() + _
-                                                                                       IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds)).ToString("HH:mm:ss")
+                                    ElapsedTimeTextEdit.Text = UiAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
+                                    OverallTimeTextEdit.Text = ConvertSecondsInHHmmss(CSng(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() + _
+                                                                                       UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds)).ToString("HH:mm:ss")
 
-                                    IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() + _
-                                                                                       IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds)) '.ToString("HH:mm:ss")
+                                    UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() + _
+                                                                                       UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds)) '.ToString("HH:mm:ss")
                                 End If
                             End If
                         End If
@@ -200,7 +200,7 @@ Public Class IMonitor
                 End If
             Else
                 'TR 06/09/2012 -Validate if reset session is launched.
-                If Not IAx00MainMDI.isResetWorkSessionActive Then
+                If Not UiAx00MainMDI.isResetWorkSessionActive Then
                     'Get value of SwParameter conatining the time in seconds for each Analyzer Cycle
                     Dim cycleMachineTime As Single = 0
                     Dim myParametersDS As New ParametersDS
@@ -222,32 +222,32 @@ Public Class IMonitor
                                     'Calculate the total WS remaining time excluding the waiting cycles before Running
                                     resultData = myWSDelegate.CalculateTimeRemaining(Nothing, WorkSessionIDField, AnalyzerIDField, True)
                                     remainingTime = DirectCast(resultData.SetDatos, Single)
-                                    Dim prevRemainingTime As Single = CSng(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
+                                    Dim prevRemainingTime As Single = CSng(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
                                     'Change the intial time to the new remaining time value and the initial time
-                                    IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime)
+                                    UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime)
                                     'Set the new maximum to the progress bar.
                                     TaskListProgressBar.Properties.Maximum = _
-                                                                CInt(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
+                                                                CInt(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
                                     'Set value of Remaining Time (as HH:mm:ss)
                                     RemainingTimeTextEdit.Text = ConvertSecondsInHHmmss(remainingTime).ToString("HH:mm:ss")
-                                    OverallTimeTextEdit.Text = IAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
+                                    OverallTimeTextEdit.Text = UiAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
                                 Else
                                     'Calculate the total WS remaining time including the waiting cycles before Running
                                     resultData = myWSDelegate.CalculateTimeRemaining(Nothing, WorkSessionIDField, AnalyzerIDField, True)
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                         remainingTime = DirectCast(resultData.SetDatos, Single)
-                                        Dim prevRemainingTime As Single = CSng(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
+                                        Dim prevRemainingTime As Single = CSng(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
                                         If remainingTime > prevRemainingTime Then
                                             'Change the intial time to the new remaining time value and the initial time (180)
-                                            IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime)
+                                            UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime)
                                             'Set the new maximum to the progress bar.
                                             TaskListProgressBar.Properties.Maximum = _
-                                                CInt(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
+                                                CInt(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
                                         End If
                                         'Set value of Remaining Time (as HH:mm:ss)
                                         RemainingTimeTextEdit.Text = ConvertSecondsInHHmmss(remainingTime).ToString("HH:mm:ss")
-                                        OverallTimeTextEdit.Text = IAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
-                                        ElapsedTimeTextEdit.Text = IAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
+                                        OverallTimeTextEdit.Text = UiAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
+                                        ElapsedTimeTextEdit.Text = UiAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
                                     End If
                                 End If
 
@@ -257,19 +257,19 @@ Public Class IMonitor
                                     resultData = myWSDelegate.CalculateTimeRemaining(Nothing, WorkSessionIDField, AnalyzerIDField, True)
                                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                         remainingTime = DirectCast(resultData.SetDatos, Single)
-                                        Dim recalRemainingTime As Double = remainingTime + IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()
+                                        Dim recalRemainingTime As Double = remainingTime + UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()
                                         'TR 25/05/2012 
-                                        If recalRemainingTime > IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() Then
+                                        If recalRemainingTime > UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() Then
                                             'Validate before recalculation
                                             'If remainingTime > (recalRemainingTime - IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds()) Then
                                             remainingTime = CSng(Math.Abs(remainingTime - (recalRemainingTime - _
-                                                            IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())))
-                                            Dim prevRemainingTime As Single = CSng(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
+                                                            UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())))
+                                            Dim prevRemainingTime As Single = CSng(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
                                             'Add the Elapsed time to the remaining time And validate if is greater than previous time
-                                            If (remainingTime + IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - cycleMachineTime) > prevRemainingTime Then
+                                            If (remainingTime + UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - cycleMachineTime) > prevRemainingTime Then
                                                 'Change the intial time to the new remaining time value
-                                                IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(remainingTime + _
-                                                                                    IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - _
+                                                UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(remainingTime + _
+                                                                                    UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - _
                                                                                     cycleMachineTime))
                                             End If
                                             'End If
@@ -278,17 +278,17 @@ Public Class IMonitor
                                     End If
                                 Else
                                     'TR 16/05/2012 Validate if timer is enable  then remove one machine cycle. 
-                                    If IAx00MainMDI.ElapsedTimeTimer.Enabled Then
+                                    If UiAx00MainMDI.ElapsedTimeTimer.Enabled Then
                                         remainingTime = ConvertHHmmssInSeconds(CDate(RemainingTimeTextEdit.Text)) - cycleMachineTime
                                     End If
                                 End If
 
                                 RemainingTimeTextEdit.Text = ConvertSecondsInHHmmss(remainingTime).ToString("HH:mm:ss")
-                                OverallTimeTextEdit.Text = IAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
-                                ElapsedTimeTextEdit.Text = IAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
-                                TaskListProgressBar.Properties.Maximum = CInt(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
+                                OverallTimeTextEdit.Text = UiAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
+                                ElapsedTimeTextEdit.Text = UiAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
+                                TaskListProgressBar.Properties.Maximum = CInt(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
                                 TaskListProgressBar.Increment(TaskListProgressBar.Properties.Maximum * -1)
-                                TaskListProgressBar.Increment(CInt(IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
+                                TaskListProgressBar.Increment(CInt(UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
 
                             End If
 
@@ -300,41 +300,41 @@ Public Class IMonitor
                                 remainingTime = DirectCast(resultData.SetDatos, Single)
                                 'Dim prevRemainingTime As Single = IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds
                                 'Add the Elapsed time to the remaining time.
-                                IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime).AddSeconds(IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds)
+                                UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(remainingTime).AddSeconds(UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds)
                                 'Set the new maximum to the progress bar.
-                                TaskListProgressBar.Properties.Maximum = CInt(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
+                                TaskListProgressBar.Properties.Maximum = CInt(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
                                 TaskListProgressBar.Increment(TaskListProgressBar.Properties.Maximum * -1)
-                                TaskListProgressBar.Increment(CInt(IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
+                                TaskListProgressBar.Increment(CInt(UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
                                 'Set value of Remaining Time (as HH:mm:ss)
                                 RemainingTimeTextEdit.Text = ConvertSecondsInHHmmss(remainingTime).ToString("HH:mm:ss")
-                                OverallTimeTextEdit.Text = IAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
+                                OverallTimeTextEdit.Text = UiAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
                             Else
                                 'Calculate the total WS remaining time excluding the waiting cycles before Running
                                 resultData = myWSDelegate.CalculateTimeRemaining(Nothing, WorkSessionIDField, AnalyzerIDField, False)
                                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                     remainingTime = DirectCast(resultData.SetDatos, Single)
-                                    Dim prevRemainingTime As Single = CSng(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
+                                    Dim prevRemainingTime As Single = CSng(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
                                     'TR 21/05/2012 Valida if time is disable, and de WS is not pauset by the user or by Alarm.
-                                    If Not IAx00MainMDI.ElapsedTimeTimer.Enabled AndAlso Not IAx00MainMDI.UserPauseWS AndAlso _
+                                    If Not UiAx00MainMDI.ElapsedTimeTimer.Enabled AndAlso Not UiAx00MainMDI.UserPauseWS AndAlso _
                                        mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.AUTO_PAUSE_BY_ALARM) = 0 Then
-                                        IAx00MainMDI.ElapsedTimeTimer.Start()
+                                        UiAx00MainMDI.ElapsedTimeTimer.Start()
                                     End If
                                     'TR 21/05/2012 -END.
                                     'Add the Elapsed time to the remaining time And validate if is greater than previous time
-                                    If (remainingTime + IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - cycleMachineTime) > prevRemainingTime Then
+                                    If (remainingTime + UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - cycleMachineTime) > prevRemainingTime Then
                                         'Change the intial time to the new remaining time value
-                                        IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(remainingTime + _
-                                                                            IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - _
+                                        UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(remainingTime + _
+                                                                            UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - _
                                                                             cycleMachineTime))
                                     End If
                                     'Set the new maximum to the progress bar.
-                                    TaskListProgressBar.Properties.Maximum = CInt(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
+                                    TaskListProgressBar.Properties.Maximum = CInt(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
                                     TaskListProgressBar.Increment(TaskListProgressBar.Properties.Maximum * -1)
-                                    TaskListProgressBar.Increment(CInt(IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
+                                    TaskListProgressBar.Increment(CInt(UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
                                     'Set value of Remaining Time (as HH:mm:ss)
                                     RemainingTimeTextEdit.Text = ConvertSecondsInHHmmss(remainingTime).ToString("HH:mm:ss")
-                                    OverallTimeTextEdit.Text = IAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
-                                    ElapsedTimeTextEdit.Text = IAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
+                                    OverallTimeTextEdit.Text = UiAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
+                                    ElapsedTimeTextEdit.Text = UiAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
                                 End If
                             End If
                         Else
@@ -342,21 +342,21 @@ Public Class IMonitor
                             resultData = myWSDelegate.CalculateTimeRemaining(Nothing, WorkSessionIDField, AnalyzerIDField, False)
                             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                                 remainingTime = DirectCast(resultData.SetDatos, Single)
-                                Dim recalRemainingTime As Double = remainingTime + IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()
+                                Dim recalRemainingTime As Double = remainingTime + UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()
                                 'TR 25/05/2012 
-                                If recalRemainingTime > IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() Then
+                                If recalRemainingTime > UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds() Then
                                     'Validate before recalculation
                                     'If remainingTime > (recalRemainingTime - IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds()) Then
                                     remainingTime = CSng(Math.Abs(remainingTime - (recalRemainingTime - _
-                                                    IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())))
+                                                    UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())))
                                     'recalculamos el elapsed time.
-                                    Dim prevRemainingTime As Single = CSng(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
+                                    Dim prevRemainingTime As Single = CSng(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds)
                                     'Add the Elapsed time to the remaining time And validate if is greater than previous time
-                                    If (remainingTime + IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - cycleMachineTime) _
+                                    If (remainingTime + UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - cycleMachineTime) _
                                                                                                                 > prevRemainingTime Then
                                         'Change the intial time to the new remaining time value
-                                        IAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(remainingTime + _
-                                                                            IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - _
+                                        UiAx00MainMDI.InitialRemainingTime = ConvertSecondsInHHmmss(CSng(remainingTime + _
+                                                                            UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds() - _
                                                                             cycleMachineTime))
                                     End If
                                 End If
@@ -369,11 +369,11 @@ Public Class IMonitor
                             'End If
 
                             RemainingTimeTextEdit.Text = ConvertSecondsInHHmmss(remainingTime).ToString("HH:mm:ss")
-                            OverallTimeTextEdit.Text = IAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
-                            ElapsedTimeTextEdit.Text = IAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
-                            TaskListProgressBar.Properties.Maximum = CInt(IAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
+                            OverallTimeTextEdit.Text = UiAx00MainMDI.InitialRemainingTime.ToString("HH:mm:ss")
+                            ElapsedTimeTextEdit.Text = UiAx00MainMDI.LocalElapsedTime.ToString("HH:mm:ss")
+                            TaskListProgressBar.Properties.Maximum = CInt(UiAx00MainMDI.InitialRemainingTime.TimeOfDay.TotalSeconds())
                             TaskListProgressBar.Increment(TaskListProgressBar.Properties.Maximum * -1)
-                            TaskListProgressBar.Increment(CInt(IAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
+                            TaskListProgressBar.Increment(CInt(UiAx00MainMDI.LocalElapsedTime.TimeOfDay.TotalSeconds()))
 
                         End If
                         'If RemainingTimeTextEdit.Text = String.Empty OrElse ConvertHHmmssInSeconds(RemainingTimeTextEdit.Text) = 0 Then
@@ -401,7 +401,7 @@ Public Class IMonitor
 
             'TR -11/11/2011 -Validate if there are remaining time left to stop Timer.
             If remainingTime = 0 Then
-                IAx00MainMDI.ElapsedTimeTimer.Stop()
+                UiAx00MainMDI.ElapsedTimeTimer.Stop()
                 'Complete the progress bar in case is no completed.
                 TaskListProgressBar.Increment(TaskListProgressBar.Properties.Maximum)
             End If
@@ -509,7 +509,7 @@ Public Class IMonitor
                 End If
             End If
             'TR validate iif is in initialization time 3:00 min.
-            If IAx00MainMDI.LocalTotalSecs2() < 180 Then
+            If UiAx00MainMDI.LocalTotalSecs2() < 180 Then
                 initializeRotor = True
             End If
 
@@ -537,7 +537,7 @@ Public Class IMonitor
             'Warming Up AREA
             If (Not mdiAnalyzerCopy Is Nothing AndAlso mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.STANDBY) Then
                 'UpdateWarmUpProgressBar()
-                If Not IAx00MainMDI.WarmUpFinished Then
+                If Not UiAx00MainMDI.WarmUpFinished Then
                     UpdateWarmUpProgressBar()
                 Else
                     If mdiAnalyzerCopy.ExistsALIGHT Then    ' XBC 05/07/2012
@@ -1004,7 +1004,7 @@ Public Class IMonitor
                 If sensorValue = 1 Then
                     ScreenWorkingProcess = False
                     mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_PROCEDURE_FINISHED) = 0 'Once updated UI clear sensor
-                    IAx00MainMDI.ISEProcedureFinished = True
+                    UiAx00MainMDI.ISEProcedureFinished = True
                 End If
 
             End If
@@ -1775,7 +1775,7 @@ Public Class IMonitor
                 End If
 
             Else
-                IAx00MainMDI.BsTimerWUp_Tick(Nothing, Nothing)
+                UiAx00MainMDI.BsTimerWUp_Tick(Nothing, Nothing)
 
                 Dim completeWupProcessFlag As Boolean = False 'AG 12/09/2011
                 Dim myAnalyzerSettings As New AnalyzerSettingsDelegate
@@ -1922,7 +1922,7 @@ Public Class IMonitor
                 Me.SetWorkSessionTab()
                 'Dim myLogAcciones As New ApplicationLogManager()
                 Dim autoProcessUserAnswer As DialogResult = DialogResult.Yes
-                autoProcessUserAnswer = IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(6)
+                autoProcessUserAnswer = UiAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(6)
                 Dim resultFlagOK As Boolean = True
                 If autoProcessUserAnswer = DialogResult.Yes Then
                     ''Positive case. No execptions
@@ -1932,17 +1932,17 @@ Public Class IMonitor
                     resultFlagOK = False
                 Else 'User answers 'Cancel' -> stop process but continue executing WorkSession
                     resultFlagOK = True
-                    IAx00MainMDI.autoWSNotFinishedButGoRunning = True 'AG 01/04/2014 - #1565 inform that the process has not finished but user wants go to running
+                    UiAx00MainMDI.autoWSNotFinishedButGoRunning = True 'AG 01/04/2014 - #1565 inform that the process has not finished but user wants go to running
                 End If
 
                 ShownScreen() 'AG 22/04/2014 - #1598 before enable buttons be sure the shown screen atribute has been activated
                 If resultFlagOK Then
                     GlobalBase.CreateLogActivity("AutoCreate WS with LIS: Process near to finish successfully. Go to Running", "IMonitor.AutoCreateWSLastStep", EventLogEntryType.Information, False)
-                    IAx00MainMDI.FinishAutomaticWSWithLIS()
+                    UiAx00MainMDI.FinishAutomaticWSWithLIS()
                 Else
-                    IAx00MainMDI.EnableButtonAndMenus(True, True) 'Enable buttons before update attribute!! (required for PLAY/PAUSE button)
-                    IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
-                    IAx00MainMDI.SetHQProcessByUserFlag(False)
+                    UiAx00MainMDI.EnableButtonAndMenus(True, True) 'Enable buttons before update attribute!! (required for PLAY/PAUSE button)
+                    UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted)
+                    UiAx00MainMDI.SetHQProcessByUserFlag(False)
                     myEnableButtonsAlreadyLaunch = True     ' XB 25/11/2013
                 End If
                 OpenByAutomaticProcessAttribute = False
@@ -1950,7 +1950,7 @@ Public Class IMonitor
 
             ' XB 25/11/2013 - Inform to MDI that this screen is shown - Task #1303
             'ShownScreen()'AG 22/04/2014 - #1598 flag is set to TRUE before last IF
-            If Not myEnableButtonsAlreadyLaunch Then IAx00MainMDI.EnableButtonAndMenus(True, True)
+            If Not myEnableButtonsAlreadyLaunch Then UiAx00MainMDI.EnableButtonAndMenus(True, True)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".ExecuteAutoCreateWSLastStep ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1977,7 +1977,7 @@ Public Class IMonitor
         'RH 18/10/2011 Initialize myMultiLangResourcesDelegate
         myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate()
 
-        MainMDI = CType(Me.MdiParent, IAx00MainMDI)
+        MainMDI = CType(Me.MdiParent, UiAx00MainMDI)
 
         mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
 
@@ -2090,7 +2090,7 @@ Public Class IMonitor
     End Sub
 
     Private Sub bsEndWarmUp_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsEndWarmUp.Click
-        IAx00MainMDI.FinishWarmUp(False)
+        UiAx00MainMDI.FinishWarmUp(False)
     End Sub
 
     Private Sub Generic_MouseDown(ByVal sender As System.Object, ByVal e As System.EventArgs)
@@ -2130,9 +2130,9 @@ Public Class IMonitor
                 myForm.SourceForm = GlobalEnumerates.ScreenCallsGraphical.WS_STATES
                 myForm.ListExecutions = myExecutions
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
             End Using
 
         End If
@@ -2199,7 +2199,7 @@ Public Class IMonitor
     Private Sub IMonitor_Shown(sender As Object, e As EventArgs) Handles Me.Shown
         'AG 31/01/2014 - BT #1486 (v211 patch D + v300)
         If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
-            UIThread(Sub() IAx00MainMDI.SetActionButtonsEnableProperty(False))
+            UIThread(Sub() UiAx00MainMDI.SetActionButtonsEnableProperty(False))
             autoWSCreationTimer.Interval = 750 '1000 '2000
             autoWSCreationTimer.Enabled = True
         Else

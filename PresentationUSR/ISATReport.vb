@@ -161,7 +161,7 @@ Public Class ISATReport
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
             'TR 14/02/2012 -END.
@@ -209,7 +209,7 @@ Public Class ISATReport
                     ExitButton.Enabled = False
                     FolderButton.Enabled = False
                     bsSATDirListBox.Enabled = False
-                    IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
 
                     Application.DoEvents()
                     Dim workingThread As New Threading.Thread(AddressOf CreateReportSAT_NEW)
@@ -221,14 +221,14 @@ Public Class ISATReport
                     processing = True
                     ScreenWorkingProcess = True  'AG 08/11/2012 - Inform this flag because the MDI requires it
                     workingThread.Start()
-                    IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+                    UiAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
 
                     While processing
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         Application.DoEvents()
                         Threading.Thread.Sleep(100)
                     End While
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                     'TR 22/12/2011 - Validate if file is created on the current folder.
                     If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension)) Then
@@ -297,8 +297,8 @@ Public Class ISATReport
             ExitButton.Enabled = True
             FolderButton.Enabled = True
             bsSATDirListBox.Enabled = True
-            IAx00MainMDI.SetActionButtonsEnableProperty(True)
-            IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 - Implement new method
+            UiAx00MainMDI.SetActionButtonsEnableProperty(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 - Implement new method
 
             'TR 09/01/2012 - Indicate Rsat END on Application LOG.'TR 09/01/2012 -Indicate Rsat END on Application LOG.
             CreateLogActivity("RSAT END  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)

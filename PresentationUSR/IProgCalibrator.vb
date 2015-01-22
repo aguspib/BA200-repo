@@ -2856,8 +2856,8 @@ Public Class IProgCalibrator
             If IsTestParamWinAttribute Then
                 Me.StartPosition = FormStartPosition.Manual
 
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             End If
@@ -2890,8 +2890,8 @@ Public Class IProgCalibrator
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
                 If IsTestParamWinAttribute Then
 
-                    Dim myLocation As Point = IAx00MainMDI.Location
-                    Dim mySize As Size = IAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
 
                     pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2) 'Me.Left
                     pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) ' Me.Top
@@ -4111,7 +4111,7 @@ Public Class IProgCalibrator
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
             'RH 21/12/2011 END
 

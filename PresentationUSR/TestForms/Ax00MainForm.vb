@@ -30,7 +30,7 @@ Public Class Ax00MainForm
     Private Sub bsLogFileViewButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsLogFileViewButton.Click
         Dim myApplicationLogView As New ApplicationLogView
 
-        myApplicationLogView.WorkSessionID = IAx00MainMDI.ActiveWorkSession
+        myApplicationLogView.WorkSessionID = UiAx00MainMDI.ActiveWorkSession
         myApplicationLogView.ShowDialog()
     End Sub
 
@@ -118,7 +118,7 @@ Public Class Ax00MainForm
     End Sub
 
     Private Sub BsButton1_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton1.Click
-        Dim obj As New IAx00MainMDI
+        Dim obj As New UiAx00MainMDI
         obj.ShowDialog()
     End Sub
 

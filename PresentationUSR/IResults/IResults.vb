@@ -326,8 +326,8 @@ Public Class IResults
             LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
 
-            WorkSessionIDField = IAx00MainMDI.ActiveWorkSession
-            AnalyzerIDField = IAx00MainMDI.ActiveAnalyzer
+            WorkSessionIDField = UiAx00MainMDI.ActiveWorkSession
+            AnalyzerIDField = UiAx00MainMDI.ActiveAnalyzer
             'AnalyzerModelField = IAx00MainMDI.AnalyzerModel 'AG 03/07/2012 - comment because causes AnalyzerModelField = ""
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -1180,7 +1180,7 @@ Public Class IResults
 
             ' XB 26/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
             ExitingScreen()
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
             Application.DoEvents()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1222,7 +1222,7 @@ Public Class IResults
                 IMonitor.WorkSessionChange = ChangeWS
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1282,7 +1282,7 @@ Public Class IResults
 
             If myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY OrElse myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse Not myAnalyzerManager.Connected Then
                 bsXlsresults.Enabled = False
-                IAx00MainMDI.SetActionButtonsEnableProperty(False) 'Disable all action button bar
+                UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'Disable all action button bar
 
                 Dim workingThread As New Threading.Thread(AddressOf ExportResults)
                 CreatingXlsResults = True
@@ -1290,13 +1290,13 @@ Public Class IResults
                 workingThread.Start()
 
                 While CreatingXlsResults
-                    IAx00MainMDI.InitializeMarqueeProgreesBar()
+                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
                     Cursor = Cursors.WaitCursor
                     Application.DoEvents()
                 End While
 
                 workingThread = Nothing
-                IAx00MainMDI.StopMarqueeProgressBar()
+                UiAx00MainMDI.StopMarqueeProgressBar()
             End If
 
         Catch ex As Exception
@@ -1307,7 +1307,7 @@ Public Class IResults
             CreatingXlsResults = False
             ScreenWorkingProcess = False 'AG 08/11/2012 - inform this flag because the MDI requires it
             bsXlsresults.Enabled = True
-            IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Activate action button bar depending Ax00 status, alarms, ...
+            UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'Activate action button bar depending Ax00 status, alarms, ...
             Cursor = Cursors.Default
 
             'Enable all screen buttons, and enable also all buttons and menus in the MainMDI
@@ -1605,7 +1605,7 @@ Public Class IResults
         Finally
             'SGM 17/04/2013
             If (SendManRepButton.Tag Is Nothing) Then
-                IAx00MainMDI.SetActionButtonsEnableProperty(True) 'RH 17/05/2012
+                UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'RH 17/05/2012
                 SendManRepButton.Enabled = True 'RH 17/05/2012
                 Cursor = Cursors.Default 'RH 17/05/2012
             End If
@@ -2898,8 +2898,8 @@ Public Class IResults
                         If (Not resultData.HasError) Then
                             If myResultsDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                                 CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".OpenOffSystemResultsScreen ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
-                                IAx00MainMDI.AddResultsIntoQueueToUpload(myResultsDelegate.LastExportedResults)
-                                IAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
+                                UiAx00MainMDI.AddResultsIntoQueueToUpload(myResultsDelegate.LastExportedResults)
+                                UiAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
 
                                 'Clear the executions
                                 myResultsDelegate.ClearLastExportedResults()
@@ -4486,9 +4486,9 @@ Public Class IResults
                 myForm.OrderTestID = pOrderTestID
                 myForm.Replicate = pReplicate
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
             End Using
 
         Catch ex As Exception
@@ -5087,10 +5087,10 @@ Public Class IResults
                                             Select row.RerunNumber).First
                 End With
 
-                IAx00MainMDI.AddNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is shown
                 myCurveForm.ShowDialog()
                 UpdateScreenGlobalDSWithAffectedResults()
-                IAx00MainMDI.RemoveNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is closed
 
                 'TR 25/09/2013 #memory
                 TestList = Nothing
@@ -5458,7 +5458,7 @@ Public Class IResults
     Private Sub ActivateDeactivateAllButtons(ByVal pStatusToSet As Boolean)
         Try
             'Disable all screen buttons, and disable also all buttons and menus in the MainMDI
-            IAx00MainMDI.EnableButtonAndMenus(pStatusToSet)
+            UiAx00MainMDI.EnableButtonAndMenus(pStatusToSet)
             PrintReportButton.Enabled = pStatusToSet
             PrintCompactReportButton.Enabled = pStatusToSet
             SummaryButton.Enabled = pStatusToSet
@@ -5561,7 +5561,7 @@ Public Class IResults
                     'AG 17/02/2014 - BT #1505
                     If (exportResults.twksWSExecutions.Rows.Count > 0) Then
                         'Pass the list of Results to be exported to LIS to the MainMDI
-                        IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
+                        UiAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
 
                         'AG 17/02/2014 - BT #1505: improvement, copy DS using Merge instead of loops
                         Dim myResultsAlarmsDS As New ResultsDS
@@ -5571,7 +5571,7 @@ Public Class IResults
                         'AG 02/01/2014 - BT #1433 (v211 patch2)
                         CreateLogActivity("Current Results manual upload", Me.Name & ".ExportResultsToLIS ", EventLogEntryType.Information, False)
 
-                        IAx00MainMDI.InvokeUploadResultsLIS(False, False, AverageResultsDS, myResultsAlarmsDS, Nothing) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
+                        UiAx00MainMDI.InvokeUploadResultsLIS(False, False, AverageResultsDS, myResultsAlarmsDS, Nothing) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                     End If
                 End If
             End If

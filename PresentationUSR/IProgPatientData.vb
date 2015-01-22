@@ -506,7 +506,7 @@ Public Class IProgPatientData
                         Me.Close()
                     Else
                         'Normal button click - Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     End If
                 End If
             End If
@@ -1752,8 +1752,8 @@ Public Class IProgPatientData
             If (entryModeAttribute = "MENU") Then
                 ResetBorder()
             Else
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
 
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
@@ -1787,8 +1787,8 @@ Public Class IProgPatientData
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
                 If (entryModeAttribute = "SEARCH") Then
-                    Dim mySize As Size = IAx00MainMDI.Size
-                    Dim myLocation As Point = IAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
                     If (Not Me.MdiParent Is Nothing) Then
                         mySize = Me.Parent.Size
                         myLocation = Me.Parent.Location

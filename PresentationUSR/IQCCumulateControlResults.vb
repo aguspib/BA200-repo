@@ -197,9 +197,9 @@ Public Class IQCCumulateControlResults
         Try
             If (IQCResultReviewGoneAttribute) Then
                 Me.Close()
-                If Not IAx00MainMDI.ActiveMdiChild Is Nothing Then
-                    If (TypeOf IAx00MainMDI.ActiveMdiChild Is IQCResultsReview) Then
-                        Dim CurrentMdiChild As IQCResultsReview = CType(IAx00MainMDI.ActiveMdiChild, IQCResultsReview)
+                If Not UiAx00MainMDI.ActiveMdiChild Is Nothing Then
+                    If (TypeOf UiAx00MainMDI.ActiveMdiChild Is IQCResultsReview) Then
+                        Dim CurrentMdiChild As IQCResultsReview = CType(UiAx00MainMDI.ActiveMdiChild, IQCResultsReview)
                         CurrentMdiChild.ReloadScreen()
                     End If
                 End If
@@ -210,7 +210,7 @@ Public Class IQCCumulateControlResults
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
         Catch ex As Exception
@@ -436,7 +436,7 @@ Public Class IQCCumulateControlResults
 
             myForm.QCTestSampleIDValue = pQCTestSampleID
             myForm.AnalyzerID = AnalyzerIDAttribute
-            myForm.MdiParent = IAx00MainMDI
+            myForm.MdiParent = UiAx00MainMDI
             myForm.Show()
 
             Me.Close()

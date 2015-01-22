@@ -6520,7 +6520,7 @@ Public Class IWSRotorPositions
             End If
 
             ' XB 01/08/2013 - add functionality according to disable LIS buttons
-            If IAx00MainMDI.DisableLISButtons() Then
+            If UiAx00MainMDI.DisableLISButtons() Then
                 BarcodeWarningButton.Enabled = False
             End If
 
@@ -6566,9 +6566,9 @@ Public Class IWSRotorPositions
                     'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
                     If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
                        (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
-                        If (Not IAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
+                        If (Not UiAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
                             'Verify if the Scanning Button can be available by checking Alarms and another Analyzer states
-                            statusScanningButton = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
+                            statusScanningButton = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
                         End If
                     End If
                 End If
@@ -6892,7 +6892,7 @@ Public Class IWSRotorPositions
                 'AG 07/06/2012
 
                 'AG-TR 10/05/2012 -validate the processingbeforerunnin.
-                If (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ AndAlso IAx00MainMDI.processingBeforeRunning <> "0") Then
+                If (myLocalEventType = GlobalEnumerates.UI_RefreshEvents.BARCODE_POSITION_READ AndAlso UiAx00MainMDI.processingBeforeRunning <> "0") Then
                     ScreenWorkingProcess = False
                     Me.Enabled = True 'Enable the screen
                 End If
@@ -6903,8 +6903,8 @@ Public Class IWSRotorPositions
             'AG 15/03/2012 - When FREEZE appears while UI is disabled because screen is working, Sw must reactivate UI
             If (mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1) Then
                 ScreenWorkingProcess = False 'Process finished
-                IAx00MainMDI.EnableButtonAndMenus(True)
-                IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                UiAx00MainMDI.EnableButtonAndMenus(True)
+                UiAx00MainMDI.SetActionButtonsEnableProperty(True)
                 Me.Enabled = True 'Enable the screen
                 Cursor = Cursors.Default
                 RefreshDoneField = True 'RH 28/03/2012
@@ -7030,10 +7030,10 @@ Public Class IWSRotorPositions
                     End If
 
                     If (Not pCreateExecutions) Then
-                        IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted)
-                        IAx00MainMDI.InitializeAutoWSFlags()
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted)
+                        UiAx00MainMDI.InitializeAutoWSFlags()
                         OpenByAutomaticProcessAttribute = False
-                        IAx00MainMDI.EnableButtonAndMenus(True, True)
+                        UiAx00MainMDI.EnableButtonAndMenus(True, True)
                     End If
                 Else
                     'The Create Executions process was launched manually by clicking in EXIT Button in Rotor Positions Screen
@@ -7079,7 +7079,7 @@ Public Class IWSRotorPositions
                     End If
                     'TR 16/04/2014 BT #1597 -END
 
-                    IAx00MainMDI.EnableButtonAndMenus(False)
+                    UiAx00MainMDI.EnableButtonAndMenus(False)
                     bsElementsTreeView.BackColor = SystemColors.MenuBar
                     Application.DoEvents()
 
@@ -7104,12 +7104,12 @@ Public Class IWSRotorPositions
                     workingThread.Start()
 
                     While ScreenWorkingProcess
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         Application.DoEvents()
                     End While
 
                     workingThread = Nothing
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                     'AG 11/12/2013 - BT #1433 ==> Comment these code lines because they fail when START/CONTINUE WS is clicked with Rotor
                     '                             Positions Screen open and no Tubes are found or LIS does not respond anything (v211 patch1)
@@ -7167,7 +7167,7 @@ Public Class IWSRotorPositions
 
                 'AG 10/02/2014 - If worksession is EMPTY, ABORTED or OPEN and this screen is closed menu and buttons (vertical and screen buttons) disable!
             Else
-                IAx00MainMDI.EnableButtonAndMenus(False)
+                UiAx00MainMDI.EnableButtonAndMenus(False)
                 If pFromOwnScreen Then
                     For Each c As Control In FunctionalityArea.Controls
                         If TypeOf (c) Is BSButton Then
@@ -7189,7 +7189,7 @@ Public Class IWSRotorPositions
             Application.DoEvents()
             ShowMessage(Me.Name & "CreateExecutionsProcess()", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            If (pCreateExecutions) Then IAx00MainMDI.StopMarqueeProgressBar()
+            If (pCreateExecutions) Then UiAx00MainMDI.StopMarqueeProgressBar()
         End Try
         Return returnValue
     End Function
@@ -7315,7 +7315,7 @@ Public Class IWSRotorPositions
     Private Sub bsScanningButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsScanningButton.Click
         Try
             CreateLogActivity("Btn Scanning", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted) 'AG 10/07/2013
+            UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.notStarted) 'AG 10/07/2013
 
             'AG 26/09/2011 - Use progress bar thread as in WSPrep screen
             If (Not mdiAnalyzerCopy Is Nothing) Then
@@ -7327,11 +7327,11 @@ Public Class IWSRotorPositions
                         Cursor = Cursors.WaitCursor
 
                         'DL 14/07/2011 Disable interface application
-                        IAx00MainMDI.DisabledMdiForms = Me
-                        IAx00MainMDI.EnableButtonAndMenus(False)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 22/03/2012
-                        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.BARCODE_READING) 'AG 22/03/2012
-                        IAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
+                        UiAx00MainMDI.DisabledMdiForms = Me
+                        UiAx00MainMDI.EnableButtonAndMenus(False)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 22/03/2012
+                        UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.BARCODE_READING) 'AG 22/03/2012
+                        UiAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
 
                         Me.Enabled = False 'Disable the screen
                         'isScanningProcess = True
@@ -7365,7 +7365,7 @@ Public Class IWSRotorPositions
 
                         ScreenWorkingProcess = True
 
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         'Dim prevMessage As String = IAx00MainMDI.bsAnalyzerStatus.Text
                         Application.DoEvents()
 
@@ -7373,22 +7373,22 @@ Public Class IWSRotorPositions
                         workingThread.Start()
 
                         While ScreenWorkingProcess 'isScanningProcess
-                            IAx00MainMDI.InitializeMarqueeProgreesBar()
+                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
                             Application.DoEvents()
                         End While
                         workingThread = Nothing
                         watchDogTimer.Enabled = False
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
 
                         'SA 25/07/2013 - If the User clicked in HQ Button is Host Query Screen, the LIS Orders Download process is executed
                         If (HQButtonUserClickAttribute) Then
-                            IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
-                            IAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
-                            IAx00MainMDI.CreateAutomaticWSWithLIS()
+                            UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
+                            UiAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
+                            UiAx00MainMDI.CreateAutomaticWSWithLIS()
                         End If
 
-                        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages._NONE) 'AG 22/03/2012
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)        'AG 22/03/2012
+                        UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages._NONE) 'AG 22/03/2012
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(True)        'AG 22/03/2012
                     End If
                 End If
             End If
@@ -7398,15 +7398,15 @@ Public Class IWSRotorPositions
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsScanningButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            IAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
+            UiAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
 
             'TR 03/04/2012
             Cursor = Cursors.Default
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             'TR 03/04/2012
 
             'TR 04/10/2011
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
         End Try
         Cursor = Cursors.Default
     End Sub
@@ -7708,7 +7708,7 @@ Public Class IWSRotorPositions
                 PrepareButtons(LisWithFilesMode) 'DL 10/05/2013
                 Application.DoEvents() 'RH 14/12/2010
 
-                IAx00MainMDI.bsTSInfoButton.Enabled = True 'RH 14/10/2011
+                UiAx00MainMDI.bsTSInfoButton.Enabled = True 'RH 14/10/2011
 
                 PrepareIconNames()
                 PrepareReagentLegendArea()
@@ -8860,7 +8860,7 @@ Public Class IWSRotorPositions
             If (createExecutionsFlag) Then
                 'TR 30/08/2012 Set the is closing  to true to avoid refresh screen executions
                 isClosingFlag = True
-                IAx00MainMDI.StopMarqueeProgressBar()
+                UiAx00MainMDI.StopMarqueeProgressBar()
 
                 'ReleaseElement() 'AG 09/07/2013
                 'RH 09/02/2011
@@ -8876,8 +8876,8 @@ Public Class IWSRotorPositions
                         autoProcessFlag = True
                     End If
 
-                    IAx00MainMDI.ActiveStatus = WorkSessionStatusAttribute
-                    IAx00MainMDI.OpenMonitorForm(Me, autoProcessFlag)
+                    UiAx00MainMDI.ActiveStatus = WorkSessionStatusAttribute
+                    UiAx00MainMDI.OpenMonitorForm(Me, autoProcessFlag)
                 End If
             Else
                 bsAcceptButton.Enabled = True 'AG 18/06/2014 #1669 - Enable button again if the screen is not closed!!
@@ -9126,18 +9126,18 @@ Public Class IWSRotorPositions
                         '#End If
 
                         'Inform the MDI the HostQuery monitor screen is shown
-                        IAx00MainMDI.AddNoMDIChildForm = myForm
+                        UiAx00MainMDI.AddNoMDIChildForm = myForm
                         myForm.ShowDialog()
 
-                        IAx00MainMDI.RemoveNoMDIChildForm = myForm
+                        UiAx00MainMDI.RemoveNoMDIChildForm = myForm
                         WorkSessionStatusAttribute = myForm.WorkSessionStatus
                         createAutoWS = myForm.HQButtonUserClick
                     End Using
 
                     If (createAutoWS) Then
-                        IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
-                        IAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
-                        IAx00MainMDI.CreateAutomaticWSWithLIS()
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessDownloadOrders)
+                        UiAx00MainMDI.pausingAutomateProcess = True 'AG 29/01/2014 - HostQuery manual can not enter in running automatically (pause automate process just before go to Running)
+                        UiAx00MainMDI.CreateAutomaticWSWithLIS()
                     End If
                 End If
 

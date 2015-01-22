@@ -335,8 +335,8 @@ Public Class ISortingTestsAux
                 mySize = Me.Parent.Size
                 myLocation = Me.Parent.Location
             Else 'Test selection sort (popup,  use the MDI)
-                mySize = IAx00MainMDI.Size
-                myLocation = IAx00MainMDI.Location
+                mySize = UiAx00MainMDI.Size
+                myLocation = UiAx00MainMDI.Location
             End If
             'AG 02/09/2014 - BA-1869
 
@@ -512,8 +512,8 @@ Public Class ISortingTestsAux
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
                 Else 'Test selection sort (popup,  use the MDI)
-                    mySize = IAx00MainMDI.Size
-                    myLocation = IAx00MainMDI.Location
+                    mySize = UiAx00MainMDI.Size
+                    myLocation = UiAx00MainMDI.Location
                 End If
                 'AG 02/09/2014 - BA-1869
 
@@ -633,7 +633,7 @@ Public Class ISortingTestsAux
                     'IAx00MainMDI.OpenMonitorForm(Me)
                     If openModeAttribute = String.Empty Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         Me.Close()
                     End If
@@ -1349,7 +1349,7 @@ Public Class ISortingTestsAux
             Select Case level
                 Case USER_LEVEL.lBIOSYSTEMS, USER_LEVEL.lADMINISTRATOR, USER_LEVEL.lSUPERVISOR
                     'AG 18/09/2014 - BA-1869 If exists worksession screen in read only mode depending the tests types
-                    If (IAx00MainMDI.ActiveStatus <> "EMPTY") Then
+                    If (UiAx00MainMDI.ActiveStatus <> "EMPTY") Then
                         'Std, ISE, CALC or OFFS read only if current WS contains tests for this test type
                         'Profiles read only if current WS is not empty
 
@@ -1358,7 +1358,7 @@ Public Class ISortingTestsAux
 
                             'Look for tests in current WS filtering by test type. If any normal mode
                             Dim myDlg As New OrderTestsDelegate
-                            Dim myGlobalDataTo As GlobalDataTO = myDlg.GetOrderTestsByWorkSession(Nothing, IAx00MainMDI.ActiveWorkSession, ScreenIDAttribute)
+                            Dim myGlobalDataTo As GlobalDataTO = myDlg.GetOrderTestsByWorkSession(Nothing, UiAx00MainMDI.ActiveWorkSession, ScreenIDAttribute)
                             If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
                                 If DirectCast(myGlobalDataTo.SetDatos, OrderTestsDS).twksOrderTests.Rows.Count = 0 Then
                                     readOnlyFlag = False

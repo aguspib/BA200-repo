@@ -2035,11 +2035,11 @@ Partial Public Class IMonitor
             'Application.DoEvents()
             'Close()
 
-            IResults.ActiveWSStatus = IAx00MainMDI.ActiveStatus
-            IResults.AnalyzerModel = IAx00MainMDI.ActiveAnalyzerModel
+            IResults.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
+            IResults.AnalyzerModel = UiAx00MainMDI.ActiveAnalyzerModel
             IResults.SampleClass = SampleClass
             IResults.SampleOrTestName = SampleOrTestName
-            IAx00MainMDI.OpenMDIChildForm(IResults)
+            UiAx00MainMDI.OpenMDIChildForm(IResults)
             ' XB 26/02/2014 - task #1529
 
         Catch ex As Exception
@@ -2084,9 +2084,9 @@ Partial Public Class IMonitor
                 'myForm.SourceCalled = GraphicalAbsScreenCallMode.WS_STATES_MULTIPLE
                 myForm.ListExecutions = myExecutions
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
 
             End Using
 

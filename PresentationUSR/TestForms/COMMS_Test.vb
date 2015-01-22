@@ -37,7 +37,7 @@ Public Class bsReception
             'Execute calculations test
             Dim myCalc As New CalculationsDelegate()
             'myGlobal = myCalc.CalculateExecution(Nothing, myExec, "SN0000099999_Ax400", "2010010501", False, "")
-            myGlobal = myCalc.CalculateExecutionNEW(Nothing, IAx00MainMDI.ActiveAnalyzer, IAx00MainMDI.ActiveWorkSession, myExec, False, "")
+            myGlobal = myCalc.CalculateExecutionNEW(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.ActiveWorkSession, myExec, False, "")
             If myGlobal.HasError Then
                 Exit Sub
             End If
@@ -75,7 +75,7 @@ Public Class bsReception
         Dim turnToPendingFlag As Boolean = False
 
         'Volume missing over the reagent or sample rotors
-        resultData = myExecutions.ProcessVolumeMissing(Nothing, myPrepID, myRotorName, myCellNumber, myOKPerformedFlag, IAx00MainMDI.ActiveWorkSession, IAx00MainMDI.ActiveAnalyzer, turnToPendingFlag)
+        resultData = myExecutions.ProcessVolumeMissing(Nothing, myPrepID, myRotorName, myCellNumber, myOKPerformedFlag, UiAx00MainMDI.ActiveWorkSession, UiAx00MainMDI.ActiveAnalyzer, turnToPendingFlag)
 
         ''SPECIAL CASE ONLY FOR Volume missing over the reactions rotor (dilutions)
         ''These code must be the same as used in method ProcessArmStatusRecived marked as ('Level detection fails (no diluted sample) in reactions rotors)
@@ -252,8 +252,8 @@ Public Class bsReception
                         myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
 
                     Case "RUNNING"
-                        myAnalyzerManager.ActiveAnalyzer = IAx00MainMDI.ActiveAnalyzer
-                        myAnalyzerManager.ActiveWorkSession = IAx00MainMDI.ActiveWorkSession
+                        myAnalyzerManager.ActiveAnalyzer = UiAx00MainMDI.ActiveAnalyzer
+                        myAnalyzerManager.ActiveWorkSession = UiAx00MainMDI.ActiveWorkSession
 
                         myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'RUNNING
 
@@ -364,7 +364,7 @@ Public Class bsReception
             'myGlobal = myCalc.CalculateExecution(Nothing, myExec, "SN0000099999_Ax400", "2010010501", False, "")
             'myGlobal = myCalc.CalculateExecution(Nothing, myExec, IAx00MainMDI.ActiveAnalyzer, IAx00MainMDI.ActiveWorkSession, False, "")
 
-            myGlobal = myCalc.CalculateExecutionNEW(Nothing, IAx00MainMDI.ActiveAnalyzer, IAx00MainMDI.ActiveWorkSession, myExec, False, "", False, Nothing)
+            myGlobal = myCalc.CalculateExecutionNEW(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.ActiveWorkSession, myExec, False, "", False, Nothing)
             If myGlobal.HasError Then
                 Exit Sub
             End If

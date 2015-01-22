@@ -41,8 +41,8 @@ Public Class IWSNotPosWarning
     Private Sub ScreenLoad()
         Try
             'DL 28/07/2011
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             'END DL 28/07/2011
 
@@ -335,7 +335,7 @@ Public Class IWSNotPosWarning
     Private Sub bsExitButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsExitButton.Click
         ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
         ExitingScreen()
-        IAx00MainMDI.EnableButtonAndMenus(True)
+        UiAx00MainMDI.EnableButtonAndMenus(True)
         Application.DoEvents()
         Me.DialogResult = Windows.Forms.DialogResult.Cancel
         Me.Close()
@@ -351,8 +351,8 @@ Public Class IWSNotPosWarning
         Try
             If m.Msg = WM_WINDOWPOSCHANGING Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
                 pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2)

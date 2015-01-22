@@ -18,7 +18,7 @@ Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILIS
 Imports System.Timers
 Imports System.IO
 
-Partial Public Class IAx00MainMDI
+Partial Public Class UiAx00MainMDI
 
 #Region "Declarations"
 
@@ -11788,4 +11788,5 @@ Partial Public Class IAx00MainMDI
 
 #End Region
 
+  
 End Class

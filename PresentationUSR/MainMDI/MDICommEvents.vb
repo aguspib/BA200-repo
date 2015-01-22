@@ -15,7 +15,7 @@ Imports LIS.Biosystems.Ax00.LISCommunications 'AG 25/02/2013 - for LIS communica
 
 
 'Refactoring code in CommEvents partial class inherits form MDI (specially method ManageReceptionEvent)
-Partial Public Class IAx00MainMDI
+Partial Public Class UiAx00MainMDI
 
 #Region "Communications events Main Methods"
 
@@ -1832,7 +1832,7 @@ Partial Public Class IAx00MainMDI
 
             End If
 
-                'AG 17/10/2011
+            'AG 17/10/2011
             If processingBeforeRunning = "0" Then refreshTriggeredFlag = False 'AG 23/01/2012 - special case: enter running process in progress
             If MdiChildIsDisabled AndAlso refreshTriggeredFlag Then
                 'Activate the current mdi child who is disabled once the refresh method is finished
@@ -1845,7 +1845,7 @@ Partial Public Class IAx00MainMDI
                     End If
                 End If
             End If
-                'AG 17/10/2011
+            'AG 17/10/2011
 
             'DL 31/07/2012. Begin 
             Dim linq As New List(Of UIRefreshDS.ReceivedAlarmsRow)
@@ -1865,7 +1865,7 @@ Partial Public Class IAx00MainMDI
             linq = Nothing
 
             'Alarm Messages (Messages do not required ActiveMdiChild) 
-                '--------------------------------------------------------
+            '--------------------------------------------------------
             '(All screens) Finally show message depending the alarms received and update vertical button bar depending the current alarms
             ShowAlarmsOrSensorsWarningMessages(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS) 
             SetActionButtonsEnableProperty(True)
@@ -2166,10 +2166,10 @@ Partial Public Class IAx00MainMDI
                     End If
                     'AG 23/05/2012
 
-                    End If
-                    'TR 20/09/2012 Commented by TR. 
-                    'EnableButtonAndMenus(True)
-                    Cursor = Cursors.Default
+                End If
+                'TR 20/09/2012 Commented by TR. 
+                'EnableButtonAndMenus(True)
+                Cursor = Cursors.Default
             End If
             lnqRes = Nothing
 

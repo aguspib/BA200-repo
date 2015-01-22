@@ -1315,18 +1315,18 @@ Public Class IHisResults
                 ScreenWorkingProcess = True
 
                 MyClass.EnableScreen(False)
-                IAx00MainMDI.EnableButtonAndMenus(False)
+                UiAx00MainMDI.EnableButtonAndMenus(False)
 
                 workingThread.Start()
 
                 While DeletingHistOrderTests
-                    IAx00MainMDI.InitializeMarqueeProgreesBar()
+                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
                     Cursor = Cursors.WaitCursor
                     Application.DoEvents()
                 End While
 
                 workingThread = Nothing
-                IAx00MainMDI.StopMarqueeProgressBar()
+                UiAx00MainMDI.StopMarqueeProgressBar()
                 CreateLogActivity("DeleteSelectedRowsFromGrid: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Name & ".DeleteSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
             End If
         Catch ex As Exception
@@ -1335,7 +1335,7 @@ Public Class IHisResults
         End Try
 
         EnableScreen(True)
-        IAx00MainMDI.EnableButtonAndMenus(True)
+        UiAx00MainMDI.EnableButtonAndMenus(True)
         Cursor = Cursors.Default
         UpdateFormBehavior(True)
     End Sub
@@ -1513,8 +1513,8 @@ Public Class IHisResults
 
                 'Inform the new results to be updated into MDI property
                 If (myExportedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
-                    IAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
-                    IAx00MainMDI.InvokeUploadResultsLIS(True, False, Nothing, Nothing, myHisWSResultsDS) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
+                    UiAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
+                    UiAx00MainMDI.InvokeUploadResultsLIS(True, False, Nothing, Nothing, myHisWSResultsDS) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                 End If 'AG 21/02/2014 - #1505
 
                 CreateLogActivity("Historical Results manual upload (end): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
@@ -1697,7 +1697,7 @@ Public Class IHisResults
                 Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

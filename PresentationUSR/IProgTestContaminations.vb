@@ -131,7 +131,7 @@ Public Class IProgTestContaminations
 
 
             'RH 27/09/2011 Initialize ExistsExecutions
-            ExistsExecutions = (IAx00MainMDI.ActiveStatus <> "EMPTY")
+            ExistsExecutions = (UiAx00MainMDI.ActiveStatus <> "EMPTY")
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels(currentLanguage)
@@ -1388,7 +1388,7 @@ Public Class IProgTestContaminations
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
         Catch ex As Exception

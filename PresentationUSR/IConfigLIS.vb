@@ -1271,7 +1271,7 @@ Public Class IConfigLIS
                 sessionSettings.tcfgUserSettings.Rows.Add(sessionSettingRow)
 
                 'Reprogram the Main MDI timer when it is needed
-                IAx00MainMDI.LISWaitTime = CInt(BsBsMaxTimeToWaitLISOrdersNumericUpDown.Value)
+                UiAx00MainMDI.LISWaitTime = CInt(BsBsMaxTimeToWaitLISOrdersNumericUpDown.Value)
 
                 '** Settings for UPLOAD
                 sessionSettingRow = sessionSettings.tcfgUserSettings.NewtcfgUserSettingsRow
@@ -1449,7 +1449,7 @@ Public Class IConfigLIS
                 resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, Nothing, sessionSettings)
                 If (Not resultData.HasError) Then
                     'BT #1349 ==> Value to assign to Main MDI Property autoWSCreationWithLISMode will depend also on value of setting LIS_ENABLE_COMMS
-                    IAx00MainMDI.autoWSCreationWithLISMode = (BsAutoQueryStartCheckbox.Checked AndAlso BsLISCommsEnabledCheckbox.Checked)
+                    UiAx00MainMDI.autoWSCreationWithLISMode = (BsAutoQueryStartCheckbox.Checked AndAlso BsLISCommsEnabledCheckbox.Checked)
                 Else
                     'Error saving the settings, show it
                     Cursor = Cursors.Default
@@ -1494,7 +1494,7 @@ Public Class IConfigLIS
                     Close()
                 Else
                     'Normal button click - Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
 
@@ -1882,9 +1882,9 @@ Public Class IConfigLIS
                                 ' No works well if there are a thread created from this screen because it is angry with the threads created on MDI
 
                                 'Release the LIS manager object
-                                IAx00MainMDI.InvokeReleaseLIS(False)
+                                UiAx00MainMDI.InvokeReleaseLIS(False)
 
-                                IAx00MainMDI.InvokeReleaseFromConfigSettings = True
+                                UiAx00MainMDI.InvokeReleaseFromConfigSettings = True
 
                                 'System.Threading.Thread.Sleep(1000)
 
@@ -1909,7 +1909,7 @@ Public Class IConfigLIS
 
                             Else
                                 ' Re-create Channel with new change settings
-                                IAx00MainMDI.InvokeCreateLISChannel()
+                                UiAx00MainMDI.InvokeCreateLISChannel()
                             End If
                             Cursor = Cursors.Default
                             ' XB 24/04/2013
@@ -2043,7 +2043,7 @@ Public Class IConfigLIS
             Dim resultData As New GlobalDataTO
 
             Dim myAnalyzersDelegate As New AnalyzerSettingsDelegate
-            resultData = myAnalyzersDelegate.GetAnalyzerSetting(Nothing, IAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+            resultData = myAnalyzersDelegate.GetAnalyzerSetting(Nothing, UiAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                 Dim myAnalyzerSettingsDS As AnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
                 If myAnalyzerSettingsDS IsNot Nothing AndAlso myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count > 0 Then

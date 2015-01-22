@@ -462,7 +462,7 @@ Public Class LIS_Test
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 Dim mySavedWSOrderTestsDS As SavedWSOrderTestsDS = DirectCast(resultData.SetDatos, SavedWSOrderTestsDS)
 
-                resultData = myOTD.GetPatientOrderTests(Nothing, IAx00MainMDI.ActiveWorkSession)
+                resultData = myOTD.GetPatientOrderTests(Nothing, UiAx00MainMDI.ActiveWorkSession)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
                     myWorkSessionResultDS = DirectCast(resultData.SetDatos, WorkSessionResultDS)
 

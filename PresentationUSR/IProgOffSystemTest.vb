@@ -491,7 +491,7 @@ Public Class IProgOffSystemTest
                     Close()
                 Else
                     'Normal button click - open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 bsFullNameTextbox.Focus()

@@ -715,7 +715,7 @@ Public Class IProgControls
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
         Catch ex As Exception
@@ -1710,8 +1710,8 @@ Public Class IProgControls
     Private Sub ScreenLoad()
         Try
             If (String.Compare(SourceScreenAttribute, GlbSourceScreen.TEST_QCTAB.ToString, False) = 0) Then
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             End If
@@ -2370,8 +2370,8 @@ Public Class IProgControls
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
                 If (SourceScreenAttribute = GlbSourceScreen.TEST_QCTAB.ToString) Then
-                    Dim myLocation As Point = IAx00MainMDI.Location
-                    Dim mySize As Size = IAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
 
                     pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2) 'Me.Left
                     pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) ' Me.Top

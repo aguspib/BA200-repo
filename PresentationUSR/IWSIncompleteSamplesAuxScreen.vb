@@ -1418,8 +1418,8 @@ Public Class IWSIncompleteSamplesAuxScreen
     Private Sub IWSIncompleteSamplesAuxScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'The screen should appear always centered regarding the Main MDI
-            Dim myLocation As Point = IAx00MainMDI.PointToScreen(Point.Empty)
-            Dim mySize As Size = IAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.PointToScreen(Point.Empty)
+            Dim mySize As Size = UiAx00MainMDI.Size
 
             myNewLocation = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 20) 'AG + RH 03/04/2012 - add - 20
             Me.Location = myNewLocation

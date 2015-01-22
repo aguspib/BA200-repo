@@ -506,7 +506,7 @@ Public Class IProgISETest
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 If bsFullNameTextbox.Enabled Then

@@ -296,8 +296,8 @@ Public Class HQBarcode
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -1129,7 +1129,7 @@ Public Class HQBarcode
             End If
 
             'XB 01/08/2013 - Add functionality to disable LIS buttons
-            If (IAx00MainMDI.DisableLISButtons()) Then
+            If (UiAx00MainMDI.DisableLISButtons()) Then
                 bsLIMSImportButton.Enabled = False
             End If
 
@@ -2610,8 +2610,8 @@ Public Class HQBarcode
     Private Sub HQBarcode_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'The screen should appear always centered regarding the Main MDI
-            Dim myLocation As Point = IAx00MainMDI.PointToScreen(Point.Empty)
-            Dim mySize As Size = IAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.PointToScreen(Point.Empty)
+            Dim mySize As Size = UiAx00MainMDI.Size
 
             myNewLocation = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 20) 'AG + RH 03/04/2012 - add - 20
             Me.Location = myNewLocation
@@ -2635,13 +2635,13 @@ Public Class HQBarcode
                 Dim autoProcessUserAnswer As DialogResult = DialogResult.OK
 
                 'Check if there are some patient tube in samples rotor
-                autoProcessUserAnswer = IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(2, Me, bsIncompleteSamplesDataGridView.Rows.Count)
+                autoProcessUserAnswer = UiAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(2, Me, bsIncompleteSamplesDataGridView.Rows.Count)
                 If (autoProcessUserAnswer = DialogResult.Yes) Then
                     'Positive case. No exceptions
 
                     'Then evaluate the 2on level exception rule
                     'Before query by specimen check the LIS status
-                    autoProcessUserAnswer = IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(1, Me)
+                    autoProcessUserAnswer = UiAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(1, Me)
                     If (autoProcessUserAnswer = DialogResult.Yes) Then
                         If Not bsLIMSImportButton.Enabled Then bsLIMSImportButton.Enabled = True 'AG 19/11/2013 - #1396-c (Protection against bar sample barcodes)
 
@@ -2651,28 +2651,28 @@ Public Class HQBarcode
                         bsExitButton.Enabled = False
 
                         'TR 16/07/2013 - Send the parameter with the number of selected specimens to activate the waiting timer
-                        IAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.Rows.Count)
+                        UiAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.Rows.Count)
                         Cursor = Cursors.WaitCursor
 
                     ElseIf (autoProcessUserAnswer = DialogResult.OK) Then 'User answers stops the automatic process
                         'Automatic process aborted
-                        IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
-                        IAx00MainMDI.InitializeAutoWSFlags()
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
+                        UiAx00MainMDI.InitializeAutoWSFlags()
                         CloseScreen()
 
                     Else 'User answers 'Cancel' -> stop process but continue executing WorkSession
-                        IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
                         CloseScreen()
                     End If
 
                 ElseIf (autoProcessUserAnswer = DialogResult.OK) Then 'User answers stops the automatic process
                     'Automatic process aborted
-                    IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
-                    IAx00MainMDI.InitializeAutoWSFlags()
+                    UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
+                    UiAx00MainMDI.InitializeAutoWSFlags()
                     CloseScreen()
 
                 Else 'User answers 'Cancel' -> stop process but continue executing WorkSession
-                    IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
+                    UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
                     CloseScreen()
                 End If
             End If
@@ -2743,8 +2743,8 @@ Public Class HQBarcode
             ' XB 26/08/2013
 
             'Request to LIS, AND SET AS ASKING
-            IAx00MainMDI.autoWSCreationWithLISMode = True  'SA 30/07/2013
-            IAx00MainMDI.InvokeLISHostQuery(listBarcodesSentToLis)
+            UiAx00MainMDI.autoWSCreationWithLISMode = True  'SA 30/07/2013
+            UiAx00MainMDI.InvokeLISHostQuery(listBarcodesSentToLis)
 
             'Refresh Grid and Controls
             RepaintGridRows()
@@ -2759,11 +2759,11 @@ Public Class HQBarcode
                 bsHQSellectAllCheckBx.Enabled = False
 
                 'Activate the Main MDI variable that indicates a HQ was sent by a final User
-                IAx00MainMDI.SetHQProcessByUserFlag(True)
-                IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessAskBySpecimen)
+                UiAx00MainMDI.SetHQProcessByUserFlag(True)
+                UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessAskBySpecimen)
 
                 'Send the parameter with the number of selected specimens to activate the waiting timer
-                IAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.SelectedRows.Count)
+                UiAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.SelectedRows.Count)
                 IWSRotorPositions.HQButtonUserClick = True
                 Cursor = Cursors.WaitCursor
             End If

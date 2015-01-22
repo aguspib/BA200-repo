@@ -96,8 +96,8 @@ Public Class IWSLoadSaveAuxScreen
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -233,8 +233,8 @@ Public Class IWSLoadSaveAuxScreen
         Try
 
             'Center the screen regarding its parent
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
             If (Not Me.MdiParent Is Nothing) Then
                 mySize = Me.Parent.Size
                 myLocation = Me.Parent.Location
@@ -315,7 +315,7 @@ Public Class IWSLoadSaveAuxScreen
             Me.DialogResult = Windows.Forms.DialogResult.OK
             If (Not Me.MdiParent Is Nothing) Then
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             Else
                 Me.Close()
             End If
@@ -339,16 +339,16 @@ Public Class IWSLoadSaveAuxScreen
             Me.DialogResult = Windows.Forms.DialogResult.OK
             If (Not Me.MdiParent Is Nothing) Then
                 'Before opening WS Preparation Screen, activate button for Reset WS
-                IAx00MainMDI.bsTSResetSessionButton.Enabled = True
+                UiAx00MainMDI.bsTSResetSessionButton.Enabled = True
 
                 'A Saved WS was loaded, open the screen of WS Preparation after inform the needed properties
-                IWSSampleRequest.ActiveAnalyzer = IAx00MainMDI.ActiveAnalyzer
-                IWSSampleRequest.ActiveWorkSession = IAx00MainMDI.ActiveWorkSession
-                IWSSampleRequest.ActiveWSStatus = IAx00MainMDI.ActiveStatus
+                IWSSampleRequest.ActiveAnalyzer = UiAx00MainMDI.ActiveAnalyzer
+                IWSSampleRequest.ActiveWorkSession = UiAx00MainMDI.ActiveWorkSession
+                IWSSampleRequest.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
                 IWSSampleRequest.WSLoadedID = IDProperty
                 IWSSampleRequest.WSLoadedName = NameProperty
 
-                IAx00MainMDI.OpenMDIChildForm(IWSSampleRequest)
+                UiAx00MainMDI.OpenMDIChildForm(IWSSampleRequest)
             End If
             Me.Close()
         Catch ex As Exception
@@ -482,7 +482,7 @@ Public Class IWSLoadSaveAuxScreen
 
                     If (Not Me.MdiParent Is Nothing) Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         Me.Close()
                     End If
@@ -498,7 +498,7 @@ Public Class IWSLoadSaveAuxScreen
                             'SavedWS was saved; the screen is closed
                             If (Not Me.MdiParent Is Nothing) Then
                                 'Open the WS Monitor form and close this one
-                                IAx00MainMDI.OpenMonitorForm(Me)
+                                UiAx00MainMDI.OpenMonitorForm(Me)
                             Else
                                 Me.Close()
                             End If
@@ -545,7 +545,7 @@ Public Class IWSLoadSaveAuxScreen
 
                     If (Not Me.MdiParent Is Nothing) Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         'Me.Opacity = 0 'Because the form could be still opening, so avoid the flickering.
                         Application.DoEvents()
@@ -678,7 +678,7 @@ Public Class IWSLoadSaveAuxScreen
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 Me.Close()

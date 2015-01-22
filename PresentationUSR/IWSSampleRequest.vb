@@ -310,8 +310,8 @@ Public Class IWSSampleRequest
             If mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.FREEZE) = 1 Then
                 ScreenWorkingProcess = False 'Process finished
                 Me.Enabled = True
-                IAx00MainMDI.EnableButtonAndMenus(True)
-                IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                UiAx00MainMDI.EnableButtonAndMenus(True)
+                UiAx00MainMDI.SetActionButtonsEnableProperty(True)
                 Cursor = Cursors.Default
                 RefreshDoneField = True
             End If
@@ -382,7 +382,7 @@ Public Class IWSSampleRequest
             End If
 
             Cursor = Cursors.Default
-            IAx00MainMDI.EnableButtonAndMenus(False)
+            UiAx00MainMDI.EnableButtonAndMenus(False)
 
             Dim continueSaving As Boolean = False
             Dim openRotorScreen As Boolean = False
@@ -434,7 +434,7 @@ Public Class IWSSampleRequest
 
                 If (ErrorOnSavingWS = String.Empty) Then
                     openRotorScreen = True
-                    IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                    UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
                 End If
 
             Else
@@ -458,21 +458,21 @@ Public Class IWSSampleRequest
                 Me.Enabled = False
 
                 'Update global variables in the main MDI Form
-                IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
 
                 ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
                 ExitingScreen()
-                IAx00MainMDI.EnableButtonAndMenus(True)
+                UiAx00MainMDI.EnableButtonAndMenus(True)
                 Application.DoEvents()
 
                 'Open the RotorPositions form and close this one
-                IAx00MainMDI.OpenRotorPositionsForm(Me)
+                UiAx00MainMDI.OpenRotorPositionsForm(Me)
 
             End If
 
-            IAx00MainMDI.SetStatusRotorPosOptions(True)
+            UiAx00MainMDI.SetStatusRotorPosOptions(True)
         Catch ex As Exception
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             Application.DoEvents()
 
             Cursor = Cursors.Default
@@ -480,7 +480,7 @@ Public Class IWSSampleRequest
             ShowMessage(Name & ".SaveWSWithPositioning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
             Cursor = Cursors.Default
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
         End Try
     End Sub
 #End Region
@@ -4355,7 +4355,7 @@ Public Class IWSSampleRequest
                     Dim myErrorData As String() = ErrorOnSavingWS.Split(CChar("|"))
                     ErrorOnSavingWS = String.Empty 'Reset the value after using it
 
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
                     Application.DoEvents()
                     Cursor = Cursors.Default
                     ShowMessage(Name & ".LoadSavedWS", myErrorData(0), myErrorData(1), Me)
@@ -4369,7 +4369,7 @@ Public Class IWSSampleRequest
                 WSLoadedNameAttribute = ""
             End If
         Catch ex As Exception
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             Application.DoEvents()
 
             Cursor = Cursors.Default
@@ -5344,8 +5344,8 @@ Public Class IWSSampleRequest
                 If (Not myGlobalDataTO.HasError) Then
                     If myWSDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                         CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".PrepareOrderTestsForWS ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
-                        IAx00MainMDI.AddResultsIntoQueueToUpload(myWSDelegate.LastExportedResults)
-                        IAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
+                        UiAx00MainMDI.AddResultsIntoQueueToUpload(myWSDelegate.LastExportedResults)
+                        UiAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
                     End If 'AG 21/02/2014 - #1505
                 End If
                 'TR 28/06/2013 -END.
@@ -5983,7 +5983,7 @@ Public Class IWSSampleRequest
                 RowPostPaintEnabled = False 'RH 08/05/2012 Bugtracking 544
 
                 Cursor = Cursors.WaitCursor
-                IAx00MainMDI.EnableButtonAndMenus(False)
+                UiAx00MainMDI.EnableButtonAndMenus(False)
 
                 Dim openOrderTests As Boolean = True
                 If (Not ChangesMadeAttribute) Then
@@ -6053,26 +6053,26 @@ Public Class IWSSampleRequest
 
                     If (ErrorOnSavingWS = String.Empty) Then
                         'Update global variables in the main MDI Form
-                        IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                        UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
                         If (Not Tag Is Nothing) Then
                             'A PerformClick() method was executed
                             Close()
                         Else
                             ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
                             ExitingScreen()
-                            IAx00MainMDI.EnableButtonAndMenus(True)
+                            UiAx00MainMDI.EnableButtonAndMenus(True)
                             Application.DoEvents()
 
                             'Normal button click
                             'Open the WS Monitor form and close this one
-                            IAx00MainMDI.OpenMonitorForm(Me)
+                            UiAx00MainMDI.OpenMonitorForm(Me)
                         End If
                         'GC.Collect()
                     Else
                         'In case of Error, set Enabled=True for all controls that can be activated
                         ChangeControlsStatusByProgressBar(True)
 
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
                         Application.DoEvents()
 
                         Dim myErrorData As String() = ErrorOnSavingWS.Split(CChar("|"))
@@ -6081,7 +6081,7 @@ Public Class IWSSampleRequest
                         ShowMessage(Name & ".SaveWSWithoutPositioning", myErrorData(0), myErrorData(1), Me)
                     End If
                 Else
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                     If (Not Tag Is Nothing) Then
                         'A PerformClick() method was executed
@@ -6089,21 +6089,21 @@ Public Class IWSSampleRequest
                     Else
                         ' XB 27/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
                         ExitingScreen()
-                        IAx00MainMDI.EnableButtonAndMenus(True)
+                        UiAx00MainMDI.EnableButtonAndMenus(True)
                         Application.DoEvents()
 
                         'Normal button click
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     End If
                 End If
-                IAx00MainMDI.SetStatusRotorPosOptions(True)
+                UiAx00MainMDI.SetStatusRotorPosOptions(True)
             Else
                 Close()
             End If
 
         Catch ex As Exception
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
             Application.DoEvents()
 
             Cursor = Cursors.Default
@@ -6115,7 +6115,7 @@ Public Class IWSSampleRequest
             'DL 15/05/2013
         Finally
             Cursor = Cursors.Default
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
         End Try
     End Sub
 
@@ -6214,7 +6214,7 @@ Public Class IWSSampleRequest
 
             'Prepare all buttons
             PrepareButtons()
-            IAx00MainMDI.bsTSInfoButton.Enabled = True
+            UiAx00MainMDI.bsTSInfoButton.Enabled = True
 
             'Disable the context menu shown with mouse right-button click in all editable fields
             Dim emptyContextMenu As New ContextMenuStrip
@@ -7332,9 +7332,9 @@ Public Class IWSSampleRequest
                         'If the Analyzer is in STAND BY or if it is in RUNNING but has been PAUSED...
                         If (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.STANDBY OrElse _
                            (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning)) Then
-                            If (Not IAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
+                            If (Not UiAx00MainMDI Is Nothing) Then  'This condition is to be sure a new instance of the MDI is not created 
                                 'Verify if the Scanning Button can be available by checking Alarms and another Analyzer states
-                                statusScanningButton = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
+                                statusScanningButton = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.READ_BARCODE)
                             End If
                         End If
                     End If
@@ -8287,7 +8287,7 @@ Public Class IWSSampleRequest
     Private Sub bsScanningButton_Click(ByVal sender As Object, ByVal e As System.EventArgs) Handles bsScanningButton.Click
         Try
             CreateLogActivity("Btn Scanning", Me.Name & ".bsScanningButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 10/07/2013
+            UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 10/07/2013
             If (Not mdiAnalyzerCopy Is Nothing) Then
                 'Call the Barcode read process only if the Analyzer is connected and the Barcode is available
                 If (mdiAnalyzerCopy.Connected AndAlso mdiAnalyzerCopy.BarCodeProcessBeforeRunning = AnalyzerManager.BarcodeWorksessionActions.BARCODE_AVAILABLE) Then
@@ -8296,17 +8296,17 @@ Public Class IWSSampleRequest
                        (mdiAnalyzerCopy.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING AndAlso mdiAnalyzerCopy.AllowScanInRunning) Then
                         Cursor = Cursors.WaitCursor
 
-                        IAx00MainMDI.DisabledMdiForms = Me
-                        IAx00MainMDI.EnableButtonAndMenus(False)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(False)
-                        IAx00MainMDI.ShowStatus(Messages.BARCODE_READING)
-                        IAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
+                        UiAx00MainMDI.DisabledMdiForms = Me
+                        UiAx00MainMDI.EnableButtonAndMenus(False)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(False)
+                        UiAx00MainMDI.ShowStatus(Messages.BARCODE_READING)
+                        UiAx00MainMDI.SinglecanningRequested = True 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen started
 
                         'Disable the screen while the scanning is executed
                         Me.Enabled = False
                         ScreenWorkingProcess = True
 
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         'Dim prevMessage As String = IAx00MainMDI.bsAnalyzerStatus.Text
                         Application.DoEvents()
 
@@ -8314,14 +8314,14 @@ Public Class IWSSampleRequest
                         workingThread.Start()
 
                         While ScreenWorkingProcess
-                            IAx00MainMDI.InitializeMarqueeProgreesBar()
+                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
                             Application.DoEvents()
                         End While
                         workingThread = Nothing
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
 
-                        IAx00MainMDI.ShowStatus(Messages._NONE)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                        UiAx00MainMDI.ShowStatus(Messages._NONE)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(True)
 
                         'If there are incomplete Patient Samples, enable button BCWarnings
                         ValidateBCWarningButtonEnabled()
@@ -8333,9 +8333,9 @@ Public Class IWSSampleRequest
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsScanningButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsScanningButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            IAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
+            UiAx00MainMDI.SinglecanningRequested = False 'AG 06/11/2013 - Task #1375 - Inform scanning requested from rotorposition screen finished
 
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
             Cursor = Cursors.Default
         End Try
 
@@ -8381,7 +8381,7 @@ Public Class IWSSampleRequest
                     End Using
 
                     'Update global variables in the main MDI Form
-                    IAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
+                    UiAx00MainMDI.SetWSActiveData(AnalyzerIDAttribute, WorkSessionIDAttribute, WSStatusAttribute)
                 Else
                     'Error updating the CompletedFlag; shown it
                     ShowMessage(Me.Name & ".bsBarcodeWarningButton_Click", resultData.ErrorCode, resultData.ErrorMessage, Me)

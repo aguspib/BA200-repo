@@ -10834,7 +10834,7 @@ Public Class IProgTest
                         ButtonCancel.PerformClick()
                     Else
                         'RH 17/12/2010
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     End If
                 ElseIf e.KeyCode = Keys.F1 Then ' TR 07/11/2011 -Search the Help File and  Chapter
                     'Help.ShowHelp(Me, GetHelpFilePath(HELP_FILE_TYPE.MANUAL, currentLanguage), GetScreenChapter(Me.Name))
@@ -11254,7 +11254,7 @@ Public Class IProgTest
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
             'END AG 11/11/2010
@@ -12866,7 +12866,7 @@ Public Class IProgTest
                         End If
 
                         'TR 01/07/2010 -Implementatation SA
-                        IAx00MainMDI.SetNumOfTests(TestListView.Items.Count)
+                        UiAx00MainMDI.SetNumOfTests(TestListView.Items.Count)
 
                         'AG 12/11/2010
                         'If closeScreen Then Me.Close()

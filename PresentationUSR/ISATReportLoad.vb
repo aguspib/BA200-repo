@@ -210,11 +210,11 @@ Public Class ISATReportLoad
                         SATThread.Start()
 
                         While Me.CreatingRestorePoint 'RH 16/11/2010
-                            IAx00MainMDI.InitializeMarqueeProgreesBar()
+                            UiAx00MainMDI.InitializeMarqueeProgreesBar()
                             Application.DoEvents()
                             Threading.Thread.Sleep(100)
                         End While
-                        IAx00MainMDI.StopMarqueeProgressBar()
+                        UiAx00MainMDI.StopMarqueeProgressBar()
 
                         SATThread.Join()
 
@@ -268,11 +268,11 @@ Public Class ISATReportLoad
                             RestoreThread.Start()
 
                             While Me.RestoringDB 'RH 16/11/2010
-                                IAx00MainMDI.InitializeMarqueeProgreesBar()
+                                UiAx00MainMDI.InitializeMarqueeProgreesBar()
                                 Application.DoEvents()
                                 Threading.Thread.Sleep(100)
                             End While
-                            IAx00MainMDI.StopMarqueeProgressBar()
+                            UiAx00MainMDI.StopMarqueeProgressBar()
 
                             RestoreThread.Join()
 
@@ -290,11 +290,11 @@ Public Class ISATReportLoad
                                     UpdateThread.Start()
 
                                     While Me.UpdatingDB 'RH 16/11/2010
-                                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                                         Application.DoEvents()
                                         Threading.Thread.Sleep(100)
                                     End While
-                                    IAx00MainMDI.StopMarqueeProgressBar()
+                                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                                     UpdateThread.Join()
 
@@ -316,7 +316,7 @@ Public Class ISATReportLoad
                                 myGlobal = templateList.DeleteNonExistingReportTemplates(Nothing)
                                 'AG 11/06/2014 #1661
 
-                                IAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
+                                UiAx00MainMDI.InitializeAnalyzerAndWorkSession(False) 'AG 24/11/2010
                             End If
                         Else
                             If Me.RestorePointMode Then
@@ -598,8 +598,8 @@ Public Class ISATReportLoad
                     'DL 02/07/2012. End 
 
                     ' XBC 04/07/2012
-                    IAx00MainMDI.ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
-                    IAx00MainMDI.ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
+                    UiAx00MainMDI.ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
+                    UiAx00MainMDI.ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
                     ' XBC 04/07/2012
                 End If
             End If
@@ -862,13 +862,13 @@ Public Class ISATReportLoad
             bsCancelButton.Enabled = False
             bsBrowseButton.Enabled = False
             'IAx00MainMDI.EnableMenusBar(False)
-            IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+            UiAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
             'Dim myZipExtension As String = ConfigurationManager.AppSettings("ZIPExtension").ToString
 
             'TR 25/01/2011 -Replace by corresponding value on global base.
             Dim myZipExtension As String = GlobalBase.ZIPExtension
 
-            IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+            UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
 
             Dim myGlobal As GlobalDataTO
 
@@ -979,11 +979,11 @@ Public Class ISATReportLoad
                 Cursor = Cursors.WaitCursor
                 If Not (mdiESWrapperCopy.Status.ToUpperInvariant = LISStatus.released.ToString.ToUpperInvariant) Then
                     'Release the LIS manager object
-                    IAx00MainMDI.InvokeReleaseLIS(False)
-                    IAx00MainMDI.InvokeReleaseFromConfigSettings = True
+                    UiAx00MainMDI.InvokeReleaseLIS(False)
+                    UiAx00MainMDI.InvokeReleaseFromConfigSettings = True
                 Else
                     ' Re-create Channel with new change settings
-                    IAx00MainMDI.InvokeCreateLISChannel()
+                    UiAx00MainMDI.InvokeCreateLISChannel()
                 End If
                 Cursor = Cursors.Default
                 ' XB 07/05/2013
@@ -1005,8 +1005,8 @@ Public Class ISATReportLoad
                 'RH 07/02/2012 Insert a REPORTSAT_LOADED_WARN alarm in DB
                 Dim myWSAnalyzerAlarmDS As New WSAnalyzerAlarmsDS
                 myWSAnalyzerAlarmDS.twksWSAnalyzerAlarms.AddtwksWSAnalyzerAlarmsRow( _
-                        GlobalEnumerates.Alarms.REPORTSATLOADED_WARN.ToString(), IAx00MainMDI.ActiveAnalyzer, _
-                        DateTime.Now, 1, IAx00MainMDI.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
+                        GlobalEnumerates.Alarms.REPORTSATLOADED_WARN.ToString(), UiAx00MainMDI.ActiveAnalyzer, _
+                        DateTime.Now, 1, UiAx00MainMDI.ActiveWorkSession, Nothing, True, Nothing) 'AG 24/07/2012 - This alarm is created with status TRUE not false as before 'False, DateTime.Now)
 
                 Dim myWSAlarmDelegate As New WSAnalyzerAlarmsDelegate
                 myGlobal = myWSAlarmDelegate.Create(Nothing, myWSAnalyzerAlarmDS) 'AG 24/07/2012 - keep using Create, do not use Save, it is not necessary
@@ -1020,7 +1020,7 @@ Public Class ISATReportLoad
 
             'RH 07/02/2012
             'Open the WS Monitor form and close this one
-            IAx00MainMDI.OpenMonitorForm(Me)
+            UiAx00MainMDI.OpenMonitorForm(Me)
 
             '' XBC 26/06/2012
             'IAx00MainMDI.Connect()
@@ -1032,9 +1032,9 @@ Public Class ISATReportLoad
 
         Finally
             Cursor = Cursors.Default
-            IAx00MainMDI.SetActionButtonsEnableProperty(True) 'AG 12/07/2011 - Enable vertical action buttons bar
+            UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'AG 12/07/2011 - Enable vertical action buttons bar
             'IAx00MainMDI.EnableMenusBar(True) 'TR 02/08/2011
-            IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
+            UiAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
 
             ' XBC 04/07/2012 - Indicate Load Rsat END on Application LOG.
             CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
@@ -1085,7 +1085,7 @@ Public Class ISATReportLoad
                     MultilanguageResourcesDelegate.SetCurrentLanguage(newLanguageID)
 
                     'Set the new language to the MDI form to reload menus in new language.
-                    IAx00MainMDI.CurrentLanguage = newLanguageID
+                    UiAx00MainMDI.CurrentLanguage = newLanguageID
                 End If
 
             End If
@@ -1118,7 +1118,7 @@ Public Class ISATReportLoad
             Else
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
         Catch ex As Exception

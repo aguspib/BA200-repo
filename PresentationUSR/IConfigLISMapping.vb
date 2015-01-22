@@ -395,7 +395,7 @@ Public Class IConfigLISMapping
             If Not myGlobalDataTO.HasError Then
                 If Not myGlobalDataTO.SetDatos Is Nothing AndAlso DirectCast(myGlobalDataTO.SetDatos, SavedWSDS).tparSavedWS.Count > 0 Then
                     mySavedOrdersFromLIMS = True
-                    IAx00MainMDI.SetErrorStatusMessage(GetMessageText(GlobalEnumerates.Messages.LIS_MAPPING_WARNING.ToString)) 'SGM 06/05/2013 - show message in status bar "Locked because there are pending LIS orders"
+                    UiAx00MainMDI.SetErrorStatusMessage(GetMessageText(GlobalEnumerates.Messages.LIS_MAPPING_WARNING.ToString)) 'SGM 06/05/2013 - show message in status bar "Locked because there are pending LIS orders"
                 End If
             End If
             'DL 24/04/2013. END
@@ -1533,7 +1533,7 @@ Public Class IConfigLISMapping
                     Close()
                 Else
                     'Normal button click - Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
 

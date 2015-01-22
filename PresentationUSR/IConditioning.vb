@@ -234,7 +234,7 @@ Public Class IConditioning
         Try
             If bsCancelButton.Enabled Then
                 If statusMDIChangedFlag Then
-                    IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+                    UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
                 End If
 
                 'This is the standard way of closing MDI forms, not the previous one
@@ -244,7 +244,7 @@ Public Class IConditioning
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
         Catch ex As Exception
@@ -275,8 +275,8 @@ Public Class IConditioning
                     If String.Equals(mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONDITIONINGprocess), "CLOSED") Then
 
                         ScreenWorkingProcess = True
-                        IAx00MainMDI.EnableButtonAndMenus(True)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                        UiAx00MainMDI.EnableButtonAndMenus(True)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(True)
 
                         'dxProgressBar.Position = 0
                         bsStatusImage.Visible = True
@@ -300,8 +300,8 @@ Public Class IConditioning
                         ScreenWorkingProcess = False 'Process finished
                         ExistConditioningError = True 'Wrong result
                         bsCancelButton.Enabled = True
-                        IAx00MainMDI.EnableButtonAndMenus(True)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                        UiAx00MainMDI.EnableButtonAndMenus(True)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(True)
                         Cursor = Cursors.Default
                         RefreshDoneField = True 'RH 28/03/2012
                     End If
@@ -366,8 +366,8 @@ Public Class IConditioning
 
                     'disable buttons
                     ScreenWorkingProcess = True
-                    IAx00MainMDI.EnableButtonAndMenus(False)
-                    IAx00MainMDI.SetActionButtonsEnableProperty(False)
+                    UiAx00MainMDI.EnableButtonAndMenus(False)
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(False)
                     bsConditioningButton.Enabled = False
                     bsCancelButton.Enabled = False
 
@@ -375,7 +375,7 @@ Public Class IConditioning
                     mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.CONDITIONINGprocess) = "INPROCESS"
 
                     If Not resultData.HasError AndAlso mdiAnalyzerCopy.Connected Then
-                        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.SRV_CONDITIONING)
+                        UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.SRV_CONDITIONING)
                         statusMDIChangedFlag = True
                         'mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
 
@@ -409,8 +409,8 @@ Public Class IConditioning
                         dxProgressBar.Show()
                         Application.DoEvents()
 
-                        IAx00MainMDI.EnableButtonAndMenus(True)
-                        IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                        UiAx00MainMDI.EnableButtonAndMenus(True)
+                        UiAx00MainMDI.SetActionButtonsEnableProperty(True)
 
                     ElseIf resultData.HasError Then
                         ShowMessage("Warning", resultData.ErrorCode)
@@ -421,19 +421,19 @@ Public Class IConditioning
 
             End If
 
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
             Cursor = Cursors.Default
 
         Catch ex As Exception
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
             Cursor = Cursors.Default
 
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsConditioningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsConditioningButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
 
-        IAx00MainMDI.EnableButtonAndMenus(True)
-        IAx00MainMDI.SetActionButtonsEnableProperty(True)
+        UiAx00MainMDI.EnableButtonAndMenus(True)
+        UiAx00MainMDI.SetActionButtonsEnableProperty(True)
 
     End Sub
 

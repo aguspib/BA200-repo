@@ -2071,10 +2071,10 @@ Public Class IResultsCalibCurve
                 'myForm.SourceCalled = GraphicalAbsScreenCallMode.CURVE_RESULTS_MULTIPLE
                 'End If
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 'myForm.ShowInfo()  ' 25/05/2011
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
             End Using
 
         Catch ex As Exception

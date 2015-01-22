@@ -262,8 +262,8 @@ Public Class Form_XBC
             Dim WorkSessionIDField As String = ""
             Dim AnalyzerIDField As String = ""
             Dim AnalyzerModelField As String = ""
-            WorkSessionIDField = IAx00MainMDI.ActiveWorkSession
-            AnalyzerIDField = IAx00MainMDI.ActiveAnalyzer
+            WorkSessionIDField = UiAx00MainMDI.ActiveWorkSession
+            AnalyzerIDField = UiAx00MainMDI.ActiveAnalyzer
             AnalyzerModelField = "A400" ' IAx00MainMDI.AnalyzerModel"
 
             Dim myHisWSOTDelegate As New HisWSOrderTestsDelegate
@@ -330,7 +330,7 @@ Public Class Form_XBC
                     If Not resultData.HasError Then
                         'Get current WS results
                         Dim myResults As New ResultsDelegate
-                        resultData = myResults.GetCompleteResults(Nothing, AnalyzerIDField, IAx00MainMDI.ActiveWorkSession)
+                        resultData = myResults.GetCompleteResults(Nothing, AnalyzerIDField, UiAx00MainMDI.ActiveWorkSession)
 
                         If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                             wsResultsDS = CType(resultData.SetDatos, ResultsDS)

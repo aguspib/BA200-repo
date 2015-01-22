@@ -14,7 +14,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 
 
 'Refactoring code in VericalButtons partial class inherits form MDI (specially method ActivateActionButtonBarOrSendNewAction)
-Partial Public Class IAx00MainMDI
+Partial Public Class UiAx00MainMDI
 
 #Region "Action Buttons managenement business"
 
