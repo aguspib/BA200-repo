@@ -176,7 +176,6 @@ Public Class IISEResultsHistoryGraph
             .View.Color = thisColor
         End With
 
-        'AJG OJO!!!! TODAVÍA COMENTADA PORQUE NO ESTÁ ADAPTADA A DEVEXPRESS 14.2.3
         CType(pGraph.Series(serieName).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
     End Sub
 
@@ -195,6 +194,10 @@ Public Class IISEResultsHistoryGraph
             pGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
             pGraph.BackColor = Color.White
             pGraph.AppearanceName = "Light"
+
+            pGraph.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            pGraph.RuntimeHitTesting = True
+            pGraph.SeriesTemplate.ArgumentScaleType = ScaleType.Qualitative
 
             'Na+
             AddSerieToGraph(pGraph, "MeanNa", ViewType.Line, Color.Green)

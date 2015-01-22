@@ -2649,20 +2649,20 @@ Public Class IResultsAbsCurve
 
     Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton2.Click
         'Simulate instruction reception
-                            If TextBox5.Text.Trim <> "" Then
-                                If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
-                                    Dim myGlobal As New GlobalDataTO
+        If TextBox5.Text.Trim <> "" Then
+            If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
+                Dim myGlobal As New GlobalDataTO
 
-                                    Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
-                                    If myAnalyzerManager.CommThreadsStarted Then
-                                        'Short instructions
-                                        myGlobal = myAnalyzerManager.SimulateInstructionReception(TextBox5.Text.Trim)
+                Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
+                If myAnalyzerManager.CommThreadsStarted Then
+                    'Short instructions
+                    myGlobal = myAnalyzerManager.SimulateInstructionReception(TextBox5.Text.Trim)
 
-                                        'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
-                                    End If
-                                End If
+                    'Me.DataGridView1.DataSource = DirectCast (myGlobal.SetDatos, 
+                End If
+            End If
 
-                            End If
+        End If
     End Sub
 
     Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton3.Click
