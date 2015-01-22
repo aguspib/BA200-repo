@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Types
 
 'Imports Biosystems.Ax00.Types
 
-Public Class IConditioning
+Public Class UiConditioning
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constructor"

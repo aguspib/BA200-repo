@@ -1799,8 +1799,8 @@ Partial Public Class UiAx00MainMDI
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode button. Else enable it
                     'Sample request
 
-                ElseIf (TypeOf myCurrentMDIForm Is IConditioning AndAlso Not conditioningTreated) Then
-                    Dim CurrentMdiChild As IConditioning = CType(myCurrentMDIForm, IConditioning)
+                ElseIf (TypeOf myCurrentMDIForm Is UiConditioning AndAlso Not conditioningTreated) Then
+                    Dim CurrentMdiChild As UiConditioning = CType(myCurrentMDIForm, UiConditioning)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         'conditioningTreated = True
@@ -1976,8 +1976,8 @@ Partial Public Class UiAx00MainMDI
                         'AG 12/01/2012
 
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IConditioning AndAlso Not conditioningTreated) Then
-                        Dim CurrentMdiChild As IConditioning = CType(myCurrentMDIForm, IConditioning)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiConditioning AndAlso Not conditioningTreated) Then
+                        Dim CurrentMdiChild As UiConditioning = CType(myCurrentMDIForm, UiConditioning)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         conditioningTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone

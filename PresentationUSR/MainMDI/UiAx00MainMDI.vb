@@ -2379,7 +2379,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IConditioning)
+            OpenMDIChildForm(UiConditioning)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ConditioningToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ConditioningToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -7285,8 +7285,8 @@ Partial Public Class UiAx00MainMDI
                         Dim auxScreen As UiChangeRotor = CType(myCurrentMDIForm, UiChangeRotor)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IConditioning) Then
-                        Dim auxScreen As IConditioning = CType(myCurrentMDIForm, IConditioning)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiConditioning) Then
+                        Dim auxScreen As UiConditioning = CType(myCurrentMDIForm, UiConditioning)
                         returnValue = auxScreen.ScreenWorkingProcess
 
                     ElseIf (TypeOf myCurrentMDIForm Is UiMonitor) Then
