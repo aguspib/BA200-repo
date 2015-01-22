@@ -4,7 +4,7 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 
 'Put here your business code for the tab SamplesTab inside Monitor Form
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
 #Region "Declarations"
 

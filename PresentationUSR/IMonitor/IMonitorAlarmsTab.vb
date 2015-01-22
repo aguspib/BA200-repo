@@ -14,7 +14,7 @@ Imports Biosystems.Ax00.BL
 'Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
 #Region "Declarations"
 
@@ -621,7 +621,7 @@ Partial Public Class IMonitor
             Dim hi = view.CalcHitInfo(e.ControlMousePosition)
 
             If hi.InRowCell Then
-                
+
                 'This is how to get the DataRow behind the GridViewRow
                 Dim CurrentRow = CType(view.GetDataRow(hi.RowHandle), WSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
 

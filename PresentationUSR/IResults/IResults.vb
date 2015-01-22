@@ -1219,7 +1219,7 @@ Public Class IResults
                 Close()
             Else
                 'TR 18/05/2012 - indicate to monitor form there was a change on the worsession.
-                IMonitor.WorkSessionChange = ChangeWS
+                UiMonitor.WorkSessionChange = ChangeWS
                 'Normal button click
                 'Open the WS Monitor form and close this one
                 UiAx00MainMDI.OpenMonitorForm(Me)

@@ -348,8 +348,8 @@ Partial Public Class UiAx00MainMDI
                         If (TypeOf ActiveMdiChild Is IISEUtilities) Then
                             Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
                             CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                        ElseIf (TypeOf ActiveMdiChild Is IMonitor AndAlso Not monitorTreated) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        ElseIf (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not monitorTreated) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             monitorTreated = True
                         Else ' XBC 10/12/2012 - Correction : Allow ISE receptions also on another active screens, not only IMonitor and IISEUtilities
@@ -592,10 +592,10 @@ Partial Public Class UiAx00MainMDI
                                                 myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                             End If
 
-                                            If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
+                                            If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is UiMonitor) Then
                                                 'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
                                                 Dim myDummyUIRefresh As New UIRefreshDS
-                                                IMonitor.UpdateWSState(myDummyUIRefresh)
+                                                UiMonitor.UpdateWSState(myDummyUIRefresh)
                                             End If
                                         End If
 
@@ -948,8 +948,8 @@ Partial Public Class UiAx00MainMDI
 
                     ElseIf (Not ActiveMdiChild Is Nothing) Then
                         'If monitor is the current screen inform analyzer and model
-                        If (TypeOf ActiveMdiChild Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
 
                             CurrentMdiChild.ActiveAnalyzer = AnalyzerIDAttribute
                             CurrentMdiChild.AnalyzerModel = AnalyzerModelAttribute
@@ -1025,8 +1025,8 @@ Partial Public Class UiAx00MainMDI
                     Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
                     CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS)
 
-                ElseIf (TypeOf ActiveMdiChild Is IMonitor) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                ElseIf (TypeOf ActiveMdiChild Is UiMonitor) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     myRefreshEventList.Add(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)
                     CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS)
                 End If
@@ -1296,8 +1296,8 @@ Partial Public Class UiAx00MainMDI
                             CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
 
                             'AG 13/02/2012 - Refresh monitor (new alarm)
-                        ElseIf (TypeOf ActiveMdiChild Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        ElseIf (TypeOf ActiveMdiChild Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             myRefreshEventList.Add(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)
                             'TR 25/09/2012 -Add the sensor value change to update the pc no connected Led.
                             myRefreshEventList.Add(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED)
@@ -1514,8 +1514,8 @@ Partial Public Class UiAx00MainMDI
                                 'AG 19/04/2012 - WS is aborted and user do not change screen
                                 If String.Equals(WSStatusAttribute, "ABORTED") AndAlso Not ActiveMdiChild Is Nothing Then
                                     '- Monitor (WSStates ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
-                                    If (TypeOf ActiveMdiChild Is IMonitor) Then
-                                        Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                                        Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                                         CurrentMdiChild.bsErrorProvider1.SetError(Nothing, GetMessageText(GlobalEnumerates.Messages.WS_ABORTED.ToString))
                                     ElseIf (TypeOf ActiveMdiChild Is IResults) Then
                                         Dim CurrentMdiChild As IResults = CType(ActiveMdiChild, IResults)
@@ -1612,8 +1612,8 @@ Partial Public Class UiAx00MainMDI
 
             'RH 10/10/2011
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                If (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not MonitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         MonitorTreated = True
@@ -1644,8 +1644,8 @@ Partial Public Class UiAx00MainMDI
             'RH 10/10/2011
             If Not ActiveMdiChild Is Nothing Then
                 '- Monitor (WSStates ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
-                If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                If (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not MonitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                     MonitorTreated = True
 
@@ -1779,8 +1779,8 @@ Partial Public Class UiAx00MainMDI
                 '- Monitor (Main or Alarms) screen ... (pRefreshDS.ReceivedAlarms contains the information to refresh)
                 '- Change rotor ... (pRefreshDS.SensorValueChanged contains the information to refresh)
 
-                If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                If (TypeOf myCurrentMDIForm Is UiMonitor AndAlso Not monitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         monitorTreated = True
@@ -1960,8 +1960,8 @@ Partial Public Class UiAx00MainMDI
                     '  <or maybe all monitor TAB's (LED's area)>
                     '- Change rotor ... (pRefreshDS.SensorValueChanged contains the information to refresh)
                     'NOTE: All sensor values are available using the property AnalyzerManager.GetSensorValue
-                    If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
-                        Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                    If (TypeOf myCurrentMDIForm Is UiMonitor AndAlso Not monitorTreated) Then
+                        Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         monitorTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
@@ -2157,8 +2157,8 @@ Partial Public Class UiAx00MainMDI
 
                 Else 'AG 23/05/2012 Connection establisment ok refresh monitor.main
                     If Not myCurrentMDIForm Is Nothing Then
-                        If (TypeOf myCurrentMDIForm Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                        If (TypeOf myCurrentMDIForm Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                             If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                                 CurrentMdiChild.RefreshAlarmsGlobes(Nothing)
                             End If
@@ -2200,8 +2200,8 @@ Partial Public Class UiAx00MainMDI
 
             If Not ActiveMdiChild Is Nothing Then
                 '- Monitor (Reactions Rotor) screen ... (pRefreshDS.ReactionWellStatusChanged contains the information to refresh)
-                If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                If (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not MonitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                     MonitorTreated = True
                 End If
@@ -2288,8 +2288,8 @@ Partial Public Class UiAx00MainMDI
             'Call the RefreshScreen method when the current screen is:
             If Not myCurrentMDIForm Is Nothing Then
                 '- Monitor (Reagents or Sample Rotor) screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
-                If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                If (TypeOf myCurrentMDIForm Is UiMonitor AndAlso Not monitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         monitorTreated = True

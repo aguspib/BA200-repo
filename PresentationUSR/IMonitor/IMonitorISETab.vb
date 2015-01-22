@@ -8,9 +8,9 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 
 'Put here your business code for the tab ISETab inside Monitor Form
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
-    
+
 
     ''' <summary>
     ''' 

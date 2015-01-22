@@ -604,8 +604,8 @@ Partial Public Class UiAx00MainMDI
 
                                 ' XBC 04/07/2012
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMonitor) Then
-                                        Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                                        Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                                         CurrentMdiChild.TimeWarmUpProgressBar.Position = 0
                                         ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
                                         ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.ALIGHT_REQUIRED.ToString)
@@ -944,8 +944,8 @@ Partial Public Class UiAx00MainMDI
                     ElseIf myAx00Ready AndAlso Not WarmUpFinishedAttribute Then
                         bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag 'AG 23/07/2012
 
-                        If ActiveMdiChild Is IMonitor Then
-                            Dim myMonitor As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If ActiveMdiChild Is UiMonitor Then
+                            Dim myMonitor As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             If myMonitor.IsEndWarmUpButtonVisible Then
                                 bsTSShutdownButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.SHUT_DOWN) 'AG 14/05/2012 True 
                                 WithShutToolStripMenuItem.Enabled = bsTSShutdownButton.Enabled  'DL 04/06/2012

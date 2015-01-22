@@ -20,7 +20,7 @@ Imports System.Timers 'AG 31/01/2014 - BT #1486
 ' SamplesTab. Appearance. PageClient. Image = ..\Debug\Images\SampleRotor.png
 ' ReagentsTab. Appearance. PageClient. Image = ..\Debug\Images\ReagentRotor.png
 '
-Public Class IMonitor
+Public Class UiMonitor
 
 #Region "Declaration"
 

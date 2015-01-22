@@ -8870,7 +8870,7 @@ Public Class IWSRotorPositions
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IMonitor.WorkSessionChange = True
+                    UiMonitor.WorkSessionChange = True
                     Dim autoProcessFlag As Boolean = False
                     If AutoWSCreationWithLISModeAttribute AndAlso OpenByAutomaticProcessAttribute Then
                         autoProcessFlag = True

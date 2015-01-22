@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
 
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
 #Region "Declaration"
 

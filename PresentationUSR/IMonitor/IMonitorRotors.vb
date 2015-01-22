@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports System.Globalization
 
 'Put here your common business code for the Rotors tabs inside Monitor Form
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
 #Region "Declarations"
     Dim myRotorTypeForm As String = ""
@@ -210,7 +210,7 @@ Partial Public Class IMonitor
     'Private BARCODEERROR_IconName As String = ""
     'Private BOTTLE3_SEL_IconName As String = "" 'Selected bottle (60ml) (Reagents or additional solution) image inside rotor
 
-    
+
 #End Region
 
 #Region "Methods"

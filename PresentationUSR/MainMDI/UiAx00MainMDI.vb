@@ -1760,7 +1760,7 @@ Partial Public Class UiAx00MainMDI
             ElseIf Not ExistSavedWorkSession() Then 'TR 01/08/2011 -Validate if there're any saved WorkSession.
                 'TR 15/02/2012 -Open Monitor Windows.
                 OpenMonitorForm()
-                IMonitor.RefreshAlarmsGlobes(Nothing)
+                UiMonitor.RefreshAlarmsGlobes(Nothing)
                 cancelOpening = True
             End If
 
@@ -2122,7 +2122,7 @@ Partial Public Class UiAx00MainMDI
                 IWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
                 IWSDeleteAuxScreen.ScreenUse = "VROTORS"
 
-                If (TypeOf ActiveMdiChild Is IMonitor) Then
+                If (TypeOf ActiveMdiChild Is UiMonitor) Then
                     ActiveMdiChild.Close()
                 End If
 
@@ -2595,7 +2595,7 @@ Partial Public Class UiAx00MainMDI
 
                     If (myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count = 1) Then
                         If String.Compare(myAnalyzerSettingsDS.tcfgAnalyzerSettings.First.CurrentValue, "1", False) = 0 Then
-                            IMonitor.bsEndWarmUp.Visible = True
+                            UiMonitor.bsEndWarmUp.Visible = True
                             completeWupProcessFlag = True
                             SetEnableMainTab(True) 'RH 26/03/2012
                             MyClass.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = False 'SGM 17/05/2012
@@ -2629,8 +2629,8 @@ Partial Public Class UiAx00MainMDI
                     If tsDiff.TotalSeconds >= (WUPFullTime * 60) AndAlso completeWupProcessFlag Then
                         FinishWarmUp(False)
                     Else
-                        If (TypeOf ActiveMdiChild Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             Dim newPosition As Integer = CInt((100 * (tsDiff.TotalSeconds / (WUPFullTime * 60))))
                             If newPosition > 100 Then newPosition -= 100
                             CurrentMdiChild.TimeWarmUpProgressBar.Position = newPosition
@@ -2834,7 +2834,7 @@ Partial Public Class UiAx00MainMDI
 
     Private Sub BsUpdateGlobesTimer_Tick(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsUpdateGlobesTimer.Tick
         BsUpdateGlobesTimer.Enabled = False
-        IMonitor.ShowActiveAlerts(False)
+        UiMonitor.ShowActiveAlerts(False)
     End Sub
 
     'SGM 10/04/2012
@@ -3448,8 +3448,8 @@ Partial Public Class UiAx00MainMDI
                     'DL 10/10/2012. Begin !!!
                     'To press Shutdown button and accept by user, call to FinishWarmUp() 
                     If (Not ActiveMdiChild Is Nothing) AndAlso _
-                       (TypeOf ActiveMdiChild Is IMonitor) AndAlso _
-                       (IMonitor.bsEndWarmUp.Enabled = True) Then
+                       (TypeOf ActiveMdiChild Is UiMonitor) AndAlso _
+                       (UiMonitor.bsEndWarmUp.Enabled = True) Then
 
                         FinishWarmUp(False)
 
@@ -4530,10 +4530,10 @@ Partial Public Class UiAx00MainMDI
                                             myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                         End If
 
-                                        If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
+                                        If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is UiMonitor) Then
                                             'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
                                             Dim myDummyUIRefresh As New UIRefreshDS
-                                            IMonitor.UpdateWSState(myDummyUIRefresh)
+                                            UiMonitor.UpdateWSState(myDummyUIRefresh)
                                         End If
                                     End If
 
@@ -4726,10 +4726,10 @@ Partial Public Class UiAx00MainMDI
                                                 myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                             End If
 
-                                            If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
+                                            If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is UiMonitor) Then
                                                 'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
                                                 Dim myDummyUIRefresh As New UIRefreshDS
-                                                IMonitor.UpdateWSState(myDummyUIRefresh)
+                                                UiMonitor.UpdateWSState(myDummyUIRefresh)
                                             End If
                                         End If
 
@@ -4955,8 +4955,8 @@ Partial Public Class UiAx00MainMDI
             Me.StartSessionisPending = False
             If Not MDIAnalyzerManager.ISE_Manager Is Nothing Then
                 If Not ActiveMdiChild Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is IMonitor) Then
-                        Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                        Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                         MDIAnalyzerManager.ISE_Manager.WorkSessionOverallTime = CurrentMdiChild.remainingTime
                     End If
                 End If
@@ -5120,13 +5120,13 @@ Partial Public Class UiAx00MainMDI
                 ' XB 16/04/2014 - #1599
 
                 'refresh WS grid
-                If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
+                If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is UiMonitor) Then
                     'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
                     Dim myDummyUIRefresh As New UIRefreshDS
 
                     ' XB+AG 18/07/2013 - there was a bug when try to refresh monitor grid from a thread without use Me.UIThread (# bugstracking)
                     'IMonitor.UpdateWSState(myDummyUIRefresh)
-                    Me.UIThread(Sub() IMonitor.UpdateWSState(myDummyUIRefresh))
+                    Me.UIThread(Sub() UiMonitor.UpdateWSState(myDummyUIRefresh))
                     ' XB+AG 18/07/2013
                 End If
             End If
@@ -6141,8 +6141,8 @@ Partial Public Class UiAx00MainMDI
         'AG 09/07/2013
 
         If (Not ActiveMdiChild Is Nothing) Then
-            If TypeOf ActiveMdiChild Is IMonitor Then
-                IMonitor.Close()
+            If TypeOf ActiveMdiChild Is UiMonitor Then
+                UiMonitor.Close()
             Else
                 'Execute the closing code of the screen currently open
                 Dim myScreenName As String = ActiveMdiChild.Name
@@ -6901,8 +6901,8 @@ Partial Public Class UiAx00MainMDI
             WarmUpFinishedAttribute = False
             BsTimerWUp.Enabled = True
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IMonitor) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     'CurrentMdiChild.bsWamUpGroupBox.Enabled = True
                     CurrentMdiChild.bsWamUpGroupBox.Visible = True
                 End If
@@ -7289,8 +7289,8 @@ Partial Public Class UiAx00MainMDI
                         Dim auxScreen As IConditioning = CType(myCurrentMDIForm, IConditioning)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IMonitor) Then
-                        Dim auxScreen As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiMonitor) Then
+                        Dim auxScreen As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                         returnValue = auxScreen.ScreenWorkingProcess
 
                     ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions) Then
@@ -7889,7 +7889,7 @@ Partial Public Class UiAx00MainMDI
             If (Not pFormToOpen Is Nothing) Then
 
                 'RH 22/12/2011 Open Monitor from another screen
-                If (TypeOf pFormToOpen Is IMonitor) AndAlso (Not ActiveMdiChild Is Nothing) Then
+                If (TypeOf pFormToOpen Is UiMonitor) AndAlso (Not ActiveMdiChild Is Nothing) Then
                     If (Not ActiveMdiChild.AcceptButton Is Nothing) Then
                         'Execute the closing code of the screen currently open
                         Dim myScreenName As String = ActiveMdiChild.Name
@@ -7915,11 +7915,11 @@ Partial Public Class UiAx00MainMDI
                         'If the screen to open is already opened, do nothing
                         IsFormClosed = False
                     Else
-                        If (TypeOf ActiveMdiChild Is IMonitor) Then
+                        If (TypeOf ActiveMdiChild Is UiMonitor) Then
                             'Close the monitor screen
                             'ActiveMdiChild.Close()
                             FormToClose = ActiveMdiChild
-                            IMonitor.HideActiveAlerts()
+                            UiMonitor.HideActiveAlerts()
 
                             MyClass.IsISEUtilClosing = False
 
@@ -7985,12 +7985,12 @@ Partial Public Class UiAx00MainMDI
 
                 'RH 14/12/2010
                 If Not FormToClose Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is IMonitor) Then
-                        IMonitor.HideActiveAlerts()
+                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                        UiMonitor.HideActiveAlerts()
                     End If
 
                     'AG 28/05/2014 - New trace
-                    If (Not FormToClose Is Nothing AndAlso TypeOf FormToClose Is IMonitor) Then
+                    If (Not FormToClose Is Nothing AndAlso TypeOf FormToClose Is UiMonitor) Then
                         CreateLogActivity("Start Closing IMonitor", Name & ".OpenMDIChildForm", EventLogEntryType.Information, False)
                     End If
 
@@ -8002,7 +8002,7 @@ Partial Public Class UiAx00MainMDI
             Else
                 'RH 07/06/2011 Don't rely on changeable text strings, but in class type
                 ' (ActiveMdiChild.Name <> "IMonitor" versus TypeOf ActiveMdiChild Is IMonitor)
-                If (Not ActiveMdiChild Is Nothing) AndAlso (Not TypeOf ActiveMdiChild Is IMonitor) Then
+                If (Not ActiveMdiChild Is Nothing) AndAlso (Not TypeOf ActiveMdiChild Is UiMonitor) Then
                     'Execute the closing code of the screen currently open
                     Dim myScreenName As String = ActiveMdiChild.Name
                     ClosedByFormCloseButton = False
@@ -8333,31 +8333,31 @@ Partial Public Class UiAx00MainMDI
             bsTSResetSessionButton.Enabled = (Not String.IsNullOrEmpty(ActiveWorkSession))
 
             'Inform screen properties
-            IMonitor.ActiveAnalyzer = AnalyzerIDAttribute
-            IMonitor.ActiveWorkSession = WorkSessionIDAttribute
-            IMonitor.CurrentWorkSessionStatus = WSStatusAttribute
-            IMonitor.OpenByAutomaticProcess = pAutomaticProcessFlag 'AG 17/07/2013
-            IMonitor.AutoWSCreationWithLISMode = autoWSCreationWithLISMode ' XB 17/07/2013
+            UiMonitor.ActiveAnalyzer = AnalyzerIDAttribute
+            UiMonitor.ActiveWorkSession = WorkSessionIDAttribute
+            UiMonitor.CurrentWorkSessionStatus = WSStatusAttribute
+            UiMonitor.OpenByAutomaticProcess = pAutomaticProcessFlag 'AG 17/07/2013
+            UiMonitor.AutoWSCreationWithLISMode = autoWSCreationWithLISMode ' XB 17/07/2013
             Application.DoEvents()
 
             If (FormToClose Is Nothing) Then
                 Application.DoEvents()
-                OpenMDIChildForm(IMonitor)
+                OpenMDIChildForm(UiMonitor)
             Else
                 'RH 14/10/2011 Disable this button before open any other window
                 bsTSInfoButton.Enabled = False
 
-                IMonitor.MdiParent = Me
-                IMonitor.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-                IMonitor.SQLMaxMemoryUsage = mySQLMaxMemoryUsage  'AG 24/02/2014 - #1520 inform new property
-                IMonitor.Show()
+                UiMonitor.MdiParent = Me
+                UiMonitor.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+                UiMonitor.SQLMaxMemoryUsage = mySQLMaxMemoryUsage  'AG 24/02/2014 - #1520 inform new property
+                UiMonitor.Show()
                 Application.DoEvents()
                 FormToClose.Close()
             End If
 
             'TR 11/07/2012 -Validate if active mdiChild is IMonitor to refresh alarms globes.
-            If Not ActiveMdiChild Is Nothing AndAlso String.Equals(ActiveMdiChild.Name, IMonitor.Name) Then
-                IMonitor.RefreshAlarmsGlobes(Nothing)
+            If Not ActiveMdiChild Is Nothing AndAlso String.Equals(ActiveMdiChild.Name, UiMonitor.Name) Then
+                UiMonitor.RefreshAlarmsGlobes(Nothing)
             End If
 
             'DL 12/09/2011
@@ -8464,17 +8464,17 @@ Partial Public Class UiAx00MainMDI
             End If
             'AG 23/09/2011
 
-            IMonitor.ActiveAnalyzer = AnalyzerIDAttribute
-            IMonitor.ActiveWorkSession = WorkSessionIDAttribute
-            IMonitor.CurrentWorkSessionStatus = WSStatusAttribute
+            UiMonitor.ActiveAnalyzer = AnalyzerIDAttribute
+            UiMonitor.ActiveWorkSession = WorkSessionIDAttribute
+            UiMonitor.CurrentWorkSessionStatus = WSStatusAttribute
 
             'RH 14/10/2011 Disable this button before open any other window
             bsTSInfoButton.Enabled = False
 
-            IMonitor.MdiParent = Me
-            IMonitor.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-            IMonitor.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-            IMonitor.Show()
+            UiMonitor.MdiParent = Me
+            UiMonitor.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+            UiMonitor.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+            UiMonitor.Show()
             Application.DoEvents()
 
             MyClass.IsISEUtilClosing = False 'SGM 11/05/2012
@@ -8796,14 +8796,14 @@ Partial Public Class UiAx00MainMDI
             'DL 17/05/2012
             If Not MDIAnalyzerManager Is Nothing AndAlso Not pEnable AndAlso pRemoveAllAlarms Then
                 MDIAnalyzerManager.Alarms.Clear()
-                If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is IMonitor Then
-                    IMonitor.RefreshAlarmsGlobes(Nothing)
+                If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is UiMonitor Then
+                    UiMonitor.RefreshAlarmsGlobes(Nothing)
                 End If
             End If
             'DL 17/05/2012
 
-            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is IMonitor Then
-                IMonitor.SetEnableMainTab(pEnable)
+            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is UiMonitor Then
+                UiMonitor.SetEnableMainTab(pEnable)
             End If
 
         Catch ex As Exception
@@ -8864,8 +8864,8 @@ Partial Public Class UiAx00MainMDI
                     SetActionButtonsEnableProperty(True)
 
                     If Not ActiveMdiChild Is Nothing Then
-                        If (TypeOf ActiveMdiChild Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             'CurrentMdiChild.TimeWarmUpProgressBar.Position =0 'TR 16/03/2012 Commented
                             CurrentMdiChild.TimeWarmUpProgressBar.Position = 100 'TR 16/03/2012 -Set the value 100%
                             'CurrentMdiChild.bsWamUpGroupBox.Enabled = False
@@ -8908,8 +8908,8 @@ Partial Public Class UiAx00MainMDI
                     SetActionButtonsEnableProperty(True)
 
                     If Not ActiveMdiChild Is Nothing Then
-                        If (TypeOf ActiveMdiChild Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             CurrentMdiChild.TimeWarmUpProgressBar.Position = 0
                             'CurrentMdiChild.bsWamUpGroupBox.Enabled = False
                             CurrentMdiChild.bsWamUpGroupBox.Visible = False
@@ -9590,7 +9590,7 @@ Partial Public Class UiAx00MainMDI
             'RH 30/06/2011
             If ClosedByFormCloseButton Then 'It is been closed by Form Close button
                 OpenMonitorForm()
-                IMonitor.RefreshAlarmsGlobes(Nothing)
+                UiMonitor.RefreshAlarmsGlobes(Nothing)
             Else
                 ClosedByFormCloseButton = True
             End If
@@ -9644,7 +9644,7 @@ Partial Public Class UiAx00MainMDI
 
                 If Me.IsMdiContainer Then
                     OpenMonitorForm()
-                    IMonitor.RefreshAlarmsGlobes(Nothing)
+                    UiMonitor.RefreshAlarmsGlobes(Nothing)
                 End If
             Else
                 ClosedByFormCloseButton = True
@@ -10829,8 +10829,8 @@ Partial Public Class UiAx00MainMDI
             'End If
 
             If refreshFlag AndAlso Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IMonitor) Then
-                    IMonitor.UpdateWSState(New UIRefreshDS)
+                If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                    UiMonitor.UpdateWSState(New UIRefreshDS)
                 ElseIf (TypeOf ActiveMdiChild Is IResults) Then
                     IResults.RefreshExportStatusChanged()
                 ElseIf (TypeOf ActiveMdiChild Is IHisResults) Then

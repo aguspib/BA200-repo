@@ -11,7 +11,7 @@ Imports Biosystems.Ax00.Global
 Imports DevExpress.XtraEditors.Controls
 Imports System.IO
 
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
     Dim rnd As Random = New Random(DateTime.Now.Second)
 

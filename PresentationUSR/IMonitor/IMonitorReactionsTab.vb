@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 
 'Put here your business code for the tab ReactionsTab inside Monitor Form
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
     Private Sub InitializeReactionsTab()
         'Put your initialization code here. It will be executed in the Monitor OnLoad event
