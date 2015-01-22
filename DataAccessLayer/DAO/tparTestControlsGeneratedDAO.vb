@@ -7,9 +7,9 @@
     Imports System.Data.SqlClient
     Imports Biosystems.Ax00.Types
     Imports Biosystems.Ax00.Global
-    Imports Biosystems.Ax00.Global.TO
-    
-    namespace Biosystems.Ax00.DAL.DAO
+
+
+namespace Biosystems.Ax00.DAL.DAO
   
 
     Partial Public Class TparTestControlsGeneratedDAO
@@ -100,20 +100,20 @@
             Catch ex As ArgumentException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -143,16 +143,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
             Finally
                 conn.Close()
             End Try
@@ -246,20 +246,20 @@
             Catch ex As ArgumentException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
                 MyGlobalTo.HasError = True
                 MyGlobalTo.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 'always call Close when done with conn.
@@ -287,16 +287,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 'always call Close when done with conn.
@@ -332,16 +332,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -370,16 +370,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -408,16 +408,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -446,16 +446,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -484,16 +484,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -522,16 +522,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -560,16 +560,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.
@@ -598,16 +598,16 @@
                 da.Fill(result.tparTestControls)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TparTestControlsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.

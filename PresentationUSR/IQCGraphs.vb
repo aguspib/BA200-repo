@@ -1,9 +1,14 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports DevExpress.XtraCharts
 Imports Biosystems.Ax00.PresentationCOM
+Imports DevExpress.Utils
 
 Public Class IQCGraphs
 
@@ -122,7 +127,7 @@ Public Class IQCGraphs
                 Dim myPoint As SeriesPoint = TryCast(e.SeriesPoint, SeriesPoint)
                 If (Not myPoint Is Nothing AndAlso Not myPoint.Tag Is Nothing) Then
                     'Validate if the n on the tag property is the last to change the icon
-                    If (e.Series.Points(e.Series.Points.Count - 1).Tag = DirectCast(myPoint.Tag, Integer)) Then
+                    If (CInt(e.Series.Points(e.Series.Points.Count - 1).Tag) = CInt(myPoint.Tag)) Then
                         CType(e.SeriesDrawOptions, PointDrawOptions).Marker.FillStyle.FillMode = FillMode.Solid
                         CType(e.SeriesDrawOptions, PointDrawOptions).Marker.Kind = MarkerKind.Star
                         e.SeriesDrawOptions.Color = Color.CornflowerBlue
@@ -221,8 +226,8 @@ Public Class IQCGraphs
             isLoading = True
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim
 
             GetScreenLabels(currentLanguage)
             GetLegendsLabels(currentLanguage)
@@ -232,7 +237,7 @@ Public Class IQCGraphs
 
             'Inform controls for Test Name and Rejection Criteria with the value of the correspondent attributes
             bsTestNameTextBox.Text = TestNameAttribute
-            bsRejectionTextBox.Text = RejectionCriteriaAttribute
+            bsRejectionTextBox.Text = CStr(RejectionCriteriaAttribute)
 
             'Select LJ Graph by default
             If (Not bsLeveyJenningsRB.Checked) Then bsLeveyJenningsRB.Checked = True
@@ -288,7 +293,7 @@ Public Class IQCGraphs
                                  ": " & myPoint.Values(0).ToString("F" & LocalDecimalAllowedAttribute)
 
                 ElseIf (bsYoudenRB.Checked) Then
-                    myToolTip &= " n: " & myPoint.Tag & Environment.NewLine
+                    myToolTip &= " n: " & myPoint.Tag.ToString & Environment.NewLine
                     myToolTip &= " x: " & myPoint.NumericalArgument.ToString("F" & LocalDecimalAllowedAttribute) & Environment.NewLine
                     myToolTip &= " y: " & myPoint.Values(0).ToString("F" & LocalDecimalAllowedAttribute)
                 End If
@@ -329,50 +334,50 @@ Public Class IQCGraphs
             Dim auxIconName As String = ""
             Dim iconPath As String = MyBase.IconsPath
 
-            Dim myToolTipsControl As New ToolTip
+            Dim myToolTipsControl As New Windows.Forms.ToolTip
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
 
             'LEGEND Icons
             auxIconName = GetIconName("GREEN_CIRCLE")
-            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("BLUE_CIRCLE")
-            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VIOLET_CIRCLE")
-            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("ORANGE_CIRCLE")
-            If (auxIconName <> "") Then bsWarningPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsWarningPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("RED_DIAMOND")
-            If (auxIconName <> "") Then bsErrorPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsErrorPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("BLUE_START")
-            If (auxIconName <> "") Then bsLastRunPintImage.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsLastRunPintImage.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("1SD")
-            If (auxIconName <> "") Then bs1SDPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bs1SDPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("2SD")
-            If (auxIconName <> "") Then bs2SDPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bs2SDPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("3SD")
-            If (auxIconName <> "") Then bs3SDPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bs3SDPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -733,15 +738,19 @@ Public Class IQCGraphs
 
             'Change the Graphic control size and set the location
             bsQCResultChartControl.Size = New Size(817, 374)
-            bsQCResultChartControl.Location = New Drawing.Point(10, 155)
+            bsQCResultChartControl.Location = New Point(10, 155)
 
             'Initialize the Graphic control
             bsQCResultChartControl.ClearCache()
             bsQCResultChartControl.Series.Clear()
-            bsQCResultChartControl.Legend.Visible = False
+            bsQCResultChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
             bsQCResultChartControl.SeriesTemplate.ValueScaleType = ScaleType.Numerical
             bsQCResultChartControl.BackColor = Color.White
             bsQCResultChartControl.AppearanceName = "Light"
+
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            bsQCResultChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            bsQCResultChartControl.RuntimeHitTesting = True
 
             'Get the list of selected Controls
             Dim mySelectedCtrlLots As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a As OpenQCResultsDS.tOpenResultsRow In OpenQCResultsDSAttribute.tOpenResults _
@@ -790,8 +799,10 @@ Public Class IQCGraphs
                 'Add a new Serie for the Selected Control
                 bsQCResultChartControl.Series.Add(openQCResultRow.ControlNameLotNum, ViewType.Line)
                 bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ShowInLegend = True
-                bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).Label.Visible = False
-                bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).PointOptions.PointView = PointView.ArgumentAndValues
+                bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
+
+                'ADDED THIS IN ORDER TO SHOW POINTS
+                CType(bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
 
                 'Set the color for each Control/Lot to graph; inform the Legend text with the Control Name
                 If (bsQCResultChartControl.Series.Count = 1) Then
@@ -813,45 +824,47 @@ Public Class IQCGraphs
                 myDiagram = CType(bsQCResultChartControl.Diagram, XYDiagram)
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
-                myDiagram.AxisX.Range.Auto = True
+                myDiagram.AxisX.WholeRange.Auto = True
+                myDiagram.AxisX.VisualRange.Auto = True
+                myDiagram.AxisY.VisualRange.SideMarginsValue = 0
                 myDiagram.AxisY.GridLines.Visible = False
                 myDiagram.AxisX.GridLines.Visible = False
-                myDiagram.AxisX.Title.Visible = False
-                myDiagram.AxisY.Title.Visible = False
+                myDiagram.AxisX.Title.Visibility = DefaultBoolean.False
+                myDiagram.AxisY.Title.Visibility = DefaultBoolean.False
 
                 If (numSelectedWithMean = 1) Then
                     'Only one Control is selected to be graph
-                    CreateConstantLine(LabelMEAN, myDiagram, openQCResultRow.Mean, Color.Black, DashStyle.Solid)
+                    CreateConstantLine(LabelMEAN, myDiagram, CSng(openQCResultRow.Mean), Color.Black, DashStyle.Solid)
 
                     If (openQCResultRow.SD > 0) Then
                         'Create the Constant line for the Rejection Criteria
                         If (RejectionCriteriaAttribute = 1) Then
-                            CreateConstantLine("+1 " & LabelSD, myDiagram, openQCResultRow.Mean + (1 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-1 " & LabelSD, myDiagram, openQCResultRow.Mean - (1 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("+1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (1 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (1 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         Else
-                            CreateConstantLine("+1 " & LabelSD, myDiagram, openQCResultRow.Mean + (1 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
-                            CreateConstantLine("-1 " & LabelSD, myDiagram, openQCResultRow.Mean - (1 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("+1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (1 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("-1 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (1 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
                         End If
 
                         If (RejectionCriteriaAttribute = 2) Then
-                            CreateConstantLine("+2 " & LabelSD, myDiagram, openQCResultRow.Mean + (2 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-2 " & LabelSD, myDiagram, openQCResultRow.Mean - (2 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("+2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (2 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (2 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         Else
-                            CreateConstantLine("+2 " & LabelSD, myDiagram, openQCResultRow.Mean + (2 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
-                            CreateConstantLine("-2 " & LabelSD, myDiagram, openQCResultRow.Mean - (2 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("+2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (2 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("-2 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (2 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
                         End If
 
                         If (RejectionCriteriaAttribute = 3) Then
-                            CreateConstantLine("+3 " & LabelSD, myDiagram, openQCResultRow.Mean + (3 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-3 " & LabelSD, myDiagram, openQCResultRow.Mean - (3 * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("+3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (3 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (3 * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         Else
-                            CreateConstantLine("+3 " & LabelSD, myDiagram, openQCResultRow.Mean + (3 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
-                            CreateConstantLine("-3 " & LabelSD, myDiagram, openQCResultRow.Mean - (3 * openQCResultRow.SD), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("+3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (3 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
+                            CreateConstantLine("-3 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (3 * openQCResultRow.SD)), Color.Black, DashStyle.Dash)
                         End If
 
-                        If (RejectionCriteriaAttribute Mod 1 OrElse RejectionCriteriaAttribute >= 4) Then
-                            CreateConstantLine("+4 " & LabelSD, myDiagram, openQCResultRow.Mean + (RejectionCriteriaAttribute * openQCResultRow.SD), Color.Red, DashStyle.Solid)
-                            CreateConstantLine("-4 " & LabelSD, myDiagram, openQCResultRow.Mean - (RejectionCriteriaAttribute * openQCResultRow.SD), Color.Red, DashStyle.Solid)
+                        If ((RejectionCriteriaAttribute Mod 1) = 1 OrElse RejectionCriteriaAttribute >= 4) Then
+                            CreateConstantLine("+4 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean + (RejectionCriteriaAttribute * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
+                            CreateConstantLine("-4 " & LabelSD, myDiagram, CSng(openQCResultRow.Mean - (RejectionCriteriaAttribute * openQCResultRow.SD)), Color.Red, DashStyle.Solid)
                         End If
                     End If
 
@@ -866,12 +879,18 @@ Public Class IQCGraphs
                             maxRelError = RejectionCriteriaAttribute
                         End If
 
-                        myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(openQCResultRow.Mean - (maxRelError * openQCResultRow.SD), 3) - 10, _
+                        myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(openQCResultRow.Mean - (maxRelError * openQCResultRow.SD), 3) - 10, _
                                                               Math.Round(openQCResultRow.Mean + (maxRelError * openQCResultRow.SD), 3) + 10)
+                        myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(openQCResultRow.Mean - (maxRelError * openQCResultRow.SD), 3) - 10, _
+                                                              Math.Round(openQCResultRow.Mean + (maxRelError * openQCResultRow.SD), 3) + 10)
+
                     Else
                         If (openQCResultRow.SD > 0) Then
-                            myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(openQCResultRow.Mean - (4 * openQCResultRow.SD), 3), _
+                            myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(openQCResultRow.Mean - (4 * openQCResultRow.SD), 3), _
                                                                   Math.Round(openQCResultRow.Mean + (4 * openQCResultRow.SD), 3))
+                            myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(openQCResultRow.Mean - (4 * openQCResultRow.SD), 3), _
+                                                                  Math.Round(openQCResultRow.Mean + (4 * openQCResultRow.SD), 3))
+
                         End If
                     End If
 
@@ -879,7 +898,7 @@ Public Class IQCGraphs
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
                                             Where a.QCControlLotID = openQCResultRow.QCControlLotID _
-                                          AndAlso a.CalcRunNumber = runNumber("Argument") _
+                                          AndAlso a.CalcRunNumber = CInt(runNumber("Argument")) _
                                          Order By a.CalcRunNumber _
                                            Select a).ToList
 
@@ -891,6 +910,9 @@ Public Class IQCGraphs
 
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).DataSource = myDataSourceTable
                     bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentDataMember = "Argument"
+
+                    'ADDED THIS FOR CORRECT SCALING
+                    bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative
 
                     'BA-1885 - When the number of results to plot is greater than 50, this property has to be used to avoid overlapping of values in X-Axis
                     If (myDataSourceTable.Rows.Count > minQCSeries) Then bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
@@ -906,14 +928,14 @@ Public Class IQCGraphs
                     myDiagram.Margins.Right = 5
 
                     'Set the Title for each axis
-                    myDiagram.AxisX.Title.Visible = True
+                    myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                     myDiagram.AxisX.Title.Antialiasing = False
                     myDiagram.AxisX.Title.TextColor = Color.Black
                     myDiagram.AxisX.Title.Alignment = StringAlignment.Center
                     myDiagram.AxisX.Title.Font = New Font("Verdana", 8.25, FontStyle.Regular)
                     myDiagram.AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Serie", currentLanguage)
 
-                    myDiagram.AxisY.Title.Visible = True
+                    myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                     myDiagram.AxisY.Title.Antialiasing = False
                     myDiagram.AxisY.Title.TextColor = Color.Black
                     myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -949,7 +971,7 @@ Public Class IQCGraphs
                             CreateConstantLine("-3 " & LabelSD, myDiagram, -3, Color.Black, DashStyle.Dash)
                         End If
 
-                        If (RejectionCriteriaAttribute Mod 1 OrElse RejectionCriteriaAttribute >= 4) Then
+                        If ((RejectionCriteriaAttribute Mod 1) = 1 OrElse RejectionCriteriaAttribute >= 4) Then
                             CreateConstantLine("+" & RejectionCriteriaAttribute.ToString() & LabelSD, myDiagram, RejectionCriteriaAttribute, Color.Red, DashStyle.Solid)
                             CreateConstantLine("-" & RejectionCriteriaAttribute.ToString() & LabelSD, myDiagram, -RejectionCriteriaAttribute, Color.Red, DashStyle.Solid)
                         End If
@@ -965,12 +987,15 @@ Public Class IQCGraphs
 
                             If (maxRelError < RejectionCriteriaAttribute) Then
                                 maxRelError = RejectionCriteriaAttribute
-                                myDiagram.AxisY.Range.SetMinMaxValues(-maxRelError - 0.1, maxRelError + 0.1)
+                                myDiagram.AxisY.WholeRange.SetMinMaxValues(-maxRelError - 0.1, maxRelError + 0.1)
+                                myDiagram.AxisY.VisualRange.SetMinMaxValues(-maxRelError - 0.1, maxRelError + 0.1)
                             Else
-                                myDiagram.AxisY.Range.SetMinMaxValues(-maxRelError - 0.5, maxRelError + 0.5)
+                                myDiagram.AxisY.WholeRange.SetMinMaxValues(-maxRelError - 0.5, maxRelError + 0.5)
+                                myDiagram.AxisY.VisualRange.SetMinMaxValues(-maxRelError - 0.5, maxRelError + 0.5)
                             End If
                         Else
-                            myDiagram.AxisY.Range.SetMinMaxValues(-4.5, 4.5)
+                            myDiagram.AxisY.WholeRange.SetMinMaxValues(-4.5, 4.5)
+                            myDiagram.AxisY.VisualRange.SetMinMaxValues(-4.5, 4.5)
                         End If
                     End If
 
@@ -978,7 +1003,7 @@ Public Class IQCGraphs
                         'Search value of the Control/Lot for the Run Number 
                         validResultValues = (From a As QCResultsDS.tqcResultsRow In QCResultsByControlDSAttribute.tqcResults _
                                             Where a.QCControlLotID = openQCResultRow.QCControlLotID _
-                                          AndAlso a.CalcRunNumber = runNumber("Argument") _
+                                          AndAlso a.CalcRunNumber = CInt(runNumber("Argument")) _
                                          Order By a.CalcRunNumber _
                                            Select a).ToList
 
@@ -1014,14 +1039,14 @@ Public Class IQCGraphs
                         myDiagram.Margins.Right = 5
 
                         'Set the Title for each axis
-                        myDiagram.AxisX.Title.Visible = True
+                        myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisX.Title.Antialiasing = False
                         myDiagram.AxisX.Title.TextColor = Color.Black
                         myDiagram.AxisX.Title.Alignment = StringAlignment.Center
                         myDiagram.AxisX.Title.Font = New Font("Verdana", 8.25, FontStyle.Regular)
                         myDiagram.AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Serie", currentLanguage)
 
-                        myDiagram.AxisY.Title.Visible = True
+                        myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisY.Title.Antialiasing = False
                         myDiagram.AxisY.Title.Text = "  "
                     End If
@@ -1153,60 +1178,60 @@ Public Class IQCGraphs
             series4.Points.Add(New SeriesPoint((pControl1Mean - pControl1SD), (pControl2Mean + pControl2SD)))
 
             myLineSeriesView = CType(series4.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Fuchsia
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series4.PointOptions.PointView = PointView.Values
+            series4.Label.TextPattern = "{V}"
             series4.ArgumentScaleType = ScaleType.Numerical
             series4.ValueScaleType = ScaleType.Numerical
-            series4.Label.Visible = False
+            series4.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series41 As New Series("SD1L2", ViewType.Line)
             series41.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), pControl2Mean + (pControl2SD)))
             series41.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), (pControl2Mean - (pControl2SD))))
 
             myLineSeriesView = CType(series41.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Fuchsia
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series41.PointOptions.PointView = PointView.Values
+            series41.Label.TextPattern = "{V}"
             series41.ArgumentScaleType = ScaleType.Numerical
             series41.ValueScaleType = ScaleType.Numerical
-            series41.Label.Visible = False
+            series41.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series42 As New Series("SD1L3", ViewType.Line)
             series42.Points.Add(New SeriesPoint(pControl1Mean - (pControl1SD), pControl2Mean - (pControl2SD)))
             series42.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), (pControl2Mean - (pControl2SD))))
 
             myLineSeriesView = CType(series42.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Fuchsia
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series42.PointOptions.PointView = PointView.Values
+            series42.Label.TextPattern = "{V}"
             series42.ArgumentScaleType = ScaleType.Numerical
             series42.ValueScaleType = ScaleType.Numerical
-            series42.Label.Visible = False
+            series42.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series43 As New Series("SD1L4", ViewType.Line)
             series43.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), pControl2Mean - (pControl2SD)))
             series43.Points.Add(New SeriesPoint(pControl1Mean + (pControl1SD), (pControl2Mean + (pControl2SD))))
 
             myLineSeriesView = CType(series43.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Fuchsia
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series43.PointOptions.PointView = PointView.Values
+            series43.Label.TextPattern = "{V}"
             series43.ArgumentScaleType = ScaleType.Numerical
             series43.ValueScaleType = ScaleType.Numerical
-            series43.Label.Visible = False
+            series43.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             '****************'
             '*  Square SD2  *'
@@ -1216,60 +1241,60 @@ Public Class IQCGraphs
             series40.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), (pControl2Mean + 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series40.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Orange  'Color.Black
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series40.PointOptions.PointView = PointView.Values
+            series40.Label.TextPattern = "{V}"
             series40.ArgumentScaleType = ScaleType.Numerical
             series40.ValueScaleType = ScaleType.Numerical
-            series40.Label.Visible = False
+            series40.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series410 As New Series("SD2L2", ViewType.Line)
             series410.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), pControl2Mean + 2 * (pControl2SD)))
             series410.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), (pControl2Mean - 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series410.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Orange  'Color.Black
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series410.PointOptions.PointView = PointView.Values
+            series410.Label.TextPattern = "{V}"
             series410.ArgumentScaleType = ScaleType.Numerical
             series410.ValueScaleType = ScaleType.Numerical
-            series410.Label.Visible = False
+            series410.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series420 As New Series("SD2L3", ViewType.Line)
             series420.Points.Add(New SeriesPoint(pControl1Mean - 2 * (pControl1SD), pControl2Mean - 2 * (pControl2SD)))
             series420.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), (pControl2Mean - 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series420.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Orange
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series420.PointOptions.PointView = PointView.Values
+            series420.Label.TextPattern = "{V}"
             series420.ArgumentScaleType = ScaleType.Numerical
             series420.ValueScaleType = ScaleType.Numerical
-            series420.Label.Visible = False
+            series420.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series430 As New Series("SD2L4", ViewType.Line)
             series430.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), pControl2Mean - 2 * (pControl2SD)))
             series430.Points.Add(New SeriesPoint(pControl1Mean + 2 * (pControl1SD), (pControl2Mean + 2 * (pControl2SD))))
 
             myLineSeriesView = CType(series430.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Orange
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series430.PointOptions.PointView = PointView.Values
+            series430.Label.TextPattern = "{V}"
             series430.ArgumentScaleType = ScaleType.Numerical
             series430.ValueScaleType = ScaleType.Numerical
-            series430.Label.Visible = False
+            series430.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             '****************'
             '*  Square SD3  *'
@@ -1279,60 +1304,60 @@ Public Class IQCGraphs
             series50.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), (pControl2Mean + 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series50.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Green
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series50.PointOptions.PointView = PointView.Values
+            series50.Label.TextPattern = "{V}"
             series50.ArgumentScaleType = ScaleType.Numerical
             series50.ValueScaleType = ScaleType.Numerical
-            series50.Label.Visible = False
+            series50.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series51 As New Series("SD3L2", ViewType.Line)
             series51.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), pControl2Mean + 3 * (pControl2SD)))
             series51.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), (pControl2Mean - 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series51.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Green
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series51.PointOptions.PointView = PointView.Values
+            series51.Label.TextPattern = "{V}"
             series51.ArgumentScaleType = ScaleType.Numerical
             series51.ValueScaleType = ScaleType.Numerical
-            series51.Label.Visible = False
+            series51.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series52 As New Series("SD3L3", ViewType.Line)
             series52.Points.Add(New SeriesPoint(pControl1Mean - 3 * (pControl1SD), pControl2Mean - 3 * (pControl2SD)))
             series52.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), (pControl2Mean - 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series52.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Green
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series52.PointOptions.PointView = PointView.Values
+            series52.Label.TextPattern = "{V}"
             series52.ArgumentScaleType = ScaleType.Numerical
             series52.ValueScaleType = ScaleType.Numerical
-            series52.Label.Visible = False
+            series52.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             Dim series53 As New Series("SD3L4", ViewType.Line)
             series53.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), pControl2Mean - 3 * (pControl2SD)))
             series53.Points.Add(New SeriesPoint(pControl1Mean + 3 * (pControl1SD), (pControl2Mean + 3 * (pControl2SD))))
 
             myLineSeriesView = CType(series53.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Green
             myLineSeriesView.LineStyle.Thickness = 2
             myLineSeriesView.LineStyle.DashStyle = DashStyle.Dash
 
-            series53.PointOptions.PointView = PointView.Values
+            series53.Label.TextPattern = "{V}"
             series53.ArgumentScaleType = ScaleType.Numerical
             series53.ValueScaleType = ScaleType.Numerical
-            series53.Label.Visible = False
+            series53.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
             '*******************'
             '*  Diagonal Line  *'
@@ -1342,14 +1367,14 @@ Public Class IQCGraphs
             series60.Points.Add(New SeriesPoint(pControl1Mean + 7 * (pControl1SD), (pControl2Mean + 7 * (pControl2SD))))
 
             myLineSeriesView = CType(series60.View, LineSeriesView)
-            myLineSeriesView.LineMarkerOptions.Visible = False
+            myLineSeriesView.MarkerVisibility = DevExpress.Utils.DefaultBoolean.False
             myLineSeriesView.Color = Color.Tomato   'Color.Red
             myLineSeriesView.LineStyle.Thickness = 2
 
-            series60.PointOptions.PointView = PointView.Values
+            series60.Label.TextPattern = "{V}"
             series60.ArgumentScaleType = ScaleType.Numerical
             series60.ValueScaleType = ScaleType.Numerical
-            series60.Label.Visible = False
+            series60.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
 
             bsQCResultChartControl.Series.AddRange(New Series() {series4, series41, series42, series43, series40, series410, _
@@ -1376,11 +1401,13 @@ Public Class IQCGraphs
 
             'Change the Graphic control size and set the location
             bsQCResultChartControl.Size = New Size(485, 435) '(485, 440)
-            bsQCResultChartControl.Location = New Drawing.Point(140, 155) 'New Drawing.Point(170, 155) '(170, 147)
+            bsQCResultChartControl.Location = New Point(140, 155) 'New Drawing.Point(170, 155) '(170, 147)
 
             bsQCResultChartControl.ClearCache()
             bsQCResultChartControl.Series.Clear()
-            bsQCResultChartControl.Legend.Visible = False
+            bsQCResultChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
+            bsQCResultChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            bsQCResultChartControl.RuntimeHitTesting = True
 
             'Get the list of selected Controls
             Dim mySelectecControlLotList As List(Of OpenQCResultsDS.tOpenResultsRow) = (From a As OpenQCResultsDS.tOpenResultsRow In OpenQCResultsDSAttribute.tOpenResults _
@@ -1417,8 +1444,8 @@ Public Class IQCGraphs
 
                 bsQCResultChartControl.Series.Add(mySelectecControlLotList.First().ControlNameLotNum, ViewType.Point)
                 bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).ShowInLegend = True
-                bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).Label.Visible = False
-                bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).PointOptions.PointView = PointView.Values
+                bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
+                bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).Label.TextPattern = "{V}"
                 bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
                 bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).ValueScaleType = ScaleType.Numerical
                 bsQCResultChartControl.Series(mySelectecControlLotList.First().ControlNameLotNum).View.Color = Color.Black
@@ -1426,8 +1453,10 @@ Public Class IQCGraphs
                 Dim myDiagram As XYDiagram = CType(bsQCResultChartControl.Diagram, XYDiagram)
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
-                myDiagram.AxisY.Range.Auto = False
-                myDiagram.AxisX.Range.Auto = False
+                myDiagram.AxisY.VisualRange.Auto = False
+                myDiagram.AxisX.VisualRange.Auto = False
+                myDiagram.AxisX.VisualRange.SideMarginsValue = 0
+                myDiagram.AxisY.VisualRange.SideMarginsValue = 0
 
                 bsPrintButton.Enabled = True
 
@@ -1455,18 +1484,24 @@ Public Class IQCGraphs
                                   AndAlso Not a.Excluded _
                                        Select a.VisibleResultValue).ToList()
 
-                        myDiagram.AxisX.Range.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                        myDiagram.AxisX.WholeRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
                                                               Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
-                        myDiagram.AxisX.Title.Visible = True
+                        myDiagram.AxisX.VisualRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                                                              Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
+
+                        myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisX.Title.Antialiasing = False
                         myDiagram.AxisX.Title.TextColor = Color.Black
                         myDiagram.AxisX.Title.Alignment = StringAlignment.Center
                         myDiagram.AxisX.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
                         myDiagram.AxisX.Title.Text = mySelectecControlLotList.First().ControlName
 
-                        myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                        myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
+                                                                                      Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
+                        myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3) - 1, _
                                                               Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3) + 1)
-                        myDiagram.AxisY.Title.Visible = True
+
+                        myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisY.Title.Antialiasing = False
                         myDiagram.AxisY.Title.TextColor = Color.Black
                         myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -1488,7 +1523,7 @@ Public Class IQCGraphs
 
                         'Create cross lines with the Control Mean
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Blue)
-                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Blue)
+                        CreateConstantLineAxisY(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, CSng(mySelectecControlLotList.First().Mean), Color.Blue)
                     End If
 
                 ElseIf (numOfSelectedCtrls = 2) Then
@@ -1515,14 +1550,15 @@ Public Class IQCGraphs
                                   AndAlso Not a.Excluded _
                                        Select a.VisibleResultValue).ToList()
 
-                        Dim MinValue As Single = Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MinValue As Single = CSng(Math.Round(mySelectecControlLotList.First().Mean - (3 * mySelectecControlLotList.First().SD), 3))
                         If (MinValue > XResultValues.Min) Then MinValue = XResultValues.Min
 
-                        Dim MaxValue As Single = Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3)
+                        Dim MaxValue As Single = CSng(Math.Round(mySelectecControlLotList.First().Mean + (3 * mySelectecControlLotList.First().SD), 3))
                         If (MaxValue < XResultValues.Max) Then MaxValue = XResultValues.Max
 
-                        myDiagram.AxisX.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
-                        myDiagram.AxisX.Title.Visible = True
+                        myDiagram.AxisX.WholeRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisX.VisualRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisX.Title.Antialiasing = False
                         myDiagram.AxisX.Title.TextColor = Color.Black
                         myDiagram.AxisX.Title.Alignment = StringAlignment.Center
@@ -1536,14 +1572,15 @@ Public Class IQCGraphs
                                                          AndAlso Not a.Excluded _
                                                               Select a.VisibleResultValue).ToList()
 
-                        MinValue = Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3)
+                        MinValue = CSng(Math.Round(mySelectecControlLotList.Last().Mean - (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MinValue > YResultValues.Min) Then MinValue = YResultValues.Min
 
-                        MaxValue = Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3)
+                        MaxValue = CSng(Math.Round(mySelectecControlLotList.Last().Mean + (3 * mySelectecControlLotList.Last().SD), 3))
                         If (MaxValue < YResultValues.Max) Then MaxValue = YResultValues.Max
 
-                        myDiagram.AxisY.Range.SetMinMaxValues(MinValue - 1, MaxValue + 1)
-                        myDiagram.AxisY.Title.Visible = True
+                        myDiagram.AxisY.WholeRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisY.VisualRange.SetMinMaxValues(MinValue - 1, MaxValue + 1)
+                        myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
                         myDiagram.AxisY.Title.Antialiasing = False
                         myDiagram.AxisY.Title.TextColor = Color.Black
                         myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -1552,7 +1589,7 @@ Public Class IQCGraphs
 
                         'Create cross lines with the Mean of selected Controls
                         CreateConstantLineAxisX(mySelectecControlLotList.First().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.First().Mean, Color.Blue)
-                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, mySelectecControlLotList.Last().Mean, Color.Blue)
+                        CreateConstantLineAxisY(mySelectecControlLotList.Last().Mean.ToString("F2"), myDiagram, CSng(mySelectecControlLotList.Last().Mean), Color.Blue)
 
                         'Create the graph squares
                         CreateSquares(mySelectecControlLotList.First().Mean, mySelectecControlLotList.First().SD, _
@@ -1581,8 +1618,8 @@ Public Class IQCGraphs
                     myDiagram.AxisY.ConstantLines.Clear()
                     myDiagram.AxisX.ConstantLines.Clear()
 
-                    myDiagram.AxisY.Title.Visible = False
-                    myDiagram.AxisX.Title.Visible = False
+                    myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
+                    myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                     bsPrintButton.Enabled = False
                 End If
@@ -1633,8 +1670,8 @@ Public Class IQCGraphs
                 'Error getting the SampleType description; shown it
                 ShowMessage(Name & ".IQCGraphs_Load ", myGlobalDataTO.ErrorCode, myGlobalDataTO.ErrorMessage, Me)
             End If
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
 
             If (Not Me.MdiParent Is Nothing) Then
                 mySize = Me.Parent.Size
@@ -1657,8 +1694,8 @@ Public Class IQCGraphs
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -1745,7 +1782,7 @@ Public Class IQCGraphs
                         bsResultControlLotGridView.CurrentCell.Value = False
                         bsResultControlLotGridView.CommitEdit(DataGridViewDataErrorContexts.Commit)
                     Else
-                        If (bsResultControlLotGridView.CurrentCell.Value) Then
+                        If (CBool(bsResultControlLotGridView.CurrentCell.Value)) Then
                             If (IsDBNull(bsResultControlLotGridView.CurrentRow.Cells("Mean").Value)) Then
                                 'The CheckBox was checked by User and the action is allowed, but there is not enough data to plot. 
                                 'A warning message is shown and the CheckBox value is set to False

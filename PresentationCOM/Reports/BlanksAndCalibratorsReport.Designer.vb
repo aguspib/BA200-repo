@@ -253,7 +253,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.DetailReportBlanks.DataSource = Me.reportsDS
         Me.DetailReportBlanks.Level = 0
         Me.DetailReportBlanks.Name = "DetailReportBlanks"
-        Me.DetailReportBlanks.PrintOnEmptyDataSource = False
+        Me.DetailReportBlanks.ReportPrintOptions.PrintOnEmptyDataSource = False
         '
         'GroupHeaderBlanks
         '
@@ -418,7 +418,7 @@ Partial Public Class BlanksAndCalibratorsReport
         Me.DetailReportCalibrators.DataSource = Me.reportsDS
         Me.DetailReportCalibrators.Level = 1
         Me.DetailReportCalibrators.Name = "DetailReportCalibrators"
-        Me.DetailReportCalibrators.PrintOnEmptyDataSource = False
+        Me.DetailReportCalibrators.ReportPrintOptions.PrintOnEmptyDataSource = False
         '
         'DetailCalibrators
         '

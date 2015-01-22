@@ -2,17 +2,7 @@
 Option Explicit On
 
 
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.Windows.Forms
-Imports Biosystems.Ax00.Global.GlobalConstants
-Imports Biosystems.Ax00.BL
-Imports System.IO
-Imports System.Threading
-Imports Biosystems.Ax00.PresentationCOM
 
 Public Class TestForm
 

@@ -3,7 +3,6 @@ Option Strict On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
@@ -465,8 +464,8 @@ Public Class IISEUtilities
     '        End If
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OnManageReceptionEvent", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "OnManageReceptionEvent", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -731,11 +730,11 @@ Public Class IISEUtilities
 
                     If Exists Then
                         If System.IO.File.Exists(iconPath & auxIconName) Then
-                            Dim myUtil As New Utilities
-                            Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-                            myGlobalDataTO = myUtil.ResizeImage(myImage, New Size(20, 20))
+                            'Dim myUtil As New Utilities.
+                            Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                            myGlobalDataTO = Utilities.ResizeImage(myImage, New Size(20, 20))
                             If Not myGlobalDataTO.HasError And myGlobalDataTO.SetDatos IsNot Nothing Then
-                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                Me.BsMessageImage.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             Else
                                 Me.BsMessageImage.BackgroundImage = myImage
                             End If
@@ -876,8 +875,8 @@ Public Class IISEUtilities
 
                 'SGM 17/10/2012 - Log ISE Operation
                 If myScreenIseCmdTo.ISECommandID <> ISECommands.NONE Then
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("ISE UTILITIES: " & myScreenIseCmdTo.ISECommandID.ToString, Me.Name & ".SendISEInstruction ", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("ISE UTILITIES: " & myScreenIseCmdTo.ISECommandID.ToString, Me.Name & ".SendISEInstruction ", EventLogEntryType.Information, False)
                 End If
                 'end SGM 17/10/2012
 
@@ -1014,8 +1013,8 @@ Public Class IISEUtilities
                 Me.BsStopButton.Enabled = True
 
                 'SGM 17/10/2012 - Log ISE Operation
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("ISE UTILITIES: " & Me.CurrentOperation.ToString, Me.Name & ".SendISEAction ", EventLogEntryType.Information, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("ISE UTILITIES: " & Me.CurrentOperation.ToString, Me.Name & ".SendISEAction ", EventLogEntryType.Information, False)
 
             End If
 
@@ -1421,65 +1420,65 @@ Public Class IISEUtilities
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If (auxIconName <> "") Then
-            '    BsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''Exit button
             'auxIconName = GetIconName("CANCEL")
             'If (auxIconName <> "") Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("READADJ")
             'If (auxIconName <> "") Then
-            '    BsSaveAsButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveAsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("RESETFIELD")
             'If (auxIconName <> "") Then
-            '    BsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''STOP Button
             'auxIconName = GetIconName("STOP")
             'If (auxIconName <> "") Then
-            '    BsStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
 
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '            BsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '            BsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '           BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             '          End If
 
             'EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("READADJ")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveAsButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveAsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsSaveAsButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''ADJUST Button
             'auxIconName = GetIconName("RESETFIELD")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsClearButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
             ''STOP Button
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStopButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
 
@@ -1497,7 +1496,7 @@ Public Class IISEUtilities
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
 
         Try
 
@@ -1506,9 +1505,9 @@ Public Class IISEUtilities
             auxIconName = GetIconName(pImageName)
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
+                myGlobal = Utilities.ResizeImage(myImage, New Size(pWidth, pHeight))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myButtonImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -1611,19 +1610,19 @@ Public Class IISEUtilities
             'NONE Image
             auxIconName = GetIconName("FREECELL") ' NONE
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("NONE", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("NONE", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'ACTION Image
             auxIconName = GetIconName("ADJUSTMENT") ' ACTION
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("ACTION", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("ACTION", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'DONE Image SGM 08/06/2012
             auxIconName = GetIconName("ACCEPT1") ' ACTION DONE
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BSActionsTreeImageList.Images.Add("DONE", Image.FromFile(iconPath & auxIconName))
+                BSActionsTreeImageList.Images.Add("DONE", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
 
@@ -1737,8 +1736,8 @@ Public Class IISEUtilities
             myResultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myResultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "IseAdjustmentDelegate.GetLimitValues", EventLogEntryType.Error, False)
         End Try
         Return myResultData
     End Function
@@ -1757,7 +1756,7 @@ Public Class IISEUtilities
     ''' </remarks>
     Public Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
+        ''Dim myGlobalbase As New GlobalBase
         Try
             Me.DisableAll()
 
@@ -2474,7 +2473,7 @@ Public Class IISEUtilities
 
                                     'SGM 25/09/2012 - check if any calibration is needed
                                     Dim isReady As Boolean = False
-                                    Dim myAffectedElectrodes As List(Of String)
+                                    Dim myAffectedElectrodes As List(Of String) = Nothing
                                     myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                         isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
@@ -3667,7 +3666,7 @@ Public Class IISEUtilities
                                         If CBool(myGlobal.SetDatos) Then
                                             'SGM 25/09/2012 - check if calibrations are ok
                                             Dim isReady As Boolean = False
-                                            Dim myAffectedElectrodes As List(Of String)
+                                            Dim myAffectedElectrodes As List(Of String) = Nothing
                                             myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
 
@@ -4328,8 +4327,8 @@ Public Class IISEUtilities
     '            PrepareTestedMode()
     '        End If
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "OnISEOperationFinished", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & "OnISEOperationFinished", EventLogEntryType.Error, False)
     '    End Try
     'End Sub
 
@@ -4337,7 +4336,7 @@ Public Class IISEUtilities
         Try
 
             'Dim myGlobal As New GlobalDataTO
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             'Get an instance of the ISE manager class
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -4347,10 +4346,10 @@ Public Class IISEUtilities
             End If
 
             'Get the current user level SGM 07/06/2012
-            MyBase.CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            MyBase.CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             Me.GetScreenLabels()
@@ -4358,7 +4357,7 @@ Public Class IISEUtilities
             Me.PrepareTreeViewImages()
 
             'hide Caret of the textbox
-            MyClass.HideCaret(Me.BsRichTextBox1.Handle)
+            HideCaret(Me.BsRichTextBox1.Handle)
 
             If ThisIsService Then
 
@@ -4515,8 +4514,8 @@ Public Class IISEUtilities
 
         Try
             'TRAZA DE CIERRE DE PANTALLA
-            Dim myApplicationLogMang As New ApplicationLogManager
-            myApplicationLogMang.CreateLogActivity(Me.Name & ".BsExitButton.Click ", "IISEUtilities", EventLogEntryType.Information, False)
+            'Dim myApplicationLogMang As New ApplicationLogManager
+            GlobalBase.CreateLogActivity(Me.Name & ".BsExitButton.Click ", "IISEUtilities", EventLogEntryType.Information, False)
             'TRAZA DE CIERRE DE PANTALLA
 
             MyClass.IsScreenCloseRequested = True 'SGM 13/06/2012
@@ -4551,7 +4550,7 @@ Public Class IISEUtilities
 
                         'SGM 25/09/2012 - check if any calibration is needed
                         Dim isReady As Boolean = False
-                        Dim myAffectedElectrodes As List(Of String)
+                        Dim myAffectedElectrodes As List(Of String) = Nothing
                         myGlobal = MyClass.myISEManager.CheckAnyCalibrationIsNeeded(myAffectedElectrodes)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                             isReady = Not (CBool(myGlobal.SetDatos) And myAffectedElectrodes Is Nothing)
@@ -4954,7 +4953,7 @@ Public Class IISEUtilities
     Private Sub BsRichTextBox1_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsRichTextBox1.GotFocus
         Try
             'hide Caret of the textbox
-            MyClass.HideCaret(Me.BsRichTextBox1.Handle)
+            HideCaret(Me.BsRichTextBox1.Handle)
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BsRichTextBox1_GotFocus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRichTextBox1_GotFocus ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -5076,10 +5075,10 @@ Public Class IISEUtilities
                 If myDocs IsNot Nothing Then
                     Dim myDocRow As SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow = CType(myDocs.srv_tfmwInfoDocuments.Rows(0), SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow)
 
-                    Dim myGlobalbase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
 
                     If myDocRow.DocumentPath.Length > 0 Then
-                        myDocumentPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.DocumentPath
+                        myDocumentPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.DocumentPath
 
                         Dim isScrollable As Boolean = myDocRow.Expandable
 
@@ -5151,7 +5150,7 @@ Public Class IISEUtilities
 
                     'video NOT V1
                     'If myDocRow.VideoPath.Length > 0 Then
-                    '    myVideoPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.VideoPath
+                    '    myVideoPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.VideoPath
                     '    If File.Exists(myVideoPath) Then
 
                     '    Else

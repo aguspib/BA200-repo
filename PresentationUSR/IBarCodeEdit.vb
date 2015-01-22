@@ -1,15 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports System
-Imports System.Text
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.BL.Framework
 
 Public Class IBarCodeEdit
 
@@ -136,13 +134,13 @@ Public Class IBarCodeEdit
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If Not String.IsNullOrEmpty(auxIconName) Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If Not String.IsNullOrEmpty(auxIconName) Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -161,8 +159,8 @@ Public Class IBarCodeEdit
     ''' </remarks>
     Private Sub InitializeScreen()
         Try
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
 
             If (Not Me.MdiParent Is Nothing) Then
                 mySize = Me.Parent.Size
@@ -171,8 +169,8 @@ Public Class IBarCodeEdit
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase()
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase()
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for Screen Buttons
             PrepareButtons()
@@ -413,8 +411,8 @@ Public Class IBarCodeEdit
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -598,7 +596,7 @@ Public Class IBarCodeEdit
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 Me.Close()

@@ -4,7 +4,6 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 
@@ -49,19 +48,19 @@ Public Class IChangeRotorSRV
             'New rotor button
             auxIconName = GetIconName("ADJUSTMENT") 'CONTINUESEB")
             If (auxIconName <> "") Then
-                bsNewRotorButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewRotorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CHANGE ROTOR Button
             auxIconName = GetIconName("CHANGEROTORB")
             If (auxIconName <> "") Then
-                bsWSUpDownButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsWSUpDownButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'icons for result
@@ -89,17 +88,17 @@ Public Class IChangeRotorSRV
         Try
             'Get the current Language from the current Application Session
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ChangeRotor", currentLanguage)
             bsChangeRotorLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RISINGUP", currentLanguage)
             bsNewAdjLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NEW_ROTOR", currentLanguage) 'LBL_SRV_NEW_ROTOR
 
             'For Tooltips...
-            bsScreenToolTips.SetToolTip(bsWSUpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RISINGUP", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsNewRotorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_NEWADJUSTROTOR", currentLanguage))
-            bsScreenToolTips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            ScreenTooltips.SetToolTip(bsWSUpDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_RISINGUP", currentLanguage))
+            ScreenTooltips.SetToolTip(bsNewRotorButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_NEWADJUSTROTOR", currentLanguage))
+            ScreenTooltips.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             'RH 14/02/2012
             MSG_StartInstrument = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_StartInstrument", currentLanguage)
@@ -240,7 +239,7 @@ Public Class IChangeRotorSRV
                 End If
                 ScreenWorkingProcess = False
                 MyBase.ActivateMDIMenusButtons(True)
-                Me.bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
                 Me.bsStatusImage.Visible = True
 
                 Me.BsNewRotorProcessTimer.Stop()
@@ -498,9 +497,9 @@ Public Class IChangeRotorSRV
             MyBase.ActivateMDIMenusButtons(True)
 
             If MyBase.myServiceMDI.MDIAnalyzerManager.ErrorCodes.Contains("550") Then 'Reactions rotor missing
-                Me.bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
             Else
-                Me.bsStatusImage.Image = Image.FromFile(OKIconName)
+                Me.bsStatusImage.Image = ImageUtilities.ImageFromFile(OKIconName)
             End If
             Me.BsProgressBar.Value = Me.BsProgressBar.Maximum
             Me.BsNewRotorProcessTimer.Stop()

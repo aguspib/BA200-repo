@@ -1,10 +1,12 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Types
 Imports DevExpress.XtraCharts
-Imports Biosystems.Ax00.PresentationCOM
 Imports System.Globalization
+Imports DevExpress.Utils
 
 Public Class IISEResultsHistoryGraph
 
@@ -67,9 +69,9 @@ Public Class IISEResultsHistoryGraph
         auxIconName = GetIconName(pKey)
         If Not String.IsNullOrEmpty(auxIconName) Then
             If mImageDict.ContainsKey(pKey) Then
-                mImageDict.Item(pKey) = Image.FromFile(iconPath & auxIconName)
+                mImageDict.Item(pKey) = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             Else
-                mImageDict.Add(pKey, Image.FromFile(iconPath & auxIconName))
+                mImageDict.Add(pKey, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         End If
 
@@ -144,7 +146,7 @@ Public Class IISEResultsHistoryGraph
     ''' Created by: JB 31/07/2012
     ''' </remarks>
     Private Sub PrepareButtons()
-        Dim myToolTipsControl As New ToolTip
+        Dim myToolTipsControl As New Windows.Forms.ToolTip
         Try
             'EXIT Button
             bsExitButton.Image = GetImage("CANCEL")
@@ -157,6 +159,28 @@ Public Class IISEResultsHistoryGraph
     End Sub
 
     ''' <summary>
+    ''' Adds a serie to the graph passed as parameter
+    ''' </summary>
+    ''' <param name="pGraph">Graph that will contain the new serie</param>
+    ''' <param name="serieName">name of the serie to be added to the chart</param>
+    ''' <param name="viewType">type of the view desired to this serie</param>
+    ''' <param name="thisColor">color of the line of the serie</param>
+    ''' <remarks></remarks>
+    Private Sub AddSerieToGraph(ByVal pGraph As ChartControl, ByVal serieName As String, ByVal viewType As ViewType, ByVal thisColor As Color)
+        pGraph.Series.Add(serieName, viewType)
+
+        With pGraph.Series(serieName)
+            .ShowInLegend = True
+            .LabelsVisibility = DefaultBoolean.False
+            .ArgumentScaleType = ScaleType.Qualitative
+            .View.Color = thisColor
+        End With
+
+        CType(pGraph.Series(serieName).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
+    End Sub
+
+
+    ''' <summary>
     ''' Initializes the Graph
     ''' </summary>
     ''' <remarks>
@@ -166,46 +190,23 @@ Public Class IISEResultsHistoryGraph
         Try
             pGraph.ClearCache()
             pGraph.Series.Clear()
-            pGraph.Legend.Visible = False
+            pGraph.Legend.Visibility = DefaultBoolean.False
             pGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
             pGraph.BackColor = Color.White
             pGraph.AppearanceName = "Light"
 
+            pGraph.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            pGraph.RuntimeHitTesting = True
+            pGraph.SeriesTemplate.ArgumentScaleType = ScaleType.Qualitative
+
             'Na+
-            pGraph.Series.Add("MeanNa", ViewType.Line)
-            With pGraph.Series("MeanNa")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.Green
-            End With
-
+            AddSerieToGraph(pGraph, "MeanNa", ViewType.Line, Color.Green)
             'K+
-            pGraph.Series.Add("MeanK", ViewType.Line)
-            With pGraph.Series("MeanK")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.Blue
-            End With
-
+            AddSerieToGraph(pGraph, "MeanK", ViewType.Line, Color.Blue)
             'Cl-
-            pGraph.Series.Add("MeanCl", ViewType.Line)
-            With pGraph.Series("MeanCl")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.DarkOrange
-            End With
-
+            AddSerieToGraph(pGraph, "MeanCl", ViewType.Line, Color.DarkOrange)
             'Li+
-            pGraph.Series.Add("MeanLi", ViewType.Line)
-            With pGraph.Series("MeanLi")
-                .ShowInLegend = True
-                .Label.Visible = False
-                .PointOptions.PointView = PointView.ArgumentAndValues
-                .View.Color = Color.DarkViolet
-            End With
+            AddSerieToGraph(pGraph, "MeanLi", ViewType.Line, Color.DarkViolet)
 
             Dim myDiagram As New XYDiagram
 
@@ -221,7 +222,7 @@ Public Class IISEResultsHistoryGraph
             myDiagram.Margins.Right = 5
 
             'Set the Title for each axis
-            myDiagram.AxisX.Title.Visible = True
+            myDiagram.AxisX.Title.Visibility = DefaultBoolean.True
             myDiagram.AxisX.Title.Antialiasing = False
             myDiagram.AxisX.Title.TextColor = Color.Black
             myDiagram.AxisX.Title.Alignment = StringAlignment.Center
@@ -233,7 +234,7 @@ Public Class IISEResultsHistoryGraph
             'myDiagram.AxisX.Label.Antialiasing = True
 
 
-            myDiagram.AxisY.Title.Visible = True
+            myDiagram.AxisY.Title.Visibility = DefaultBoolean.True
             myDiagram.AxisY.Title.Antialiasing = False
             myDiagram.AxisY.Title.TextColor = Color.Black
             myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -260,8 +261,8 @@ Public Class IISEResultsHistoryGraph
             mTextDict = New Dictionary(Of String, String)()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels()
             PrepareButtons()
@@ -389,10 +390,10 @@ Public Class IISEResultsHistoryGraph
             Dim aux As Single
             For Each serie As Series In pGraph.Series
                 If serie.Visible Then
-                    aux = (From p In serie.Points Select p.Values(0)).Min
+                    aux = CSng((From p In serie.Points Select p.UserValues(0)).Min)
                     If Not minY.HasValue OrElse aux < minY Then minY = aux
 
-                    aux = (From p In serie.Points Select p.Values(0)).Max
+                    aux = CSng((From p In serie.Points Select p.UserValues(0)).Max)
                     If Not maxY.HasValue OrElse aux > maxY Then maxY = aux
                 End If
             Next
@@ -401,7 +402,8 @@ Public Class IISEResultsHistoryGraph
             Dim yExtra As Single = 1
             If maxY.HasValue AndAlso minY.HasValue Then
                 yExtra += (maxY.Value - minY.Value) * PERCENTAGE
-                myDiagram.AxisY.Range.SetMinMaxValues(minY - yExtra, maxY + yExtra)
+                myDiagram.AxisY.WholeRange.SetMinMaxValues(minY - yExtra, maxY + yExtra)
+                myDiagram.AxisY.VisualRange.SetMinMaxValues(minY - yExtra, maxY + yExtra)
             End If
 
         Catch ex As Exception
@@ -453,8 +455,8 @@ Public Class IISEResultsHistoryGraph
                 '    myLocation = Me.Parent.Location
                 'End If
 
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
                 pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2)

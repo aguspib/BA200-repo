@@ -5,13 +5,10 @@ Imports System.IO
 'Imports System.Configuration
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports System.Drawing
 Imports System.Windows.Forms
@@ -91,19 +88,19 @@ Public Class IRestPointUpdateProc
             'OK Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsOKButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsOKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL AcceptButton
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 11/01/2011 -Path Button.
             auxIconName = GetIconName("OPEN")
             If (auxIconName <> "") Then
-                bsBrowseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsBrowseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
@@ -158,7 +155,7 @@ Public Class IRestPointUpdateProc
     ''' </remarks>
     Private Function ManageVersionComparison(ByVal pVersionComparison As GlobalEnumerates.SATReportVersionComparison) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 
@@ -236,7 +233,7 @@ Public Class IRestPointUpdateProc
                     End If
                     'RH 12/11/2010 tempFolder
 
-                    myGlobal = myUtil.ExtractFromZip(RestorePointPath, tempFolder)
+                    myGlobal = Utilities.ExtractFromZip(RestorePointPath, tempFolder)
 
                     If Not myGlobal.HasError AndAlso Not myGlobal Is Nothing Then
                         'search for the .bak file
@@ -487,12 +484,12 @@ Public Class IRestPointUpdateProc
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim mySATUtil As New SATReportUtilities
 
             'obtain the APP version
             Dim myAppVersion As String
-            myGlobal = myUtil.GetSoftwareVersion()
+            myGlobal = Utilities.GetSoftwareVersion()
             If Not myGlobal.HasError And Not myGlobal Is Nothing Then
                 myAppVersion = CStr(myGlobal.SetDatos)
 
@@ -641,8 +638,8 @@ Public Class IRestPointUpdateProc
             PrepareButtons()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(CurrentLanguage)
@@ -830,11 +827,11 @@ Public Class IRestPointUpdateProc
 
                     'If not error found the export log file and clean application log table.
                     'TR 31/08/2012 -Export the log information saved on DB to Xml file.
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myGlobal = myLogAcciones.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    myGlobal = ApplicationLogManager.ExportLogToXml(mdiAnalyzerCopy.ActiveWorkSession, myLogMaxDays)
                     'If expor to xml OK then delete all records on Application log Table
                     If (Not myGlobal.HasError) Then
-                        myGlobal = myLogAcciones.DeleteAll()
+                        myGlobal = ApplicationLogManager.DeleteAll()
                     Else
                         'DL 31/05/2013
                         'The Reset process will continue even if errors in ExportLogToXML
@@ -993,9 +990,9 @@ Public Class IRestPointUpdateProc
 
             If Not myGlobalDataTO.HasError Then
                 Dim newLanguageID As String = myGlobalDataTO.SetDatos.ToString()
-                Dim currentSession As New GlobalBase
+                'Dim currentSession As New GlobalBase
                 Dim myApplicationInfoSessionTO As New ApplicationInfoSessionTO
-                myApplicationInfoSessionTO = currentSession.GetSessionInfo()
+                myApplicationInfoSessionTO = GlobalBase.GetSessionInfo()
                 'Validate if language is diferent than the current use languae.
                 If Not myApplicationInfoSessionTO.ApplicationLanguage = newLanguageID Then
                     'Initialize session information.

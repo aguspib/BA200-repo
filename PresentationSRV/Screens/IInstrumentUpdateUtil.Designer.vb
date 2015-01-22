@@ -1,7 +1,4 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Controls.UserControls
+﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class IInstrumentUpdateUtil

@@ -1,24 +1,13 @@
 ﻿Option Explicit On
 Option Strict On
-
-Imports System.Xml
+Option Infer On
 Imports System.Windows.Forms
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Controls.UserControls
-Imports LIS.Biosystems.Ax00.LISCommunications
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.DAL.DAO
-
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraPrinting
-Imports DevExpress.XtraEditors
 
 
 Public Class Ax00MainForm
@@ -41,7 +30,7 @@ Public Class Ax00MainForm
     Private Sub bsLogFileViewButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsLogFileViewButton.Click
         Dim myApplicationLogView As New ApplicationLogView
 
-        myApplicationLogView.WorkSessionID = IAx00MainMDI.ActiveWorkSession
+        myApplicationLogView.WorkSessionID = UiAx00MainMDI.ActiveWorkSession
         myApplicationLogView.ShowDialog()
     End Sub
 
@@ -129,7 +118,7 @@ Public Class Ax00MainForm
     End Sub
 
     Private Sub BsButton1_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton1.Click
-        Dim obj As New IAx00MainMDI
+        Dim obj As New UiAx00MainMDI
         obj.ShowDialog()
     End Sub
 
@@ -292,8 +281,8 @@ Public Class Ax00MainForm
                     'resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField)
                     resultData = xlsResults.ExportTestXLS("2013101701", pathname, "Test.xls", "834000134")
                     If resultData.HasError Then
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
 
                         'DL 15/05/2013
                         'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me)

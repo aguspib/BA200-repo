@@ -2,17 +2,8 @@
 Option Explicit On
 
 Imports System.Windows.Forms
-Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-
-Imports PerpetuumSoft.Instrumentation
-Imports PerpetuumSoft.Instrumentation.Windows.Forms
-Imports PerpetuumSoft.Instrumentation.Model
-Imports PerpetuumSoft.Framework.Drawing
 
 
 ''' <summary>

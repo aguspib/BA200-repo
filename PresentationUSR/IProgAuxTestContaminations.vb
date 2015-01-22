@@ -1,10 +1,10 @@
-﻿Imports System.Data.SqlClient
+﻿Option Infer On
+Option Strict On
+Option Explicit On
+
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports System.Configuration
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Controls.UserControls
 
 Public Class IProgAuxTestContaminations
 
@@ -31,7 +31,7 @@ Public Class IProgAuxTestContaminations
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -46,15 +46,15 @@ Public Class IProgAuxTestContaminations
     ''' </remarks>
     Private Sub ScreenLoad()
         Try
-            Dim myLocation As Point = IAx00MainMDI.PointToScreen(Point.Empty)
-            Dim mySize As Size = IAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.PointToScreen(Point.Empty)
+            Dim mySize As Size = UiAx00MainMDI.Size
 
             myNewLocation = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             Me.Location = myNewLocation
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels(currentLanguage)

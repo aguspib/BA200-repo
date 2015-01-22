@@ -1,12 +1,12 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
 
 Public Class IProgCalibrator
@@ -202,8 +202,8 @@ Public Class IProgCalibrator
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim myGlobalBase As New GlobalBase
-            currentLanguage = myGlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim myGlobalbase As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'LocalCurLanguage = currentLanguage
 
@@ -295,58 +295,58 @@ Public Class IProgCalibrator
             'NEW Calibrator
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                AddCalibButon.Image = Image.FromFile(iconPath & auxIconName)
+                AddCalibButon.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(AddCalibButon, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", pLanguageID))
             End If
 
             'EDIT Calibrator and EDIT Calibrator Values
             auxIconName = GetIconName("EDIT")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                EditCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(EditCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
 
-                EditCalTestSampleButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditCalTestSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(EditCalTestSampleButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", pLanguageID))
             End If
 
             'DELETE Calibrators
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                DeleteCalbButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteCalbButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(DeleteCalbButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'PRINT Calibrators Report
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(PrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'SAVE Changes (Calibrators and SAVE Calibrator Values)
             auxIconName = GetIconName("SAVE")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                SaveCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(SaveCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Calibs_SaveCalib", pLanguageID))
 
-                SaveTestSampleCalValue.Image = Image.FromFile(iconPath & auxIconName)
+                SaveTestSampleCalValue.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(SaveTestSampleCalValue, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Calibs_SaveCurve", pLanguageID))
             End If
 
             'CANCEL Changes (Calibrators and SAVE Calibrator Values)
             auxIconName = GetIconName("UNDO")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                CancelCalibButton.Image = Image.FromFile(iconPath & auxIconName)
+                CancelCalibButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(CancelCalibButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
 
-                CancelTestSampleCalValue.Image = Image.FromFile(iconPath & auxIconName)
+                CancelTestSampleCalValue.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(CancelTestSampleCalValue, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
             End If
 
             'CLOSE SCREEN
             auxIconName = GetIconName("CANCEL")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsAcceptButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
         Catch ex As Exception
@@ -2848,16 +2848,16 @@ Public Class IProgCalibrator
 
         Try
             'TR 23/04/2012 -Get the current level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 23/04/2012 -END
 
             ''DL 28/07/2011
             If IsTestParamWinAttribute Then
                 Me.StartPosition = FormStartPosition.Manual
 
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             End If
@@ -2890,8 +2890,8 @@ Public Class IProgCalibrator
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
                 If IsTestParamWinAttribute Then
 
-                    Dim myLocation As Point = IAx00MainMDI.Location
-                    Dim mySize As Size = IAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
 
                     pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2) 'Me.Left
                     pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) ' Me.Top
@@ -4111,7 +4111,7 @@ Public Class IProgCalibrator
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
             'RH 21/12/2011 END
 

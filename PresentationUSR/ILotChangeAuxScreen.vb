@@ -1,12 +1,10 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.BL.Framework
-Imports System.Configuration
 
 Public Class ILotChangeAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -201,13 +199,13 @@ Public Class ILotChangeAuxScreen
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -305,15 +303,15 @@ Public Class ILotChangeAuxScreen
         Try
 
             'DL 28/07/2011
-            Dim myLocation As Point = IAx00MainMDI.Location
-            Dim mySize As Size = IAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
 
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for Screen Buttons
             PrepareButtons()
@@ -373,8 +371,8 @@ Public Class ILotChangeAuxScreen
             Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, _
                                                                                              GetType(WINDOWPOS)),  _
                                                                                              WINDOWPOS)
-            Dim myLocation As Point = IAx00MainMDI.Location
-            Dim mySize As Size = IAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
 
             pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2)
             pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2)

@@ -1,7 +1,10 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports System.IO
 
 Public Class IWarningAfectedElements
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -235,20 +238,20 @@ Public Class IWarningAfectedElements
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Warning PictureBox
             auxIconName = GetIconName("STUS_WITHERRS") 'WARNING") dl 23/03/2012
             If (auxIconName <> "") Then
                 bsWarningPictureBox.ImageLocation = MyBase.IconsPath & auxIconName
-                bsWarningPictureBox.SizeMode = ImageLayout.Stretch
+                bsWarningPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtonsAndPicturesControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -265,8 +268,8 @@ Public Class IWarningAfectedElements
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim().ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim().ToString()
 
             PrepareButtonsAndPicturesControls()
             GetScreenLabels(currentLanguage)
@@ -297,11 +300,11 @@ Public Class IWarningAfectedElements
 
             'For Button ToolTips
             If (TestConcentrationAttribute) Then
-                myScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_No", pLanguageID))
+                myScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_No", pLanguageID))
                 myScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Yes", pLanguageID))
             Else
                 'For Tooltips...
-                myScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
+                myScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
                 myScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", pLanguageID))
             End If
         Catch ex As Exception
@@ -315,7 +318,7 @@ Public Class IWarningAfectedElements
     Private Sub AfectedElementsWarning_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         InitializeScreen()
     End Sub
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Close()
     End Sub
 #End Region

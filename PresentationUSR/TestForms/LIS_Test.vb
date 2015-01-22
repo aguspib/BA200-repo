@@ -1,27 +1,17 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Types.AlarmsDS
-Imports Biosystems.Ax00.Types.AlarmsDS.tfmwAlarmsRow
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Configuration
-Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.PresentationCOM
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports System.Xml
 Imports Biosystems.Ax00.DAL.DAO
 Imports System.Threading
 Imports System.Net.Sockets
-Imports System.Text
 Imports System.Diagnostics
 
 Public Class LIS_Test
@@ -113,10 +103,10 @@ Public Class LIS_Test
 #Region "LIS"
 
     Private Sub BsButton1_Click(sender As Object, e As EventArgs) Handles BsButton1.Click
-        Dim myUtils As New Utilities
+        'Dim Utilities As New Utilities
         Dim ResultData As New GlobalDataTO
         Dim myXML As String = ""
-        Dim myGuid As String = CStr(myUtils.GetNewGUID.SetDatos)
+        Dim myGuid As String = CStr(Utilities.GetNewGUID.SetDatos)
 
         If EncodeComboBox.SelectedItem IsNot Nothing Then
             Select Case EncodeComboBox.SelectedItem.ToString
@@ -472,7 +462,7 @@ Public Class LIS_Test
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 Dim mySavedWSOrderTestsDS As SavedWSOrderTestsDS = DirectCast(resultData.SetDatos, SavedWSOrderTestsDS)
 
-                resultData = myOTD.GetPatientOrderTests(Nothing, IAx00MainMDI.ActiveWorkSession)
+                resultData = myOTD.GetPatientOrderTests(Nothing, UiAx00MainMDI.ActiveWorkSession)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
                     myWorkSessionResultDS = DirectCast(resultData.SetDatos, WorkSessionResultDS)
 

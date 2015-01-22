@@ -368,11 +368,11 @@ Public Class AnalyzerInfo
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(bsEditSNButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(bsSaveSNButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(bsCancelSNButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(bsEditSNButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(bsSaveSNButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(bsCancelSNButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -391,35 +391,35 @@ Public Class AnalyzerInfo
             ' PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 bsPrintButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If File.Exists(iconPath & auxIconName) Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             End If
 
             ' EDIT serial number button
             auxIconName = GetIconName("EDIT")
             If File.Exists(iconPath & auxIconName) Then
-                bsEditSNButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditSNButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'bsEditSNButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
             ' SAVE serial number button
             auxIconName = GetIconName("SAVE")
             If File.Exists(iconPath & auxIconName) Then
-                bsSaveSNButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveSNButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'bsSaveSNButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
             ' CANCEL serial number edition button
             auxIconName = GetIconName("UNDO")
             If File.Exists(iconPath & auxIconName) Then
-                bsCancelSNButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelSNButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'bsCancelSNButton.BackgroundImageLayout = ImageLayout.Center
             End If
 
@@ -1814,14 +1814,14 @@ Public Class AnalyzerInfo
 
     Private Sub CreateAnalyzerInfoFileOutput()
         Dim myPath As String
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myFWInfo As UIRefreshDS.FirmwareValueChangedRow
         Dim myArmInfo As UIRefreshDS.ArmValueChangedRow
         Dim myProbeInfo As UIRefreshDS.ProbeValueChangedRow
         Dim myRotorInfo As UIRefreshDS.RotorValueChangedRow
         Try
             ' Write Results into output file
-            myPath = Application.StartupPath & myGlobalbase.AnalyzerInfoFileOut
+            myPath = Application.StartupPath & GlobalBase.AnalyzerInfoFileOut
 
             If File.Exists(myPath) Then File.Delete(myPath)
             Dim myStreamWriter As StreamWriter = File.CreateText(myPath)
@@ -2982,19 +2982,19 @@ Public Class AnalyzerInfo
 
     Private Sub Startup_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
+        ''Dim myGlobalbase As New GlobalBase
         Try
             Ax00ServiceMainMDI.ActivateMenus(False)
             Me.Cursor = Cursors.WaitCursor
 
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -3117,8 +3117,8 @@ Public Class AnalyzerInfo
                 'obtain needed fw version SGM 22/06/2012
                 Dim myGlobal As New GlobalDataTO
                 Dim mySwVersion As String
-                Dim myUtil As New Utilities
-                myGlobal = myUtil.GetSoftwareVersion()
+                ''Dim myUtil As New Utilities.
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     mySwVersion = myGlobal.SetDatos.ToString
 
@@ -3353,7 +3353,7 @@ Public Class AnalyzerInfo
         Try
             If Not myScreenDelegate Is Nothing Then
                 myScreenDelegate.SerialNumber = Me.bsModelTextBox.Text + Me.bsSerialTextBox.Text
-                Me.bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = MyClass.SpecifiedSerialNumberLength) 'SGM 15/10/2012
+                Me.bsSaveSNButton.Enabled = (myScreenDelegate.SerialNumber.Length = SpecifiedSerialNumberLength) 'SGM 15/10/2012
                 MyClass.IsEditingSN = True
             End If
         Catch ex As Exception

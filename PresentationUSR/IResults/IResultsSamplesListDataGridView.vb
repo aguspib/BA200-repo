@@ -1,30 +1,12 @@
 ﻿Option Explicit On
-'Option Strict On
-
+Option Strict On
+Option Infer On
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
-Imports Biosystems.Ax00.CommunicationsSwFw
+'AG 26/07/2010
 
-Imports System.Text
-Imports System.ComponentModel
-Imports DevExpress.XtraReports.UI
-Imports DevExpress.XtraPrinting
-Imports DevExpress.XtraPrintingLinks
-Imports DevExpress.XtraEditors
-Imports DevExpress.XtraGrid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.XtraGrid.Views.Base
-Imports DevExpress.XtraGrid.Views.Grid
-Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
-Imports DevExpress.XtraGrid.Repository
-Imports DevExpress.XtraEditors.Controls
-Imports DevExpress.Utils
 Imports Biosystems.Ax00.Global.TO 'AG 22/09/2014 - BA-1940
 
 Partial Class IResults
@@ -312,12 +294,13 @@ Partial Class IResults
 
             'AG 22/09/2014 - BA-1940 declare new variables
             Dim patientIDSpecimensList As New List(Of PatientSpecimenTO)
-            Dim linqRes As List(Of PatientSpecimenTO)
+            Dim linqRes As List(Of PatientSpecimenTO) = Nothing
             Dim auxPatientToolTipInfo As String = String.Empty
             Dim updateRow As Boolean = False 'Update an existing item in grid list
             'AG 22/09/2014 - BA-1940
 
             For i As Integer = 0 To 1
+                Dim aux_i = i
                 'AG 22/09/2014 - BA-1940 clear lists and dictionary when changes the priority
                 addedPatients.Clear()
                 patientIDSpecimensList.Clear()
@@ -325,7 +308,7 @@ Partial Class IResults
 
                 SamplesList = (From row In ExecutionsResultsDS.vwksWSExecutionsResults _
                                Where row.SampleClass = "PATIENT" _
-                               AndAlso row.StatFlag = StatFlag(i) _
+                               AndAlso row.StatFlag = StatFlag(aux_i) _
                                AndAlso row.RerunNumber = 1 _
                                Select row).ToList()
 
@@ -354,7 +337,7 @@ Partial Class IResults
                         RowIndex += 1
                         If RowIndex = dgv.Rows.Count Then dgv.Rows.Add()
 
-                        dgv("STAT", RowIndex).Value = SampleIconList.Images(i)
+                        dgv("STAT", RowIndex).Value = SampleIconList.Images(aux_i)
 
                         'BT #1667 - Get value of Patient First and Last Name (if both of them have a hyphen as value, ignore these 
                         '           fields and shown only the PatientID
@@ -410,7 +393,7 @@ Partial Class IResults
                         If linqRes.Count = 0 Then
                             Dim newItem As New PatientSpecimenTO
                             newItem.patientID = sampleRow.PatientID
-                            newItem.UpdateSpecimenList(dgv("PatientID", RowIndex).Value)
+                            newItem.UpdateSpecimenList(CStr(dgv("PatientID", RowIndex).Value))
                             newItem.RowIndex = RowIndex
                             If (sampleRow.PatientID.Trim <> myPatientName.Trim AndAlso myPatientName.Trim <> String.Empty) Then
                                 auxPatientToolTipInfo = String.Format("({0}) - {1}", sampleRow.PatientID.Trim, myPatientName.Trim)
@@ -440,41 +423,42 @@ Partial Class IResults
                     ElseIf updateRow Then
                         'Get the row in grid
                         If linqRes.Count > 0 Then
-                            dgv("PatientID", linqRes(0).RowIndex).Value &= ", " & sampleRow.SpecimenIDList
+                            Dim auxStr = dgv("PatientID", linqRes(0).RowIndex).Value.ToString
+                            dgv("PatientID", linqRes(0).RowIndex).Value = auxStr & ", " & sampleRow.SpecimenIDList
                             dgv("PatientID", linqRes(0).RowIndex).ToolTipText &= ", " & sampleRow.SpecimenIDList
 
                             linqRes(0).UpdateSpecimenList(sampleRow.SpecimenIDList) 'Add specimen to the TO list
                         End If
                         'AG 22/09/2014 - BA-1940
 
-                        End If
+                    End If
 
-                        'Update Report Print available and HIS export icons
-                        If sampleRow.OrderStatus = "CLOSED" AndAlso existsRow Then
-                            'Print available
-                            If sampleRow.PrintAvailable Then
-                                'DL 09/11/2010
-                                dgv("Print", RowIndex).Value = PrintImage
-                                dgv("Print", RowIndex).ToolTipText = labelReportPrintAvailable
-                            Else
-                                dgv("Print", RowIndex).Value = NoImage
-                                dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable
-                            End If
-
-                            'HIS sent
-                            If sampleRow.HIS_Sent Then
-                                dgv("HISExport", RowIndex).Value = OKImage
-                                dgv("HISExport", RowIndex).ToolTipText = labelHISSent '"HIS sent"
-                            Else
-                                dgv("HISExport", RowIndex).Value = NoImage
-                                dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
-                            End If
+                    'Update Report Print available and HIS export icons
+                    If sampleRow.OrderStatus = "CLOSED" AndAlso existsRow Then
+                        'Print available
+                        If sampleRow.PrintAvailable Then
+                            'DL 09/11/2010
+                            dgv("Print", RowIndex).Value = PrintImage
+                            dgv("Print", RowIndex).ToolTipText = labelReportPrintAvailable
                         Else
                             dgv("Print", RowIndex).Value = NoImage
-                            dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable '"Report printing NOT available"
+                            dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable
+                        End If
+
+                        'HIS sent
+                        If sampleRow.HIS_Sent Then
+                            dgv("HISExport", RowIndex).Value = OKImage
+                            dgv("HISExport", RowIndex).ToolTipText = labelHISSent '"HIS sent"
+                        Else
                             dgv("HISExport", RowIndex).Value = NoImage
                             dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
                         End If
+                    Else
+                        dgv("Print", RowIndex).Value = NoImage
+                        dgv("Print", RowIndex).ToolTipText = labelReportPrintNOTAvailable '"Report printing NOT available"
+                        dgv("HISExport", RowIndex).Value = NoImage
+                        dgv("HISExport", RowIndex).ToolTipText = labelHISNOTSent '"HIS NOT sent"
+                    End If
                 Next sampleRow
 
                 'AG 22/09/2014 - BA-1940 finally complete the tooltip in list with (PatID) - pat name
@@ -483,7 +467,7 @@ Partial Class IResults
                 Next
                 'AG 22/09/2014 - BA-1940
 
-            Next i
+            Next
             Debug.Print("IResults.UpdateSamplesListDataGrid (Update patient list): " & Now.Subtract(startTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 21/06/2012 - time estimation
 
             'AG 22/09/2014 - BA-1940 - release memory

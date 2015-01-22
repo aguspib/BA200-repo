@@ -1,4 +1,6 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿Imports DevExpress.Utils
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class IResultsAbsCurve
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
@@ -627,7 +629,7 @@ Partial Class IResultsAbsCurve
         Me.ResultChartControl.Name = "ResultChartControl"
         Me.ResultChartControl.PaletteName = "Nature Colors"
         Me.ResultChartControl.SeriesSerializable = New DevExpress.XtraCharts.Series(-1) {}
-        SideBySideBarSeriesLabel1.LineVisible = True
+        SideBySideBarSeriesLabel1.LineVisibility = DefaultBoolean.True
         Me.ResultChartControl.SeriesTemplate.Label = SideBySideBarSeriesLabel1
         Me.ResultChartControl.Size = New System.Drawing.Size(693, 483)
         Me.ResultChartControl.TabIndex = 191

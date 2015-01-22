@@ -3,7 +3,6 @@ Option Strict On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
@@ -214,7 +213,7 @@ Public Class ILevelDetectionTest
                 For Each P As UIRefreshDS.ProbeValueChangedRow In myProbeValueChangedDT.Rows
 
                     Dim myFreqValue As Single = P.DetectionFrequency
-                    Dim myDisplayLabel As Label
+                    Dim myDisplayLabel As Label = Nothing
                     Dim myArm As LevelDetectionTestDelegate.Arms
 
                     Select Case P.ProbeID.ToUpperBS.Trim  ' ToUpper.Trim
@@ -360,8 +359,8 @@ Public Class ILevelDetectionTest
             Dim MLRD As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsFrequencyButton, MLRD.GetResourceText(Nothing, "SRV_BTN_ReadFrequency", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsDetectionButton, MLRD.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsFrequencyButton, MLRD.GetResourceText(Nothing, "SRV_BTN_ReadFrequency", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsDetectionButton, MLRD.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
 
 
         Catch ex As Exception
@@ -387,21 +386,21 @@ Public Class ILevelDetectionTest
             ''ADJUST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsFrequencyButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsFrequencyButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Me.BsFrequencyButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''SAVE Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsDetectionButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsDetectionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Me.BsDetectionButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -896,7 +895,7 @@ Public Class ILevelDetectionTest
     Private Sub SetFrequencyTooltip(ByVal pArm As LevelDetectionTestDelegate.Arms, ByVal pIsOut As Boolean)
         Try
             Dim MLRD As New MultilanguageResourcesDelegate
-            Dim myLabel As Label
+            Dim myLabel As Label = Nothing
 
             Select Case pArm
                 Case LevelDetectionTestDelegate.Arms.SAMPLE : myLabel = Me.BsFreqSampleValueLabel
@@ -906,9 +905,9 @@ Public Class ILevelDetectionTest
 
             If myLabel IsNot Nothing Then
                 If pIsOut Then
-                    MyBase.bsScreenToolTips.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_OUT_LIMITS", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_OUT_LIMITS", currentLanguage))
                 Else
-                    MyBase.bsScreenToolTips.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_IN_LIMITS", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(myLabel, MLRD.GetResourceText(Nothing, "LBL_SRV_FREQ_IN_LIMITS", currentLanguage))
                 End If
             End If
 
@@ -1156,7 +1155,7 @@ Public Class ILevelDetectionTest
 
     Private Sub IlevelDetectionTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
 
             MyBase.MyBase_Load(sender, e)
@@ -1164,7 +1163,7 @@ Public Class ILevelDetectionTest
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            MyClass.currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            MyClass.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             MyClass.GetScreenLabels()

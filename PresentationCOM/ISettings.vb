@@ -3,10 +3,7 @@ Option Strict Off
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
-Imports System.IO
 
 Imports Biosystems.Ax00.CommunicationsSwFw
 
@@ -287,7 +284,7 @@ Public Class ISettings
     ''' <remarks>
     ''' Created by:  DL 11/07/2011
     ''' </remarks>    
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Try
             CancelEdition()
         Catch ex As Exception
@@ -563,8 +560,8 @@ Public Class ISettings
     Private Sub ISettings_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         Try
             If (e.KeyCode = Keys.Escape) Then
-                If (CancelButton.Enabled) Then
-                    CancelButton.PerformClick()
+                If (ButtonCancel.Enabled) Then
+                    ButtonCancel.PerformClick()
                 Else
                     CloseButton.PerformClick()
                 End If
@@ -706,8 +703,8 @@ Public Class ISettings
             If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
                 myVersionsDS = CType(myGlobal.SetDatos, VersionsDS)
 
-                Dim myUtil As New Utilities
-                myGlobal = myUtil.GetSoftwareVersion()
+                'Dim myUtil As New Utilities.
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     Dim SwVersion As String = myGlobal.SetDatos.ToString
 
@@ -745,8 +742,8 @@ Public Class ISettings
             Cursor = Cursors.WaitCursor
             '
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'DL 09/09/2011
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -825,7 +822,7 @@ Public Class ISettings
 
             ' Fot tooltips
             bsScreenToolTips.SetToolTip(CloseButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(EditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
             bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
 
@@ -855,31 +852,31 @@ Public Class ISettings
             ' Close Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                CloseButton.Image = Image.FromFile(iconPath & auxIconName)
+                CloseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Edit EditButton
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                EditButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Save SaveButton
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Undo Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
@@ -1135,7 +1132,7 @@ Public Class ISettings
 
             If (pInitializeListView) Then
                 EditButton.Enabled = True
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 SaveButton.Enabled = False
                 FilterComboBox.Enabled = True
             End If
@@ -1155,7 +1152,7 @@ Public Class ISettings
             If SettingsListView.SelectedItems.Count > 0 AndAlso originalselectedindex <> SettingsListView.SelectedItems.Item(0).Index Then
                 EditButton.Enabled = True
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 FilterComboBox.Enabled = True
 
                 If SettingsListView.SelectedItems.Item(0).Text.ToString = LblLimits Then
@@ -1448,7 +1445,7 @@ Public Class ISettings
 
                     EditButton.Enabled = True
                     SaveButton.Enabled = False
-                    CancelButton.Enabled = False
+                    ButtonCancel.Enabled = False
                     FilterComboBox.Enabled = True
                     EditionMode = False
 
@@ -1469,7 +1466,7 @@ Public Class ISettings
 
                 EditButton.Enabled = True
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 FilterComboBox.Enabled = True
                 EditionMode = False
             End If
@@ -1499,7 +1496,7 @@ Public Class ISettings
             EditionMode = True
             EditButton.Enabled = False
             SaveButton.Enabled = True
-            CancelButton.Enabled = True
+            ButtonCancel.Enabled = True
             FilterComboBox.Enabled = False
             ' XBC 14/09/2012
             Me.BsFwVersionTextBox.Enabled = True
@@ -1609,7 +1606,7 @@ Public Class ISettings
                 If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DISCARD_PENDING_CHANGES.ToString) = Windows.Forms.DialogResult.Yes) Then
                     EditButton.Enabled = True
                     SaveButton.Enabled = False
-                    CancelButton.Enabled = False
+                    ButtonCancel.Enabled = False
                     FilterComboBox.Enabled = True
 
                     If SettingsListView.SelectedItems.Item(0).Text.ToString = LblLimits Then
@@ -1687,7 +1684,7 @@ Public Class ISettings
                 EditionMode = False
                 EditButton.Enabled = True
                 SaveButton.Enabled = False
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 FilterComboBox.Enabled = True
 
                 If SettingsListView.SelectedItems.Item(0).Text.ToString = LblLimits Then

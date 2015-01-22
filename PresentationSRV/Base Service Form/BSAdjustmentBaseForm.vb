@@ -1,22 +1,24 @@
 ﻿Option Explicit On
 Option Strict On
 
+Imports System.Data.SqlClient
+Imports System.IO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.DAL.DAO
-Imports System.IO
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 
 Imports Biosystems.Ax00.Controls.UserControls
+Imports Biosystems.Ax00.PresentationCOM
+Imports DevExpress.XtraEditors
 
 
 Public Class BSAdjustmentBaseForm
-    Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
+    Inherits BSBaseForm
 
 #Region "Declarations"
 
@@ -28,7 +30,7 @@ Public Class BSAdjustmentBaseForm
     Protected Friend myAllAdjustmentsDS As SRVAdjustmentsDS 'SGM 27/01/11
     'Protected Friend SelectedAdjustmentsDS As SRVAdjustmentsDS 'SGM 22/09/2011
     Protected Friend myAdjustmentsDelegate As FwAdjustmentsDelegate 'SGM 27/01/11
-    
+
 
     Protected Friend CurrentUserNumericalLevel As Integer = -1   'Initial value when NO userlevel exists
 
@@ -63,13 +65,13 @@ Public Class BSAdjustmentBaseForm
     Private CloseWithoutShutDownRequestedByMDIAttr As Boolean = False
 
     'SGM 04/06/2012
-    Protected Friend ProgressBar As DevExpress.XtraEditors.MarqueeProgressBarControl
+    Protected Friend ProgressBar As MarqueeProgressBarControl
 
 #End Region
 
 #Region "Constructor"
 
-   
+
 
     Protected Friend Sub New()
 
@@ -240,7 +242,7 @@ Public Class BSAdjustmentBaseForm
 
 #Region "Common Event Handlers"
 
-    Protected Friend Sub MyBase_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+    Protected Friend Sub MyBase_FormClosed(ByVal sender As Object, ByVal e As FormClosedEventArgs) Handles Me.FormClosed
         MyClass.myFwScriptDelegate = Nothing
     End Sub
 
@@ -251,7 +253,7 @@ Public Class BSAdjustmentBaseForm
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Protected Friend Sub MyBase_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Protected Friend Sub MyBase_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
         Try
             Cursor = Cursors.WaitCursor 'SGM 15/11/2012
 
@@ -270,7 +272,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & " MyBase_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
@@ -325,7 +327,7 @@ Public Class BSAdjustmentBaseForm
     '        End If
 
     '    Catch ex As Exception
-    '        Dim myLogAcciones As New ApplicationLogManager()
+    '        'Dim myLogAcciones As New ApplicationLogManager()
     '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".OnDataReceivedFromAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '    End Try
     'End Sub
@@ -1249,7 +1251,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & " GetAdjustControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
             Return Nothing
         End Try
     End Function
@@ -1291,7 +1293,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & " SetAdjustmentItems ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
@@ -1330,31 +1332,31 @@ Public Class BSAdjustmentBaseForm
                             'Error Message 
                             myScreenLayout.MessagesPanel.Label.Text = msgText
                             auxIconName = GetIconName("CANCELF")
-                            Exists = System.IO.File.Exists(iconPath & auxIconName)
+                            Exists = File.Exists(iconPath & auxIconName)
 
                         ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "Information") Then
                             'Information Message 
                             myScreenLayout.MessagesPanel.Label.Text = msgText
                             auxIconName = GetIconName("INFO")
-                            Exists = System.IO.File.Exists(iconPath & auxIconName)
+                            Exists = File.Exists(iconPath & auxIconName)
 
                         ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "Warning") Then
                             'Warning
                             myScreenLayout.MessagesPanel.Label.Text = msgText
                             auxIconName = GetIconName("STUS_WITHERRS") 'WARNING")dl 23/03/2012
-                            Exists = System.IO.File.Exists(iconPath & auxIconName)
+                            Exists = File.Exists(iconPath & auxIconName)
 
                         ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "OK") Then
                             'Warning
                             myScreenLayout.MessagesPanel.Label.Text = msgText
                             auxIconName = GetIconName("ACCEPTF")
-                            Exists = System.IO.File.Exists(iconPath & auxIconName)
+                            Exists = File.Exists(iconPath & auxIconName)
 
                         ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "Working") Then
                             'Warning
                             myScreenLayout.MessagesPanel.Label.Text = msgText
                             auxIconName = GetIconName("GEAR")
-                            Exists = System.IO.File.Exists(iconPath & auxIconName)
+                            Exists = File.Exists(iconPath & auxIconName)
                         End If
 
                     End If
@@ -1370,12 +1372,12 @@ Public Class BSAdjustmentBaseForm
                     End If
 
                     If Exists Then
-                        If System.IO.File.Exists(iconPath & auxIconName) Then
-                            Dim myUtil As New Utilities
-                            Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-                            myGlobalDataTO = myUtil.ResizeImage(myImage, New Size(20, 20))
+                        If File.Exists(iconPath & auxIconName) Then
+                            ''Dim myUtil As New Utilities.
+                            Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                            myGlobalDataTO = Utilities.ResizeImage(myImage, New Size(20, 20))
                             If Not myGlobalDataTO.HasError And myGlobalDataTO.SetDatos IsNot Nothing Then
-                                myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobalDataTO.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                             Else
                                 myScreenLayout.MessagesPanel.Icon.BackgroundImage = myImage
                             End If
@@ -1409,7 +1411,7 @@ Public Class BSAdjustmentBaseForm
     Protected Friend Function DisplayLabel(ByVal pMessageType As String, ByVal pLabelID As String, Optional ByVal p2ndLabelID As String = "") As GlobalDataTO
         Dim resultData As New GlobalDataTO
         Try
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
             Dim MLRD As New MultilanguageResourcesDelegate
             Dim myGlobal As New GlobalDataTO
 
@@ -1421,13 +1423,13 @@ Public Class BSAdjustmentBaseForm
             'obtain the connection
             myGlobal = DAOBase.GetOpenDBConnection(Nothing)
             If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
-                dbConnection = DirectCast(myGlobal.SetDatos, SqlClient.SqlConnection)
+                dbConnection = DirectCast(myGlobal.SetDatos, SqlConnection)
 
                 If dbConnection IsNot Nothing Then
 
                     'obtain the current language
-                    Dim myLocalBase As New GlobalBase
-                    Dim LanguageID As String = myLocalBase.GetSessionInfo.ApplicationLanguage
+                    'Dim myLocalBase As New GlobalBase
+                    Dim LanguageID As String = GlobalBase.GetSessionInfo.ApplicationLanguage
 
                     'Get type and multilanguage text for the informed Message
                     Dim msgText As String = ""
@@ -1445,37 +1447,37 @@ Public Class BSAdjustmentBaseForm
                             Case "error"
                                 myScreenLayout.MessagesPanel.Label.Text = msgText
                                 auxIconName = GetIconName("CANCELF")
-                                Exists = System.IO.File.Exists(iconPath & auxIconName)
+                                Exists = File.Exists(iconPath & auxIconName)
 
                             Case "information"
                                 myScreenLayout.MessagesPanel.Label.Text = msgText
                                 auxIconName = GetIconName("INFO")
-                                Exists = System.IO.File.Exists(iconPath & auxIconName)
+                                Exists = File.Exists(iconPath & auxIconName)
 
                             Case "warning"
                                 myScreenLayout.MessagesPanel.Label.Text = msgText
                                 auxIconName = GetIconName("STUS_WITHERRS") 'WARNING")dl 23/03/2012
-                                Exists = System.IO.File.Exists(iconPath & auxIconName)
+                                Exists = File.Exists(iconPath & auxIconName)
 
                             Case "ok"
                                 myScreenLayout.MessagesPanel.Label.Text = msgText
                                 auxIconName = GetIconName("ACCEPTF")
-                                Exists = System.IO.File.Exists(iconPath & auxIconName)
+                                Exists = File.Exists(iconPath & auxIconName)
 
                             Case "working"
                                 myScreenLayout.MessagesPanel.Label.Text = msgText
                                 auxIconName = GetIconName("GEAR")
-                                Exists = System.IO.File.Exists(iconPath & auxIconName)
+                                Exists = File.Exists(iconPath & auxIconName)
 
                         End Select
 
                         If Exists Then
-                            If System.IO.File.Exists(iconPath & auxIconName) Then
-                                Dim myUtil As New Utilities
-                                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-                                myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
+                            If File.Exists(iconPath & auxIconName) Then
+                                ''Dim myUtil As New Utilities.
+                                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                                myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
                                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-                                    myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobal.SetDatos, Image) 'Image.FromFile(iconPath & auxIconName)
+                                    myScreenLayout.MessagesPanel.Icon.BackgroundImage = CType(myGlobal.SetDatos, Image) 'ImageUtilities.ImageFromFile(iconPath & auxIconName)
                                 Else
                                     myScreenLayout.MessagesPanel.Icon.BackgroundImage = myImage
                                 End If
@@ -1550,18 +1552,18 @@ Public Class BSAdjustmentBaseForm
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Try
 
             Dim myButtonImage As Image
 
             auxIconName = GetIconName(pImageName)
-            If System.IO.File.Exists(iconPath & auxIconName) Then
+            If File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
+                myGlobal = Utilities.ResizeImage(myImage, New Size(pWidth, pHeight))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myButtonImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -1575,7 +1577,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetButtonImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SetButtonImage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyBase.ShowMessage(Me.Name & ".SetButtonImage", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
@@ -1594,7 +1596,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetHWElementsName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage(Me.Name & ".GetHWElementsName", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyClass.ShowMessage(Me.Name & ".GetHWElementsName", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
         Return res
@@ -1608,13 +1610,13 @@ Public Class BSAdjustmentBaseForm
     Protected Friend Sub GetUserNumericalLevel()
 
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim res As Integer = -1
 
         Try
             'Get the current user level
             Dim CurrentUserLevel As String = ""
-            CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             Dim myUsersLevel As New UsersLevelDelegate
             If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
                 myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -1624,7 +1626,7 @@ Public Class BSAdjustmentBaseForm
             End If
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetHWElementsName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage(Me.Name & ".GetHWElementsName", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyClass.ShowMessage(Me.Name & ".GetHWElementsName", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
 
@@ -1658,11 +1660,11 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".ActivateMDIMenusButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage(Me.Name & ".ActivateMDIMenusButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+            MyClass.ShowMessage(Me.Name & ".ActivateMDIMenusButtons", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
-    
+
 
 #Region "MustOverride Methods"
 
@@ -1735,10 +1737,10 @@ Public Class BSAdjustmentBaseForm
             myAllAdjustmentsDS = Nothing
             myAdjustmentsDelegate = Nothing
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             MyBase.CreateLogActivity(ex.Message, Me.Name & " RequestAdjustmentsMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
     End Function
@@ -1752,9 +1754,9 @@ Public Class BSAdjustmentBaseForm
     '        'REQUEST ADJUSTMENTS TO ANALYZER BY CORRESPONDING SCRIPT
     '        'A - SIMULATE 
     '        Dim myData As String = ""
-    '        Dim myGlobalbase As New GlobalBase
+    '        'Dim myGlobalbase As New GlobalBase
     '        Dim objReader As System.IO.StreamReader
-    '        Dim path As String = Application.StartupPath & myGlobalbase.FwAdjustmentsFile
+    '        Dim path As String = Application.StartupPath & GlobalBase.FwAdjustmentsFile
     '        objReader = New System.IO.StreamReader(path)
     '        myData = objReader.ReadToEnd()
     '        objReader.Close()
@@ -1813,10 +1815,10 @@ Public Class BSAdjustmentBaseForm
         Catch ex As Exception
             AdjustmentsObtainedFromAnalyzer = False
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             MyBase.CreateLogActivity(ex.Message, Me.Name & " SimulateRequestAdjustmentsFromAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
     End Function
@@ -1844,10 +1846,10 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             MyBase.CreateLogActivity(ex.Message, Me.Name & " UpdateAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
         MyClass.ActivateMDIMenusButtons(True) 'SGM 28/09/2011
@@ -1865,22 +1867,23 @@ Public Class BSAdjustmentBaseForm
 
 #Region "Overriden Methods"
 
-    Public Overrides Function ShowMessage(ByVal pWindowTitle As String, _
-                                          ByVal pMessageID As String, _
-                                          Optional ByVal pSystemMessageText As String = "", _
-                                          Optional ByVal pOwnerWindow As System.Windows.Forms.IWin32Window = Nothing, _
-                                          Optional ByVal pTextParameters As List(Of String) = Nothing, _
-                                          Optional ByVal pAditionalText As String = "", _
-                                          Optional ByVal pMessageType As String = "") As DialogResult
+    'This does the same in the base class, except that in the base class it does not has the risk of infinite recursion. commented out:
+    'Public Overrides Function ShowMessage(ByVal pWindowTitle As String, _
+    '                                      ByVal pMessageID As String, _
+    '                                      Optional ByVal pSystemMessageText As String = "", _
+    '                                      Optional ByVal pOwnerWindow As IWin32Window = Nothing, _
+    '                                      Optional ByVal pTextParameters As List(Of String) = Nothing, _
+    '                                      Optional ByVal pAditionalText As String = "", _
+    '                                      Optional ByVal pMessageType As String = "") As DialogResult
 
-        Try
-            Return MyBase.ShowMessage(My.Application.Info.ProductName, pMessageID, pSystemMessageText, pOwnerWindow)
-        Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " ShowMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("ShowMessage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
-            Return Nothing
-        End Try
-    End Function
+    '    Try
+    '        Return MyBase.ShowMessage(My.Application.Info.ProductName, pMessageID, pSystemMessageText, pOwnerWindow)
+    '    Catch ex As Exception
+    '        MyBase.CreateLogActivity(ex.Message, Me.Name & " ShowMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        MyClass.ShowMessage("ShowMessage", Messages.SYSTEM_ERROR.ToString, ex.Message) '<-- Infinite recursion chance!!! 
+    '        Return Nothing
+    '    End Try
+    'End Function
 
 #End Region
 
@@ -1905,8 +1908,8 @@ Public Class BSAdjustmentBaseForm
             Return mySortedList
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " GetAdjustControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            CreateLogActivity(ex.Message, Me.Name & " GetAdjustControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
             Return Nothing
         End Try
     End Function
@@ -1946,7 +1949,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & " LookForAdjustmentAreas ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
             Throw ex
         End Try
     End Sub
@@ -1975,7 +1978,7 @@ Public Class BSAdjustmentBaseForm
             Next
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & " LookForAdjustControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
             Throw ex
         End Try
     End Sub
@@ -2409,7 +2412,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & " RefreshModes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
     End Sub
@@ -2419,7 +2422,7 @@ Public Class BSAdjustmentBaseForm
 #Region "Screen Events"
 
     'force the info XPS margins to 0
-    Private Sub BSAdjustmentBaseForm_Paint(ByVal sender As Object, ByVal e As System.Windows.Forms.PaintEventArgs) Handles Me.Paint
+    Private Sub BSAdjustmentBaseForm_Paint(ByVal sender As Object, ByVal e As PaintEventArgs) Handles Me.Paint
         Try
             If MyClass.myScreenLayout.InfoPanel.InfoXPS IsNot Nothing Then
                 MyClass.myScreenLayout.InfoPanel.InfoXPS.HorizontalPageMargin = 0
@@ -2430,7 +2433,7 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & " MyBase_Paint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
@@ -2443,7 +2446,7 @@ Public Class BSAdjustmentBaseForm
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_SetPointOutOfRange(ByVal sender As System.Object)
+    Private Sub BsAdjustControl_SetPointOutOfRange(ByVal sender As Object)
         Try
             Dim myAdjustControl As BSAdjustControl = CType(sender, BSAdjustControl)
             If Not myAdjustControl Is Nothing Then
@@ -2463,7 +2466,7 @@ Public Class BSAdjustmentBaseForm
     ''' <param name="sender"></param>
     ''' <param name="Value">setpoint value</param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_AbsoluteSetPointReleased(ByVal sender As System.Object, ByVal Value As System.Double)
+    Private Sub BsAdjustControl_AbsoluteSetPointReleased(ByVal sender As Object, ByVal Value As Double)
         Try
 
             'Me.Enabled = False
@@ -2482,7 +2485,7 @@ Public Class BSAdjustmentBaseForm
     ''' <param name="sender"></param>
     ''' <param name="Value">setpoint value</param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_RelativeSetPointReleased(ByVal sender As System.Object, ByVal Value As System.Double)
+    Private Sub BsAdjustControl_RelativeSetPointReleased(ByVal sender As Object, ByVal Value As Double)
         Try
 
             FwActionRequested = True
@@ -2498,7 +2501,7 @@ Public Class BSAdjustmentBaseForm
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_HomeRequestReleased(ByVal sender As System.Object)
+    Private Sub BsAdjustControl_HomeRequestReleased(ByVal sender As Object)
         Try
             'Me.Enabled = False
             FwActionRequested = True
@@ -2531,7 +2534,7 @@ Public Class BSAdjustmentBaseForm
     ''' <param name="sender"></param>
     ''' <param name="pEditionMode"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_EditionModeChanged(ByVal sender As System.Object, ByVal pEditionMode As System.Boolean)
+    Private Sub BsAdjustControl_EditionModeChanged(ByVal sender As Object, ByVal pEditionMode As Boolean)
         Try
             Dim myControl As BSAdjustControl = CType(sender, BSAdjustControl)
 
@@ -2552,7 +2555,7 @@ Public Class BSAdjustmentBaseForm
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_FocusReceived(ByVal sender As System.Object)
+    Private Sub BsAdjustControl_FocusReceived(ByVal sender As Object)
         Try
             myFocusedAdjustControl = CType(sender, BSAdjustControl)
 
@@ -2567,7 +2570,7 @@ Public Class BSAdjustmentBaseForm
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_FocusLost(ByVal sender As System.Object)
+    Private Sub BsAdjustControl_FocusLost(ByVal sender As Object)
         Try
             'myFocusedAdjustControl = Nothing
 
@@ -2582,7 +2585,7 @@ Public Class BSAdjustmentBaseForm
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_TabRequest(ByVal sender As System.Object)
+    Private Sub BsAdjustControl_TabRequest(ByVal sender As Object)
         Try
             If MyClass.myAdjustControls IsNot Nothing Then
                 MyClass.AdjControlTabRequested = True
@@ -2608,7 +2611,7 @@ Public Class BSAdjustmentBaseForm
     ''' </summary>
     ''' <param name="sender"></param>
     ''' <remarks>Created by SG 03/01/11</remarks>
-    Private Sub BsAdjustControl_BackTabRequest(ByVal sender As System.Object)
+    Private Sub BsAdjustControl_BackTabRequest(ByVal sender As Object)
         Try
             If MyClass.myAdjustControls IsNot Nothing Then
                 MyClass.AdjControlBackTabRequested = True
@@ -2721,7 +2724,7 @@ Public Class BSAdjustmentBaseForm
             Dim y As Integer
 
             Dim myCurrentControl As BSAdjustControl
-            Dim myNextControl As Control
+            Dim myNextControl As Control = Nothing
             If myFocusedAdjustControl IsNot Nothing Then
                 For x As Integer = 0 To myAdjustControls.Count - 1 Step 1
                     myCurrentControl = myAdjustControls(x)
@@ -2787,10 +2790,10 @@ Public Class BSAdjustmentBaseForm
                 If myDocs IsNot Nothing Then
                     Dim myDocRow As SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow = CType(myDocs.srv_tfmwInfoDocuments.Rows(0), SRVInfoDocumentsDS.srv_tfmwInfoDocumentsRow)
 
-                    Dim myGlobalbase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
 
                     If myDocRow.DocumentPath.Length > 0 Then
-                        myDocumentPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.DocumentPath
+                        myDocumentPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.DocumentPath
 
                         Dim isScrollable As Boolean = myDocRow.Expandable
 
@@ -2798,7 +2801,7 @@ Public Class BSAdjustmentBaseForm
                         If myDocumentPath.Length > 0 Then
                             If myDocumentPath.Length > 0 Then
                                 'show document
-                                If System.IO.File.Exists(myDocumentPath) Then
+                                If File.Exists(myDocumentPath) Then
                                     If pInfoTextControl IsNot Nothing Then
                                         With pInfoTextControl
 
@@ -2849,10 +2852,10 @@ Public Class BSAdjustmentBaseForm
                                 End If
                             Else
                                 myGlobal.HasError = True
-                                myGlobal.ErrorCode = GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString
+                                myGlobal.ErrorCode = Messages.MASTER_DATA_MISSING.ToString
 
 
-                                MyBase.CreateLogActivity(GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString, Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                                MyBase.CreateLogActivity(Messages.MASTER_DATA_MISSING.ToString, Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                                 'Myclass.ShowMessage("Error", GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString)
                             End If
 
@@ -2862,7 +2865,7 @@ Public Class BSAdjustmentBaseForm
 
                     'video NOT V1
                     'If myDocRow.VideoPath.Length > 0 Then
-                    '    myVideoPath = Application.StartupPath & myGlobalbase.ServiceInfoDocsPath & myDocRow.VideoPath
+                    '    myVideoPath = Application.StartupPath & GlobalBase.ServiceInfoDocsPath & myDocRow.VideoPath
                     '    If File.Exists(myVideoPath) Then
 
                     '    Else
@@ -2879,10 +2882,10 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             MyBase.CreateLogActivity(ex.Message, Me.Name & " GetInformationText ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
         Return myGlobal
@@ -2921,8 +2924,8 @@ Public Class BSAdjustmentBaseForm
                     auxIconName = GetIconName("RIGHT")
                 End If
 
-                If System.IO.File.Exists(iconPath & auxIconName) Then
-                    pExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                If File.Exists(iconPath & auxIconName) Then
+                    pExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                     pExpandButton.BackgroundImageLayout = ImageLayout.Stretch
                 End If
 
@@ -2934,10 +2937,10 @@ Public Class BSAdjustmentBaseForm
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             MyBase.CreateLogActivity(ex.Message, Me.Name & " ExpandInformation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyClass.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            MyClass.ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
         Application.DoEvents()
@@ -2985,6 +2988,17 @@ Public Class BSAdjustmentBaseForm
         Application.DoEvents()
     End Sub
 #End Region
+
+    <Obsolete("To access the tool tips control for this form, use ScreenTooltips property instead.")> _
+    Friend Overridable Function bsScreenTooltips() As BSToolTip
+        Return ScreenTooltips()
+    End Function
+
+    Friend Overridable Function ScreenTooltips() As BSToolTip
+        Return bsScreenToolTipsControl
+    End Function
+
+    'Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
 
 End Class
 

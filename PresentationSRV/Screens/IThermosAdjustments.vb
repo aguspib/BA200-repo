@@ -110,7 +110,7 @@ Public Class IThermosAdjustments
 
     '        Try
     '            Dim myGlobal As New GlobalDataTO
-    '            Dim myUtil As New Utilities
+    '            'Dim myUtil As New Utilities.
     '            Dim auxIconName As String = String.Empty
     '            Dim iconPath As String = MyBase.IconsPath
     '            Dim myAuxButtonImage As Image
@@ -118,7 +118,7 @@ Public Class IThermosAdjustments
     '            If value Then
     '                auxIconName = GetIconName("REDO")
     '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = Image.FromFile(iconPath & auxIconName)
+    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
     '                Else
     '                    myAuxButtonImage = Nothing
     '                End If
@@ -127,7 +127,7 @@ Public Class IThermosAdjustments
     '            Else
     '                auxIconName = GetIconName("UNDO")
     '                If System.IO.File.Exists(iconPath & auxIconName) Then
-    '                    myAuxButtonImage = Image.FromFile(iconPath & auxIconName)
+    '                    myAuxButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
     '                Else
     '                    myAuxButtonImage = Nothing
     '                End If
@@ -162,7 +162,7 @@ Public Class IThermosAdjustments
 
             Try
                 Dim myGlobal As New GlobalDataTO
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim auxIconName As String = String.Empty
                 Dim iconPath As String = MyBase.IconsPath
                 Dim myRotorCondImage As Image
@@ -176,9 +176,9 @@ Public Class IThermosAdjustments
 
                     If System.IO.File.Exists(iconPath & auxIconName) Then
                         Dim myImage As Image
-                        myImage = Image.FromFile(iconPath & auxIconName)
+                        myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                        myGlobal = myUtil.ResizeImage(myImage, New Size(26, 26))
+                        myGlobal = Utilities.ResizeImage(myImage, New Size(26, 26))
                         If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                             myRotorCondImage = CType(myGlobal.SetDatos, Bitmap)
                         Else
@@ -189,20 +189,20 @@ Public Class IThermosAdjustments
                     End If
 
                     'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_TestStop")
-                    MyBase.bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
                 Else
                     MyBase.myServiceMDI.SEND_INFO_START()
 
                     auxIconName = GetIconName("ADJUSTMENT")
                     If System.IO.File.Exists(iconPath & auxIconName) Then
-                        myRotorCondImage = Image.FromFile(iconPath & auxIconName)
+                        myRotorCondImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                     Else
                         myRotorCondImage = Nothing
                     End If
 
                     'bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, "SRV_BTN_Conditionate")
-                    MyBase.bsScreenToolTips.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+                    MyBase.bsScreenToolTipsControl.SetToolTip(Me.Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
 
                 End If
 
@@ -898,25 +898,25 @@ Public Class IThermosAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab1ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
             'MyBase.bsScreenToolTips.SetToolTip(Tab1MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
             'MyBase.bsScreenToolTips.SetToolTip(Tab1UndoMeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab1AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String uification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab1AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String uification
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab2ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab2MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab2AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2MeasureButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_MeasureTemp", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab2AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
             'MyBase.bsScreenToolTips.SetToolTip(Tab2AuxButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_ToParking", currentLanguage)) SGM 01/12/2011
 
-            MyBase.bsScreenToolTips.SetToolTip(Tab3ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Tab3AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab3ConditioningButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Conditionate", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Tab3AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
 
             ' XBC 20/04/2012
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1094,30 +1094,30 @@ Public Class IThermosAdjustments
             'dl 20/04/2012
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                Tab1ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab1AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2MeasureButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab2AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+                Tab1ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab1AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2MeasureButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab2AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsUpDownWSButton1.Image = Image.FromFile(iconPath & auxIconName)
-                BsUpDownWSButton2.Image = Image.FromFile(iconPath & auxIconName)
+                BsUpDownWSButton1.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUpDownWSButton2.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'dl 20/04/2012
 
@@ -1141,28 +1141,28 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab1ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab1ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ' ''MEASUREMENT TEMP Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1MeasureButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab1MeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab1MeasureButton.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ' ''CANCEL MEASUREMENT Button
             ''auxIconName = GetIconName("UNDO")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab1UndoMeasureButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab1UndoMeasureButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab1UndoMeasureButton.BackgroundImageLayout = ImageLayout.Stretch
             ''End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab1AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab1AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab1AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -1174,28 +1174,28 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''MEASUREMENT TEMP Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2MeasureButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2MeasureButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2MeasureButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab2AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab2AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ' ''AUX TO PARKING/TO WASHING Button SGM 01/12/2011
             ''auxIconName = GetIconName("UNDO")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    Tab2AuxButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    Tab2AuxButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    Tab2AdjustButton.BackgroundImageLayout = ImageLayout.Stretch
             ''End If
 
@@ -1207,14 +1207,14 @@ Public Class IThermosAdjustments
             ''CONDITIONING Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3ConditioningButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab3ConditioningButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab3ConditioningButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''TEST ADJUSTMENT Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Tab3AdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    Tab3AdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'Tab3AdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -1224,14 +1224,14 @@ Public Class IThermosAdjustments
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsSaveButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -1631,7 +1631,7 @@ Public Class IThermosAdjustments
     ''' </remarks>
     Private Sub PrepareTestedMode()
         Dim myGlobal As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Me.BsSaveButton.Enabled = False
 
@@ -2488,7 +2488,7 @@ Public Class IThermosAdjustments
     Private Sub ValidateToCalulatePHOTOMETRYMeanTemps()
         Dim myResultData As New GlobalDataTO
         Try
-            Dim myUtilities As New Utilities
+            'Dim Utilities As New Utilities
             Dim AllTempsFilled As Boolean = True
 
             ' 1st validation
@@ -2558,7 +2558,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp1.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2568,7 +2568,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp2.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2578,7 +2578,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp3.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2588,7 +2588,7 @@ Public Class IThermosAdjustments
                 AllTempsFilled = False
             Else
                 If IsNumeric(Me.Tab1TextBoxTemp4.Text) Then
-                    If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
+                    If Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
                         AllTempsFilled = False
                     End If
                 End If
@@ -2605,13 +2605,13 @@ Public Class IThermosAdjustments
                 '    AllTempsFilled = False
                 'ElseIf CSng(Me.Tab1TextBoxTemp4.Text) = 0 Then
                 '    AllTempsFilled = False
-                If myUtilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
+                If Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text) = 0 Then
                     AllTempsFilled = False
-                ElseIf myUtilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
+                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text) = 0 Then
                     AllTempsFilled = False
-                ElseIf myUtilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
+                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text) = 0 Then
                     AllTempsFilled = False
-                ElseIf myUtilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
+                ElseIf Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text) = 0 Then
                     AllTempsFilled = False
 
 
@@ -2677,7 +2677,7 @@ Public Class IThermosAdjustments
 
     Private Sub ValidateToCalulateNEEDLESTemp()
         Dim myResultData As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Dim NewCorrection As Single
             Dim ProposalCorrection As Single
@@ -2685,7 +2685,7 @@ Public Class IThermosAdjustments
             If IsNumeric(Me.Tab2TextBoxTemp.Text) Then
                 ' XBC 18/11/2011 - correction singles
                 'MeasuredTemp = CSng(Me.Tab2TextBoxTemp.Text)
-                MeasuredTemp = myUtilities.FormatToSingle(Me.Tab2TextBoxTemp.Text)
+                MeasuredTemp = Utilities.FormatToSingle(Me.Tab2TextBoxTemp.Text)
 
                 myScreenDelegate.ReagentMeasuredTemp = MeasuredTemp
 
@@ -2731,7 +2731,7 @@ Public Class IThermosAdjustments
 
     Private Sub ValidateToCalulateHEATERTemp()
         Dim myResultData As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Dim NewCorrection As Single
             Dim ProposalCorrection As Single
@@ -2739,7 +2739,7 @@ Public Class IThermosAdjustments
             If IsNumeric(Me.Tab3TextBoxTemp.Text) Then
                 ' XBC 18/11/2011 - correction singles
                 'MeasuredTemp = CSng(Me.Tab3TextBoxTemp.Text)
-                MeasuredTemp = myUtilities.FormatToSingle(Me.Tab3TextBoxTemp.Text)
+                MeasuredTemp = Utilities.FormatToSingle(Me.Tab3TextBoxTemp.Text)
 
                 myScreenDelegate.HeaterMeasuredTemp = MeasuredTemp
 
@@ -2809,7 +2809,7 @@ Public Class IThermosAdjustments
     End Sub
 
     Private Sub PopulateEditionValues()
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             Dim value As String
             With Me.EditedValue
@@ -2818,7 +2818,7 @@ Public Class IThermosAdjustments
                     ' XBC 18/11/2011 - correction singles
                     'value = value.Replace(",", MyClass.myDecimalSeparator.ToString)
                     '.SetPointCurrentValue = CSng(value)
-                    .SetPointCurrentValue = myUtilities.FormatToSingle(value)
+                    .SetPointCurrentValue = Utilities.FormatToSingle(value)
                 Else
                     .SetPointCurrentValue = 0
                 End If
@@ -2828,7 +2828,7 @@ Public Class IThermosAdjustments
                     ' XBC 18/11/2011 - correction singles
                     'value = value.Replace(",", MyClass.myDecimalSeparator.ToString)
                     '.TargetValue = CSng(value)
-                    .TargetValue = myUtilities.FormatToSingle(value)
+                    .TargetValue = Utilities.FormatToSingle(value)
                 Else
                     .TargetValue = 0
                 End If
@@ -3253,11 +3253,11 @@ Public Class IThermosAdjustments
 
     Private Sub ThermosAdjustments2_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -3270,7 +3270,7 @@ Public Class IThermosAdjustments
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             MyClass.GetScreenLabels()
@@ -3432,7 +3432,7 @@ Public Class IThermosAdjustments
 
     Private Sub BsSaveButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsSaveButton.Click
         Dim myGlobal As New GlobalDataTO
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.EditingRotorTemperatures Then
                 Exit Sub
@@ -3456,28 +3456,28 @@ Public Class IThermosAdjustments
                             If IsNumeric(Me.Tab1CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab1CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
                             End If
                         Case ADJUSTMENT_GROUPS.THERMOS_REAGENT1
                             myScreenDelegate.CurrentTest = ADJUSTMENT_GROUPS.THERMOS_REAGENT1
                             If IsNumeric(Me.Tab2CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab2CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
                             End If
                         Case ADJUSTMENT_GROUPS.THERMOS_REAGENT2
                             myScreenDelegate.CurrentTest = ADJUSTMENT_GROUPS.THERMOS_REAGENT2
                             If IsNumeric(Me.Tab2CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab2CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
                             End If
                         Case ADJUSTMENT_GROUPS.THERMOS_WS_HEATER
                             myScreenDelegate.CurrentTest = ADJUSTMENT_GROUPS.THERMOS_WS_HEATER
                             If IsNumeric(Me.Tab3CorrectionTextBox.Text) Then
                                 ' XBC 18/11/2011 - correction singles
                                 'myScreenDelegate.ProposalCorrection = CSng(Me.Tab3CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                                myScreenDelegate.ProposalCorrection = myUtilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
+                                myScreenDelegate.ProposalCorrection = Utilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
                             End If
                     End Select
 
@@ -4226,7 +4226,7 @@ Public Class IThermosAdjustments
     ' XBC 29/11/2011
 
     Private Sub Tab1TextBoxTemp1_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp1.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4236,7 +4236,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp1.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(0) = CSng(Me.Tab1TextBoxTemp1.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(0) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text)
+                        myScreenDelegate.ProbeWellsTemps(0) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp1.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4252,7 +4252,7 @@ Public Class IThermosAdjustments
     End Sub
 
     Private Sub Tab1TextBoxTemp2_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp2.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4262,7 +4262,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp2.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(1) = CSng(Me.Tab1TextBoxTemp2.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(1) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text)
+                        myScreenDelegate.ProbeWellsTemps(1) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp2.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4278,7 +4278,7 @@ Public Class IThermosAdjustments
     End Sub
 
     Private Sub Tab1TextBoxTemp3_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp3.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4288,7 +4288,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp3.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(2) = CSng(Me.Tab1TextBoxTemp3.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(2) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text)
+                        myScreenDelegate.ProbeWellsTemps(2) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp3.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4304,7 +4304,7 @@ Public Class IThermosAdjustments
     End Sub
 
     Private Sub Tab1TextBoxTemp4_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab1TextBoxTemp4.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4314,7 +4314,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab1TextBoxTemp4.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'myScreenDelegate.ProbeWellsTemps(3) = CSng(Me.Tab1TextBoxTemp4.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        myScreenDelegate.ProbeWellsTemps(3) = myUtilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text)
+                        myScreenDelegate.ProbeWellsTemps(3) = Utilities.FormatToSingle(Me.Tab1TextBoxTemp4.Text)
 
                         'ValidateToCalulatePHOTOMETRYMeanTemps()    ' XBC 29/11/2011
                     End If
@@ -4427,7 +4427,7 @@ Public Class IThermosAdjustments
     End Sub
 
     Private Sub Tab1CorrectionTextBox_StatusChanged()
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
 
             If Me.Tab1CorrectionTextBox.Text.Length = 0 Then
@@ -4437,7 +4437,7 @@ Public Class IThermosAdjustments
                 If IsNumeric(Me.Tab1CorrectionTextBox.Text) Then
                     ' XBC 18/11/2011 - correction singles
                     'Me.EditedValue.NewCorrection = CSng(Me.Tab1CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                    Me.EditedValue.NewCorrection = myUtilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
+                    Me.EditedValue.NewCorrection = Utilities.FormatToSingle(Me.Tab1CorrectionTextBox.Text)
                 End If
 
                 ' XBC 18/10/2011 - Canceled
@@ -4844,7 +4844,7 @@ Public Class IThermosAdjustments
     End Sub
 
     Private Sub Tab2CorrectionTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab2CorrectionTextBox.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -4857,7 +4857,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab2CorrectionTextBox.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'Me.EditedValue.NewCorrection = CSng(Me.Tab2CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        Me.EditedValue.NewCorrection = myUtilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
+                        Me.EditedValue.NewCorrection = Utilities.FormatToSingle(Me.Tab2CorrectionTextBox.Text)
                     End If
 
                     'If myScreenDelegate.ReagentNeedleMeasuredTempDone Then
@@ -5114,7 +5114,7 @@ Public Class IThermosAdjustments
     End Sub
 
     Private Sub Tab3CorrectionTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Tab3CorrectionTextBox.TextChanged
-        Dim myUtilities As New Utilities
+        'Dim Utilities As New Utilities
         Try
             If Me.PageInitialized Then
 
@@ -5125,7 +5125,7 @@ Public Class IThermosAdjustments
                     If IsNumeric(Me.Tab3CorrectionTextBox.Text) Then
                         ' XBC 18/11/2011 - correction singles
                         'Me.EditedValue.NewCorrection = CSng(Me.Tab3CorrectionTextBox.Text.Replace(".", MyClass.myDecimalSeparator.ToString))
-                        Me.EditedValue.NewCorrection = myUtilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
+                        Me.EditedValue.NewCorrection = Utilities.FormatToSingle(Me.Tab3CorrectionTextBox.Text)
                     End If
 
                     'If myScreenDelegate.HeaterConditioningDone Then

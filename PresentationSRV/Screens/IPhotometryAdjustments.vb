@@ -54,7 +54,7 @@ Public Class IPhotometryAdjustments
     Private UnableHandlers As Boolean
     Private RunningTest As Boolean
     Private FirstIteration As Boolean
-    Private ExitingScreen As Boolean
+    Private FlagExitingScreen As Boolean
     Private WarningLeds As String
 #End Region
 
@@ -280,7 +280,7 @@ Public Class IPhotometryAdjustments
         Return True
     End Function
 
-   
+
 
 #End Region
 
@@ -530,12 +530,12 @@ Public Class IPhotometryAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(BsStep1DacsReferenceButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsStep1ITSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsStep1ITExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsStep1DacsReferenceButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsStep1ITSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsStep1ITExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             WarningLeds = myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_LEDS_WARNINGS", currentLanguage)
 
@@ -552,7 +552,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareButtons()
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -572,33 +572,33 @@ Public Class IPhotometryAdjustments
             'DL 20/04/2012. Substitute icons
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                BsStep1DacsReferenceButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1DacsReferenceButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsStep1ITSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1ITSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                BsStep1ITExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1ITExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsStep1UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsStep2UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsStep1UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsStep2UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'DL 20/04/2012
 
@@ -608,21 +608,21 @@ Public Class IPhotometryAdjustments
             ''ADJUST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsAdjustButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsAdjustButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsAdjustButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''SAVE Button
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsSaveButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsSaveButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsSaveButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsCancelButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsCancelButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsCancelButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
@@ -630,7 +630,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -639,7 +639,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsTestButton.Image = myImage
             '    BsTestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -648,7 +648,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("EDIT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1DacsReferenceButton.Image = myImage
             '    BsStep1DacsReferenceButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -657,7 +657,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITSaveButton.Image = myImage
             '    BsStep1ITSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -666,7 +666,7 @@ Public Class IPhotometryAdjustments
             'auxIconName = GetIconName("UNDO")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStep1ITExitButton.Image = myImage
             '    BsStep1ITExitButton.ImageAlign = ContentAlignment.MiddleCenter
             '    'BsStep1ITExitButton.BackgroundImageLayout = ImageLayout.Stretch
@@ -680,20 +680,20 @@ Public Class IPhotometryAdjustments
             'STEP2 TEST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStep2TestButtonTODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsStep2TestButtonTODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStep2TestButtonTODELETE.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             ''STEP3 TEST Button
             'auxIconName = GetIconName("VOLUME")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsStep3TestButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    BsStep3TestButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    BsStep3TestButton.BackgroundImageLayout = ImageLayout.Center
             'End If
 
             Dim myNewNGImage As Bitmap = Nothing
             Dim myNGImage As Image = Nothing
-            'Dim myUtil As New Utilities
+            ''Dim myUtil As New Utilities.
             Dim myGlobal As New GlobalDataTO
 
             ' Icons used to informate about warning Limits into ListViews PhMain & PhRef and also Intesities of the LEDs
@@ -702,9 +702,9 @@ Public Class IPhotometryAdjustments
 
             auxIconName = GetIconName("FREECELL")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myNGImage = Image.FromFile(iconPath & auxIconName)
+                myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myClearImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -716,9 +716,9 @@ Public Class IPhotometryAdjustments
 
             auxIconName = GetIconName("STUS_WITHERRS") 'WARNING") dl 23/03/2012
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myNGImage = Image.FromFile(iconPath & auxIconName)
+                myNGImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myWarningImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -728,17 +728,17 @@ Public Class IPhotometryAdjustments
                 myWarningImage = Nothing
             End If
 
-            
+
             '' XBC 20/02/2012
             'auxIconName = GetIconName("UPDOWN") ' UPDOWNROW
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myImage = CType(myGlobal.SetDatos, Image)
             '    End If
-            '    'Me.BsStep1UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
-            '    'Me.BsStep2UpDownWSButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    'Me.BsStep1UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+            '    'Me.BsStep2UpDownWSButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    Me.BsStep1UpDownWSButton.Image = myImage
             '    Me.BsStep1UpDownWSButton.ImageAlign = ContentAlignment.MiddleCenter
             '    Me.BsStep2UpDownWSButton.Image = myImage
@@ -879,7 +879,7 @@ Public Class IPhotometryAdjustments
     ''' <remarks>Created by XBC 23/02/2011</remarks>
     Private Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPhotometryDataTO As PhotometryDataTO
         Try
             DisableAll()
@@ -899,7 +899,7 @@ Public Class IPhotometryAdjustments
                 myResultData = PrepareScreen()
 
                 ' Check Previous completed BLDC tests
-                Dim myPathBLFile As String = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+                Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
                 If IO.File.Exists(myPathBLFile) Then
                     ' Recover BLDC test previously completed
                     myResultData = myScreenDelegate.GetLastBLDCCompletedTest(myPathBLFile)
@@ -1068,7 +1068,7 @@ Public Class IPhotometryAdjustments
     Private Sub PrepareTestedMode()
         Dim myResultData As New GlobalDataTO
         'Dim myPhotometryDataTO As PhotometryDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Dim myPath As String
         Try
             Select Case Me.SelectedPage
@@ -1115,7 +1115,7 @@ Public Class IPhotometryAdjustments
                                 Me.BsExitButton.Enabled = True
 
                                 ' Save BLDC Test
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+                                myPath = Application.StartupPath & GlobalBase.PhotometryTestsFile
                                 myResultData = myScreenDelegate.SaveBLDCFile(myPath, Me.ActiveAnalyzer)
 
                                 MyBase.DisplayMessage(Messages.SRV_COMPLETED.ToString)
@@ -1129,7 +1129,7 @@ Public Class IPhotometryAdjustments
                                 PopulateBLChart(myScreenDelegate.BaseLineMainCounts, myScreenDelegate.BaseLineRefCounts)
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryBLFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryBLFileOut
                                 CreateBLResultsFileOutput(myPath)
                             Else
                                 If myScreenDelegate.HomesDone Then
@@ -1228,18 +1228,18 @@ Public Class IPhotometryAdjustments
                                                        myScreenDelegate.MeasuresRepeatabilityphRefCountsDKByLed(Me.BsStep2WLCombo.SelectedIndex))
                                     'myScreenDelegate.GetMaxValueRepeatabilityResult(0), _
                                     'myScreenDelegate.GetMinValueRepeatabilityResult(0))
-                                    Step2Chart.Legend.Visible = True
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
                                 ElseIf Me.BsStep2LightRadioButton.Checked Then
                                     ' LIGHT
                                     Me.BsStep2AbsCVResult.Visible = True
                                     Me.BsStep2CVevLabel.Visible = True
                                     PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                     PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                    Step2Chart.Legend.Visible = False
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                                 End If
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryRepeatabilityFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryRepeatabilityFileOut
                                 CreateRepeatabilityResultsFileOutput(myPath)
 
                             Else
@@ -1325,19 +1325,19 @@ Public Class IPhotometryAdjustments
                                                        myScreenDelegate.MeasuresStabilityphRefCountsDKByLed(Me.BsStep2WLCombo.SelectedIndex))
                                     'myScreenDelegate.GetMaxValueStabilityResult(0), _
                                     'myScreenDelegate.GetMinValueStabilityResult(0))
-                                    Step2Chart.Legend.Visible = True
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
                                 ElseIf Me.BsStep2LightRadioButton.Checked Then
                                     ' LIGHT
                                     Me.BsStep2AbsCVResult.Visible = True
                                     Me.BsStep2CVevLabel.Visible = True
                                     PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                     PopulateStep2Chart(myScreenDelegate.MeasuresStabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                    Step2Chart.Legend.Visible = False
+                                    Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                                 End If
                                 'End If
 
                                 ' Write Results into output file
-                                myPath = Application.StartupPath & myGlobalbase.PhotometryStabilityFileOut
+                                myPath = Application.StartupPath & GlobalBase.PhotometryStabilityFileOut
                                 CreateStabilityResultsFileOutput(myPath)
 
                             Else
@@ -1412,7 +1412,7 @@ Public Class IPhotometryAdjustments
                                 PopulateABSStep2(Me.BsStep2WLCombo.SelectedIndex)
                                 ' Clear Chart
                                 PopulateStep2Chart(myScreenDelegate.GetAbsorbanceABSResult, True)
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
                             End If
 
                     End Select
@@ -1461,9 +1461,9 @@ Public Class IPhotometryAdjustments
     ''' <remarks>Created by XBC 15/03/2011</remarks>
     Private Sub PrepareTestExitedMode()
         Try
-            If Me.ExitingScreen Then
-                MyBase.ActivateMDIMenusButtons(True) 'SGM 27/09/2011
-                Me.Close()
+            If FlagExitingScreen Then
+                ActivateMDIMenusButtons(True) 'SGM 27/09/2011
+                Close()
             Else
                 PrepareLoadedMode()
                 MyBase.DisplayMessage(Messages.SRV_TEST_EXIT_COMPLETED.ToString)
@@ -1983,6 +1983,10 @@ Public Class IPhotometryAdjustments
             If BSStep1BLChart.Series(1).Points.Count > 0 Then
                 BSStep1BLChart.Series(1).Points.RemoveRange(0, BSStep1BLChart.Series(1).Points.Count)
             End If
+
+            BSStep1BLChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            BSStep1BLChart.RuntimeHitTesting = True
+
             If Not pCountsphMain Is Nothing AndAlso Not pCountsphRef Is Nothing AndAlso pCountsphMain.Count > 0 AndAlso pCountsphRef.Count > 0 Then
                 ' Configure Ranges
 
@@ -1993,22 +1997,31 @@ Public Class IPhotometryAdjustments
                 Dim myMin As Single = 0
                 ' XBC 01/03/2012
 
-                If CLng(CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue) >= myMax Then
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MaxValue = myMax
+                If CLng(CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue) >= myMax Then
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myMax
                 Else
-                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myMax
                     If myMax = myMin Then
-                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin - 1
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin - 1
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin - 1
                     Else
-                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.Range.MinValue = myMin
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = myMin
+                        CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = myMin
                     End If
                 End If
-                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.GridSpacingAuto = True
+
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                 'CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.Range.MaxValue = pCountsphMain.Count + 1
                 'CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.Range.MinValue = 0
-                CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.GridSpacingAuto = True
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = True
+
+                'IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+                CType(BSStep1BLChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
                 ' Populate new values
                 For i As Integer = 0 To pCountsphMain.Count - 1
@@ -2136,6 +2149,10 @@ Public Class IPhotometryAdjustments
                     Step2ChartAbs.Series(0).Points.RemoveRange(0, Step2ChartAbs.Series(0).Points.Count)
                 End If
 
+                'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+                Step2ChartAbs.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+                Step2ChartAbs.RuntimeHitTesting = True
+
                 If Not pCounts Is Nothing AndAlso pCounts.Count > 0 Then
                     ' Configure Ranges
                     If pCounts.Max = 0 And pCounts.Min = 0 Then
@@ -2143,26 +2160,35 @@ Public Class IPhotometryAdjustments
                     End If
 
                     ' Initializating...
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = -1000
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = 1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = -1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = 1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = -1000
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = 1000
+
                     ' Setting values...
                     If pCounts.Max = pCounts.Min Then
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = pCounts.Min - 1
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = pCounts.Min - 1
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = pCounts.Min - 1
                         If pCounts.Max = 99999 Then
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
                         Else
                         End If
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     Else
-                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MinValue = pCounts.Min
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MinValue = pCounts.Min
+                        CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MinValue = pCounts.Min
                         If pCounts.Max = 99999 Then
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = myScreenDelegate.MaxAbsToDisplay
                         Else
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.Range.MaxValue = pCounts.Max
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                         End If
                     End If
 
-                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.GridSpacingAuto = True
+                    CType(Step2ChartAbs.Diagram, XYDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                     ' Populate new values
                     For i As Integer = 0 To pCounts.Count - 1
@@ -2187,6 +2213,11 @@ Public Class IPhotometryAdjustments
                 If Step2Chart.Series(1).Points.Count > 0 Then
                     Step2Chart.Series(1).Points.RemoveRange(0, Step2Chart.Series(1).Points.Count)
                 End If
+
+                'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+                Step2Chart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+                Step2Chart.RuntimeHitTesting = True
+
                 If Not pCounts Is Nothing AndAlso pCounts.Count > 0 Then
                     ' Configure Ranges
                     If pCounts.Max = 0 And pCounts.Min = 0 Then
@@ -2194,16 +2225,24 @@ Public Class IPhotometryAdjustments
                     End If
 
                     ' Initializating...
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = -1000
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = 1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = -1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = 1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = -1000
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = 1000
+
                     ' Setting values...
                     If pCounts.Max = pCounts.Min Then
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min - 1
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = pCounts.Min - 1
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = pCounts.Min - 1
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     Else
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min
-                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = pCounts.Min
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = pCounts.Max
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = pCounts.Min
+                        CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = pCounts.Max
                     End If
+
 
                     'If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue) >= pCounts.Max Then
                     '    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = pCounts.Min
@@ -2217,7 +2256,7 @@ Public Class IPhotometryAdjustments
                     '    End If
                     'End If
 
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.GridSpacingAuto = True
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                     ' XBC 21/02/2012
                     'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = pCounts.Count + 1
@@ -2234,6 +2273,9 @@ Public Class IPhotometryAdjustments
 
             End If
 
+            'AJG IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.SideMarginsValue = 0
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2257,6 +2299,11 @@ Public Class IPhotometryAdjustments
             If Step2Chart.Series(1).Points.Count > 0 Then
                 Step2Chart.Series(1).Points.RemoveRange(0, Step2Chart.Series(1).Points.Count)
             End If
+
+            'AJG ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            Step2Chart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            Step2Chart.RuntimeHitTesting = True
+
             If Not pCountsphMain Is Nothing AndAlso Not pCountsphRef Is Nothing AndAlso pCountsphMain.Count > 0 AndAlso pCountsphRef.Count > 0 Then
                 ' Configure Ranges
                 Dim myMax As Single = Math.Max(pCountsphMain.Max, pCountsphRef.Max)
@@ -2264,14 +2311,18 @@ Public Class IPhotometryAdjustments
                 If myMax = 0 And myMin = 0 Then
                     Exit Sub
                 End If
-                If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue) >= myMax Then
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = myMin
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = myMax
+                If CLng(CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue) >= myMax Then
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = myMax
                 Else
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MaxValue = myMax
-                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Range.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.WholeRange.MinValue = myMin
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MaxValue = myMax
+                    CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.MinValue = myMin
                 End If
-                CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.GridSpacingAuto = True
+                CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.NumericScaleOptions.AutoGrid = True
 
                 ' XBC 21/02/2012
                 'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = pCountsphMain.Count + 1
@@ -2285,6 +2336,10 @@ Public Class IPhotometryAdjustments
                     Step2Chart.Series(1).Points.Add(New SeriesPoint(i + 1, pCountsphRef(i)))
                 Next
             End If
+
+            'AJG IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.SideMarginsValue = 0
+            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.VisualRange.SideMarginsValue = 0
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".PopulateStep2Chart ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2332,10 +2387,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 21/02/2012
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxRepeatability + 1
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = 0
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacing = 50
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacingAuto = True
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxRepeatability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxRepeatability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.GridSpacing = 50
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.AutoGrid = True
                             ' XBC 21/02/2012
 
                             If Me.BsStep2DarkRadioButton.Checked Then
@@ -2355,7 +2412,7 @@ Public Class IPhotometryAdjustments
                                 PopulatephRefStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityphMainCountsDKByLed(pLedpPosition), _
                                                    myScreenDelegate.MeasuresRepeatabilityphRefCountsDKByLed(pLedpPosition))
-                                Step2Chart.Legend.Visible = True
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumberCounts", currentLanguage)
@@ -2377,7 +2434,7 @@ Public Class IPhotometryAdjustments
 
                                 PopulateABSStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresRepeatabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", currentLanguage) ' JB 01/10/2012 - Resource String unification
@@ -2389,10 +2446,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 21/02/2012
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxStability + 1
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = 0
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacing = 50
-                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.GridSpacingAuto = True
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxStability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.WholeRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxStability + 1
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.VisualRange.MinValue = 0
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.GridSpacing = 50
+                            CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.NumericScaleOptions.AutoGrid = True
                             ' XBC 21/02/2012
 
                             If Me.BsStep2DarkRadioButton.Checked Then
@@ -2412,7 +2471,7 @@ Public Class IPhotometryAdjustments
                                 PopulatephRefStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresStabilityphMainCountsDKByLed(pLedpPosition), _
                                                    myScreenDelegate.MeasuresStabilityphRefCountsDKByLed(pLedpPosition))
-                                Step2Chart.Legend.Visible = True
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.True
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumberCounts", currentLanguage)
@@ -2434,7 +2493,7 @@ Public Class IPhotometryAdjustments
 
                                 PopulateABSStep2(pLedpPosition)
                                 PopulateStep2Chart(myScreenDelegate.MeasuresStabilityAbsorbances(Me.BsStep2WLCombo.SelectedIndex))
-                                Step2Chart.Legend.Visible = False
+                                Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NumReadings", currentLanguage)
                                 CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisY.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Absorbance_Full", currentLanguage) ' JB 01/10/2012 - Resource String unification
@@ -2446,10 +2505,12 @@ Public Class IPhotometryAdjustments
                             '
 
                             ' XBC 24/02/2012
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.Range.MaxValue = myScreenDelegate.MaxWaveLengths
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.Range.MinValue = 1
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.GridSpacing = 1
-                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.GridSpacingAuto = False
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.WholeRange.MaxValue = myScreenDelegate.MaxWaveLengths
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.WholeRange.MinValue = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.VisualRange.MaxValue = myScreenDelegate.MaxWaveLengths
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.VisualRange.MinValue = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.NumericScaleOptions.GridSpacing = 1
+                            CType(Step2ChartAbs.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = False
                             ' XBC 24/02/2012
 
                             Me.BsStep2phMainGroupBox.Visible = False
@@ -2474,7 +2535,7 @@ Public Class IPhotometryAdjustments
                             ' Populate results of the readed Absorbances to screen
                             PopulateABSStep2(pLedpPosition)
                             PopulateStep2Chart(myScreenDelegate.GetAbsorbanceABSResult, True)
-                            Step2Chart.Legend.Visible = False
+                            Step2Chart.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                             ' XBC 24/02/2012
                             'CType(Step2Chart.Diagram, SwiftPlotDiagram).AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_Wavelength", currentLanguage)
@@ -3314,11 +3375,11 @@ Public Class IPhotometryAdjustments
 
     Private Sub PhotometryAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -3330,7 +3391,7 @@ Public Class IPhotometryAdjustments
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -4383,8 +4444,8 @@ Public Class IPhotometryAdjustments
     '    Dim myGlobal As New GlobalDataTO
     '    Try
     '        ' Save BLDC Test
-    '        Dim myGlobalbase As New GlobalBase
-    '        Dim myPathBLFile As String = Application.StartupPath & myGlobalbase.PhotometryTestsFile
+    '        'Dim myGlobalbase As New GlobalBase
+    '        Dim myPathBLFile As String = Application.StartupPath & GlobalBase.PhotometryTestsFile
     '        myGlobal = myScreenDelegate.SaveBLDCFile(myPathBLFile)
     '        If myGlobal.HasError Then
     '            PrepareErrorMode()

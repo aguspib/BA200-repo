@@ -1,8 +1,12 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+
+Imports Biosystems.Ax00.Global
 
 'Put here your business code for the tab ReagentsTab inside Monitor Form
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
 #Region "Methods"
     ''' <summary>

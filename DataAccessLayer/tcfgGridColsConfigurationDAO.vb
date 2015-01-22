@@ -51,8 +51,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -75,13 +75,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim myGlobalBase As New GlobalBase
+                    'Dim myGlobalbase As New GlobalBase
                     Dim cmdText As String = String.Empty
 
                     For Each row As GridColsConfigDS.tcfgGridColsConfigurationRow In pGridColsConfigDS.tcfgGridColsConfiguration
                         cmdText &= " UPDATE tcfgGridColsConfiguration " & vbCrLf & _
                                    " SET    SavedWidth  = " & row.SavedWidth.ToString & ", " & vbCrLf & _
-                                          " TS_User     = N'" & myGlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', " & vbCrLf & _
+                                          " TS_User     = N'" & GlobalBase.GetSessionInfo().UserName().Replace("'", "''") & "', " & vbCrLf & _
                                           " TS_DateTime = '" & Now.ToString("yyyyMMdd HH:mm:ss") & "' " & vbCrLf & _
                                    " WHERE  ScreenID = '" & row.ScreenID & "' " & vbCrLf & _
                                    " AND    GridName = '" & row.GridName & "' " & vbCrLf & _
@@ -98,8 +98,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Update", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tcfgGridColsConfigurationDAO.Update", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function

@@ -1,18 +1,16 @@
-﻿Option Explicit On
-Option Strict Off
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
-Imports System.IO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports System.Threading
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports Biosystems.Ax00.PresentationCOM
 Imports System.Text
 
-Public Class IConfigLIS
+Public Class UiConfigLIS
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Attributes"
@@ -90,8 +88,8 @@ Public Class IConfigLIS
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If Not AppDomain.CurrentDomain.GetData("GlobalLISManager") Is Nothing Then
                 mdiESWrapperCopy = CType(AppDomain.CurrentDomain.GetData("GlobalLISManager"), ESWrapper) ' Use the same ESWrapper as the MDI
@@ -182,8 +180,8 @@ Public Class IConfigLIS
             bsAcceptButton.Enabled = True
 
             'Load level permissions
-            Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = myGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             ScreenStatusByUserLevel()
 
             ' Prepare Screen fields
@@ -207,7 +205,7 @@ Public Class IConfigLIS
                 bsInternalGroupBox.Enabled = False
             End If
 
-            Select Case BsDataTransmissionComboBox.SelectedValue
+            Select Case BsDataTransmissionComboBox.SelectedValue.ToString
                 Case "TCPIP-Client"
                     HostNameTextBox.Mandatory = True
                     TCPPort2Label.Visible = False
@@ -226,7 +224,7 @@ Public Class IConfigLIS
                     TCPPort2Label.Text = myPortServerLabel & ":"
             End Select
 
-            If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+            If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                 bsIHECompliantCheckbox.Enabled = True
                 BsSubcomponentLabel.Visible = True
                 BsSubComponentSeparatorTextBox.Visible = True
@@ -295,22 +293,22 @@ Public Class IConfigLIS
                     BsMaxTimeToRespondNumericUpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
                     BsmaxTimeWaitingForResponseNumericUpDown.Minimum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
                     BsmaxTimeWaitingForResponseNumericUpDown.Maximum = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
-                    minCommonTimerbyHL7 = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
-                    maxCommonTimerbyHL7 = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                    minCommonTimerbyHL7 = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Integer)
+                    maxCommonTimerbyHL7 = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Integer)
                 End If
                 myGlobal = myFieldLimitsDelegate.GetList(Nothing, FieldLimitsEnum.LIS_TIMER_LIMIT_ASTM)
                 If Not myGlobal.HasError Then
                     myFieldLimitsDS = CType(myGlobal.SetDatos, FieldLimitsDS)
                     If myFieldLimitsDS.tfmwFieldLimits.Rows.Count > 0 Then
-                        minCommonTimerbyASTM = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Decimal)
-                        maxCommonTimerbyASTM = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Decimal)
+                        minCommonTimerbyASTM = CType(myFieldLimitsDS.tfmwFieldLimits(0).MinValue, Integer)
+                        maxCommonTimerbyASTM = CType(myFieldLimitsDS.tfmwFieldLimits(0).MaxValue, Integer)
                     End If
                 Else
                     ShowMessage("Error", myGlobal.ErrorCode)
                     Exit Try
                 End If
 
-                If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+                If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                     BsmaxTimeWaitACKNumericUpDown.Minimum = minCommonTimerbyHL7
                     BsmaxTimeWaitACKNumericUpDown.Maximum = maxCommonTimerbyHL7
                 Else
@@ -415,13 +413,13 @@ Public Class IConfigLIS
             'SAVE Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -609,7 +607,7 @@ Public Class IConfigLIS
             Dim myPreloadedMasterDataDelegate As New PreloadedMasterDataDelegate
 
 
-            If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+            If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                 myGlobalDataTO = myPreloadedMasterDataDelegate.GetList(Nothing, PreloadedMasterDataEnum.LIS_DATA_TRANS_HL7)
             Else
                 myGlobalDataTO = myPreloadedMasterDataDelegate.GetList(Nothing, PreloadedMasterDataEnum.LIS_DATA_TRANS_ASTM)
@@ -686,7 +684,7 @@ Public Class IConfigLIS
             Dim CodePagexHL7 As String = "65001"    ' value by default
             Dim CodePagexASTM As String = "28591"   ' value by default
 
-            If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+            If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                 BsTransmissionCodePageTextBox.Text = CodePagexHL7
             Else
                 BsTransmissionCodePageTextBox.Text = CodePagexASTM
@@ -863,7 +861,7 @@ Public Class IConfigLIS
             returnData = myUserSettingDelegate.GetCurrentValueBySettingID(Nothing, UserSettingsEnum.LIS_STORAGE_RECEPTION_MAX_MSG.ToString())
             If (Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing) Then
                 BsMaxReceptionMsgsNumericUpDown.Value = CType(returnData.SetDatos, Integer)
-                MaxReceptionInitialValue = BsMaxReceptionMsgsNumericUpDown.Value
+                MaxReceptionInitialValue = CInt(BsMaxReceptionMsgsNumericUpDown.Value)
             Else
                 'Error getting the Session Setting value, show it 
                 ShowMessage(Name & ".LoadLISDetails ", returnData.ErrorCode, returnData.ErrorMessage)
@@ -872,7 +870,7 @@ Public Class IConfigLIS
             returnData = myUserSettingDelegate.GetCurrentValueBySettingID(Nothing, UserSettingsEnum.LIS_STORAGE_TRANS_MAX_MSG.ToString())
             If (Not returnData.HasError AndAlso Not returnData.SetDatos Is Nothing) Then
                 BsMaxTransmissionMsgsNumericUpDown.Value = CType(returnData.SetDatos, Integer)
-                MaxTransmissionInitialValue = BsMaxTransmissionMsgsNumericUpDown.Value
+                MaxTransmissionInitialValue = CInt(BsMaxTransmissionMsgsNumericUpDown.Value)
             Else
                 'Error getting the Session Setting value, show it 
                 ShowMessage(Name & ".LoadLISDetails ", returnData.ErrorCode, returnData.ErrorMessage)
@@ -1009,7 +1007,7 @@ Public Class IConfigLIS
                 ShowMessage(Name & ".LoadLISDetails ", returnData.ErrorCode, returnData.ErrorMessage)
             End If
 
-            If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+            If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                 ' HL7
                 BsFieldSeparatorTextBox.Text = myInitialValueField_Sep_HL7
                 BsComponentSeparatorTextBox.Text = myInitialValueComp_Sep_HL7
@@ -1103,7 +1101,7 @@ Public Class IConfigLIS
                         ValidationError = True
                     End If
 
-                    Select Case BsDataTransmissionComboBox.SelectedValue
+                    Select Case BsDataTransmissionComboBox.SelectedValue.ToString
                         Case "TCPIP-Client"
                             If Not HostNameTextBox.Text.Length > 0 Then
                                 bsErrorProvider1.SetError(HostNameTextBox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
@@ -1191,7 +1189,7 @@ Public Class IConfigLIS
                         bsErrorProvider1.SetError(BsSpecialSeparatorTextBox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
                         ValidationError = True
                     End If
-                    If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+                    If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                         If Not BsSubComponentSeparatorTextBox.Text.Length > 0 Then
                             bsErrorProvider1.SetError(BsSubComponentSeparatorTextBox, GetMessageText(GlobalEnumerates.Messages.REQUIRED_VALUE.ToString))
                             ValidationError = True
@@ -1273,7 +1271,7 @@ Public Class IConfigLIS
                 sessionSettings.tcfgUserSettings.Rows.Add(sessionSettingRow)
 
                 'Reprogram the Main MDI timer when it is needed
-                IAx00MainMDI.LISWaitTime = CInt(BsBsMaxTimeToWaitLISOrdersNumericUpDown.Value)
+                UiAx00MainMDI.LISWaitTime = CInt(BsBsMaxTimeToWaitLISOrdersNumericUpDown.Value)
 
                 '** Settings for UPLOAD
                 sessionSettingRow = sessionSettings.tcfgUserSettings.NewtcfgUserSettingsRow
@@ -1395,7 +1393,7 @@ Public Class IConfigLIS
                 sessionSettingRow.CurrentValue = BsInstrumentProviderTextBox.Text.ToString()
                 sessionSettings.tcfgUserSettings.Rows.Add(sessionSettingRow)
 
-                If (bsProtocolNameComboBox.SelectedValue = "HL7") Then
+                If (bsProtocolNameComboBox.SelectedValue.ToString = "HL7") Then
                     '** Settings for HL7 Protocol
                     sessionSettingRow = sessionSettings.tcfgUserSettings.NewtcfgUserSettingsRow
                     sessionSettingRow.SettingID = UserSettingsEnum.LIS_FIELD_SEPARATOR_HL7.ToString()
@@ -1451,7 +1449,7 @@ Public Class IConfigLIS
                 resultData = myAnalyzerSettings.Save(Nothing, AnalyzerIDAttribute, Nothing, sessionSettings)
                 If (Not resultData.HasError) Then
                     'BT #1349 ==> Value to assign to Main MDI Property autoWSCreationWithLISMode will depend also on value of setting LIS_ENABLE_COMMS
-                    IAx00MainMDI.autoWSCreationWithLISMode = (BsAutoQueryStartCheckbox.Checked AndAlso BsLISCommsEnabledCheckbox.Checked)
+                    UiAx00MainMDI.autoWSCreationWithLISMode = (BsAutoQueryStartCheckbox.Checked AndAlso BsLISCommsEnabledCheckbox.Checked)
                 Else
                     'Error saving the settings, show it
                     Cursor = Cursors.Default
@@ -1496,7 +1494,7 @@ Public Class IConfigLIS
                     Close()
                 Else
                     'Normal button click - Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
 
@@ -1672,7 +1670,7 @@ Public Class IConfigLIS
                         End If
 
                     Case "BsDataTransmissionComboBox"
-                        Select Case BsDataTransmissionComboBox.SelectedValue
+                        Select Case BsDataTransmissionComboBox.SelectedValue.ToString
                             Case "TCPIP-Client"
                                 HostNameTextBox.Mandatory = True
                                 TCPPort2Label.Visible = False
@@ -1692,7 +1690,7 @@ Public Class IConfigLIS
                         End Select
 
                     Case "bsProtocolNameComboBox"
-                        If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+                        If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                             bsIHECompliantCheckbox.Enabled = True
                             BsSubcomponentLabel.Visible = True
                             BsSubComponentSeparatorTextBox.Visible = True
@@ -1884,9 +1882,9 @@ Public Class IConfigLIS
                                 ' No works well if there are a thread created from this screen because it is angry with the threads created on MDI
 
                                 'Release the LIS manager object
-                                IAx00MainMDI.InvokeReleaseLIS(False)
+                                UiAx00MainMDI.InvokeReleaseLIS(False)
 
-                                IAx00MainMDI.InvokeReleaseFromConfigSettings = True
+                                UiAx00MainMDI.InvokeReleaseFromConfigSettings = True
 
                                 'System.Threading.Thread.Sleep(1000)
 
@@ -1911,7 +1909,7 @@ Public Class IConfigLIS
 
                             Else
                                 ' Re-create Channel with new change settings
-                                IAx00MainMDI.InvokeCreateLISChannel()
+                                UiAx00MainMDI.InvokeCreateLISChannel()
                             End If
                             Cursor = Cursors.Default
                             ' XB 24/04/2013
@@ -1954,7 +1952,7 @@ Public Class IConfigLIS
                                                                                             BsSubComponentSeparatorTextBox.LostFocus
 
         Try
-            If bsProtocolNameComboBox.SelectedValue = "HL7" Then
+            If bsProtocolNameComboBox.SelectedValue.ToString = "HL7" Then
                 ' HL7
                 myInitialValueField_Sep_HL7 = BsFieldSeparatorTextBox.Text
                 myInitialValueComp_Sep_HL7 = BsComponentSeparatorTextBox.Text
@@ -2045,12 +2043,12 @@ Public Class IConfigLIS
             Dim resultData As New GlobalDataTO
 
             Dim myAnalyzersDelegate As New AnalyzerSettingsDelegate
-            resultData = myAnalyzersDelegate.GetAnalyzerSetting(Nothing, IAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
+            resultData = myAnalyzersDelegate.GetAnalyzerSetting(Nothing, UiAx00MainMDI.ActiveAnalyzer, AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                 Dim myAnalyzerSettingsDS As AnalyzerSettingsDS = CType(resultData.SetDatos, AnalyzerSettingsDS)
                 If myAnalyzerSettingsDS IsNot Nothing AndAlso myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows.Count > 0 Then
-                    Dim myRow As AnalyzerSettingsDS.tcfgAnalyzerSettingsRow = myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows(0)
-                    Dim isDisabled As Boolean = IIf(CInt(myRow.CurrentValue) = 1, True, False).ToString()
+                    Dim myRow = TryCast(myAnalyzerSettingsDS.tcfgAnalyzerSettings.Rows(0), AnalyzerSettingsDS.tcfgAnalyzerSettingsRow)
+                    Dim isDisabled As Boolean = CBool(IIf(CInt(myRow.CurrentValue) = 1, True, False))
                     If isDisabled Then
                         Dim res As DialogResult = MyBase.ShowMessage(Me.Name, Messages.AUTOLIS_BARCODE_DISABLED.ToString)
                     End If

@@ -1,13 +1,11 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
-Imports Biosystems.Ax00.BL
+
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.PresentationCOM
 
 Public Class ISE_Test
     Private mOnlyTreated As Boolean = False
@@ -67,8 +65,8 @@ Public Class ISE_Test
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -77,8 +75,8 @@ Public Class ISE_Test
             txtProcessedData.Text &= pInstructionSent & vbCrLf
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "OnManageReceptionEvent", EventLogEntryType.Error, False)
         End Try
     End Sub
 #End Region

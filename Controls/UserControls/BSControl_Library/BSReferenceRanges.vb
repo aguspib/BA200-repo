@@ -7,7 +7,6 @@ Imports System.Drawing
 'Imports Biosystems.Ax00.Controls
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Types.TestRefRangesDS
 
 'User Control that allows the edition of Reference Ranges for Tests of whatever type: 
 'Standard, Calculated, ISE and/or Off-System Tests
@@ -1522,12 +1521,13 @@ Public Class BSReferenceRanges
                 If (bsDetailedCheckBox.Checked) Then rowsToIgnore = 2
 
                 For i As Integer = 0 To bsRefDetailDataGridView.Rows.Count - rowsToIgnore
-                    If (bsRefDetailDataGridView.Rows(i).Cells("RangeID").Value Is Nothing) Then
+                    Dim auxIndex = i    'data type inferred. do not ""fix""!
+                    If (bsRefDetailDataGridView.Rows(auxIndex).Cells("RangeID").Value Is Nothing) Then
                         'New Range; add it to the DS
                         Dim testRefRangesRow As TestRefRangesDS.tparTestRefRangesRow
                         testRefRangesRow = SelectedTestRefRangesDS.tparTestRefRanges.NewtparTestRefRangesRow()
 
-                        If AddDetailedRangeToDS_NEW(testRefRangesRow, i) Then
+                        If AddDetailedRangeToDS_NEW(testRefRangesRow, auxIndex) Then
                             SelectedTestRefRangesDS.tparTestRefRanges.AddtparTestRefRangesRow(testRefRangesRow)
                         End If
 
@@ -1537,30 +1537,30 @@ Public Class BSReferenceRanges
                         qDetailedRange = (From a In SelectedTestRefRangesDS.tparTestRefRanges _
                                          Where String.Compare(a.RangeType, "DETAILED", False) = 0 _
                                            And Not a.IsRangeIDNull _
-                                       AndAlso a.RangeID = CInt(bsRefDetailDataGridView.Rows(i).Cells("RangeID").Value) _
+                                       AndAlso a.RangeID = CInt(bsRefDetailDataGridView.Rows(auxIndex).Cells("RangeID").Value) _
                                         Select a).ToList()
 
                         If (qDetailedRange.Count = 1) Then
-                            If (bsRefDetailDataGridView.Rows(i).Cells("GenderDesc").Value Is Nothing OrElse _
-                                bsRefDetailDataGridView.Rows(i).Cells("GenderDesc").Value.ToString = "EMPTY") Then
+                            If (bsRefDetailDataGridView.Rows(auxIndex).Cells("GenderDesc").Value Is Nothing OrElse _
+                                bsRefDetailDataGridView.Rows(auxIndex).Cells("GenderDesc").Value.ToString = "EMPTY") Then
                                 qDetailedRange(0).SetGenderNull()
                             Else
-                                qDetailedRange(0).Gender = bsRefDetailDataGridView.Rows(i).Cells("GenderDesc").Value.ToString
+                                qDetailedRange(0).Gender = bsRefDetailDataGridView.Rows(auxIndex).Cells("GenderDesc").Value.ToString
                             End If
 
-                            If (bsRefDetailDataGridView.Rows(i).Cells("AgeUnitDesc").Value Is Nothing OrElse _
-                                bsRefDetailDataGridView.Rows(i).Cells("AgeUnitDesc").Value.ToString = "EMPTY") Then
+                            If (bsRefDetailDataGridView.Rows(auxIndex).Cells("AgeUnitDesc").Value Is Nothing OrElse _
+                                bsRefDetailDataGridView.Rows(auxIndex).Cells("AgeUnitDesc").Value.ToString = "EMPTY") Then
                                 qDetailedRange(0).SetAgeUnitNull()
                                 qDetailedRange(0).SetAgeRangeFromNull()
                                 qDetailedRange(0).SetAgeRangeToNull()
                             Else
-                                qDetailedRange(0).AgeUnit = bsRefDetailDataGridView.Rows(i).Cells("AgeUnitDesc").Value.ToString
-                                qDetailedRange(0).AgeRangeFrom = CInt(bsRefDetailDataGridView.Rows(i).Cells("AgeRangeFrom").FormattedValue)
-                                qDetailedRange(0).AgeRangeTo = CInt(bsRefDetailDataGridView.Rows(i).Cells("AgeRangeTo").FormattedValue)
+                                qDetailedRange(0).AgeUnit = bsRefDetailDataGridView.Rows(auxIndex).Cells("AgeUnitDesc").Value.ToString
+                                qDetailedRange(0).AgeRangeFrom = CInt(bsRefDetailDataGridView.Rows(auxIndex).Cells("AgeRangeFrom").FormattedValue)
+                                qDetailedRange(0).AgeRangeTo = CInt(bsRefDetailDataGridView.Rows(auxIndex).Cells("AgeRangeTo").FormattedValue)
                             End If
 
-                            qDetailedRange(0).NormalLowerLimit = CDec(bsRefDetailDataGridView.Rows(i).Cells("NormalLowerLimit").FormattedValue)
-                            qDetailedRange(0).NormalUpperLimit = CDec(bsRefDetailDataGridView.Rows(i).Cells("NormalUpperLimit").FormattedValue)
+                            qDetailedRange(0).NormalLowerLimit = CDec(bsRefDetailDataGridView.Rows(auxIndex).Cells("NormalLowerLimit").FormattedValue)
+                            qDetailedRange(0).NormalUpperLimit = CDec(bsRefDetailDataGridView.Rows(auxIndex).Cells("NormalUpperLimit").FormattedValue)
                         End If
                     End If
                 Next

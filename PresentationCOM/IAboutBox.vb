@@ -48,7 +48,7 @@ Public NotInheritable Class IAboutBox
                 OKButton.PerformClick()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ProgControls_KeyDown", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ProgControls_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -63,8 +63,8 @@ Public NotInheritable Class IAboutBox
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim LanguageIDGlobal As New GlobalBase
-            LanguageID = LanguageIDGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim LanguageIDGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()
@@ -113,10 +113,10 @@ Public NotInheritable Class IAboutBox
             Me.RightLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RightsReserved", LanguageID)
 
             'Get the Application Version from the assembly information
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim myGlobalDataTO As GlobalDataTO
 
-            myGlobalDataTO = myUtil.GetSoftwareVersion()
+            myGlobalDataTO = Utilities.GetSoftwareVersion()
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 Me.LabelVersion.Text = String.Format("{0}: {1}", LabelVersion.Text, myGlobalDataTO.SetDatos)
             Else
@@ -148,7 +148,7 @@ Public NotInheritable Class IAboutBox
             End If
 
             If (auxIconName <> String.Empty) Then
-                LogoPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+                LogoPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -169,7 +169,7 @@ Public NotInheritable Class IAboutBox
             Dim iconPath As String = IconsPath
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then OKButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then OKButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             bsScreenToolTips.SetToolTip(OKButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", LanguageID))

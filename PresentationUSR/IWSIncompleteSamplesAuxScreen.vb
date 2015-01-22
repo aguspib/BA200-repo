@@ -1,13 +1,11 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalConstants
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.CommunicationsSwFw
 
@@ -718,25 +716,25 @@ Public Class IWSIncompleteSamplesAuxScreen
             'IMPORT FROM LIMS Button
             auxIconName = GetIconName("LIMSIMPORT")
             If (auxIconName <> "") Then
-                bsLIMSImportButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsLIMSImportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -988,8 +986,8 @@ Public Class IWSIncompleteSamplesAuxScreen
         Dim myGlobalDataTO As GlobalDataTO = Nothing
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
             mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS) = 0
@@ -1420,8 +1418,8 @@ Public Class IWSIncompleteSamplesAuxScreen
     Private Sub IWSIncompleteSamplesAuxScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'The screen should appear always centered regarding the Main MDI
-            Dim myLocation As Point = IAx00MainMDI.PointToScreen(Point.Empty)
-            Dim mySize As Size = IAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.PointToScreen(Point.Empty)
+            Dim mySize As Size = UiAx00MainMDI.Size
 
             myNewLocation = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 20) 'AG + RH 03/04/2012 - add - 20
             Me.Location = myNewLocation

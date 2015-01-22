@@ -1,5 +1,6 @@
 ﻿Option Explicit On
-Option Strict Off
+Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
@@ -13,7 +14,7 @@ Public Class IConfigLISMapping
     Private currentLanguage As String                      'To store the current application language  
 
 
-    Private LoadingScreen As Boolean = True 'flag for avoiding to handle events while screen is not loaded yet
+    Private ScreenIsLoading As Boolean = True 'flag for avoiding to handle events while screen is not loaded yet
 
     Private AllLISMappingDS As LISMappingsDS
     Private ConfigLISMappingDS As LISMappingsDS
@@ -48,8 +49,8 @@ Public Class IConfigLISMapping
         Get
             Dim res As Boolean = False
 
-            Dim myGlobalbase As New GlobalBase
-            If myGlobalbase.GetSessionInfo.UserLevel = "OPERATOR" Then
+            'Dim myGlobalbase As New GlobalBase
+            If GlobalBase.GetSessionInfo.UserLevel = "OPERATOR" Then
                 res = True
             End If
 
@@ -84,7 +85,7 @@ Public Class IConfigLISMapping
                 If Not MyClass.IsReadOnly Then
                     IsEditionModeAttr = value
                     Me.EditButton.Enabled = Not value
-                    Me.CancelButton.Enabled = value
+                    Me.ButtonCancel.Enabled = value
                     Me.FilterComboBox.Enabled = Not value
                     Me.SaveButton.Enabled = value
 
@@ -215,7 +216,7 @@ Public Class IConfigLISMapping
             End If
 
             'initialize the editing ds
-            MyClass.EditingConfigLISMappingDS = MyClass.ConfigLISMappingDS.Clone
+            MyClass.EditingConfigLISMappingDS = CType(MyClass.ConfigLISMappingDS.Clone, LISMappingsDS)
             For Each dr As LISMappingsDS.vcfgLISMappingRow In MyClass.ConfigLISMappingDS.vcfgLISMapping.Rows
                 Dim myRow As LISMappingsDS.vcfgLISMappingRow = MyClass.EditingConfigLISMappingDS.vcfgLISMapping.NewvcfgLISMappingRow
                 MyClass.EditingConfigLISMappingDS.vcfgLISMapping.ImportRow(dr)
@@ -243,7 +244,7 @@ Public Class IConfigLISMapping
             End If
 
             'initialize the editing ds
-            MyClass.EditingTestsLISMappingDS = MyClass.TestsLISMappingDS.Clone
+            MyClass.EditingTestsLISMappingDS = TryCast(MyClass.TestsLISMappingDS.Clone, AllTestsByTypeDS)
             For Each dr As AllTestsByTypeDS.vparAllTestsByTypeRow In MyClass.TestsLISMappingDS.vparAllTestsByType.Rows
                 Dim myRow As AllTestsByTypeDS.vparAllTestsByTypeRow = MyClass.EditingTestsLISMappingDS.vparAllTestsByType.NewvparAllTestsByTypeRow
                 MyClass.EditingTestsLISMappingDS.vparAllTestsByType.ImportRow(dr)
@@ -277,11 +278,11 @@ Public Class IConfigLISMapping
                     Dim myRow As LISMappingsDS.vcfgLISMappingRow = MyClass.AllLISMappingDS.vcfgLISMapping.NewvcfgLISMappingRow
                     With myRow
                         .ValueType = dr.TestType
-                        .ValueId = dr.TestID
+                        .ValueId = CStr(dr.TestID)
                         .LongName = dr.TestName
                         .LISValue = dr.LISValue
                         .LanguageID = MyClass.currentLanguage
-                        .InUse = dr.InUse
+                        .InUse = CStr(dr.InUse)
                         .UniqueSampleType = dr.UniqueSampleType
                     End With
                     MyClass.AllLISMappingDS.vcfgLISMapping.AddvcfgLISMappingRow(myRow)
@@ -354,11 +355,11 @@ Public Class IConfigLISMapping
     Private Sub ScreenLoad()
         Try
             Cursor = Cursors.WaitCursor
-            LoadingScreen = True
+            ScreenIsLoading = True
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) ' Use the same AnalyzerManager as the MDI
@@ -394,7 +395,7 @@ Public Class IConfigLISMapping
             If Not myGlobalDataTO.HasError Then
                 If Not myGlobalDataTO.SetDatos Is Nothing AndAlso DirectCast(myGlobalDataTO.SetDatos, SavedWSDS).tparSavedWS.Count > 0 Then
                     mySavedOrdersFromLIMS = True
-                    IAx00MainMDI.SetErrorStatusMessage(GetMessageText(GlobalEnumerates.Messages.LIS_MAPPING_WARNING.ToString)) 'SGM 06/05/2013 - show message in status bar "Locked because there are pending LIS orders"
+                    UiAx00MainMDI.SetErrorStatusMessage(GetMessageText(GlobalEnumerates.Messages.LIS_MAPPING_WARNING.ToString)) 'SGM 06/05/2013 - show message in status bar "Locked because there are pending LIS orders"
                 End If
             End If
             'DL 24/04/2013. END
@@ -427,7 +428,7 @@ Public Class IConfigLISMapping
 
             ' Fot tooltips
             bsScreenToolTips.SetToolTip(CloseButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
-            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(EditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", currentLanguage))
             bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
 
@@ -460,25 +461,25 @@ Public Class IConfigLISMapping
             ' Close Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                CloseButton.Image = Image.FromFile(iconPath & auxIconName)
+                CloseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Edit EditButton
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                EditButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Save SaveButton
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Undo Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -684,7 +685,7 @@ Public Class IConfigLISMapping
                 dr.Cells("IsTest").Value = IsNumeric(CStr(dr.Cells("ValueID").Value))
 
                 If CBool(dr.Cells("IsTest").Value) Then
-                    dr.Cells("IsCalcTest").Value = CBool(CStr(dr.Cells("ValueType").Value = "CALC"))
+                    dr.Cells("IsCalcTest").Value = CBool(dr.Cells("ValueType").Value.ToString = "CALC")
                 Else
                     dr.Cells("IsCalcTest").Value = False
                 End If
@@ -724,7 +725,7 @@ Public Class IConfigLISMapping
             ''DL 24/04/2013. END
             Me.EditButton.Enabled = Not MyClass.IsReadOnly
 
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
             Me.SaveButton.Enabled = False
             Me.FilterComboBox.Enabled = True
             Me.LISMappingDataGridView.Columns("LISValue").ReadOnly = True
@@ -733,7 +734,7 @@ Public Class IConfigLISMapping
                 Me.LISMappingDataGridView.Rows(i).Cells("LISValue").Style.BackColor = Color.WhiteSmoke
             Next i
 
-            LoadingScreen = False
+            ScreenIsLoading = False
 
 
 
@@ -761,12 +762,12 @@ Public Class IConfigLISMapping
                 Dim myTestsDataToUpdate As New AllTestsByTypeDS
 
                 For Each R As DataGridViewRow In LISMappingDataGridView.Rows
-                    If R.Cells("Changed").Value Then
-                        If Not R.Cells("HasError").Value Then
+                    If CBool(R.Cells("Changed").Value) = True Then
+                        If Not CBool(R.Cells("HasError").Value) Then
                             If IsDBNull(R.Cells("LISValue").Value) Then
                                 R.Cells("LISValue").Value = ""
                             End If
-                            If Not R.Cells("IsTest").Value Then
+                            If Not CBool(R.Cells("IsTest").Value) Then
                                 Dim myRow As LISMappingsDS.vcfgLISMappingRow = myMasterDataToUpdate.vcfgLISMapping.NewvcfgLISMappingRow
                                 myRow.BeginEdit()
                                 myRow.ValueType = CStr(R.Cells("ValueType").Value)
@@ -778,7 +779,7 @@ Public Class IConfigLISMapping
                                 Dim myRow As AllTestsByTypeDS.vparAllTestsByTypeRow = myTestsDataToUpdate.vparAllTestsByType.NewvparAllTestsByTypeRow
                                 myRow.BeginEdit()
                                 myRow.TestType = CStr(R.Cells("ValueType").Value)
-                                myRow.TestID = CStr(R.Cells("ValueId").Value)
+                                myRow.TestID = CInt(R.Cells("ValueId").Value)
                                 myRow.LISValue = CStr(R.Cells("LISValue").Value)
                                 myRow.EndEdit()
                                 myTestsDataToUpdate.vparAllTestsByType.AddvparAllTestsByTypeRow(myRow)
@@ -814,7 +815,7 @@ Public Class IConfigLISMapping
 
             Else
                 For Each dr As DataGridViewRow In Me.LISMappingDataGridView.Rows
-                    If dr.Cells("HasError").Value Then
+                    If CBool(dr.Cells("HasError").Value) Then
                         dr.Selected = True
                         dr.Cells("LISValue").Selected = True
                         Exit For
@@ -921,13 +922,13 @@ Public Class IConfigLISMapping
                             'Empty is a valid value
                         Else
 
-                            Dim myValType As String = IIf(IsDBNull(myRow.Cells("ValueType").Value), String.Empty, CStr(myRow.Cells("ValueType").Value))
+                            Dim myValType As String = CStr(IIf(IsDBNull(myRow.Cells("ValueType").Value), String.Empty, CStr(myRow.Cells("ValueType").Value)))
 
-                            Dim isTest As Boolean = IIf(IsDBNull(myRow.Cells("IsTest").Value), False, myRow.Cells("IsTest").Value)
+                            Dim isTest As Boolean = CBool(IIf(IsDBNull(myRow.Cells("IsTest").Value), False, myRow.Cells("IsTest").Value))
                             If Not isTest Then
                                 'master data
                                 'the new value entered must be UNIQUE for its own type
-                                Dim myValID As String = IIf(IsDBNull(myRow.Cells("ValueId").Value), String.Empty, CStr(myRow.Cells("ValueId").Value))
+                                Dim myValID As String = CStr(IIf(IsDBNull(myRow.Cells("ValueId").Value), String.Empty, CStr(myRow.Cells("ValueId").Value)))
 
                                 If MyClass.EditingConfigLISMappingDS IsNot Nothing Then
                                     Dim myRows As List(Of LISMappingsDS.vcfgLISMappingRow)
@@ -947,7 +948,7 @@ Public Class IConfigLISMapping
                             Else
 
                                 'validation to preserve unique LIS value for all test types
-                                Dim myValID As String = IIf(IsNumeric(myRow.Cells("ValueId").Value), CStr(myRow.Cells("ValueId").Value), String.Empty)
+                                Dim myValID As String = CStr(IIf(IsNumeric(myRow.Cells("ValueId").Value), myRow.Cells("ValueId").Value, String.Empty))
 
                                 If MyClass.EditingTestsLISMappingDS IsNot Nothing Then
                                     Dim myRows As List(Of AllTestsByTypeDS.vparAllTestsByTypeRow)
@@ -995,7 +996,7 @@ Public Class IConfigLISMapping
         Dim isError As Boolean = False
         Try
             For Each dr As DataGridViewRow In Me.LISMappingDataGridView.Rows
-                If dr.Cells("HasError").Value Then
+                If CBool(dr.Cells("HasError").Value) Then
                     isError = True
                     Exit For
                 End If
@@ -1020,9 +1021,9 @@ Public Class IConfigLISMapping
             Dim myChars() As Char = pString.ToCharArray
             For c As Integer = 0 To myChars.Length - 1 Step 1
                 Select Case myChars(c)
-                    Case "&" : res &= "&#x26;"
-                    Case "<" : res &= "&#x60;"
-                    Case ">" : res &= "&#x62;"
+                    Case "&"c : res &= "&#x26;"
+                    Case "<"c : res &= "&#x60;"
+                    Case ">"c : res &= "&#x62;"
                     Case Else : res &= myChars(c)
                 End Select
             Next
@@ -1078,7 +1079,7 @@ Public Class IConfigLISMapping
 
                 Case "OPERATOR"
                     Me.EditButton.Enabled = False
-                    Me.CancelButton.Enabled = False
+                    Me.ButtonCancel.Enabled = False
                     'Me.FilterComboBox.Enabled = False
                     Me.SaveButton.Enabled = False
                     Me.LISMappingDataGridView.ReadOnly = True
@@ -1104,9 +1105,9 @@ Public Class IConfigLISMapping
             For Each r As DataGridViewRow In Me.LISMappingDataGridView.Rows
                 If Not IsDBNull(r.Cells("IsTest").Value) AndAlso Not CBool(r.Cells("IsTest").Value) Then
 
-                    Dim myValID As String = IIf(IsDBNull(r.Cells("ValueID").Value), String.Empty, r.Cells("ValueID").Value)
-                    Dim myValType As String = IIf(IsDBNull(r.Cells("ValueType").Value), String.Empty, r.Cells("ValueType").Value)
-                    Dim myLISValue As String = IIf(IsDBNull(r.Cells("LISValue").Value), String.Empty, r.Cells("LISValue").Value)
+                    Dim myValID As String = CStr(IIf(IsDBNull(r.Cells("ValueID").Value), String.Empty, r.Cells("ValueID").Value))
+                    Dim myValType As String = CStr(IIf(IsDBNull(r.Cells("ValueType").Value), String.Empty, r.Cells("ValueType").Value))
+                    Dim myLISValue As String = CStr(IIf(IsDBNull(r.Cells("LISValue").Value), String.Empty, r.Cells("LISValue").Value))
 
                     Dim myRows As List(Of LISMappingsDS.vcfgLISMappingRow)
                     myRows = (From dr In MyClass.EditingConfigLISMappingDS.vcfgLISMapping _
@@ -1143,9 +1144,9 @@ Public Class IConfigLISMapping
             For Each r As DataGridViewRow In Me.LISMappingDataGridView.Rows
                 If Not IsDBNull(r.Cells("IsTest").Value) AndAlso CBool(r.Cells("IsTest").Value) Then
 
-                    Dim myValID As Integer = IIf(IsNumeric(r.Cells("ValueID").Value), CInt(r.Cells("ValueID").Value), 0)
-                    Dim myTestName As String = IIf(IsDBNull(r.Cells("LongName").Value), String.Empty, r.Cells("LongName").Value)
-                    Dim myLISValue As String = IIf(IsDBNull(r.Cells("LISValue").Value), String.Empty, r.Cells("LISValue").Value)
+                    Dim myValID As Integer = CInt(IIf(IsNumeric(r.Cells("ValueID").Value), CInt(r.Cells("ValueID").Value), 0))
+                    Dim myTestName As String = CStr(IIf(IsDBNull(r.Cells("LongName").Value), String.Empty, r.Cells("LongName").Value))
+                    Dim myLISValue As String = CStr(IIf(IsDBNull(r.Cells("LISValue").Value), String.Empty, r.Cells("LISValue").Value))
 
                     Dim myRows As List(Of AllTestsByTypeDS.vparAllTestsByTypeRow)
                     myRows = (From dr In MyClass.EditingTestsLISMappingDS.vparAllTestsByType _
@@ -1208,9 +1209,9 @@ Public Class IConfigLISMapping
             Dim IsInUse As Boolean = False
             If pDataRow IsNot Nothing Then
 
-                Dim isTest As Boolean = IIf(IsDBNull(pDataRow.Cells("IsTest").Value), False, pDataRow.Cells("IsTest").Value)
+                Dim isTest As Boolean = CBool(IIf(IsDBNull(pDataRow.Cells("IsTest").Value), False, pDataRow.Cells("IsTest").Value))
                 If isTest Then
-                    IsInUse = IIf(IsDBNull(pDataRow.Cells("InUse").Value), False, CBool(pDataRow.Cells("InUse").Value))
+                    IsInUse = CBool(IIf(IsDBNull(pDataRow.Cells("InUse").Value), False, CBool(pDataRow.Cells("InUse").Value)))
 
                     'Pending to accept
                     ''SGM 09/05/2013 - Allow to Edit in case of Mapping not defined yet
@@ -1221,9 +1222,9 @@ Public Class IConfigLISMapping
                     'End If
                     'Pending to accept
                 Else
-                    Dim myValType As String = IIf(IsDBNull(pDataRow.Cells("ValueType").Value), String.Empty, CStr(pDataRow.Cells("ValueType").Value))
+                    Dim myValType As String = CStr(IIf(IsDBNull(pDataRow.Cells("ValueType").Value), String.Empty, CStr(pDataRow.Cells("ValueType").Value)))
                     If myValType.ToUpperBS = "SAMPLE_TYPES" Then
-                        Dim myValID As String = IIf(IsDBNull(pDataRow.Cells("ValueID").Value), String.Empty, CStr(pDataRow.Cells("ValueID").Value))
+                        Dim myValID As String = CStr(IIf(IsDBNull(pDataRow.Cells("ValueID").Value), String.Empty, CStr(pDataRow.Cells("ValueID").Value)))
                         IsInUse = MyClass.mySampleTypesInWS.Contains(myValID)
                     End If
                 End If
@@ -1250,18 +1251,18 @@ Public Class IConfigLISMapping
     ''' <remarks>
     ''' Created by SGM 02/05/2013
     ''' </remarks>
-    Private Function CheckCalcTestIsMultiSampleType(ByRef pDataRow As DataGridViewRow)
+    Private Function CheckCalcTestIsMultiSampleType(ByRef pDataRow As DataGridViewRow) As Boolean
         Dim ReadOnlyRow As Boolean
         Try
             Dim resultData As New GlobalDataTO
             Dim IsUniqueSampleType As Boolean = True
             If pDataRow IsNot Nothing Then
 
-                Dim isTest As Boolean = IIf(IsDBNull(pDataRow.Cells("IsTest").Value), False, pDataRow.Cells("IsTest").Value)
+                Dim isTest As Boolean = CBool(IIf(IsDBNull(pDataRow.Cells("IsTest").Value), False, pDataRow.Cells("IsTest").Value))
                 If isTest Then
-                    Dim isCalcTest As Boolean = IIf(IsDBNull(pDataRow.Cells("IsCalcTest").Value), False, pDataRow.Cells("IsCalcTest").Value)
+                    Dim isCalcTest As Boolean = CBool(IIf(IsDBNull(pDataRow.Cells("IsCalcTest").Value), False, pDataRow.Cells("IsCalcTest").Value))
                     If isCalcTest Then
-                        IsUniqueSampleType = IIf(IsDBNull(pDataRow.Cells("UniqueSampleType").Value), True, CBool(pDataRow.Cells("UniqueSampleType").Value))
+                        IsUniqueSampleType = CBool(IIf(IsDBNull(pDataRow.Cells("UniqueSampleType").Value), True, CBool(pDataRow.Cells("UniqueSampleType").Value)))
                     End If
                 End If
 
@@ -1302,8 +1303,8 @@ Public Class IConfigLISMapping
 
             MyClass.InitialModeScreenStatus()
 
-            Dim myGlobalbase As New GlobalBase
-            CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             ScreenStatusByUserLevel()
 
         Catch ex As Exception
@@ -1321,7 +1322,7 @@ Public Class IConfigLISMapping
     Private Sub LISMappingTypeComboBox_SelectedIndexChanged(sender As Object, e As EventArgs) Handles FilterComboBox.SelectedIndexChanged
         Try
 
-            If Not LoadingScreen Then
+            If Not ScreenIsLoading Then
                 If Not MyClass.IsEditionMode Then
                     Me.LISMappingDataGridView.DataSource = Nothing
                     MyClass.FillLISMappingsGrid()
@@ -1353,13 +1354,13 @@ Public Class IConfigLISMapping
 
     Private Sub LISMappingDataGridView_CellValueChanged(sender As Object, e As DataGridViewCellEventArgs) Handles LISMappingDataGridView.CellValueChanged
         Try
-            If Not LoadingScreen And MyClass.IsEditionMode Then
+            If Not ScreenIsLoading And IsEditionMode Then
                 Dim myDgv As DataGridView = TryCast(sender, DataGridView)
                 For Each dr As DataGridViewRow In myDgv.Rows
                     If dr.Cells("LISValue").ColumnIndex = e.ColumnIndex Then
                         If dr.Index = e.RowIndex Then
                             dr.Cells("Changed").Value = True
-                            MyClass.IsAnyChanged = True
+                            IsAnyChanged = True
                             Exit For
                         End If
                     End If
@@ -1374,9 +1375,9 @@ Public Class IConfigLISMapping
     Private Sub LISMappingDataGridView_RowValidating(ByVal sender As Object, ByVal e As System.Windows.Forms.DataGridViewCellCancelEventArgs) Handles LISMappingDataGridView.RowValidating
         Dim IsAllOK As Boolean
         Try
-            If Not LoadingScreen And MyClass.IsEditionMode Then
-                MyClass.ValidateGridRow(e.RowIndex)
-                IsAllOK = MyClass.IsAllValidatedOK
+            If Not ScreenIsLoading And IsEditionMode Then
+                ValidateGridRow(e.RowIndex)
+                IsAllOK = IsAllValidatedOK
             End If
 
         Catch ex As Exception
@@ -1432,8 +1433,8 @@ Public Class IConfigLISMapping
     Private Sub IConfigLISMapping_KeyDown(ByVal sender As Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles Me.KeyDown
         Try
             If (e.KeyCode = Keys.Escape) Then
-                If (CancelButton.Enabled) Then
-                    CancelButton.PerformClick()
+                If (ButtonCancel.Enabled) Then
+                    ButtonCancel.PerformClick()
                 Else
                     CloseButton.PerformClick()
                 End If
@@ -1490,7 +1491,7 @@ Public Class IConfigLISMapping
     ''' <remarks>
     ''' Created by XB 01/03/2013
     ''' </remarks>    
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         Try
             CancelEdition()
 
@@ -1532,7 +1533,7 @@ Public Class IConfigLISMapping
                     Close()
                 Else
                     'Normal button click - Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
 

@@ -5,7 +5,6 @@ Option Explicit On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types.ExecutionsDS
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -136,8 +135,8 @@ Namespace Biosystems.Ax00.BL
                         'AG 31/03/2014 - #1565 add trace + inform the analyzer status!!
                         'Create Executions for the Rerun (without deleting the not in curse ones --> set parameter pWorkInRunningMode to FALSE)
                         'myGlobal = myExecutionDelegate.CreateWSExecutions(dbConnection, pAnalyzerID, pWorkSessionID, False, pOrderTestID, myAutoRepCriterion, pIsISEModuleReady)
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Launch CreateWSExecutions !", "AnalyzerManager.ManageRepetitions", EventLogEntryType.Information, False)
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("Launch CreateWSExecutions !", "AnalyzerManager.ManageRepetitions", EventLogEntryType.Information, False)
                         Debug.Print("Manage Repetitions!!! - RunningMode: " & pRunningMode)
                         'NOTE: AG 30/05/2014 #1644 - No changes made here! When add reruns the new parameter pauseMode is not required
 
@@ -222,8 +221,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.ManageRepetitions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.ManageRepetitions", EventLogEntryType.Error, False)
             Finally
                 'If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -254,7 +253,7 @@ Namespace Biosystems.Ax00.BL
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones1 As New ApplicationLogManager()
+                'Dim myLogAcciones1 As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 Dim myWSRepetitionsToAddDelegate As New WSRepetitionsToAddDelegate
@@ -301,7 +300,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones1.CreateLogActivity("AddManualRepetitions (Complete): " & _
+                GlobalBase.CreateLogActivity("AddManualRepetitions (Complete): " & _
                                                 Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "RepetititonsDelegate.AddManualRepetitions", EventLogEntryType.Information, False)
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -321,8 +320,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.AddManualRepetitions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.AddManualRepetitions", EventLogEntryType.Error, False)
             Finally
                 'If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -470,8 +469,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.Init", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.Init", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -494,7 +493,7 @@ Namespace Biosystems.Ax00.BL
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones1 As New ApplicationLogManager()
+            'Dim myLogAcciones1 As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Try
@@ -584,12 +583,12 @@ Namespace Biosystems.Ax00.BL
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobal.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.CalculateAutoRepetitionCriterion", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RepetitionsDelegate.CalculateAutoRepetitionCriterion", EventLogEntryType.Error, False)
             End Try
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones1.CreateLogActivity("CalculateAutoRepetitionCriterion (Complete): " & _
+            GlobalBase.CreateLogActivity("CalculateAutoRepetitionCriterion (Complete): " & _
                                             Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "RepetitionDelegate.CalculateAutoRepetitionCriterion", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

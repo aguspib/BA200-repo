@@ -2,11 +2,8 @@
 Option Strict On
 
 Imports Microsoft.Win32
-Imports System.Windows.Forms
-Imports System.Configuration
 Imports System.Globalization
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global
 
 ''' <summary>

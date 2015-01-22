@@ -5,14 +5,12 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports System.Configuration
 Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
 
 Imports Biosystems.Ax00.CommunicationsSwFw  ' XBC 06/09/2011
 
 Imports Biosystems.Ax00.FwScriptsManagement 'SGM 28/10/2011
-Imports System.IO
 
 Public Class IConfigGeneral
 
@@ -180,20 +178,20 @@ Public Class IConfigGeneral
             'SAVE Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             If MyClass.IsService Then
                 'TEST Communications Button
                 auxIconName = GetIconName("ADJUSTMENT")
                 If System.IO.File.Exists(iconPath & auxIconName) Then
-                    BsTestCommunicationsButton.Image = Image.FromFile(iconPath & auxIconName)
+                    BsTestCommunicationsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                     BsTestCommunicationsButton.Visible = True
                 End If
             End If
@@ -243,8 +241,8 @@ Public Class IConfigGeneral
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'Get Icons for Form Buttons
             PrepareButtons()

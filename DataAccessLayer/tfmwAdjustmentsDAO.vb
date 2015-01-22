@@ -29,7 +29,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
 
                     Dim myAdjustmentsDS As SRVAdjustmentsDS
-                    Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
+                    'Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
                     
                     myAdjustmentsDS = pAdjDS
 
@@ -93,8 +93,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.CreateMasterData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.CreateMasterData", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -143,8 +143,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.GetMasterData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.GetMasterData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -202,8 +202,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.UpdateAdjustmentsTable", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.UpdateAdjustmentsTable", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -227,7 +227,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
 
                     Dim myAdjustmentsDS As SRVAdjustmentsDS
-                    Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
+                    'Dim myAdjustmentsDAO As New tfmwAdjustmentsDAO
                     resultData = MyClass.GetMasterData(Nothing, "MasterData")
                     If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                         myAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
@@ -299,8 +299,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.CreateMasterData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.CreateMasterData", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -345,8 +345,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.Delete", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -388,8 +388,8 @@ Namespace Biosystems.Ax00.DAL.DAO
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.ReadAllAdjustmentsDB", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tfmwAdjustmentsDAO.ReadAllAdjustmentsDB", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

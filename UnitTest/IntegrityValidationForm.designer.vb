@@ -26,7 +26,7 @@ Partial Class IntegrityValidationForm
         Me.ExecuteTestButton = New System.Windows.Forms.Button()
         Me.ResultTextBox = New System.Windows.Forms.RichTextBox()
         Me.TitleLabel = New System.Windows.Forms.Label()
-        Me.CancelButton = New System.Windows.Forms.Button()
+        Me.ButtonCancel = New System.Windows.Forms.Button()
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.ShowErrorChkBox = New System.Windows.Forms.CheckBox()
@@ -63,12 +63,12 @@ Partial Class IntegrityValidationForm
         '
         'CancelButton
         '
-        Me.CancelButton.Image = CType(resources.GetObject("CancelButton.Image"), System.Drawing.Image)
-        Me.CancelButton.Location = New System.Drawing.Point(528, 401)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 3
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Image = CType(resources.GetObject("CancelButton.Image"), System.Drawing.Image)
+        Me.ButtonCancel.Location = New System.Drawing.Point(528, 401)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 3
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'ProgressBar1
         '
@@ -107,7 +107,7 @@ Partial Class IntegrityValidationForm
         Me.Controls.Add(Me.ShowErrorChkBox)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.ProgressBar1)
-        Me.Controls.Add(Me.CancelButton)
+        Me.Controls.Add(Me.ButtonCancel)
         Me.Controls.Add(Me.TitleLabel)
         Me.Controls.Add(Me.ResultTextBox)
         Me.Controls.Add(Me.ExecuteTestButton)
@@ -124,7 +124,7 @@ Partial Class IntegrityValidationForm
     Friend WithEvents ExecuteTestButton As System.Windows.Forms.Button
     Friend WithEvents ResultTextBox As System.Windows.Forms.RichTextBox
     Friend WithEvents TitleLabel As System.Windows.Forms.Label
-    Friend WithEvents CancelButton As System.Windows.Forms.Button
+    Friend WithEvents ButtonCancel As System.Windows.Forms.Button
     Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
     Friend WithEvents Label1 As System.Windows.Forms.Label
     Friend WithEvents ShowErrorChkBox As System.Windows.Forms.CheckBox

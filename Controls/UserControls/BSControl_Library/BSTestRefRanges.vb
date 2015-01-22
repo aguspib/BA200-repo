@@ -3,11 +3,8 @@ Option Explicit On
 
 Imports System.Windows.Forms
 Imports System.Drawing
-Imports Biosystems.Ax00
-Imports Biosystems.Ax00.Controls
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Types.TestRefRangesDS
 
 'User Control that allows the edition of Reference Ranges for Tests of whatever type: 
 'Standard, Calculated, ISE and/or Off-System Tests
@@ -644,11 +641,11 @@ Public Class BSTestRefRanges
     ''' </remarks>
     Public Sub UpdateTestRefRanges(ByVal pTestId As Integer, ByVal pSampleType As String)
         Dim sampleType As String
-        Dim testRefRangesRowGeneric As TestRefRangesDS.tparTestRefRangesRow
+        Dim testRefRangesRowGeneric As TestRefRangesDS.tparTestRefRangesRow = Nothing
         Dim testRefRangesRowDetailed As TestRefRangesDS.tparTestRefRangesRow
 
         Try
-            Dim qTestSampleRow As List(Of TestSamplesDS.tparTestSamplesRow)
+            Dim qTestSampleRow As List(Of TestSamplesDS.tparTestSamplesRow) = Nothing
             Dim qISETestSampleRow As List(Of ISETestSamplesDS.tparISETestSamplesRow)
             Dim qOFFSTestSampleRow As List(Of OffSystemTestSamplesDS.tparOffSystemTestSamplesRow)
             Dim myTestType As String = "STD"
@@ -1079,7 +1076,7 @@ Public Class BSTestRefRanges
     Public Sub RefUpdateDetailDataGridViewBySampleType(ByVal pTestID As Integer, ByVal pNewSampleType As String)
         Dim NewSampleType As String
         Dim FirstSampleType As String
-        Dim NewDetailedRows As New List(Of DataGridViewRow)
+        'Dim NewDetailedRows As New List(Of DataGridViewRow)
 
         Try
             NewSampleType = pNewSampleType
@@ -1161,7 +1158,7 @@ Public Class BSTestRefRanges
     Public Sub RefUpdateGenericBySampleType(ByVal pTestID As Integer, ByVal pNewSampleType As String)
         Dim NewSampleType As String
         Dim FirstSampleType As String
-        Dim NewDetailedRows As New List(Of DataGridViewRow)
+        'Dim NewDetailedRows As New List(Of DataGridViewRow)
 
         Try
             NewSampleType = pNewSampleType
@@ -1657,7 +1654,7 @@ Public Class BSTestRefRanges
     ''' Modified by: SA 17/11/2010 - Use the Code of the selected AgeUnit, not the multilanguage description
     ''' </remarks>
     Private Sub RefDetailAgeLimitsSetUp()
-        Dim myFieldLimits As FieldLimitsDS.tfmwFieldLimitsRow
+        Dim myFieldLimits As FieldLimitsDS.tfmwFieldLimitsRow = Nothing
 
         Try
             If (bsRefDetailAgeComboBox.SelectedIndex > -1) Then

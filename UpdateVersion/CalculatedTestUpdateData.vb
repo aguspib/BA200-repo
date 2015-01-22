@@ -1,7 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
@@ -93,8 +92,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.CREATENewCALCTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.CREATENewCALCTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -173,8 +172,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCalcTestFormula", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCalcTestFormula", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -270,8 +269,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetTestNameForFormula", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetTestNameForFormula", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -349,8 +348,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetCustomerTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.GetCustomerTestID", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -446,8 +445,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateDate.UpdateRenamedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateDate.UpdateRenamedTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -534,8 +533,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.RenameTestName", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.RenameTestName", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -619,8 +618,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.DELETERemovedCALCTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.DELETERemovedCALCTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -647,7 +646,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 Dim myRefRanges As New TestRefRangesDS
                 Dim myCustomerCalcTestsDS As New CalculatedTestsDS
                 Dim myFactoryCalcTestDS As New CalculatedTestsDS
-                Dim myFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow
+                Dim myFactoryCalcTestRow As CalculatedTestsDS.tparCalculatedTestsRow = Nothing
                 Dim myPreloadedCALCTestList As New List(Of CalculatedTestsDS.tparCalculatedTestsRow)
 
                 Dim myFormulasDelegate As New FormulasDelegate
@@ -729,8 +728,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UPDATEModifiedCALCTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UPDATEModifiedCALCTests", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -822,8 +821,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCustomerTest", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1041,8 +1040,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCalcTestRefRanges", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.UpdateCalcTestRefRanges", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -1076,8 +1075,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 pUpdateVersionChangesList.UpdatedElements.AddUpdatedElementsRow(myUpdateVersionChangedElementsRow)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error", "CalculatedTestUpdateData.AddUpdatedElementToChangesStructure", EventLogEntryType.Error, False)
                 Throw
             End Try
         End Sub
@@ -1144,8 +1143,8 @@ End Namespace
 '                    Return True
 
 '                Catch ex As Exception
-'                    Dim myLogAcciones As New ApplicationLogManager()
-'                    myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchCalcTestByName", EventLogEntryType.Error, False)
+'                    'Dim myLogAcciones As New ApplicationLogManager()
+'                    GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchCalcTestByName", EventLogEntryType.Error, False)
 '                Finally
 '                    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '                End Try
@@ -1185,8 +1184,8 @@ End Namespace
 '                    Return True
 
 '                Catch ex As Exception
-'                    Dim myLogAcciones As New ApplicationLogManager()
-'                    myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchCalcTestByLongName", EventLogEntryType.Error, False)
+'                    'Dim myLogAcciones As New ApplicationLogManager()
+'                    GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchCalcTestByLongName", EventLogEntryType.Error, False)
 '                Finally
 '                    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '                End Try
@@ -1225,8 +1224,8 @@ End Namespace
 '                    formulaDS = DirectCast(resultData.SetDatos, FormulasDS)
 '                    Return True
 '                Catch ex As Exception
-'                    Dim myLogAcciones As New ApplicationLogManager()
-'                    myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchFormulaByCalcTestId", EventLogEntryType.Error, False)
+'                    'Dim myLogAcciones As New ApplicationLogManager()
+'                    GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchFormulaByCalcTestId", EventLogEntryType.Error, False)
 '                Finally
 '                    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '                End Try
@@ -1266,8 +1265,8 @@ End Namespace
 '                    Return True
 
 '                Catch ex As Exception
-'                    Dim myLogAcciones As New ApplicationLogManager()
-'                    myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchRefRangesByCalcTestId", EventLogEntryType.Error, False)
+'                    'Dim myLogAcciones As New ApplicationLogManager()
+'                    GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchRefRangesByCalcTestId", EventLogEntryType.Error, False)
 '                Finally
 '                    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '                End Try
@@ -1308,8 +1307,8 @@ End Namespace
 '                    Return True
 
 '                Catch ex As Exception
-'                    Dim myLogAcciones As New ApplicationLogManager()
-'                    myLogAcciones.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchCalcTestByBiosystemsID", EventLogEntryType.Error, False)
+'                    'Dim myLogAcciones As New ApplicationLogManager()
+'                    GlobalBase.CreateLogActivity(ex.Message, "CalculatedTestUpdateData.DataInDB.SearchCalcTestByBiosystemsID", EventLogEntryType.Error, False)
 '                Finally
 '                    If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
 '                End Try
@@ -1394,8 +1393,8 @@ End Namespace
 '                myGlobalDataTO.SetDatos = dataDB
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetDataInDB", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetDataInDB", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1435,8 +1434,8 @@ End Namespace
 '                'Return row.PreloadedCalculatedTest
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.IsFactoryDefinedItem", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.IsFactoryDefinedItem", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return False
@@ -1450,8 +1449,8 @@ End Namespace
 '                myGlobalDataTO = CalculatedTestUpdateDAO.GetPreloadedCALCTestsDistinctInClient(pDBConnection)
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetAffectedItemsFromFactoryUpdates", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1518,8 +1517,8 @@ End Namespace
 
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoCreateNewElement", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoCreateNewElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1617,8 +1616,8 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoUpdateUserDefinedElement", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoUpdateUserDefinedElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1730,8 +1729,8 @@ End Namespace
 '                myGlobalDataTO = calcTestDelegate.Modify(pDBConnection, mycalcTest, myFormula, myRefRanges)
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoUpdateFactoryDefinedElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1791,8 +1790,8 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.RenameCalcTestNameWhenUpdateOrCreateNew", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.RenameCalcTestNameWhenUpdateOrCreateNew", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1814,8 +1813,8 @@ End Namespace
 '            Try
 '                myGlobalDataTO = UpdateDeprecatedIdentifiers(pDBConnection)
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoFinalActions", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoFinalActions", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1886,8 +1885,8 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.UpdateDeprecatedIdentifiers", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.UpdateDeprecatedIdentifiers", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1904,8 +1903,8 @@ End Namespace
 '                myGlobalDataTO = CalculatedTestUpdateDAO.GetPreloadedCALCTestsDistinctInFactory(pDBConnection)
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetAffectedItemsFromFactoryRemoves", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetAffectedItemsFromFactoryRemoves", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1957,8 +1956,8 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoRemoveUserElement", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoRemoveUserElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -1981,8 +1980,8 @@ End Namespace
 '                'Update in HTML Report?
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoRemoveFactoryElement", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.DoRemoveFactoryElement", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -2023,8 +2022,8 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("CALC Test Update Error.", "CalculatedTestUpdateData.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message
@@ -2059,8 +2058,8 @@ End Namespace
 '                End If
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity("Elememt Update Error.", "CalculatedTestUpdateData.GetActionFromFactoryUpdates", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity("Elememt Update Error.", "CalculatedTestUpdateData.GetActionFromFactoryUpdates", EventLogEntryType.Error, False)
 '                myGlobalDataTO.HasError = True
 '                myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
 '                myGlobalDataTO.ErrorMessage = ex.Message

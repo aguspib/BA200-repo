@@ -2,7 +2,6 @@ Option Explicit On
 Option Strict On
 
 
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports System.Windows.Forms
 Imports System.Drawing
@@ -159,11 +158,11 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' </remarks>
         Public Sub RefreshFieldsData(ByVal pISEMonitorData As ISEMonitorTO)
             Try
-                Dim myUtil As New Utilities
+                ''Dim myUtil As New Utilities.
 
-                Me.InitializeFields()
-                Me.InitializeWarnings()
-                Me.InitializeIcons()
+                InitializeFields()
+                InitializeWarnings()
+                InitializeIcons()
 
                 If Not pISEMonitorData Is Nothing AndAlso pISEMonitorData.HasData Then
 

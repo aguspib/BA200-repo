@@ -1,7 +1,4 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Controls.UserControls
+﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class IMotorsPumpsValvesTest
@@ -366,7 +363,7 @@ Partial Class IMotorsPumpsValvesTest
         Me.BsHomingSimulationTimer = New System.Windows.Forms.Timer(Me.components)
         Me.BsSimulateContinuousTimer = New System.Windows.Forms.Timer(Me.components)
         Me.BsCollisionSimulationTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
+        Me.bsScreenToolTips2 = New Biosystems.Ax00.Controls.UserControls.BSToolTip
         Me.BsMessagesPanel.SuspendLayout()
         CType(Me.BsMessageImage, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.BsButtonsPanel.SuspendLayout()
@@ -7943,7 +7940,7 @@ Partial Class IMotorsPumpsValvesTest
     'Friend WithEvents Col_StartButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents Enco_EncoderPanel As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents Enco_UnitsLabel As System.Windows.Forms.Label
-    Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
+    Friend WithEvents bsScreenToolTips2 As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents WSAsp_UpDownButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents WSDisp_UpDownButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsInfoInDoXPSViewer As BsXPSViewer

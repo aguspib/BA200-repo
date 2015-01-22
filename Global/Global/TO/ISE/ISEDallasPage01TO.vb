@@ -85,8 +85,8 @@ Namespace Biosystems.Ax00.Global
         End Property
         Public ReadOnly Property InstallationDate() As DateTime
             Get
-                If MyClass.InstallationYearAttr >= 0 And MyClass.InstallationMonthAttr >= 1 And MyClass.InstallationDayAttr >= 1 Then
-                    Dim myDate As New DateTime(MyClass.InstallationYear, MyClass.InstallationMonthAttr, MyClass.InstallationDayAttr)
+                If Me.InstallationYearAttr >= 0 And Me.InstallationMonthAttr >= 1 And Me.InstallationDayAttr >= 1 Then
+                    Dim myDate As New DateTime(Me.InstallationYear, Me.InstallationMonthAttr, Me.InstallationDayAttr)
                     Return myDate ' Nothing for testing
                 Else
                     Return Nothing
@@ -119,18 +119,18 @@ Namespace Biosystems.Ax00.Global
 
         Public Property ConsumptionCalAbitData() As String
             Get
-                Return MyClass.ConsumptionCalAbitDataAttr
+                Return Me.ConsumptionCalAbitDataAttr
             End Get
             Set(ByVal value As String)
-                MyClass.ConsumptionCalAbitDataAttr = value
+                Me.ConsumptionCalAbitDataAttr = value
             End Set
         End Property
         Public Property ConsumptionCalBbitData() As String
             Get
-                Return MyClass.ConsumptionCalBbitDataAttr
+                Return Me.ConsumptionCalBbitDataAttr
             End Get
             Set(ByVal value As String)
-                MyClass.ConsumptionCalBbitDataAttr = value
+                Me.ConsumptionCalBbitDataAttr = value
             End Set
         End Property
 
@@ -211,7 +211,7 @@ Namespace Biosystems.Ax00.Global
 
 
         Public Overrides Function ToString() As String
-            Return MyClass.Page01DataStringAttr
+            Return Me.Page01DataStringAttr
         End Function
 
     End Class

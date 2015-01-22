@@ -1,11 +1,11 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
-Imports System.Globalization
 Imports DevExpress.XtraEditors.Repository
 Imports DevExpress.XtraEditors
 Imports DevExpress.XtraEditors.Controls
@@ -106,8 +106,8 @@ Public Class IHisResults
         myHisWSResultsDelegate = New HisWSResultsDelegate
 
         'Get the current Language from the current Application Session
-        Dim currentLanguageGlobal As New GlobalBase
-        currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+        'Dim currentLanguageGlobal As New GlobalBase
+        currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
     End Sub
 #End Region
 
@@ -157,9 +157,9 @@ Public Class IHisResults
         auxIconName = GetIconName(pKey)
         If (Not String.IsNullOrEmpty(auxIconName)) Then
             If (mImageDict.ContainsKey(pKey)) Then
-                mImageDict.Item(pKey) = Image.FromFile(iconPath & auxIconName)
+                mImageDict.Item(pKey) = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             Else
-                mImageDict.Add(pKey, Image.FromFile(iconPath & auxIconName))
+                mImageDict.Add(pKey, ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
         End If
     End Sub
@@ -992,12 +992,12 @@ Public Class IHisResults
             FindHistoricalResults()
 
             'Get Level of the connected User and set the screen status according the Level of the current User
-            Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = myGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ScreenStatusByUserLevel()
 
             'Set declared variables to Nothing 
-            myGlobalBase = Nothing
+            'myGlobalBase = Nothing
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeScreen ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -1315,18 +1315,18 @@ Public Class IHisResults
                 ScreenWorkingProcess = True
 
                 MyClass.EnableScreen(False)
-                IAx00MainMDI.EnableButtonAndMenus(False)
+                UiAx00MainMDI.EnableButtonAndMenus(False)
 
                 workingThread.Start()
 
                 While DeletingHistOrderTests
-                    IAx00MainMDI.InitializeMarqueeProgreesBar()
+                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
                     Cursor = Cursors.WaitCursor
                     Application.DoEvents()
                 End While
 
                 workingThread = Nothing
-                IAx00MainMDI.StopMarqueeProgressBar()
+                UiAx00MainMDI.StopMarqueeProgressBar()
                 CreateLogActivity("DeleteSelectedRowsFromGrid: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Name & ".DeleteSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
             End If
         Catch ex As Exception
@@ -1335,7 +1335,7 @@ Public Class IHisResults
         End Try
 
         EnableScreen(True)
-        IAx00MainMDI.EnableButtonAndMenus(True)
+        UiAx00MainMDI.EnableButtonAndMenus(True)
         Cursor = Cursors.Default
         UpdateFormBehavior(True)
     End Sub
@@ -1513,8 +1513,8 @@ Public Class IHisResults
 
                 'Inform the new results to be updated into MDI property
                 If (myExportedExecutionsDS.twksWSExecutions.Rows.Count > 0) Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
-                    IAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
-                    IAx00MainMDI.InvokeUploadResultsLIS(True, False, Nothing, Nothing, myHisWSResultsDS) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
+                    UiAx00MainMDI.AddResultsIntoQueueToUpload(myExportedExecutionsDS)
+                    UiAx00MainMDI.InvokeUploadResultsLIS(True, False, Nothing, Nothing, myHisWSResultsDS) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                 End If 'AG 21/02/2014 - #1505
 
                 CreateLogActivity("Historical Results manual upload (end): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), Me.Name & ".ExportSelectedRowsFromGrid", EventLogEntryType.Information, False) 'AG 13/02/2014 - #1505
@@ -1697,7 +1697,7 @@ Public Class IHisResults
                 Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1815,7 +1815,7 @@ Public Class IHisResults
     Private Sub PrintReport(ByVal pCompactReport As Boolean)
         Try
             Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            'Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Dim myHisWSResults As New List(Of HisWSResultsDS.vhisWSResultsRow)
 
@@ -1858,7 +1858,7 @@ Public Class IHisResults
             End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "IHisResults.PrintReport", EventLogEntryType.Information, False)
                 StartTime = Now
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

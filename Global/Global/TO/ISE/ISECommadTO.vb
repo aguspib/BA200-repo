@@ -12,7 +12,7 @@ Namespace Biosystems.Ax00.Global
         End Sub
 
         Public Sub New(ByVal pISETestType As GlobalEnumerates.ISECycles)
-            MyClass.TestTypeAttr = pISETestType
+            Me.TestTypeAttr = pISETestType
         End Sub
 #End Region
 

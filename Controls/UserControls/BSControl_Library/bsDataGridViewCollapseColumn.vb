@@ -1,6 +1,7 @@
 ﻿Imports System
 Imports System.Drawing
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.Controls.UserControls
 
@@ -108,8 +109,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.New", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.New", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -130,8 +130,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.CollapseAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.CollapseAll", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -152,8 +151,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.ExpandAll", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.ExpandAll", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -179,8 +177,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.OnDataGridViewChanged", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.OnDataGridViewChanged", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -217,8 +214,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.InitializeHeaderPicBox", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.InitializeHeaderPicBox", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -232,8 +228,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.Validating", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.Validating", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -249,8 +244,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
                 headerPictureBox.Size = New Size(PlusImage.Width, PlusImage.Height)
 
-                Dim OffsetWidth As Integer = (Width - PlusImage.Width) / 2 + 1
-                Dim OffsetHeight As Integer = (DataGridView.ColumnHeadersHeight - PlusImage.Height) / 2 + 2
+                Dim OffsetWidth As Integer = CInt((Width - PlusImage.Width) / 2 + 1)
+                Dim OffsetHeight As Integer = CInt((DataGridView.ColumnHeadersHeight - PlusImage.Height) / 2 + 2)
 
                 Dim LeftPadding As Integer = OffsetWidth
                 For i As Integer = 0 To Me.Index - 1
@@ -266,8 +261,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.RefreshHeader", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.RefreshHeader", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -297,8 +291,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.headerPictureBox_Click", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "bsDataGridViewCollapseColumn.headerPictureBox_Click", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 

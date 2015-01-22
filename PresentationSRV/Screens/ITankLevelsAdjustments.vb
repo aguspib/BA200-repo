@@ -838,12 +838,12 @@ Public Class ITankLevelsAdjustments
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            bsScreenToolTips.SetToolTip(Me.BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
-            bsScreenToolTips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
-            bsScreenToolTips.SetToolTip(Me.BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", pLanguageID))
+            ScreenTooltips.SetToolTip(Me.BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
 
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsStartTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsStopTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsStartTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", pLanguageID))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsStopTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", pLanguageID))
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -885,7 +885,7 @@ Public Class ITankLevelsAdjustments
     ''' <remarks>Created by XBC 05/01/2011</remarks>
     Private Function GetLimitValues() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             ' Get Value limit ranges
             Dim myFieldLimitsDS As New FieldLimitsDS
@@ -927,7 +927,7 @@ Public Class ITankLevelsAdjustments
             End If
 
             ' Another Initializations
-            Me.SCALESDINAMICRANGE = myGlobalbase.ScalesDinamicRange
+            Me.SCALESDINAMICRANGE = GlobalBase.ScalesDinamicRange
 
         Catch ex As Exception
             myGlobalDataTO.HasError = True
@@ -951,7 +951,7 @@ Public Class ITankLevelsAdjustments
     Private Sub PrepareButtons()
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
-        Dim myutil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 
@@ -971,7 +971,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsAdjustButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -980,7 +980,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
             '    BsSaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -989,7 +989,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsCancelButton.Image = myImage
             '    BsCancelButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -998,7 +998,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1009,7 +1009,7 @@ Public Class ITankLevelsAdjustments
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
 
             '    WSFullAdjustButton.Image = myImage
             '    WSFullAdjustButton.ImageAlign = ContentAlignment.MiddleLeft
@@ -1029,17 +1029,17 @@ Public Class ITankLevelsAdjustments
             auxIconName = GetIconName("ACCEPTF")
             If System.IO.File.Exists(iconPath & auxIconName) Then
 
-                WSFullSavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                WSEmptySavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                HCFullSavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
-                HCEmptySavedPictureBox.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                WSFullSavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                WSEmptySavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                HCFullSavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                HCEmptySavedPictureBox.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             End If
 
             'Info Button
             auxIconName = GetIconName("RIGHT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+                Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             End If
 
@@ -1047,7 +1047,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsStartTestButton.Image = myImage
             '    BsAdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -1056,7 +1056,7 @@ Public Class ITankLevelsAdjustments
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myutil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    BsStopTestButton.Image = myImage
             '    BsStopTestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -2810,13 +2810,13 @@ Public Class ITankLevelsAdjustments
 
             If System.IO.File.Exists(iconPath & NG_IconName) Then
 
-                Dim myNGImage As Image = Image.FromFile(iconPath & NG_IconName)
+                Dim myNGImage As Image = ImageUtilities.ImageFromFile(iconPath & NG_IconName)
 
 
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myUtil.ResizeImage(myNGImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myNGImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewNGImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -3022,21 +3022,21 @@ Public Class ITankLevelsAdjustments
 
             If System.IO.File.Exists(iconPath & RUN_IconName) And System.IO.File.Exists(iconPath & OK_IconName) Then
 
-                Dim myRunImage As Image = Image.FromFile(iconPath & RUN_IconName)
-                Dim myOKImage As Image = Image.FromFile(iconPath & OK_IconName)
+                Dim myRunImage As Image = ImageUtilities.ImageFromFile(iconPath & RUN_IconName)
+                Dim myOKImage As Image = ImageUtilities.ImageFromFile(iconPath & OK_IconName)
 
 
-                Dim myUtil As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myGlobal As New GlobalDataTO
 
-                myGlobal = myUtil.ResizeImage(myRunImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myRunImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewRunImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
                     myNewRunImage = CType(myRunImage, Bitmap)
                 End If
 
-                myGlobal = myUtil.ResizeImage(myOKImage, New Size(20, 20))
+                myGlobal = Utilities.ResizeImage(myOKImage, New Size(20, 20))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewOKImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -4137,8 +4137,8 @@ Public Class ITankLevelsAdjustments
                 max = CSng(myGlobal.SetDatos)
             End If
 
-            Dim myUtil As New Utilities
-            myGlobal = myUtil.CalculatePercent(pValue, min, max)
+            ''Dim myUtil As New Utilities.
+            myGlobal = Utilities.CalculatePercent(pValue, min, max)
 
         Catch ex As Exception
             myGlobal.HasError = True
@@ -4517,7 +4517,7 @@ Public Class ITankLevelsAdjustments
     'End Sub
     Private Sub TankLevelsAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             ''sensors
             'With MyBase.SensorsTimer
@@ -4527,7 +4527,7 @@ Public Class ITankLevelsAdjustments
             'End With
 
             'Get the current Language from the current Application Session
-            MyClass.LanguageId = myGlobalbase.GetSessionInfo.ApplicationLanguage.Trim.ToString
+            MyClass.LanguageId = GlobalBase.GetSessionInfo.ApplicationLanguage.Trim.ToString
 
             MyClass.GetScreenLabels(MyClass.LanguageId)
 
@@ -5013,7 +5013,7 @@ Public Class ITankLevelsAdjustments
         End Try
     End Sub
 
-    Private Sub OnTankLevelChanged(ByVal pTank As INTERMEDIATE_TANKS) Handles MyClass.TankLevelChanged
+    Private Sub OnTankLevelChanged(ByVal pTank As INTERMEDIATE_TANKS) Handles Me.TankLevelChanged
         Try
             Select Case pTank
                 Case INTERMEDIATE_TANKS.DISTILLED_WATER
@@ -5036,7 +5036,7 @@ Public Class ITankLevelsAdjustments
         End Try
     End Sub
 
-    Private Sub OnTankLevelUndefined(ByVal pTank As INTERMEDIATE_TANKS) Handles MyClass.TankLevelUndefined
+    Private Sub OnTankLevelUndefined(ByVal pTank As INTERMEDIATE_TANKS) Handles Me.TankLevelUndefined
         Try
             Select Case pTank
                 Case INTERMEDIATE_TANKS.DISTILLED_WATER

@@ -17,9 +17,9 @@ Public NotInheritable Class TestPDF
             'Me.BsWebBrowser1.ScrollBarsEnabled = False
             'Me.BsWebBrowser1.AutoScrollOffset = New Point(0, 0)
 
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
 
-            myUtil.ExtractFromZip("C:\Prueba3.zip", "C:\tmp", "AX00")
+            Utilities.ExtractFromZip("C:\Prueba3.zip", "C:\tmp", "AX00")
 
             Application.DoEvents()
 

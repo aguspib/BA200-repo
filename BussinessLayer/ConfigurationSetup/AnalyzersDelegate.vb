@@ -38,8 +38,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetDistinctAnalyzers", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetDistinctAnalyzers", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -75,8 +75,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAllAnalyzers", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAllAnalyzers", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -121,8 +121,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -159,8 +159,8 @@ Namespace Biosystems.Ax00.BL
         '        returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        returnedData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerByID", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerByID", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -195,8 +195,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerModel", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerModel", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -216,7 +216,7 @@ Namespace Biosystems.Ax00.BL
                                       Optional ByVal pAnalyzer As AnalyzersDS.tcfgAnalyzersRow = Nothing) As GlobalDataTO
             Dim returnedData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
-            Dim myLogAccionesAux As New ApplicationLogManager()
+            'Dim myLogAccionesAux As New ApplicationLogManager()
             Try
                 returnedData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not returnedData.HasError And Not returnedData.SetDatos Is Nothing) Then
@@ -259,10 +259,10 @@ Namespace Biosystems.Ax00.BL
                                     ' Current Analyzer connected is already inserted in Database !
                                     ' Not isNew !!!
 
-                                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Update Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("(Analyzer Change) Update Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
                                     myGlobal = mytcfgAnalyzersDAO.UpdateAnalyzerActive(dbConnection, pAnalyzer.AnalyzerID)
                                     If myGlobal.HasError Then
-                                        myLogAccionesAux.CreateLogActivity("Update Analyzer Active Error !", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
+                                        GlobalBase.CreateLogActivity("Update Analyzer Active Error !", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
                                         returnedData.HasError = True
                                     End If
 
@@ -273,7 +273,7 @@ Namespace Biosystems.Ax00.BL
                                     Dim myAnalyzersRow As AnalyzersDS.tcfgAnalyzersRow
                                     myAnalyzersRow = myAnalyzersDS.tcfgAnalyzers.NewtcfgAnalyzersRow
 
-                                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Insert New Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("(Analyzer Change) Insert New Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
                                     myAnalyzersRow.AnalyzerID = pAnalyzer.AnalyzerID
                                     myAnalyzersRow.AnalyzerModel = pAnalyzer.AnalyzerModel
                                     myAnalyzersRow.FirmwareVersion = pAnalyzer.FirmwareVersion
@@ -307,8 +307,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -328,7 +328,7 @@ Namespace Biosystems.Ax00.BL
             Dim returnedData As New GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
-            Dim myLogAccionesAux As New ApplicationLogManager()
+            'Dim myLogAccionesAux As New ApplicationLogManager()
             Try
                 returnedData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not returnedData.HasError And Not returnedData.SetDatos Is Nothing) Then
@@ -344,13 +344,13 @@ Namespace Biosystems.Ax00.BL
 
                             If (myAnalyzerData.tcfgAnalyzers.Rows.Count = 0) Then
                                 'Create new connected Analyzer
-                                myLogAccionesAux.CreateLogActivity("(Analyzer Change) Create New Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("(Analyzer Change) Create New Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.CheckAnalyzer", EventLogEntryType.Information, False)
                                 returnedData = mytcfgAnalyzersDAO.Create(dbConnection, pAnalyzer)
                                 If (Not returnedData.HasError) Then
                                     ' If there are another Analyzers previously connected set Active field as False
                                     ' Just the current Analyzer connected has Active fiels as True
 
-                                    myLogAccionesAux.CreateLogActivity("(Analyzer Change) Update Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.InsertAnalyzer", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("(Analyzer Change) Update Analyzer Active [" & pAnalyzer.AnalyzerID & " ]", "AnalyzersDelegate.InsertAnalyzer", EventLogEntryType.Information, False)
                                     returnedData = mytcfgAnalyzersDAO.UpdateAnalyzerActive(dbConnection, pAnalyzer.AnalyzerID)
                                     If Not returnedData.HasError Then
                                         Dim myAnalyzersRow As AnalyzersDS.tcfgAnalyzersRow
@@ -384,8 +384,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.InsertAnalyzer", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.InsertAnalyzer", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -420,8 +420,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerGeneric", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerGeneric", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -463,8 +463,8 @@ Namespace Biosystems.Ax00.BL
                 returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnedData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.DeleteConnectedAnalyzersNotActive", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.DeleteConnectedAnalyzersNotActive", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -501,8 +501,8 @@ Namespace Biosystems.Ax00.BL
         '        returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        returnedData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerDetails", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.GetAnalyzerDetails", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -560,8 +560,8 @@ Namespace Biosystems.Ax00.BL
         '        returnedData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        returnedData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.AnalyzerSettings", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.AnalyzerSettings", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -614,8 +614,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "AnalyzersDelegate.SaveUserSettings", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "AnalyzersDelegate.SaveUserSettings", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try

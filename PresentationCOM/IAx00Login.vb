@@ -4,7 +4,6 @@ Option Explicit On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.IO
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
@@ -320,19 +319,19 @@ Public Class IAx00Login
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsLoginButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsLoginButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CHANGE PASSWORD Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsChangePwdButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsChangePwdButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -636,8 +635,8 @@ Public Class IAx00Login
                     Me.DialogResult = DialogResult.Cancel
 
                     'SGM 07/11/2012 - log app ends
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application END", Name & ".ExitApplication", EventLogEntryType.Information, False)
 
                     Close()
                 End If
@@ -895,9 +894,9 @@ Public Class IAx00Login
                 ' END DL
 
                 'TR 07/02/2012 -Get the version information from the assembly information.
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities.
                 Dim myGlobalDataTO As GlobalDataTO
-                myGlobalDataTO = myUtil.GetSoftwareVersion()
+                myGlobalDataTO = Utilities.GetSoftwareVersion()
                 If Not myGlobalDataTO.HasError Then
                     bsVersionLabel.Text = "Version: " & myGlobalDataTO.SetDatos.ToString()
                 Else
@@ -919,7 +918,7 @@ Public Class IAx00Login
                     Dim myVersionFileName As String = GlobalBase.VersionFileName
 
                     If Not File.Exists(myFolder & myVersionFileName) Then
-                        myUtil.CreateVersionFile(myFolder & myVersionFileName)
+                        Utilities.CreateVersionFile(myFolder & myVersionFileName)
                     End If
 
                 End If
@@ -1169,12 +1168,12 @@ Public Class IAx00Login
     ''' </summary>
     Private Shared Function InstallUpdateProcess() As GlobalDataTO
         'Private Shared Sub InstallUpdateProcess()
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
         Dim myGlobalDataTO As New GlobalDataTO
         Try
             Dim mydbmngDelegate As New DataBaseManagerDelegate()
 
-            'myLogAcciones.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity(Me.Name & ".Updateprocess -Validating if Data Base exists ", "Installation validation", EventLogEntryType.Information, False)
             myGlobalDataTO = mydbmngDelegate.InstallUpdateProcess(DAOBase.DBServer, DAOBase.CurrentDB, DAOBase.DBLogin, DAOBase.DBPassword)
 
         Catch ex As Exception

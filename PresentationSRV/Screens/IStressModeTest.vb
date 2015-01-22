@@ -502,12 +502,12 @@ Public Class IStressModeTest
             ' For Tooltips...
 
             If myScreenDelegate.StatusStressMode = STRESS_STATUS.UNFINISHED Then
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
             Else
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
             End If
 
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -525,12 +525,12 @@ Public Class IStressModeTest
         Try
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
 
@@ -545,28 +545,28 @@ Public Class IStressModeTest
             ' ''ADJUST Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsAdjustButtonTODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsAdjustButtonTODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsAdjustButtonTODELETE.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ' ''SAVE Button
             ''auxIconName = GetIconName("SAVE")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsTestButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsTestButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsTestButton.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ' ''CANCEL Button
             ''auxIconName = GetIconName("UNDO") 'CANCEL
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsAbortTestButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsAbortTestButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsAbortTestButton.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -574,14 +574,14 @@ Public Class IStressModeTest
             ' ''TEST Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsTestButton_TODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsTestButton_TODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsTestButton_TODELETE.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ''TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsTestButton.BackgroundImageLayout = ImageLayout.Center
             'End If
             '' XBC 24/11/2011 - Unify buttons Start and Stop Test Stress
@@ -589,7 +589,7 @@ Public Class IStressModeTest
             ''Info Button
             'auxIconName = GetIconName("RIGHT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -846,7 +846,7 @@ Public Class IStressModeTest
     ''' <remarks>Created by XBC 22/03/2011</remarks>
     Private Sub PrepareTestingMode()
         Try
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             ' Configurate GUI Controls
             Me.DisableAll()
             Me.BsResultsGroupBox.Enabled = True
@@ -861,10 +861,10 @@ Public Class IStressModeTest
 
             Me.TotalTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + _
                                  (myScreenDelegate.NumCycles * myScreenDelegate.TimeMachineCycle)
-            Me.TimeTotalLabel.Text = myUtil.FormatToHHmmss(Me.TotalTimeStress)
+            Me.TimeTotalLabel.Text = Utilities.FormatToHHmmss(Me.TotalTimeStress)
 
             Me.CompletedTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + myScreenDelegate.TimeElapsedStressTest
-            Me.TimeCompletedLabel.Text = myUtil.FormatToHHmmss(Me.CompletedTimeStress)
+            Me.TimeCompletedLabel.Text = Utilities.FormatToHHmmss(Me.CompletedTimeStress)
 
             Me.ResetsNumLabel.Text = myScreenDelegate.NumResetsStress.ToString
             Me.ErrorsNumLabel.Text = myScreenDelegate.NumErrorsStress.ToString
@@ -906,7 +906,7 @@ Public Class IStressModeTest
             '    Debug.Print("aqui !!!")
             'End If
 
-            Dim myUtil As New Utilities
+            'Dim Utilities As New Utilities
             Me.BsCyclesUpDown.Enabled = True
             Me.bsCompleteRadioButton.Enabled = True
 
@@ -948,10 +948,10 @@ Public Class IStressModeTest
 
             Me.TotalTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + _
                                  (myScreenDelegate.NumCycles * myScreenDelegate.TimeMachineCycle)
-            Me.TimeTotalLabel.Text = myUtil.FormatToHHmmss(Me.TotalTimeStress)
+            Me.TimeTotalLabel.Text = Utilities.FormatToHHmmss(Me.TotalTimeStress)
 
             Me.CompletedTimeStress = (InitCycles * myScreenDelegate.TimeMachineCycle) + myScreenDelegate.TimeElapsedStressTest
-            Me.TimeCompletedLabel.Text = myUtil.FormatToHHmmss(Me.CompletedTimeStress)
+            Me.TimeCompletedLabel.Text = Utilities.FormatToHHmmss(Me.CompletedTimeStress)
 
             Me.ResetsNumLabel.Text = myScreenDelegate.NumResetsStress.ToString
             Me.ErrorsNumLabel.Text = myScreenDelegate.NumErrorsStress.ToString
@@ -1245,8 +1245,8 @@ Public Class IStressModeTest
             MyClass.myScreenDelegate = New StressModeTestDelegate(MyBase.myServiceMDI.ActiveAnalyzer, myFwScriptDelegate)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             myScreenDelegate.currentLanguage = Me.currentLanguage
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
@@ -1535,7 +1535,7 @@ Public Class IStressModeTest
     Private Sub PrepareTestButton()
 
         'Dim myGlobal As New GlobalDataTO
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
@@ -1548,16 +1548,16 @@ Public Class IStressModeTest
                 auxIconName = GetIconName("ADJUSTMENT")
             End If
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Dim myNewImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myNewImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else

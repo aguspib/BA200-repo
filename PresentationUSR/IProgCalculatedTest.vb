@@ -1,12 +1,12 @@
 Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Types.AllowedTestsDS
 
 Public Class IProgCalculatedTest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -267,7 +267,7 @@ Public Class IProgCalculatedTest
             If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 'Get the current User from the Appliction Session
                 Dim currentSession As New ApplicationSessionManager
-                Dim loggedUser As String = currentSession.GetSessionInfo().UserName
+                Dim loggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                 'Load all selected Calculated Tests in a typed DataSet CalculatedTestsDS
                 Dim calTestDataDS As New CalculatedTestsDS
@@ -467,7 +467,7 @@ Public Class IProgCalculatedTest
                     Me.Close()
                 Else
                     'Normal button click - Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 bsFullNameTextbox.Focus()
@@ -1000,7 +1000,7 @@ Public Class IProgCalculatedTest
 
             'Gets from the Session the Username of the connected User; get also the current datetime
             Dim currentSession As New ApplicationSessionManager
-            calTestRow.TS_User = currentSession.GetSessionInfo().UserName
+            calTestRow.TS_User = GlobalBase.GetSessionInfo().UserName
             calTestRow.TS_DateTime = Now
 
             calTestData.tparCalculatedTests.Rows.Add(calTestRow)
@@ -1029,13 +1029,13 @@ Public Class IProgCalculatedTest
             'Get the Icon defined for Calculated Tests that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("TCALC")
             If (notInUseIcon <> "") Then
-                myIcons.Images.Add("TCALC", Image.FromFile(MyBase.IconsPath & notInUseIcon))
+                myIcons.Images.Add("TCALC", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
             End If
 
             'Get the Icon defined for Calculated Tests that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSETCALC")
             If (inUseIcon <> "") Then
-                myIcons.Images.Add("INUSETCALC", Image.FromFile(MyBase.IconsPath & inUseIcon))
+                myIcons.Images.Add("INUSETCALC", ImageUtilities.ImageFromFile(MyBase.IconsPath & inUseIcon))
             End If
 
             'Assign the Icons to the Calculated Tests List View
@@ -1586,26 +1586,26 @@ Public Class IProgCalculatedTest
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Buttons
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
@@ -1613,25 +1613,25 @@ Public Class IProgCalculatedTest
             'CUSTOM SORT Button 'AG 05/09/2014 - BA-1869
             auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
-                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Buttons for status of the Calculated Test Formula
@@ -1947,8 +1947,8 @@ Public Class IProgCalculatedTest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -2373,8 +2373,8 @@ Public Class IProgCalculatedTest
     ''' </remarks>
     Private Sub IProgCalculatedTest_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             ScreenLoad()
         Catch ex As Exception

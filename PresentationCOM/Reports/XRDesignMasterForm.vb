@@ -40,8 +40,8 @@ Public Class XRDesignMasterForm
     Private Sub XRForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             PrepareButtons()
 
@@ -135,7 +135,7 @@ Public Class XRDesignMasterForm
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> String.Empty) Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception

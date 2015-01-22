@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myResult As String = ""
             Dim myGlobalDataTO As New GlobalDataTO()
             Try
-                Dim myInstruction As New Instructions()
+                'Dim myInstruction As New Instructions()
                 If myParametersList.Count > 0 Then
                     For Each myParameterTO As ParametersTO In myParametersList
                         myResult &= myParameterTO.ParameterID
@@ -37,8 +37,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.Write", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Write", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -92,8 +92,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.Read", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -192,8 +192,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadWithAdditionalBusiness", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadWithAdditionalBusiness", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -227,8 +227,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.WriteFwScript", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.WriteFwScript", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -307,8 +307,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadFwScript", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "LAX00Interpreter.ReadFwScript", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function

@@ -1,7 +1,10 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
 Imports DevExpress.XtraCharts
@@ -112,7 +115,7 @@ Public Class IQCCumulatedReview
                     Dim myCumulateResultsRow As CumulatedResultsDS.tqcCumulatedResultsRow
 
                     For Each SelQCResult As DataGridViewRow In bsResultsDetailsGridView.SelectedRows
-                        myCumulateResultsRow = myCumulateResultsDS.tqcCumulatedResults.NewRow
+                        myCumulateResultsRow = CType(myCumulateResultsDS.tqcCumulatedResults.NewRow, CumulatedResultsDS.tqcCumulatedResultsRow)
 
                         myCumulateResultsRow.QCTestSampleID = CInt(SelQCResult.Cells("QCTestSampleID").Value)
                         myCumulateResultsRow.QCControlLotID = CInt(SelQCResult.Cells("QCControlLotID").Value)
@@ -200,10 +203,10 @@ Public Class IQCCumulatedReview
 
                     'Add the Test/Sample Type to the ListView
                     bsTestSampleListView.Items.Add(historyTestSampRow.TestName, myIconNameVar).SubItems.Add(historyTestSampRow.SampleType)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(activeTestSample.ToString)
                     bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestType)
 
                     myIndex += 1
@@ -358,10 +361,10 @@ Public Class IQCCumulatedReview
                             bsResultControlLotGridView.DataSource = LocalQCCumulateResultsDS.QCCumulatedSummaryTable.DefaultView
 
                             'Get the current Language from the current Application Session and get the text for the Button in the DataGridView
-                            Dim currentLanguageGlobal As New GlobalBase
+                            'Dim currentLanguageGlobal As New GlobalBase
                             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+                            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
                             Dim myButtonText As String = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_CumReview_SaveAsTarget", currentLanguage)
 
                             'For each Control/Lot, verify if Button for Save values as Target has to be enabled or disabled
@@ -527,8 +530,8 @@ Public Class IQCCumulatedReview
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             GetLegendsLabels(currentLanguage)
@@ -557,9 +560,14 @@ Public Class IQCCumulatedReview
 
             bsMeanChartControl.Series.Clear()
             bsMeanChartControl.ClearCache()
-            bsMeanChartControl.Legend.Visible = False
+            bsMeanChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
             bsMeanChartControl.BackColor = Color.White
             bsMeanChartControl.AppearanceName = "Light"
+
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            bsMeanChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            bsMeanChartControl.RuntimeHitTesting = True
+            CType(bsMeanChartControl.Diagram, XYDiagram).AxisX.VisualRange.SideMarginsValue = 0
 
             Dim myDiagram As New XYDiagram
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
@@ -569,8 +577,7 @@ Public Class IQCCumulatedReview
                     'Set up the series
                     bsMeanChartControl.Series.Add(qcCumResultRow.QCControlLotID.ToString(), ViewType.Line)
                     bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).ShowInLegend = False
-                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Label.Visible = False
-                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).PointOptions.PointView = PointView.ArgumentAndValues
+                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
 
                     'Set Serie Color
                     If (bsMeanChartControl.Series.Count = 1) Then
@@ -580,8 +587,9 @@ Public Class IQCCumulatedReview
                         bsFirstCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsFirstCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber.ToString
+
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 2) Then
@@ -591,8 +599,8 @@ Public Class IQCCumulatedReview
                         bsSecondCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsSecondCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
 
                     ElseIf (bsMeanChartControl.Series.Count = 3) Then
@@ -602,8 +610,8 @@ Public Class IQCCumulatedReview
                         bsThirdCtrlLotLabel.Text &= qcCumResultRow.LotNumber
                         bsThirdCtrlLotLabel.Enabled = True
 
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine
-                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag &= qcCumResultRow.LotNumber
+                        bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).Tag = qcCumResultRow.ControlName & Environment.NewLine &
+                            qcCumResultRow.LotNumber
                         bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LegendText = qcCumResultRow.LotNumber
                     End If
 
@@ -647,8 +655,8 @@ Public Class IQCCumulatedReview
                 'Remove all Constant lines
                 myDiagram.AxisY.ConstantLines.Clear()
                 myDiagram.AxisX.ConstantLines.Clear()
-                myDiagram.AxisX.Title.Visible = False
-                myDiagram.AxisY.Title.Visible = False
+                myDiagram.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
+                myDiagram.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.False
 
                 'Create constans lines depending the number of selected controls
                 If ((From a In LocalQCCumulateResultsDS.QCCumulatedSummaryTable _
@@ -669,14 +677,17 @@ Public Class IQCCumulatedReview
                     CreateConstantLine("-1 " & LabelSD, myDiagram, myMean - (1 * mySD), Color.Black, DashStyle.Dash)
 
                     'Set limits for Axis Y
-                    myDiagram.AxisY.Range.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+                    myDiagram.AxisY.WholeRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
+                                                          myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
+                    myDiagram.AxisY.VisualRange.SetMinMaxValues(myMean - (1 * mySD) - (myMean - (myMean - mySD)) / 2, _
                                                           myMean + (1 * mySD) + (myMean - (myMean - mySD)) / 2)
                 Else
                     'More than one control selected
                     CreateConstantLine("+1 " & LabelSD, myDiagram, 1, Color.Black, DashStyle.Dash)
                     CreateConstantLine(LabelMEAN, myDiagram, 0, Color.Black, DashStyle.Solid)
                     CreateConstantLine("-1 " & LabelSD, myDiagram, -1, Color.Black, DashStyle.Dash)
-                    myDiagram.AxisY.Range.SetMinMaxValues(-1.5, 1.5)
+                    myDiagram.AxisY.WholeRange.SetMinMaxValues(-1.5, 1.5)
+                    myDiagram.AxisY.VisualRange.SetMinMaxValues(-1.5, 1.5)
 
                     'Get the max value for X Axis
                     Dim MaxValue As Integer = (From a In LocalCumulateResultsDS.tqcCumulatedResults _
@@ -685,7 +696,8 @@ Public Class IQCCumulatedReview
                                             AndAlso b.Selected _
                                              Select a.CumResultsNum).Max
 
-                    myDiagram.AxisX.Range.SetMinMaxValues(0, MaxValue)
+                    myDiagram.AxisX.WholeRange.SetMinMaxValues(0, MaxValue)
+                    myDiagram.AxisX.VisualRange.SetMinMaxValues(0, MaxValue)
                 End If
             End If
 
@@ -762,40 +774,40 @@ Public Class IQCCumulatedReview
             'SEARCH Button
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                bsSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsSearchButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Search", pLanguageID))
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteCumulateSeries.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteCumulateSeries.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsDeleteCumulateSeries, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'ICONS for the Graph Legend GroupBox
             auxIconName = GetIconName("GREEN_CIRCLE")
-            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsFirstCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("BLUE_CIRCLE")
-            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsSecondCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VIOLET_CIRCLE")
-            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsThirdCtrlLotPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -1101,12 +1113,12 @@ Public Class IQCCumulatedReview
             Dim myTestIconList As New ImageList
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            myTestIconList.Images.Add("TESTICON", Image.FromFile(MyBase.IconsPath & GetIconName("TESTICON")))
-            myTestIconList.Images.Add("USERTEST", Image.FromFile(MyBase.IconsPath & GetIconName("USERTEST")))
-            myTestIconList.Images.Add("TISE_SYS", Image.FromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
-            myTestIconList.Images.Add("INUSETEST", Image.FromFile(MyBase.IconsPath & GetIconName("INUSETEST")))
-            myTestIconList.Images.Add("INUSUSTEST", Image.FromFile(MyBase.IconsPath & GetIconName("INUSUSTEST")))
-            myTestIconList.Images.Add("INUSETISE", Image.FromFile(MyBase.IconsPath & GetIconName("INUSETISE")))
+            myTestIconList.Images.Add("TESTICON", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TESTICON")))
+            myTestIconList.Images.Add("USERTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("USERTEST")))
+            myTestIconList.Images.Add("TISE_SYS", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
+            myTestIconList.Images.Add("INUSETEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSETEST")))
+            myTestIconList.Images.Add("INUSUSTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSUSTEST")))
+            myTestIconList.Images.Add("INUSETISE", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("INUSETISE")))
 
             'Initialization of Tests/Sample Types list
             bsTestSampleListView.Items.Clear()
@@ -1262,8 +1274,8 @@ Public Class IQCCumulatedReview
     ''' </remarks>
     Private Sub IQCCumulatedReview_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             InitializeScreen()
             FillTestSampleListView()
@@ -1324,7 +1336,7 @@ Public Class IQCCumulatedReview
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1540,7 +1552,7 @@ Public Class IQCCumulatedReview
             'Clear Graphics controls
             bsMeanChartControl.Series.Clear()
             bsMeanChartControl.ClearCache()
-            bsMeanChartControl.Legend.Visible = False
+            bsMeanChartControl.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
             bsMeanChartControl.BackColor = Color.White
             bsMeanChartControl.AppearanceName = "Light"
         Catch ex As Exception

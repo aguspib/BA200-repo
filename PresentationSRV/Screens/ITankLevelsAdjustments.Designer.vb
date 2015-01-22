@@ -1,6 +1,4 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.CommunicationsSwFw
+﻿
 Imports Biosystems.Ax00.Controls.UserControls
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
@@ -27,92 +25,91 @@ Partial Class ITankLevelsAdjustments
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ITankLevelsAdjustments))
-        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
+        Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
+        Dim DataGridViewCellStyle1 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Me.TestProcessTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.BsResponse = New Biosystems.Ax00.Controls.UserControls.BSTextBox
-        Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsLabel4 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsLabel5 = New Biosystems.Ax00.Controls.UserControls.BSLabel
+        Me.BsResponse = New Biosystems.Ax00.Controls.UserControls.BSTextBox()
+        Me.BsPanel1 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsLabel4 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLabel5 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.TestSimulatorTimer = New System.Windows.Forms.Timer(Me.components)
-        Me.BsTabPagesControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl
-        Me.BsScalesTabPage = New System.Windows.Forms.TabPage
-        Me.BsTanksInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsInfoScalesXPSViewer = New BsXPSViewer
-        Me.BsInfoExpandButton = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsTanksInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsTanksAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.HCWGroupBox = New System.Windows.Forms.GroupBox
-        Me.HCTableLayoutPanel = New System.Windows.Forms.TableLayoutPanel
-        Me.HCEmptyNewValueLabel = New System.Windows.Forms.Label
-        Me.HCEmptySavedLabel = New System.Windows.Forms.Label
-        Me.HCFullAdjustButton = New System.Windows.Forms.Button
-        Me.HCFullSavedLabel = New System.Windows.Forms.Label
-        Me.HCEmptyAdjustButton = New System.Windows.Forms.Button
-        Me.HCEmptySavedPictureBox = New System.Windows.Forms.PictureBox
-        Me.HCFullNewValueLabel = New System.Windows.Forms.Label
-        Me.HCFullSavedPictureBox = New System.Windows.Forms.PictureBox
-        Me.HCSavedLabel = New System.Windows.Forms.Label
-        Me.HCMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankA
-        Me.HCCountsLabel = New System.Windows.Forms.Label
-        Me.HCCurrentLabel = New System.Windows.Forms.Label
-        Me.HCCurrentPercentLabel = New System.Windows.Forms.Label
-        Me.HCPercentLabel = New System.Windows.Forms.Label
-        Me.WashingSolutionGroupBox = New System.Windows.Forms.GroupBox
-        Me.WSMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankA
-        Me.WSCountsLabel = New System.Windows.Forms.Label
-        Me.WSCurrentLabel = New System.Windows.Forms.Label
-        Me.WSTableLayoutPanel = New System.Windows.Forms.TableLayoutPanel
-        Me.WSEmptyNewValueLabel = New System.Windows.Forms.Label
-        Me.WSFullSavedLabel = New System.Windows.Forms.Label
-        Me.WSFullNewValueLabel = New System.Windows.Forms.Label
-        Me.WSSavedLabel = New System.Windows.Forms.Label
-        Me.WSEmptySavedPictureBox = New System.Windows.Forms.PictureBox
-        Me.WSEmptyAdjustButton = New System.Windows.Forms.Button
-        Me.WSFullSavedPictureBox = New System.Windows.Forms.PictureBox
-        Me.WSEmptySavedLabel = New System.Windows.Forms.Label
-        Me.WSFullAdjustButton = New System.Windows.Forms.Button
-        Me.WSCurrentPercentLabel = New System.Windows.Forms.Label
-        Me.WSPercentLabel = New System.Windows.Forms.Label
-        Me.BsTanksTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsTanksAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsIntermediateTabPage = New System.Windows.Forms.TabPage
-        Me.BsIntermediateInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsIntermediateInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsIntermediateInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsIntermediateAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
-        Me.TestProgressBar = New System.Windows.Forms.ProgressBar
-        Me.IntermediateTanksTestGroupBox = New System.Windows.Forms.GroupBox
-        Me.BsTestLabel = New System.Windows.Forms.Label
-        Me.BsStartTestButton = New System.Windows.Forms.Button
-        Me.ProcessDataGridView = New System.Windows.Forms.DataGridView
-        Me.NumberColumn = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.IconColumn = New System.Windows.Forms.DataGridViewImageColumn
-        Me.StepColumn = New System.Windows.Forms.DataGridViewTextBoxColumn
-        Me.BsStopTestButton = New System.Windows.Forms.Button
-        Me.DWInputGroupBox = New System.Windows.Forms.GroupBox
-        Me.DWTankInputLabel = New System.Windows.Forms.Label
-        Me.BsInternalTanksAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.LCGroupBox = New System.Windows.Forms.GroupBox
-        Me.LCPanel = New System.Windows.Forms.Panel
-        Me.LCMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankLevels
-        Me.DWGroupBox = New System.Windows.Forms.GroupBox
-        Me.DWPanel = New System.Windows.Forms.Panel
-        Me.DWMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankLevels
-        Me.BsIntermediateAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
-        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox
-        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
+        Me.BsTabPagesControl = New Biosystems.Ax00.Controls.UserControls.BSTabControl()
+        Me.BsScalesTabPage = New System.Windows.Forms.TabPage()
+        Me.BsTanksInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsInfoScalesXPSViewer = New BsXPSViewer()
+        Me.BsInfoExpandButton = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsTanksInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsTanksAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.HCWGroupBox = New System.Windows.Forms.GroupBox()
+        Me.HCTableLayoutPanel = New System.Windows.Forms.TableLayoutPanel()
+        Me.HCEmptyNewValueLabel = New System.Windows.Forms.Label()
+        Me.HCEmptySavedLabel = New System.Windows.Forms.Label()
+        Me.HCFullAdjustButton = New System.Windows.Forms.Button()
+        Me.HCFullSavedLabel = New System.Windows.Forms.Label()
+        Me.HCEmptyAdjustButton = New System.Windows.Forms.Button()
+        Me.HCEmptySavedPictureBox = New System.Windows.Forms.PictureBox()
+        Me.HCFullNewValueLabel = New System.Windows.Forms.Label()
+        Me.HCFullSavedPictureBox = New System.Windows.Forms.PictureBox()
+        Me.HCSavedLabel = New System.Windows.Forms.Label()
+        Me.HCMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankA()
+        Me.HCCountsLabel = New System.Windows.Forms.Label()
+        Me.HCCurrentLabel = New System.Windows.Forms.Label()
+        Me.HCCurrentPercentLabel = New System.Windows.Forms.Label()
+        Me.HCPercentLabel = New System.Windows.Forms.Label()
+        Me.WashingSolutionGroupBox = New System.Windows.Forms.GroupBox()
+        Me.WSMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankA()
+        Me.WSCountsLabel = New System.Windows.Forms.Label()
+        Me.WSCurrentLabel = New System.Windows.Forms.Label()
+        Me.WSTableLayoutPanel = New System.Windows.Forms.TableLayoutPanel()
+        Me.WSEmptyNewValueLabel = New System.Windows.Forms.Label()
+        Me.WSFullSavedLabel = New System.Windows.Forms.Label()
+        Me.WSFullNewValueLabel = New System.Windows.Forms.Label()
+        Me.WSSavedLabel = New System.Windows.Forms.Label()
+        Me.WSEmptySavedPictureBox = New System.Windows.Forms.PictureBox()
+        Me.WSEmptyAdjustButton = New System.Windows.Forms.Button()
+        Me.WSFullSavedPictureBox = New System.Windows.Forms.PictureBox()
+        Me.WSEmptySavedLabel = New System.Windows.Forms.Label()
+        Me.WSFullAdjustButton = New System.Windows.Forms.Button()
+        Me.WSCurrentPercentLabel = New System.Windows.Forms.Label()
+        Me.WSPercentLabel = New System.Windows.Forms.Label()
+        Me.BsTanksTestButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsTanksAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsIntermediateTabPage = New System.Windows.Forms.TabPage()
+        Me.BsIntermediateInfoPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsIntermediateInfoTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsIntermediateInfoLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsIntermediateAdjustPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.ProgressBar1 = New System.Windows.Forms.ProgressBar()
+        Me.TestProgressBar = New System.Windows.Forms.ProgressBar()
+        Me.IntermediateTanksTestGroupBox = New System.Windows.Forms.GroupBox()
+        Me.BsTestLabel = New System.Windows.Forms.Label()
+        Me.BsStartTestButton = New System.Windows.Forms.Button()
+        Me.ProcessDataGridView = New System.Windows.Forms.DataGridView()
+        Me.NumberColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.IconColumn = New System.Windows.Forms.DataGridViewImageColumn()
+        Me.StepColumn = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.BsStopTestButton = New System.Windows.Forms.Button()
+        Me.DWInputGroupBox = New System.Windows.Forms.GroupBox()
+        Me.DWTankInputLabel = New System.Windows.Forms.Label()
+        Me.BsInternalTanksAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.LCGroupBox = New System.Windows.Forms.GroupBox()
+        Me.LCPanel = New System.Windows.Forms.Panel()
+        Me.LCMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankLevels()
+        Me.DWGroupBox = New System.Windows.Forms.GroupBox()
+        Me.DWPanel = New System.Windows.Forms.Panel()
+        Me.DWMonitorTank = New Biosystems.Ax00.Controls.UserControls.BSMonitorTankLevels()
+        Me.BsIntermediateAdjustTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsButtonsPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsAdjustButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel()
+        Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
+        Me.BsMessageLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.BsTabPagesControl.SuspendLayout()
         Me.BsScalesTabPage.SuspendLayout()
         Me.BsTanksInfoPanel.SuspendLayout()
@@ -228,8 +225,8 @@ Partial Class ITankLevelsAdjustments
         Me.BsInfoScalesXPSViewer.ActualZoomButtonCaption = "Actual Zoom"
         Me.BsInfoScalesXPSViewer.ActualZoomButtonVisible = True
         Me.BsInfoScalesXPSViewer.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsInfoScalesXPSViewer.CopyButtonCaption = "Copy"
         Me.BsInfoScalesXPSViewer.CopyButtonVisible = True
         Me.BsInfoScalesXPSViewer.DecreaseZoomButtonCaption = "Zoom Out"
@@ -238,9 +235,10 @@ Partial Class ITankLevelsAdjustments
         Me.BsInfoScalesXPSViewer.FitToHeightButtonVisible = True
         Me.BsInfoScalesXPSViewer.FitToWidthButtonCaption = "Fit To Width"
         Me.BsInfoScalesXPSViewer.FitToWidthButtonVisible = True
-        Me.BsInfoScalesXPSViewer.HorizontalPageMargin = 10
+        Me.BsInfoScalesXPSViewer.HorizontalPageMargin = 0
         Me.BsInfoScalesXPSViewer.IncreaseZoomButtonCaption = "Zoom In"
         Me.BsInfoScalesXPSViewer.IncreaseZoomButtonVisible = True
+        Me.BsInfoScalesXPSViewer.IsLoaded = False
         Me.BsInfoScalesXPSViewer.IsScrollable = False
         Me.BsInfoScalesXPSViewer.Location = New System.Drawing.Point(0, 22)
         Me.BsInfoScalesXPSViewer.MenuBarVisible = False
@@ -253,7 +251,7 @@ Partial Class ITankLevelsAdjustments
         Me.BsInfoScalesXPSViewer.TabIndex = 85
         Me.BsInfoScalesXPSViewer.TwoPagesButtonCaption = "Two Pages"
         Me.BsInfoScalesXPSViewer.TwoPagesButtonVisible = True
-        Me.BsInfoScalesXPSViewer.VerticalPageMargin = 10
+        Me.BsInfoScalesXPSViewer.VerticalPageMargin = 0
         Me.BsInfoScalesXPSViewer.WholePageButtonCaption = "Whole Page"
         Me.BsInfoScalesXPSViewer.WholePageButtonVisible = True
         '
@@ -270,7 +268,7 @@ Partial Class ITankLevelsAdjustments
         'BsTanksInfoTitle
         '
         Me.BsTanksInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsTanksInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsTanksInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsTanksInfoTitle.ForeColor = System.Drawing.Color.Black
@@ -284,8 +282,8 @@ Partial Class ITankLevelsAdjustments
         'BsTanksAdjustPanel
         '
         Me.BsTanksAdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsTanksAdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsTanksAdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsTanksAdjustPanel.Controls.Add(Me.HCWGroupBox)
@@ -468,12 +466,12 @@ Partial Class ITankLevelsAdjustments
         Me.HCMonitorTank.BackColor = System.Drawing.Color.Transparent
         Me.HCMonitorTank.BackImage = Nothing
         Me.HCMonitorTank.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
-        Me.HCMonitorTank.LevelValue = 57.32
+        Me.HCMonitorTank.LevelValue = 57.32R
         Me.HCMonitorTank.Location = New System.Drawing.Point(84, 173)
-        Me.HCMonitorTank.LowerLevelValue = 0
+        Me.HCMonitorTank.LowerLevelValue = 0.0R
         Me.HCMonitorTank.LowerLevelVisible = False
-        Me.HCMonitorTank.MaxLimit = 100
-        Me.HCMonitorTank.MinLimit = 0
+        Me.HCMonitorTank.MaxLimit = 100.0R
+        Me.HCMonitorTank.MinLimit = 0.0R
         Me.HCMonitorTank.Name = "HCMonitorTank"
         Me.HCMonitorTank.ScaleDivisions = 4
         Me.HCMonitorTank.ScaleStep = 50
@@ -485,7 +483,7 @@ Partial Class ITankLevelsAdjustments
         Me.HCMonitorTank.TitleForeColor = System.Drawing.Color.Black
         Me.HCMonitorTank.TitleHeight = 0
         Me.HCMonitorTank.TitleText = "Control Title"
-        Me.HCMonitorTank.UpperLevelValue = 100
+        Me.HCMonitorTank.UpperLevelValue = 100.0R
         Me.HCMonitorTank.UpperLevelVisible = False
         '
         'HCCountsLabel
@@ -564,12 +562,12 @@ Partial Class ITankLevelsAdjustments
         Me.WSMonitorTank.BackColor = System.Drawing.Color.Transparent
         Me.WSMonitorTank.BackImage = Nothing
         Me.WSMonitorTank.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
-        Me.WSMonitorTank.LevelValue = 57.32
+        Me.WSMonitorTank.LevelValue = 57.32R
         Me.WSMonitorTank.Location = New System.Drawing.Point(84, 173)
-        Me.WSMonitorTank.LowerLevelValue = 0
+        Me.WSMonitorTank.LowerLevelValue = 0.0R
         Me.WSMonitorTank.LowerLevelVisible = False
-        Me.WSMonitorTank.MaxLimit = 100
-        Me.WSMonitorTank.MinLimit = 0
+        Me.WSMonitorTank.MaxLimit = 100.0R
+        Me.WSMonitorTank.MinLimit = 0.0R
         Me.WSMonitorTank.Name = "WSMonitorTank"
         Me.WSMonitorTank.ScaleDivisions = 4
         Me.WSMonitorTank.ScaleStep = 50
@@ -581,7 +579,7 @@ Partial Class ITankLevelsAdjustments
         Me.WSMonitorTank.TitleForeColor = System.Drawing.Color.Black
         Me.WSMonitorTank.TitleHeight = 0
         Me.WSMonitorTank.TitleText = "Control Title"
-        Me.WSMonitorTank.UpperLevelValue = 100
+        Me.WSMonitorTank.UpperLevelValue = 100.0R
         Me.WSMonitorTank.UpperLevelVisible = False
         '
         'WSCountsLabel
@@ -837,7 +835,7 @@ Partial Class ITankLevelsAdjustments
         'BsIntermediateInfoTitle
         '
         Me.BsIntermediateInfoTitle.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsIntermediateInfoTitle.BackColor = System.Drawing.Color.LightSteelBlue
         Me.BsIntermediateInfoTitle.Font = New System.Drawing.Font("Verdana", 10.0!)
         Me.BsIntermediateInfoTitle.ForeColor = System.Drawing.Color.Black
@@ -851,8 +849,8 @@ Partial Class ITankLevelsAdjustments
         'BsIntermediateInfoLabel
         '
         Me.BsIntermediateInfoLabel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsIntermediateInfoLabel.BackColor = System.Drawing.Color.Transparent
         Me.BsIntermediateInfoLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsIntermediateInfoLabel.ForeColor = System.Drawing.Color.Black
@@ -866,8 +864,8 @@ Partial Class ITankLevelsAdjustments
         'BsIntermediateAdjustPanel
         '
         Me.BsIntermediateAdjustPanel.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
-                    Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsIntermediateAdjustPanel.BackColor = System.Drawing.Color.Gainsboro
         Me.BsIntermediateAdjustPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.BsIntermediateAdjustPanel.Controls.Add(Me.ProgressBar1)
@@ -1078,12 +1076,12 @@ Partial Class ITankLevelsAdjustments
         Me.LCMonitorTank.BottomStopImage = Nothing
         Me.LCMonitorTank.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
         Me.LCMonitorTank.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.LCMonitorTank.LevelValue = 50
+        Me.LCMonitorTank.LevelValue = 50.0R
         Me.LCMonitorTank.Location = New System.Drawing.Point(0, 0)
-        Me.LCMonitorTank.LowerLevelValue = 0
+        Me.LCMonitorTank.LowerLevelValue = 0.0R
         Me.LCMonitorTank.LowerLevelVisible = False
-        Me.LCMonitorTank.MaxLimit = 100
-        Me.LCMonitorTank.MinLimit = 0
+        Me.LCMonitorTank.MaxLimit = 100.0R
+        Me.LCMonitorTank.MinLimit = 0.0R
         Me.LCMonitorTank.Name = "LCMonitorTank"
         Me.LCMonitorTank.SharpImage = Nothing
         Me.LCMonitorTank.Size = New System.Drawing.Size(185, 322)
@@ -1096,7 +1094,7 @@ Partial Class ITankLevelsAdjustments
         Me.LCMonitorTank.TitleText = "Control Title"
         Me.LCMonitorTank.TopLevelImage = Nothing
         Me.LCMonitorTank.TopStopImage = Nothing
-        Me.LCMonitorTank.UpperLevelValue = 100
+        Me.LCMonitorTank.UpperLevelValue = 100.0R
         Me.LCMonitorTank.UpperLevelVisible = False
         '
         'DWGroupBox
@@ -1128,12 +1126,12 @@ Partial Class ITankLevelsAdjustments
         Me.DWMonitorTank.BottomStopImage = Nothing
         Me.DWMonitorTank.CurrentStatus = Biosystems.Ax00.Controls.UserControls.BSMonitorControlBase.Status.DISABLED
         Me.DWMonitorTank.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.DWMonitorTank.LevelValue = 10
+        Me.DWMonitorTank.LevelValue = 10.0R
         Me.DWMonitorTank.Location = New System.Drawing.Point(0, 0)
-        Me.DWMonitorTank.LowerLevelValue = 0
+        Me.DWMonitorTank.LowerLevelValue = 0.0R
         Me.DWMonitorTank.LowerLevelVisible = False
-        Me.DWMonitorTank.MaxLimit = 100
-        Me.DWMonitorTank.MinLimit = 0
+        Me.DWMonitorTank.MaxLimit = 100.0R
+        Me.DWMonitorTank.MinLimit = 0.0R
         Me.DWMonitorTank.Name = "DWMonitorTank"
         Me.DWMonitorTank.SharpImage = Nothing
         Me.DWMonitorTank.Size = New System.Drawing.Size(185, 322)
@@ -1146,7 +1144,7 @@ Partial Class ITankLevelsAdjustments
         Me.DWMonitorTank.TitleText = "Control Title"
         Me.DWMonitorTank.TopLevelImage = Nothing
         Me.DWMonitorTank.TopStopImage = Nothing
-        Me.DWMonitorTank.UpperLevelValue = 100
+        Me.DWMonitorTank.UpperLevelValue = 100.0R
         Me.DWMonitorTank.UpperLevelVisible = False
         '
         'BsIntermediateAdjustTitle
@@ -1219,7 +1217,7 @@ Partial Class ITankLevelsAdjustments
         'BsMessagesPanel
         '
         Me.BsMessagesPanel.Anchor = CType(((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left) _
-                    Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.BsMessagesPanel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageImage)
         Me.BsMessagesPanel.Controls.Add(Me.BsMessageLabel)
@@ -1262,6 +1260,7 @@ Partial Class ITankLevelsAdjustments
         Me.Controls.Add(Me.BsTabPagesControl)
         Me.Controls.Add(Me.BsButtonsPanel)
         Me.Controls.Add(Me.BsMessagesPanel)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.Name = "ITankLevelsAdjustments"
@@ -1375,7 +1374,6 @@ Partial Class ITankLevelsAdjustments
     Friend WithEvents TestProgressBar As System.Windows.Forms.ProgressBar
     Friend WithEvents TestSimulatorTimer As System.Windows.Forms.Timer
     Friend WithEvents ProgressBar1 As System.Windows.Forms.ProgressBar
-    Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents BsInfoExpandButton As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents BsTestLabel As System.Windows.Forms.Label
     Friend WithEvents BsInfoScalesXPSViewer As BsXPSViewer

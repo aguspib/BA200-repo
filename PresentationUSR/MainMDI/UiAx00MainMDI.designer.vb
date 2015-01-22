@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IAx00MainMDI
+Partial Class UiAx00MainMDI
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -24,7 +24,7 @@ Partial Class IAx00MainMDI
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IAx00MainMDI))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiAx00MainMDI))
         Me.ToolTip = New System.Windows.Forms.ToolTip(Me.components)
         Me.BsAx00MenuStrip = New System.Windows.Forms.MenuStrip()
         Me.ConfigurationToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -158,8 +158,8 @@ Partial Class IAx00MainMDI
         Me.bsTSSoundOff = New System.Windows.Forms.ToolStripButton()
         Me.InstrumentToolStripLabel = New System.Windows.Forms.ToolStripLabel()
         Me.ToolStripSeparator7 = New System.Windows.Forms.ToolStripSeparator()
-        Me.bsTSAbortSessionButton = New System.Windows.Forms.ToolStripButton()
         Me.bsTSMultiFunctionSessionButton = New System.Windows.Forms.ToolStripButton()
+        Me.bsTSAbortSessionButton = New System.Windows.Forms.ToolStripButton()
         Me.SessionToolStripLabel = New System.Windows.Forms.ToolStripLabel()
         Me.BsStatusStrip1 = New Biosystems.Ax00.Controls.UserControls.BSStatusStrip()
         Me.ErrorStatusLabel = New System.Windows.Forms.ToolStripStatusLabel()
@@ -997,19 +997,19 @@ Partial Class IAx00MainMDI
         Me.ToolStripSeparator7.Name = "ToolStripSeparator7"
         Me.ToolStripSeparator7.TextDirection = System.Windows.Forms.ToolStripTextDirection.Vertical270
         '
-        'bsTSAbortSessionButton
-        '
-        resources.ApplyResources(Me.bsTSAbortSessionButton, "bsTSAbortSessionButton")
-        Me.bsTSAbortSessionButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.bsTSAbortSessionButton.Margin = New System.Windows.Forms.Padding(0, 1, 0, 1)
-        Me.bsTSAbortSessionButton.Name = "bsTSAbortSessionButton"
-        '
         'bsTSMultiFunctionSessionButton
         '
         resources.ApplyResources(Me.bsTSMultiFunctionSessionButton, "bsTSMultiFunctionSessionButton")
         Me.bsTSMultiFunctionSessionButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.bsTSMultiFunctionSessionButton.Margin = New System.Windows.Forms.Padding(0, 1, 0, 1)
         Me.bsTSMultiFunctionSessionButton.Name = "bsTSMultiFunctionSessionButton"
+        '
+        'bsTSAbortSessionButton
+        '
+        resources.ApplyResources(Me.bsTSAbortSessionButton, "bsTSAbortSessionButton")
+        Me.bsTSAbortSessionButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.bsTSAbortSessionButton.Margin = New System.Windows.Forms.Padding(0, 1, 0, 1)
+        Me.bsTSAbortSessionButton.Name = "bsTSAbortSessionButton"
         '
         'SessionToolStripLabel
         '
@@ -1111,7 +1111,6 @@ Partial Class IAx00MainMDI
         'IAx00MainMDI
         '
         Me.Appearance.BackColor = CType(resources.GetObject("IAx00MainMDI.Appearance.BackColor"), System.Drawing.Color)
-        Me.Appearance.Font = CType(resources.GetObject("IAx00MainMDI.Appearance.Font"), System.Drawing.Font)
         Me.Appearance.GradientMode = CType(resources.GetObject("IAx00MainMDI.Appearance.GradientMode"), System.Drawing.Drawing2D.LinearGradientMode)
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True

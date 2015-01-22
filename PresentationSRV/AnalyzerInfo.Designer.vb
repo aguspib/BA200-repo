@@ -15,17 +15,6 @@ Partial Class AnalyzerInfo
     End Sub
 
 
-    'XBC 27/07/2011
-    Private Structure WINDOWPOS
-        Public hwnd As Int32
-        Public hWndInsertAfter As Int32
-        Public x As Int32
-        Public y As Int32
-        Public cx As Int32
-        Public cy As Int32
-        Public flags As Int32
-    End Structure
-
     'Const WM_WINDOWPOSCHANGING As Int32 = &H46
 
     'Not allow move form

@@ -24,7 +24,7 @@ Partial Class XRMainForm
         Me.bsPanel2 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
         Me.ExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.BsPanel3 = New Biosystems.Ax00.Controls.UserControls.BSPanel()
-        Me.PrintControl1 = New DevExpress.XtraPrinting.Control.PrintControl()
+        Me.DocumentViewer1 = New DevExpress.XtraPrinting.Preview.DocumentViewer()
         Me.PrintBarManager1 = New DevExpress.XtraPrinting.Preview.PrintBarManager()
         Me.PreviewBar1 = New DevExpress.XtraPrinting.Preview.PreviewBar()
         Me.PrintPreviewBarItem8 = New DevExpress.XtraPrinting.Preview.PrintPreviewBarItem()
@@ -133,31 +133,31 @@ Partial Class XRMainForm
         'BsPanel3
         '
         Me.BsPanel3.BackColor = System.Drawing.Color.Transparent
-        Me.BsPanel3.Controls.Add(Me.PrintControl1)
+        Me.BsPanel3.Controls.Add(Me.DocumentViewer1)
         Me.BsPanel3.Dock = System.Windows.Forms.DockStyle.Top
         Me.BsPanel3.Location = New System.Drawing.Point(0, 53)
         Me.BsPanel3.Name = "BsPanel3"
         Me.BsPanel3.Size = New System.Drawing.Size(1018, 620)
         Me.BsPanel3.TabIndex = 1
         '
-        'PrintControl1
+        'DocumentViewer1
         '
-        Me.PrintControl1.BackColor = System.Drawing.Color.FromArgb(CType(CType(248, Byte), Integer), CType(CType(248, Byte), Integer), CType(CType(248, Byte), Integer))
-        Me.PrintControl1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.PrintControl1.ForeColor = System.Drawing.Color.Empty
-        Me.PrintControl1.IsMetric = True
-        Me.PrintControl1.Location = New System.Drawing.Point(0, 0)
-        Me.PrintControl1.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.PrintControl1.LookAndFeel.UseWindowsXPTheme = True
-        Me.PrintControl1.Name = "PrintControl1"
-        Me.PrintControl1.PageBorderColor = System.Drawing.Color.DimGray
-        Me.PrintControl1.SelectedPageBorderColor = System.Drawing.Color.DimGray
-        Me.PrintControl1.ShowPageMargins = False
-        Me.PrintControl1.Size = New System.Drawing.Size(1018, 620)
-        Me.PrintControl1.TabIndex = 0
-        Me.PrintControl1.TooltipBackColor = System.Drawing.Color.LemonChiffon
-        Me.PrintControl1.TooltipFont = New System.Drawing.Font("Tahoma", 8.25!)
-        Me.PrintControl1.TooltipForeColor = System.Drawing.Color.Black
+        Me.DocumentViewer1.BackColor = System.Drawing.Color.FromArgb(CType(CType(248, Byte), Integer), CType(CType(248, Byte), Integer), CType(CType(248, Byte), Integer))
+        Me.DocumentViewer1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.DocumentViewer1.ForeColor = System.Drawing.Color.Empty
+        Me.DocumentViewer1.IsMetric = True
+        Me.DocumentViewer1.Location = New System.Drawing.Point(0, 0)
+        Me.DocumentViewer1.LookAndFeel.UseDefaultLookAndFeel = False
+        Me.DocumentViewer1.LookAndFeel.UseWindowsXPTheme = True
+        Me.DocumentViewer1.Name = "DocumentViewer1"
+        Me.DocumentViewer1.PageBorderColor = System.Drawing.Color.DimGray
+        Me.DocumentViewer1.SelectedPageBorderColor = System.Drawing.Color.DimGray
+        Me.DocumentViewer1.ShowPageMargins = False
+        Me.DocumentViewer1.Size = New System.Drawing.Size(1018, 620)
+        Me.DocumentViewer1.TabIndex = 0
+        Me.DocumentViewer1.TooltipBackColor = System.Drawing.Color.LemonChiffon
+        Me.DocumentViewer1.TooltipFont = New System.Drawing.Font("Tahoma", 8.25!)
+        Me.DocumentViewer1.TooltipForeColor = System.Drawing.Color.Black
         '
         'PrintBarManager1
         '
@@ -172,7 +172,7 @@ Partial Class XRMainForm
         Me.PrintBarManager1.MainMenu = Me.PreviewBar3
         Me.PrintBarManager1.MaxItemId = 57
         Me.PrintBarManager1.PreviewBar = Me.PreviewBar1
-        Me.PrintBarManager1.PrintControl = Me.PrintControl1
+        Me.PrintBarManager1.PrintControl = Me.DocumentViewer1
         Me.PrintBarManager1.RepositoryItems.AddRange(New DevExpress.XtraEditors.Repository.RepositoryItem() {Me.RepositoryItemProgressBar1, Me.RepositoryItemZoomTrackBar1, Me.PrintPreviewRepositoryItemComboBox1})
         Me.PrintBarManager1.StatusBar = Me.PreviewBar2
         Me.PrintBarManager1.TransparentEditors = True
@@ -892,7 +892,7 @@ Partial Class XRMainForm
     Friend WithEvents bsPanel2 As Biosystems.Ax00.Controls.UserControls.BSPanel
     Friend WithEvents ExitButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents BsPanel3 As Biosystems.Ax00.Controls.UserControls.BSPanel
-    Friend WithEvents PrintControl1 As DevExpress.XtraPrinting.Control.PrintControl
+    Friend WithEvents DocumentViewer1 As DevExpress.XtraPrinting.Preview.DocumentViewer
     Friend WithEvents PrintBarManager1 As DevExpress.XtraPrinting.Preview.PrintBarManager
     Friend WithEvents PreviewBar1 As DevExpress.XtraPrinting.Preview.PreviewBar
     Friend WithEvents PrintPreviewBarItem2 As DevExpress.XtraPrinting.Preview.PrintPreviewBarItem

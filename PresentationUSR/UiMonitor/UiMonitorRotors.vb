@@ -1,11 +1,15 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports System.Globalization
 
 'Put here your common business code for the Rotors tabs inside Monitor Form
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
 #Region "Declarations"
     Dim myRotorTypeForm As String = ""
@@ -206,7 +210,7 @@ Partial Public Class IMonitor
     'Private BARCODEERROR_IconName As String = ""
     'Private BOTTLE3_SEL_IconName As String = "" 'Selected bottle (60ml) (Reagents or additional solution) image inside rotor
 
-    
+
 #End Region
 
 #Region "Methods"
@@ -218,7 +222,8 @@ Partial Public Class IMonitor
                 pControl.IsTransparentImage = pTransparentImage
 
                 If (pImagePath <> Nothing) Then
-                    pControl.Image = Image.FromFile(pImagePath)
+                    'pControl.Image = ImageUtilities.ImageFromFile(pImagePath)
+                    pControl.Image = ImageUtilities.ImageFromFile(pImagePath)
                     pControl.BringToFront()
                 Else
                     pControl.Image = Nothing
@@ -296,7 +301,7 @@ Partial Public Class IMonitor
                 Else
                     'Get the control type to validate if it will go to our list (only for PictureBox)
                     If (TypeOf myPosControl Is BSRImage) Then
-                        myPosControlList.Add(myPosControl)
+                        myPosControlList.Add(CType(myPosControl, BSRImage))
                     End If
                 End If
             Next
@@ -656,15 +661,16 @@ Partial Public Class IMonitor
 
                 Dim query As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
                 For i As Integer = 1 To 120
+                    Dim auxI = i
                     RotorContentByPositionRow = myRotorContentByPositionDSForm.twksWSRotorContentByPosition.NewtwksWSRotorContentByPositionRow()
                     RotorContentByPositionRow.RotorType = "REACTIONS"
                     RotorContentByPositionRow.AnalyzerID = ActiveAnalyzer
                     RotorContentByPositionRow.WorkSessionID = ActiveWorkSession
-                    RotorContentByPositionRow.CellNumber = i
+                    RotorContentByPositionRow.CellNumber = auxI
 
                     If Not myReactionsRotorDS Is Nothing AndAlso myReactionsRotorDS.twksWSReactionsRotor.Rows.Count > 0 Then
                         query = (From a In myReactionsRotorDS.twksWSReactionsRotor _
-                                Where a.WellNumber = i _
+                                Where a.WellNumber = auxI _
                               AndAlso a.AnalyzerID = ActiveAnalyzer _
                                Select a).ToList()
 
@@ -749,8 +755,9 @@ Partial Public Class IMonitor
                 Dim auxIconPath As String = String.Empty
 
                 If (pMarkPosition) Then
-                    Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\")
-                    Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png")
+                    Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\"c)
+                    'TODO: This is wrong parsing, we're splitting by a ., p, n and g. Not by ".png"
+                    Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png".ToCharArray)
 
                     'Set cell to selected and check previous status
                     PreviousSelect = myImageName(0)
@@ -795,7 +802,7 @@ Partial Public Class IMonitor
                             auxIconPath = REACPOSELEC_IconName
                     End Select
 
-                    controlQuery.First.Image = Image.FromFile(MyBase.IconsPath & auxIconPath)
+                    controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                     controlQuery.First.BringToFront()
                     controlQuery.First.Refresh()
                 Else
@@ -839,7 +846,7 @@ Partial Public Class IMonitor
                     End Select
 
                     If (PreviousSelect <> String.Empty) Then
-                        controlQuery.First.Image = Image.FromFile(MyBase.IconsPath & auxIconPath)
+                        controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                         controlQuery.First.BringToFront()
                         controlQuery.First.Refresh()
                     Else
@@ -1179,26 +1186,26 @@ Partial Public Class IMonitor
                         myTubeContent = "SPEC_SOL" OrElse myTubeContent = "TUBE_SPEC_SOL" OrElse _
                         myTubeContent = "WASH_SOL" OrElse myTubeContent = "TUBE_WASH_SOL") Then
                         If (posContent.First.BarcodeStatus = "ERROR") Then
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                         Else
                             Select Case (posContent.First.Status)
                                 Case "NO_INUSE"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
                                 Case "DEPLETED"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
                                 Case "PENDING"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
                                 Case "INPROCESS"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
                                 Case "FINISHED"
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
                             End Select
                         End If
                     Else
                         If (posContent.First.BarcodeStatus = "ERROR") Then
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                         Else
-                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
                         End If
                     End If
                 Else
@@ -1247,39 +1254,39 @@ Partial Public Class IMonitor
             'MOVE TO FIRST ROTOR POSITION Buttons
             auxIconName = GetIconName("BACKWARDL")
             If (Not String.IsNullOrEmpty(auxIconName)) Then
-                bsSamplesMoveFirstPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsMoveFirstPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReactionsMoveFirstPositionButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesMoveFirstPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsMoveFirstPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReactionsMoveFirstPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO PREVIOUS ROTOR POSITION Buttons
             auxIconName = GetIconName("LEFT")
             If (Not String.IsNullOrEmpty(auxIconName)) Then
-                bsSamplesDecreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsDecreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReactionsDecreaseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesDecreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsDecreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReactionsDecreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO NEXT ROTOR POSITION Buttons
             auxIconName = GetIconName("RIGHT")
             If (Not String.IsNullOrEmpty(auxIconName)) Then
-                bsSamplesIncreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsIncreaseButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReactionsIncreaseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesIncreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsIncreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReactionsIncreaseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MOVE TO LAST ROTO POSITION Buttons
             auxIconName = GetIconName("FORWARDL")
             If Not String.IsNullOrEmpty(auxIconName) Then
-                bsSamplesMoveLastPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReagentsMoveLastPositionButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsReactionsMoveLastPositionButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSamplesMoveLastPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReagentsMoveLastPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsReactionsMoveLastPositionButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'OPEN CURVE GRAPH Button
             auxIconName = GetIconName("ABS_GRAPH")
             If (Not String.IsNullOrEmpty(auxIconName)) Then
-                bsReactionsOpenGraph.Image = Image.FromFile(iconPath & auxIconName)
+                bsReactionsOpenGraph.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1786,29 +1793,29 @@ Partial Public Class IMonitor
             If (pBarCodeStatus = String.Empty OrElse pBarCodeStatus = "OK" OrElse pBarCodeStatus = "EMPTY") Then
                 Select Case (pStatus)
                     Case "NO_INUSE"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & NOTINUSE_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & NOTINUSE_IconName)
                         Exit Select
 
                     Case "DEPLETED"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & DEPLETED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & DEPLETED_IconName)
                         Exit Select
 
                     Case "PENDING"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & PENDING_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & PENDING_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                         Exit Select
 
                     Case "INPROCESS"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & INPROGRESS_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & INPROGRESS_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
 
                     Case "FINISHED"
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FINISHED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FINISHED_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
 
                     Case "BARERROR"
-                        pPositionControl.Image = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        pPositionControl.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                         Exit Select
                     Case Else
@@ -1867,16 +1874,16 @@ Partial Public Class IMonitor
                     CleanInfoArea(False)
 
                     If (pRotorType = "SAMPLES") Then
-                        bsSampleCellTextBox.Text = pCellNumber
+                        bsSampleCellTextBox.Text = CStr(pCellNumber)
                         bsSampleCellTextBox.Refresh()
-                        bsSampleDiskNameTextBox.Text = pRingNumber
+                        bsSampleDiskNameTextBox.Text = CStr(pRingNumber)
                         bsSampleDiskNameTextBox.Refresh()
                         bsSampleStatusTextBox.Text = String.Empty
 
                     ElseIf (pRotorType = "REAGENTS") Then
-                        bsReagentsCellTextBox.Text = pCellNumber
+                        bsReagentsCellTextBox.Text = CStr(pCellNumber)
                         bsReagentsCellTextBox.Refresh()
-                        bsReagentsDiskNameTextBox.Text = pRingNumber
+                        bsReagentsDiskNameTextBox.Text = CStr(pRingNumber)
                         bsReagentsDiskNameTextBox.Refresh()
                         bsReagentsStatusTextBox.Text = String.Empty
                     End If
@@ -2161,7 +2168,8 @@ Partial Public Class IMonitor
                 If myMonth <> "" AndAlso myYear <> "" AndAlso CInt(myMonth) >= 1 AndAlso CInt(myMonth) <= 12 Then
                     ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
                     'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
-                    ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
+                    'ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
+                    ExpirationDate = New DateTime(CInt(myYear), CInt(myMonth), 1)
                 End If
             End If
         Catch ex As Exception
@@ -2208,7 +2216,7 @@ Partial Public Class IMonitor
                 If (currentStatus = "FREE") Then
                     CleanInfoArea(False)
 
-                    bsWellNrTextBox.Text = pCellNumber
+                    bsWellNrTextBox.Text = CStr(pCellNumber)
                     bsWellNrTextBox.Refresh()
 
                     bsReacStatusTextBox.Text = String.Empty
@@ -2237,7 +2245,7 @@ Partial Public Class IMonitor
                         Dim myReactionRotorDetails As ReactionRotorDetailsDS = DirectCast(myGlobalDataTO.SetDatos, ReactionRotorDetailsDS)
 
                         If (myReactionRotorDetails.ReactionsRotorDetails.Rows.Count > 0) Then
-                            bsWellNrTextBox.Text = pCellNumber
+                            bsWellNrTextBox.Text = CStr(pCellNumber)
                             bsWellNrTextBox.Refresh()
 
                             Dim mySampleClass As String = ""
@@ -2276,17 +2284,17 @@ Partial Public Class IMonitor
 
                             BsExecutionIDTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsExecutionIDNull) Then
-                                BsExecutionIDTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.ExecutionID
+                                BsExecutionIDTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.ExecutionID)
                             End If
 
                             bsCalibNrTextBox.Clear()
                             If (mySampleClass = "CALIB" AndAlso Not myReactionRotorDetails.ReactionsRotorDetails.First.IsMultiItemNumberNull) Then
-                                bsCalibNrTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.MultiItemNumber
+                                bsCalibNrTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.MultiItemNumber)
                             End If
 
                             bsOrderTestIDTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsOrderTestIDNull) Then
-                                bsOrderTestIDTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.OrderTestID
+                                bsOrderTestIDTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.OrderTestID)
                             End If
 
                             bsDilutionTextBox.Clear()
@@ -2296,12 +2304,12 @@ Partial Public Class IMonitor
 
                             bsReplicateTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsReplicateNumberNull) Then
-                                bsReplicateTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.ReplicateNumber
+                                bsReplicateTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.ReplicateNumber)
                             End If
 
                             bsRerunTextBox.Clear()
                             If (Not myReactionRotorDetails.ReactionsRotorDetails.First.IsRerunNumberNull) Then
-                                bsRerunTextBox.Text = myReactionRotorDetails.ReactionsRotorDetails.First.RerunNumber
+                                bsRerunTextBox.Text = CStr(myReactionRotorDetails.ReactionsRotorDetails.First.RerunNumber)
                             End If
 
                             bsReacStatusTextBox.Clear()
@@ -2311,7 +2319,7 @@ Partial Public Class IMonitor
                         Else
                             CleanInfoArea(False)
 
-                            bsWellNrTextBox.Text = pCellNumber
+                            bsWellNrTextBox.Text = CStr(pCellNumber)
                             bsWellNrTextBox.Refresh()
                         End If
                     Else
@@ -2449,9 +2457,15 @@ Partial Public Class IMonitor
                     myControlName = "Reac" & pRotorContenByPosRow.CellNumber
                 End If
 
-                Dim lstRotorControl As List(Of Control) = (From a As Control In myControls _
-                                                          Where a.Name = myControlName _
-                                                         Select a).ToList()
+                'Dim lstRotorControl2 As List(Of Control) = (From a As Control In myControls _
+                '                                          Where a.Name = myControlName _
+                '                                         Select a).ToList()
+                Dim lstRotorControl As New List(Of Control)
+                For Each obj In myControls
+                    Dim a = TryCast(obj, Control)
+                    If a IsNot Nothing AndAlso a.Name = myControlName Then lstRotorControl.Add(a)
+                Next
+
                 If (lstRotorControl.Count = 1) Then
                     Dim myBSRImage As BSRImage = CType(lstRotorControl(0), BSRImage)
 
@@ -2529,7 +2543,7 @@ Partial Public Class IMonitor
                    Select a).ToList()
 
             For Each myrow As WSRotorContentByPositionDS.twksWSRotorContentByPositionRow In query
-                myrow.ItemArray = pRotorContentByPosRow.ItemArray.Clone()
+                myrow.ItemArray = CType(pRotorContentByPosRow.ItemArray.Clone(), Object())
             Next
             result = True
         Catch ex As Exception
@@ -2572,7 +2586,7 @@ Partial Public Class IMonitor
                                      Select a).ToList()
 
             If (pWSRotorContentByPositionDS.twksWSRotorContentByPosition.Rows.Count > 0) Then
-                Dim myRotorPicture As Object
+                Dim myRotorPicture As Control
                 Dim auxIconPath As String = String.Empty
                 Dim myVirtualRotorPosititionsDS As VirtualRotorPosititionsDS
                 Dim myWSRequiredElementsDelegate As New WSRequiredElementsDelegate
@@ -2844,7 +2858,7 @@ Partial Public Class IMonitor
 #Region "TO DELETE - OLD"
     Private Sub MarkSelectedPositionOLD(ByVal pRingNumber As Integer, ByVal pCellNumber As Integer, ByVal pMarkPosition As Boolean)
         Try
-            Dim rotorPrefix As String
+            Dim rotorPrefix As String = Nothing
             Dim controlQuery As List(Of BSRImage)
             Dim FilterName As String
 
@@ -2875,7 +2889,7 @@ Partial Public Class IMonitor
 
                         If String.Equals(rotorPrefix, "Sam") Then 'No changes for samples rotor
                             'DL 27/09/2011
-                            'controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+                            'controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
 
                             If String.Equals(query.First.TubeContent, "PATIENT") OrElse String.Equals(query.First.TubeContent, "TUBE_SPEC_SOL") OrElse _
                                String.Equals(query.First.TubeContent, "TUBE_WASH_SOL") OrElse String.Equals(query.First.TubeContent, "WASH_SOL") OrElse _
@@ -2884,19 +2898,19 @@ Partial Public Class IMonitor
                                 'query.First.TubeContent = "REAGENT" Then
 
                                 If String.Equals(query.First.BarcodeStatus, "ERROR") Then
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                                 Else
                                     Select Case query.First.Status
                                         Case "PENDING"
-                                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
+                                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEPENDING_SEL_IconName)
                                         Case "DEPLETED"
-                                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
+                                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEDEPLETED_SEL_IconName)
                                         Case "NO_INUSE"
-                                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
+                                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLENOINUSE_SEL_IconName)
                                         Case "FINISHED"
-                                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
+                                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEFINISHED_SEL_IconName)
                                         Case "INPROCESS"
-                                            controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
+                                            controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEINPROCES_SEL_IconName)
                                             'Case "BARERROR"
                                             'Case "FREE"
                                             'Case "FEW"
@@ -2904,9 +2918,9 @@ Partial Public Class IMonitor
                                 End If
                             Else
                                 If String.Equals(query.First.BarcodeStatus, "ERROR") Then
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_SEL_IconName)
                                 Else
-                                    controlQuery.First.BackgroundImage = Image.FromFile(MyBase.IconsPath & EMPTYCELL_IconName)
+                                    controlQuery.First.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & EMPTYCELL_IconName)
                                 End If
 
                             End If
@@ -3119,8 +3133,8 @@ Partial Public Class IMonitor
 
                 If (controlQuery.Count > 0) Then
                     If (pMarkPosition) Then
-                        Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\")
-                        Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png")
+                        Dim myImage() As String = controlQuery.First.ImagePath.ToString.Split("\"c)
+                        Dim myImageName() As String = myImage(UBound(myImage)).ToString.Split(".png".ToCharArray)
 
                         PreviousSelect = myImageName(0)
 
@@ -3167,7 +3181,7 @@ Partial Public Class IMonitor
                                 auxIconPath = REACPOSELEC_IconName
                         End Select
 
-                        controlQuery.First.Image = Image.FromFile(MyBase.IconsPath & auxIconPath)
+                        controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                         controlQuery.First.BringToFront()
                         controlQuery.First.Refresh()
 
@@ -3215,7 +3229,7 @@ Partial Public Class IMonitor
                         End Select
 
                         If PreviousSelect <> "" Then
-                            controlQuery.First.Image = Image.FromFile(MyBase.IconsPath & auxIconPath)
+                            controlQuery.First.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & auxIconPath)
                             controlQuery.First.BringToFront()
                             controlQuery.First.Refresh()
                         Else
@@ -3555,7 +3569,7 @@ Partial Public Class IMonitor
             Select Case pStatus
                 Case "NO_INUSE"
                     If pRotorType <> "REAGENTS" Then
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & NOTINUSE_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & NOTINUSE_IconName)
 
                     ElseIf pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1" Then
                         If pRingNumber = 1 Then
@@ -3570,7 +3584,7 @@ Partial Public Class IMonitor
 
                 Case "DEPLETED", "LOCKED" 'TR 28/09/2012 add the locked status to do the same as deplete 
                     If pRotorType <> "REAGENTS" Then
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & DEPLETED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & DEPLETED_IconName)
 
                     ElseIf pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1" Then
                         If pRingNumber = 1 Then
@@ -3585,30 +3599,30 @@ Partial Public Class IMonitor
 
                 Case "PENDING"
                     If pRotorType = "SAMPLES" Then
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & PENDING_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & PENDING_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                     End If
 
                     Exit Select
                 Case "INPROCESS"
                     If pRotorType = "SAMPLES" Then
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & INPROGRESS_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & INPROGRESS_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                     End If
 
                     Exit Select
                 Case "FINISHED"
                     If pRotorType = "SAMPLES" Then
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FINISHED_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FINISHED_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                     End If
                     Exit Select
                 Case "BARERROR"
                     If pRotorType = "SAMPLES" Then
-                        'pPositionControl.Image = Image.FromFile(MyBase.IconsPath & BARCODEERROR_IconName)
-                        'pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & BARCODEERROR_IconName)
-                        pPositionControl.Image = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
-                        pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        'pPositionControl.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & BARCODEERROR_IconName)
+                        'pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BARCODEERROR_IconName)
+                        pPositionControl.Image = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
+                        pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & BTLSAMPLEBCERR_IconName)
                         pPositionControl.BackgroundImageLayout = ImageLayout.Stretch
                     End If
                     Exit Select
@@ -3616,7 +3630,7 @@ Partial Public Class IMonitor
                 Case "FEW"
                     'AG 12/04/2011 - Nes status case (Few volume)
                     If pRotorType <> "REAGENTS" Then
-                        'pPositionControl.BackgroundImage = Image.FromFile(MyBase.IconsPath & FEWVOL_IconName)
+                        'pPositionControl.BackgroundImage = ImageUtilities.ImageFromFile(MyBase.IconsPath & FEWVOL_IconName)
 
                     ElseIf pTubeType = "BOTTLE2" OrElse pTubeType = "BOTTLE1" Then
                         If pRingNumber = 1 Then

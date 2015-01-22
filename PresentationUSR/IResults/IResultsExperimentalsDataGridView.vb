@@ -1,18 +1,13 @@
 ﻿Option Explicit On
-'Option Strict On
+Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations 'AG 26/07/2010
-Imports Biosystems.Ax00.CommunicationsSwFw
+'AG 26/07/2010
 
-Imports System.Text
-Imports System.ComponentModel
 'Imports DevExpress.XtraReports.UI
 'Imports DevExpress.XtraPrinting
 'Imports DevExpress.XtraPrintingLinks
@@ -249,7 +244,7 @@ Partial Class IResults
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Try
@@ -413,7 +408,7 @@ Partial Class IResults
                     'AG 22/09/2014 - BA-1940 show specimen in the grid (sample type column)
                     dgv("TestName", MaxRows).ToolTipText = String.Empty
                     If Not resultRow.IsSpecimenIDListNull Then
-                        dgv("TestName", MaxRows).ToolTipText = resultRow.SpecimenIDList & " (" & dgv("TestName", MaxRows).Value & ")"
+                        dgv("TestName", MaxRows).ToolTipText = resultRow.SpecimenIDList & " (" & dgv("TestName", MaxRows).Value.ToString & ")"
                     End If
                     'AG 22/09/2014
 
@@ -795,7 +790,7 @@ Partial Class IResults
             dgv.Enabled = True
             Cursor = Cursors.Default
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults UpdateExperimentalDataGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+            GlobalBase.CreateLogActivity("IResults UpdateExperimentalDataGrid (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                             " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                             "IResults.UpdateExperimentalDataGrid", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

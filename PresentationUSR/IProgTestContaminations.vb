@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.BL
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Global
@@ -68,43 +72,43 @@ Public Class IProgTestContaminations
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SUMMARY BY TEST Button
             auxIconName = GetIconName("GRID")
             If (auxIconName <> "") Then
-                bsSummaryByTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSummaryByTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -121,13 +125,13 @@ Public Class IProgTestContaminations
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
-            Dim currentLanguage As String = MyGlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
 
             'RH 27/09/2011 Initialize ExistsExecutions
-            ExistsExecutions = (IAx00MainMDI.ActiveStatus <> "EMPTY")
+            ExistsExecutions = (UiAx00MainMDI.ActiveStatus <> "EMPTY")
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels(currentLanguage)
@@ -160,8 +164,8 @@ Public Class IProgTestContaminations
         Try
             'If pcurrentLanguage = "" Then
             '    'Get the current Language from the current Application Session
-            '    Dim currentLanguageGlobal As New GlobalBase
-            '    pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            '    'Dim currentLanguageGlobal As New GlobalBase
+            '    pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
             'End If
 
             ''Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -179,8 +183,8 @@ Public Class IProgTestContaminations
 
             If String.IsNullOrEmpty(pCurrentLanguage) Then
                 'Get the current Language from the current Application Session
-                Dim currentLanguageGlobal As New GlobalBase
-                pCurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                'Dim currentLanguageGlobal As New GlobalBase
+                pCurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
             End If
 
             'Load the ComboBoxes of Washing Solutions (for Cuvettes Contaminations)
@@ -298,17 +302,17 @@ Public Class IProgTestContaminations
 
             'Get the Icons defined for Preloaded Standard Tests that are inuse/not inuse in the current Work Session
             Dim iconName As String = GetIconName("TESTICON")
-            If (iconName <> "") Then myIcons.Images.Add("TESTICON", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("TESTICON", ImageUtilities.ImageFromFile(IconsPath & iconName))
 
             iconName = GetIconName("INUSETEST")
-            If (iconName <> "") Then myIcons.Images.Add("INUSETEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("INUSETEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
 
             'Get the Icon defined for User Defined Standard Tests that are not inuse/not inuse in the current Work Session
             iconName = GetIconName("USERTEST")
-            If (iconName <> "") Then myIcons.Images.Add("USERTEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("USERTEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
             'TR 10/01/2013 -Correct the icon name.
             iconName = GetIconName("INUSUSTEST")
-            If (iconName <> "") Then myIcons.Images.Add("INUSUSEST", Image.FromFile(IconsPath & iconName))
+            If (iconName <> "") Then myIcons.Images.Add("INUSUSEST", ImageUtilities.ImageFromFile(IconsPath & iconName))
             'TR 10/01/2013 -END.
             'Assign the Icons to the Contaminator Tests List View
             bsTestContaminatorsListView.Items.Clear()
@@ -388,7 +392,7 @@ Public Class IProgTestContaminations
                             bsTestContaminatorsListView.Items(0).Selected = True
 
                             ReadOnlyMode()
-                            LoadContaminationsByTest(bsTestContaminatorsListView.Items(0).Name)
+                            LoadContaminationsByTest(CInt(bsTestContaminatorsListView.Items(0).Name))
                         End If
                     End If
 
@@ -928,7 +932,7 @@ Public Class IProgTestContaminations
             If EditionMode Then ChangesMade = True
             If (pType = "R1") Then
                 For Each test As TestContaminationsDS.tparContaminationsRow In R1TestsDS.tparContaminations.Rows
-                    If (test.TestID <> bsTestContaminatorsListView.SelectedItems(0).Name) Then
+                    If (test.TestID <> CInt(bsTestContaminatorsListView.SelectedItems(0).Name)) Then
                         test.BeginEdit()
                         test.Selected = pCheckedState
                         test.EndEdit()
@@ -937,7 +941,7 @@ Public Class IProgTestContaminations
 
             ElseIf (pType = "R2") Then
                 For Each test As TestContaminationsDS.tparContaminationsRow In R2TestsDS.tparContaminations.Rows
-                    If (test.TestID <> bsTestContaminatorsListView.SelectedItems(0).Name) Then
+                    If (test.TestID <> CInt(bsTestContaminatorsListView.SelectedItems(0).Name)) Then
                         test.BeginEdit()
                         test.Selected = pCheckedState
                         test.EndEdit()
@@ -1021,7 +1025,7 @@ Public Class IProgTestContaminations
                     bsR1ContaminatedDataGridView.Rows(i).ReadOnly = (Not pStatus)
                     bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").ReadOnly = (Not pStatus)
 
-                    If (bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value) Then
+                    If (CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)) Then
                         bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = (Not pStatus)
                         'bsR1ContaminatedDataGridView.Rows(i).Cells("AlreadySaved").Value = "Y"
                     Else
@@ -1055,7 +1059,7 @@ Public Class IProgTestContaminations
                     bsR2ContaminatedDataGridView.Rows(i).ReadOnly = (Not pStatus)
                     bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").ReadOnly = (Not pStatus)
 
-                    If (bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").Value) Then
+                    If (CBool(bsR2ContaminatedDataGridView.Rows(i).Cells("Selected").Value)) Then
                         bsR2ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = (Not pStatus)
                         'bsR1ContaminatedDataGridView.Rows(i).Cells("AlreadySaved").Value = "Y"
                     Else
@@ -1200,7 +1204,7 @@ Public Class IProgTestContaminations
                 'RH 28/06/2011
                 For i As Integer = 0 To bsR1ContaminatedDataGridView.RowCount - 1
                     bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").ReadOnly = _
-                            (Not bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)
+                            (Not CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value))
                 Next
             End If
 
@@ -1222,7 +1226,7 @@ Public Class IProgTestContaminations
             ChangesMade = False
 
             Using testNewContaminationsDS As New ContaminationsDS()
-                Dim myTestID As Integer = bsTestContaminatorsListView.SelectedItems(0).Name
+                Dim myTestID As Integer = CInt(bsTestContaminatorsListView.SelectedItems(0).Name)
                 Dim currentTestIsContaminator As Boolean = False
                 'Read current contaminations defined for current selected TEST
 
@@ -1247,11 +1251,11 @@ Public Class IProgTestContaminations
                         Distinct).Max
                         'Search for new, updated or deleted R1 contaminations
                         For i As Integer = 0 To bsR1ContaminatedDataGridView.Rows.Count - 1
-                            Dim mySelectedValue As Boolean = bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value
-                            Dim myContaminatedReagentID As Integer = bsR1ContaminatedDataGridView.Rows(i).Cells("ReagentID").Value
+                            Dim mySelectedValue = CBool(bsR1ContaminatedDataGridView.Rows(i).Cells("Selected").Value)
+                            Dim myContaminatedReagentID = CInt(bsR1ContaminatedDataGridView.Rows(i).Cells("ReagentID").Value)
                             Dim mwWashSolution As String = ""
                             If bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value.ToString <> "" Then
-                                mwWashSolution = bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value
+                                mwWashSolution = CStr(bsR1ContaminatedDataGridView.Rows(i).Cells("WashingSolution").Value)
                             End If
                             If mySelectedValue Then
                                 Dim newRow As ContaminationsDS.tparContaminationsRow
@@ -1321,7 +1325,7 @@ Public Class IProgTestContaminations
                 '(1)
                 If (Not resultData.HasError) Then
                     ReadOnlyMode()
-                    LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                    LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
                 Else
                     'Error saving the list of Contaminations defined for the selected Test; shown it
                     ShowMessage(Name & ".SaveTestContaminations", resultData.ErrorCode, resultData.ErrorMessage, Me)
@@ -1350,7 +1354,7 @@ Public Class IProgTestContaminations
 
             If (executeAction) Then
                 ReadOnlyMode()
-                If bsTestContaminatorsListView.SelectedItems.Count = 1 Then LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                If bsTestContaminatorsListView.SelectedItems.Count = 1 Then LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CancelEdition ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1384,7 +1388,7 @@ Public Class IProgTestContaminations
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
         Catch ex As Exception
@@ -1475,7 +1479,7 @@ Public Class IProgTestContaminations
 
                     originalSelectedIndex = bsTestContaminatorsListView.SelectedIndices(0)
                     ReadOnlyMode()
-                    LoadContaminationsByTest(bsTestContaminatorsListView.SelectedItems(0).Name)
+                    LoadContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(0).Name))
 
                 Else 'Multi selection
                     CancelEdition()
@@ -1512,7 +1516,7 @@ Public Class IProgTestContaminations
             If (ShowMessage(Name, GlobalEnumerates.Messages.DELETE_CONTAMINATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 Dim hasError As Boolean = False
                 For i As Integer = 0 To bsTestContaminatorsListView.SelectedItems.Count - 1
-                    hasError = DeleteAllContaminationsByTest(bsTestContaminatorsListView.SelectedItems(i).Name, i)
+                    hasError = DeleteAllContaminationsByTest(CInt(bsTestContaminatorsListView.SelectedItems(i).Name), i)
                     If hasError Then Exit For
                 Next
             End If
@@ -1712,8 +1716,8 @@ Public Class IProgTestContaminations
     Private Sub ProgTestContaminations_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             ''TR 23/04/2012 get the current user level
-            'Dim MyGlobalBase As New GlobalBase
-            'CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            ''Dim myGlobalbase As New GlobalBase
+            'CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             ''TR 23/04/2012 -END.
 
             ScreenLoad()
@@ -1877,15 +1881,15 @@ Public Class IProgTestContaminations
                 If Not EditionMode Then Return
 
                 If dgv.Columns(myColumn).Name = "Selected" Then
-                    dgv.Rows(myRow).Cells("Selected").Value = Not dgv.Rows(myRow).Cells("Selected").Value
-                    dgv.Rows(myRow).Cells("WashingSolution").ReadOnly = Not dgv.Rows(myRow).Cells("Selected").Value
+                    dgv.Rows(myRow).Cells("Selected").Value = Not CBool(dgv.Rows(myRow).Cells("Selected").Value)
+                    dgv.Rows(myRow).Cells("WashingSolution").ReadOnly = Not CBool(dgv.Rows(myRow).Cells("Selected").Value)
                     ChangesMade = True
-                    If Not dgv.Rows(myRow).Cells("Selected").Value Then
+                    If Not CBool(dgv.Rows(myRow).Cells("Selected").Value) Then
                         dgv.Rows(myRow).Cells("WashingSolution").Value = ""
                     End If
 
                 ElseIf dgv.Columns(myColumn).Name = "WashingSolution" Then
-                    If dgv.Rows(myRow).Cells("Selected").Value Then
+                    If CBool(dgv.Rows(myRow).Cells("Selected").Value) Then
                         ChangesMade = True
                     Else
                         dgv.Rows(myRow).Cells("WashingSolution").Value = ""

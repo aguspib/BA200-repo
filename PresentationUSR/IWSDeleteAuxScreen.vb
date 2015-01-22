@@ -1,6 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
-
+Option Infer On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
@@ -10,7 +10,7 @@ Public Class IWSDeleteAuxScreen
 
 #Region "Attributes"
     Private ScreenUseAttribute As String = "VROTORS"
-    Private AnalyzerModelAttribute As String = "A400"
+    'Private AnalyzerModelAttribute1 As String = "A400"
 #End Region
 
 #Region "Properties"
@@ -23,11 +23,11 @@ Public Class IWSDeleteAuxScreen
         End Set
     End Property
 
-    Public WriteOnly Property AnalyzerModel() As String
-        Set(ByVal value As String)
-            AnalyzerModelAttribute = value
-        End Set
-    End Property
+    'Public WriteOnly Property AnalyzerModel() As String
+    '    Set(ByVal value As String)
+    '        AnalyzerModelAttribute = value
+    '    End Set
+    'End Property
 #End Region
 
 #Region "Methods"
@@ -289,7 +289,7 @@ Public Class IWSDeleteAuxScreen
 
             'Load the list of existing Virtual Rotors sorted by Rotor Type and Rotor Name...
             Dim resultData As GlobalDataTO
-            If (String.Compare(AnalyzerModelAttribute, "A400", False) = 0) Then
+            If (String.Compare(AnalyzerModel(), "A400", False) = 0) Then
                 Dim myVRotorsDelegate As New VirtualRotorsDelegate
 
                 'Get all Virtual Rotors 
@@ -305,11 +305,11 @@ Public Class IWSDeleteAuxScreen
 
                         'Icon for RotorType=Reagents
                         auxIconName = GetIconName("REAGENTPOS")
-                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("REAGENTS", Image.FromFile(iconPath & auxIconName))
+                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("REAGENTS", ImageUtilities.ImageFromFile(iconPath & auxIconName))
 
                         'Icon for RotorType=Samples
                         auxIconName = GetIconName("SAMPLEPOS")
-                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("SAMPLES", Image.FromFile(iconPath & auxIconName))
+                        If (String.Compare(auxIconName, String.Empty, False) <> 0) Then myIcons.Images.Add("SAMPLES", ImageUtilities.ImageFromFile(iconPath & auxIconName))
 
                         'Link the Icons to the ListView
                         bsElementsListView.SmallImageList = myIcons
@@ -346,11 +346,11 @@ Public Class IWSDeleteAuxScreen
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
-            If (String.Compare(auxIconName, "", False) <> 0) Then bsDeleteButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            If (String.Compare(auxIconName, "", False) <> 0) Then bsDeleteButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
-            If (String.Compare(auxIconName, "", False) <> 0) Then bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (String.Compare(auxIconName, "", False) <> 0) Then bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -371,8 +371,8 @@ Public Class IWSDeleteAuxScreen
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 60)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             PrepareButtons()
             GetScreenLabels(currentLanguage)
@@ -425,7 +425,7 @@ Public Class IWSDeleteAuxScreen
 
             'RH 17/12/2010
             'Open the WS Monitor form and close this one
-            IAx00MainMDI.OpenMonitorForm(Me)
+            UiAx00MainMDI.OpenMonitorForm(Me)
         End If
     End Sub
 
@@ -445,7 +445,7 @@ Public Class IWSDeleteAuxScreen
             Else
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsExitButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

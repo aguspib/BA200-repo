@@ -1,10 +1,13 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.BL
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 
 'Put here your business code for the tab ReactionsTab inside Monitor Form
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
     Private Sub InitializeReactionsTab()
         'Put your initialization code here. It will be executed in the Monitor OnLoad event
@@ -102,7 +105,7 @@ Partial Public Class IMonitor
 
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
 
             'Call the Method incharge to update Rotor (Sample/Reagent)
@@ -160,7 +163,7 @@ Partial Public Class IMonitor
             RotorContentList = Nothing
             'TR 25/09/2013 END
 
-            myLogAcciones.CreateLogActivity("Refresh reactions rotor: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshReactionsRotor", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Refresh reactions rotor: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshReactionsRotor", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshReactionsRotor ", EventLogEntryType.Error, _

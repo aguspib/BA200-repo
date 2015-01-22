@@ -7,7 +7,6 @@ Option Strict On
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 
 Namespace Biosystems.Ax00.DAL.DAO
 
@@ -38,16 +37,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                 da.Fill(result.twksOrderTests)
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TwksOrderTestsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TwksOrderTestsDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TwksOrderTestsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TwksOrderTestsDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "TwksOrderTestsDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "TwksOrderTestsDAO", EventLogEntryType.Error, False)
 
             Finally
                 ' always call Close when done with conn.

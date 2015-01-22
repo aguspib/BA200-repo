@@ -1,12 +1,11 @@
-Option Explicit On
 Option Strict On
+Option Explicit On
+Option Infer On
 
-Imports System.Globalization
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports System.Configuration
 Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.PresentationCOM
 
@@ -507,7 +506,7 @@ Public Class IProgPatientData
                         Me.Close()
                     Else
                         'Normal button click - Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     End If
                 End If
             End If
@@ -1233,8 +1232,8 @@ Public Class IProgPatientData
     Private Sub PatientSearchLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(currentLanguage)
@@ -1300,74 +1299,74 @@ Public Class IProgPatientData
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL EDITION and CANCEL SEARCH Buttons
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsSelectPatientButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSelectPatientButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'FIND Button
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                bsSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL") '("ACCEPT")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsCloseSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsCloseSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'FILTER Button
             auxIconName = GetIconName("FILTER")
             If (auxIconName <> "") Then
-                bsOpenSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsOpenSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLEAR FILTER Button
             auxIconName = GetIconName("DELFILTER")
             If (auxIconName <> "") Then
-                bsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'RESET FIELDS IN FILTER FRAME Button SG 12/07/2010
             auxIconName = GetIconName("RESETFIELD")
             If (auxIconName <> "") Then
-                bsResetButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsResetButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1401,7 +1400,7 @@ Public Class IProgPatientData
                 If (bsCommentsTextBox.Text.Trim() <> "") Then .Comments = bsCommentsTextBox.Text.Trim()
 
                 Dim currentSession As New ApplicationSessionManager
-                .TS_User = currentSession.GetSessionInfo().UserName
+                .TS_User = GlobalBase.GetSessionInfo().UserName
                 .TS_DateTime = Date.Now
             End With
             patientData.tparPatients.AddtparPatientsRow(patientRow)
@@ -1450,7 +1449,7 @@ Public Class IProgPatientData
                 If (bsCommentsTextBox.Text.Trim() <> "") Then .Comments = bsCommentsTextBox.Text.Trim()
 
                 Dim currentSession As New ApplicationSessionManager
-                .TS_User = currentSession.GetSessionInfo().UserName
+                .TS_User = GlobalBase.GetSessionInfo().UserName
                 .TS_DateTime = Date.Now
             End With
             patientData.tparPatients.AddtparPatientsRow(patientRow)
@@ -1742,8 +1741,8 @@ Public Class IProgPatientData
     Private Sub IProgPatientData_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'Get Level of the connected User
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             PrepareButtons()
             PatientSearchLoad()
@@ -1753,8 +1752,8 @@ Public Class IProgPatientData
             If (entryModeAttribute = "MENU") Then
                 ResetBorder()
             Else
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
 
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
@@ -1788,8 +1787,8 @@ Public Class IProgPatientData
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
                 If (entryModeAttribute = "SEARCH") Then
-                    Dim mySize As Size = IAx00MainMDI.Size
-                    Dim myLocation As Point = IAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
                     If (Not Me.MdiParent Is Nothing) Then
                         mySize = Me.Parent.Size
                         myLocation = Me.Parent.Location

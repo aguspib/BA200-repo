@@ -4,6 +4,7 @@
     Partial Class BSMonitorDigitLabel
         Inherits BSMonitorControlBase
 
+
         'UserControl overrides dispose to clean up the component list.
         <System.Diagnostics.DebuggerNonUserCode()> _
         Protected Overrides Sub Dispose(ByVal disposing As Boolean)
@@ -104,6 +105,9 @@
         Friend WithEvents LabelPanel As System.Windows.Forms.Panel
         Friend WithEvents UnitsLabel As System.Windows.Forms.Label
 
+        Protected Friend Overrides Sub RefreshControl()
+            UpdateContentsSize(InstrumentPanel)
+        End Sub
     End Class
 
 End Namespace

@@ -1,24 +1,21 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
-Imports System.Globalization
 Imports LIS.Biosystems.Ax00.LISCommunications 'AG 25/02/2013 - for LIS communications
-Imports System.Xml 'AG 25/02/2013 - for LIS communications
-Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
-Imports System.Timers
+'AG 25/02/2013 - for LIS communications
+'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
 
 
 'Refactoring code in CommEvents partial class inherits form MDI (specially method ManageReceptionEvent)
-Partial Public Class IAx00MainMDI
+Partial Public Class UiAx00MainMDI
 
 #Region "Communications events Main Methods"
 
@@ -59,7 +56,7 @@ Partial Public Class IAx00MainMDI
                                          ByVal pTreated As Boolean, _
                                          ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), _
                                          ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) As Boolean
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         'RH Save UIRefreshDS for recording generated UIRefreshDS data and reproduce bugs in Debug sessions
         'pRefreshDS.WriteXml(String.Format("UIRefreshDS{0}.xml", DSNumber))
 
@@ -83,12 +80,12 @@ Partial Public Class IAx00MainMDI
             Dim copyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
 
             ''TR 18/09/2012 -Log to trace incase Exception error is race.
-            'myLogAcciones.CreateLogActivity("START BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
+            'GlobalBase.CreateLogActivity("START BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
             '                                EventLogEntryType.FailureAudit, False)
 
             ' XB 30/08/2013
             If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ANSFCP_RECEIVED Then
-                myLogAcciones.CreateLogActivity("START ANSFCP received with pTreated value as [" & pTreated & "] ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("START ANSFCP received with pTreated value as [" & pTreated & "] ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
             End If
 
             'AG 04/04/2012 - This code is needed because the incomplete samples screen is open using ShowDialog
@@ -119,7 +116,7 @@ Partial Public Class IAx00MainMDI
             SyncLock lockThis
                 copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("BEFORE pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("BEFORE pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 For Each item As GlobalEnumerates.UI_RefreshEvents In pRefreshEvent
                     'copyRefreshEventList.Add(item)
                     If item = UI_RefreshEvents.BARCODE_POSITION_READ AndAlso incompleteSamplesOpenFlag Then
@@ -129,19 +126,19 @@ Partial Public Class IAx00MainMDI
                     End If
                 Next
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("AFTER pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("AFTER pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
 
                 If pRefreshEvent.Count > 0 Then MDIAnalyzerManager.ReadyToClearUIRefreshDS(pMainThread) 'Inform the ui refresh dataset can be cleared so they are already copied
             End SyncLock
             'END DL 16/09/2011
 
             ''TR 18/09/2012 -Log to trace incase Exception error is race.
-            'myLogAcciones.CreateLogActivity("END BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
+            'GlobalBase.CreateLogActivity("END BLOCK 0.", Me.Name & ".ManageReceptionEvent ", _
             '                                EventLogEntryType.FailureAudit, False)
 
             If pTreated Then '(1) 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("START BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("START BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
                 '////////////////////////////
                 'REFRESH MDI BUTTONS & STATUS
@@ -237,13 +234,13 @@ Partial Public Class IAx00MainMDI
                 End If '(2)
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("END BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("END BLOCK 1.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
 
                 ChangeErrorStatusLabel(False) 'AG 18/05/2012 - When some process is paused by some error set the error providers text to 'Not Finished'
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("START BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("START BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
                 '////////////////
                 ' REFRESH SCREENS
@@ -303,11 +300,11 @@ Partial Public Class IAx00MainMDI
                     PerformNewWRotorPositionChange(copyRefreshEventList, copyRefreshDS, monitorTreated, wsRotorPositionTreated)
                 End If
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("END BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("END BLOCK 2.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("START BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("START BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
                 '                                EventLogEntryType.FailureAudit, False)
 
                 'LAST EVENT REFRESH TREATMENT DUE some PopUp screen can be opened
@@ -351,8 +348,8 @@ Partial Public Class IAx00MainMDI
                         If (TypeOf ActiveMdiChild Is IISEUtilities) Then
                             Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
                             CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
-                        ElseIf (TypeOf ActiveMdiChild Is IMonitor AndAlso Not monitorTreated) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        ElseIf (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not monitorTreated) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             monitorTreated = True
                         Else ' XBC 10/12/2012 - Correction : Allow ISE receptions also on another active screens, not only IMonitor and IISEUtilities
@@ -595,10 +592,10 @@ Partial Public Class IAx00MainMDI
                                                 myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                             End If
 
-                                            If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is IMonitor) Then
+                                            If (Not Me.ActiveMdiChild Is Nothing) AndAlso (TypeOf ActiveMdiChild Is UiMonitor) Then
                                                 'Refresh the status of ISE Preparations in Monitor Screen if it is the active screen
                                                 Dim myDummyUIRefresh As New UIRefreshDS
-                                                IMonitor.UpdateWSState(myDummyUIRefresh)
+                                                UiMonitor.UpdateWSState(myDummyUIRefresh)
                                             End If
                                         End If
 
@@ -636,14 +633,14 @@ Partial Public Class IAx00MainMDI
                 ' XBC 15/06/2012
                 If MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.ANSFCP_RECEIVED Then
                     ' XB 30/08/2013
-                    myLogAcciones.CreateLogActivity("(Analyzer Change) ANSFCP received (get it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("(Analyzer Change) ANSFCP received (get it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
                     If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.FWCPUVALUE_CHANGED) Then
                         ' XB 30/08/2013
-                        myLogAcciones.CreateLogActivity("(Analyzer Change) ANSFCP received (manage it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("(Analyzer Change) ANSFCP received (manage it !) ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
-                        Dim myLogAccionesAux As New ApplicationLogManager()
-                        myLogAccionesAux.CreateLogActivity("(Analyzer Change) calling function ManageAnalyzerConnected ... ", Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                        'Dim myLogAccionesAux As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("(Analyzer Change) calling function ManageAnalyzerConnected ... ", Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
 
                         ManageAnalyzerConnected(True, False)
                         MDIAnalyzerManager.InstructionTypeReceived = AnalyzerManagerSwActionList.NONE
@@ -711,7 +708,7 @@ Partial Public Class IAx00MainMDI
                 'AG 02/04/2013
 
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("END BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
+                'GlobalBase.CreateLogActivity("END BLOCK 3.", Me.Name & ".ManageReceptionEvent ", _
                 '                                 EventLogEntryType.FailureAudit, False)
             End If
 
@@ -744,7 +741,7 @@ Partial Public Class IAx00MainMDI
                                 Dim myTmpAnalyzerConnected As String = ""
                                 myTmpAnalyzerConnected = MDIAnalyzerManager.TemporalAnalyzerConnected
                                 If myAnalyzerData.tcfgAnalyzers(0).Generic OrElse myAnalyzerData.tcfgAnalyzers(0).AnalyzerID <> myTmpAnalyzerConnected Then
-                                    myLogAcciones.CreateLogActivity("(Analyzer Change) Activate protection to register the Connected Analyzer... ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("(Analyzer Change) Activate protection to register the Connected Analyzer... ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False)
                                     ManageAnalyzerConnected(True, False)
                                     CheckAnalyzerIDOnFirstConnection = False
                                 End If
@@ -831,11 +828,11 @@ Partial Public Class IAx00MainMDI
             'AG 04/12/2013
 
         Catch ex As Exception
-            'Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))" & ". SOURCE --> " & ex.Source, "ManageReceptionEvent", _
+            ''Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))" & ". SOURCE --> " & ex.Source, "ManageReceptionEvent", _
                                             EventLogEntryType.Error, False)
 
-            myLogAcciones.CreateLogActivity("Instruction Recived --> " & pInstructionReceived, "ManageReceptionEvent", _
+            GlobalBase.CreateLogActivity("Instruction Recived --> " & pInstructionReceived, "ManageReceptionEvent", _
                                             EventLogEntryType.Error, False)
         End Try
 
@@ -848,8 +845,8 @@ Partial Public Class IAx00MainMDI
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myLogAccionesAux As New ApplicationLogManager()
-            myLogAccionesAux.CreateLogActivity("(Analyzer Change) Manage Analyzer Connection... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
+            'Dim myLogAccionesAux As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity("(Analyzer Change) Manage Analyzer Connection... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
 
             If (pisReportSATLoading) Then Exit Sub
 
@@ -861,9 +858,9 @@ Partial Public Class IAx00MainMDI
 
                 'Obtain needed fw version
                 Dim mySwVersion As String
-                Dim myUtil As New Utilities
+                'Dim myUtil As New Utilities.
 
-                myGlobal = myUtil.GetSoftwareVersion()
+                myGlobal = Utilities.GetSoftwareVersion()
                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
                     mySwVersion = myGlobal.SetDatos.ToString
 
@@ -921,12 +918,12 @@ Partial Public Class IAx00MainMDI
                 Exit Try
             End If
 
-            myLogAccionesAux.CreateLogActivity("(Analyzer Change) ActiveWorkSession [ " & ActiveWorkSession & " ] ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("(Analyzer Change) ActiveWorkSession [ " & ActiveWorkSession & " ] ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
 
             If (ActiveWorkSession.Length > 0) Then
                 ' Execute process to update the corresponding Work Session tables 
                 MDIAnalyzerManager.ForceAbortSession = False
-                myLogAccionesAux.CreateLogActivity("(Analyzer Change) Calling function ProcessUpdateWSByAnalyzerID ... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("(Analyzer Change) Calling function ProcessUpdateWSByAnalyzerID ... ", Name & ".ManageAnalyzerConnected ", EventLogEntryType.Information, False)
                 myGlobal = MDIAnalyzerManager.ProcessUpdateWSByAnalyzerID(Nothing)
                 If (Not myGlobal.HasError) Then
                     'If (MDIAnalyzerManager.ForceAbortSession) Then
@@ -951,8 +948,8 @@ Partial Public Class IAx00MainMDI
 
                     ElseIf (Not ActiveMdiChild Is Nothing) Then
                         'If monitor is the current screen inform analyzer and model
-                        If (TypeOf ActiveMdiChild Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
 
                             CurrentMdiChild.ActiveAnalyzer = AnalyzerIDAttribute
                             CurrentMdiChild.AnalyzerModel = AnalyzerModelAttribute
@@ -962,14 +959,14 @@ Partial Public Class IAx00MainMDI
                     End If
 
                 Else
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("Analyzer ID checking", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("Analyzer ID checking", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
                     ShowMessage("Error", GlobalEnumerates.Messages.MASTER_DATA_MISSING.ToString)
                 End If
             End If
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageAnalyzerConnected", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -1028,8 +1025,8 @@ Partial Public Class IAx00MainMDI
                     Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
                     CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS)
 
-                ElseIf (TypeOf ActiveMdiChild Is IMonitor) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                ElseIf (TypeOf ActiveMdiChild Is UiMonitor) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     myRefreshEventList.Add(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)
                     CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS)
                 End If
@@ -1086,8 +1083,8 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageSentEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageSentEvent", EventLogEntryType.Error, False)
         End Try
         Return True
     End Function
@@ -1191,8 +1188,8 @@ Partial Public Class IAx00MainMDI
             End If
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageWatchDogEvent", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ManageWatchDogEvent", EventLogEntryType.Error, False)
         End Try
         Return True
     End Function
@@ -1299,8 +1296,8 @@ Partial Public Class IAx00MainMDI
                             CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
 
                             'AG 13/02/2012 - Refresh monitor (new alarm)
-                        ElseIf (TypeOf ActiveMdiChild Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        ElseIf (TypeOf ActiveMdiChild Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             myRefreshEventList.Add(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED)
                             'TR 25/09/2012 -Add the sensor value change to update the pc no connected Led.
                             myRefreshEventList.Add(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED)
@@ -1517,8 +1514,8 @@ Partial Public Class IAx00MainMDI
                                 'AG 19/04/2012 - WS is aborted and user do not change screen
                                 If String.Equals(WSStatusAttribute, "ABORTED") AndAlso Not ActiveMdiChild Is Nothing Then
                                     '- Monitor (WSStates ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
-                                    If (TypeOf ActiveMdiChild Is IMonitor) Then
-                                        Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                                        Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                                         CurrentMdiChild.bsErrorProvider1.SetError(Nothing, GetMessageText(GlobalEnumerates.Messages.WS_ABORTED.ToString))
                                     ElseIf (TypeOf ActiveMdiChild Is IResults) Then
                                         Dim CurrentMdiChild As IResults = CType(ActiveMdiChild, IResults)
@@ -1615,8 +1612,8 @@ Partial Public Class IAx00MainMDI
 
             'RH 10/10/2011
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                If (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not MonitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         MonitorTreated = True
@@ -1647,8 +1644,8 @@ Partial Public Class IAx00MainMDI
             'RH 10/10/2011
             If Not ActiveMdiChild Is Nothing Then
                 '- Monitor (WSStates ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
-                If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                If (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not MonitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                     MonitorTreated = True
 
@@ -1665,7 +1662,7 @@ Partial Public Class IAx00MainMDI
                     Dim found As Boolean = False
                     Dim index As Integer
                     ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                    'myLogAcciones.CreateLogActivity("1- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                    'GlobalBase.CreateLogActivity("1- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                     For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
                         If String.Compare(NoMDIChildActiveFormsAttribute.Item(index).Name, IResultsCalibCurve.Name, False) = 0 Then
                             found = True
@@ -1673,7 +1670,7 @@ Partial Public Class IAx00MainMDI
                         End If
                     Next index
                     ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                    'myLogAcciones.CreateLogActivity("1- AFTER NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                    'GlobalBase.CreateLogActivity("1- AFTER NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
 
                     If found Then
                         Dim CurrentNoMdiChild As IResultsCalibCurve
@@ -1723,7 +1720,7 @@ Partial Public Class IAx00MainMDI
                 Dim found As Boolean = False
                 Dim index As Integer
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("2- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("2- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
                     If NoMDIChildActiveFormsAttribute.Item(index).Name = IResultsAbsCurve.Name Then
                         found = True
@@ -1731,7 +1728,7 @@ Partial Public Class IAx00MainMDI
                     End If
                 Next index
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'myLogAcciones.CreateLogActivity("2- After NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
+                'GlobalBase.CreateLogActivity("2- After NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 If found Then
                     Dim CurrentNoMdiChild As IResultsAbsCurve
                     CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), IResultsAbsCurve)
@@ -1782,8 +1779,8 @@ Partial Public Class IAx00MainMDI
                 '- Monitor (Main or Alarms) screen ... (pRefreshDS.ReceivedAlarms contains the information to refresh)
                 '- Change rotor ... (pRefreshDS.SensorValueChanged contains the information to refresh)
 
-                If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                If (TypeOf myCurrentMDIForm Is UiMonitor AndAlso Not monitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         monitorTreated = True
@@ -1791,8 +1788,8 @@ Partial Public Class IAx00MainMDI
                     End If
                     'AG 16/03/2012 - If no reactions rotor alarm appears while the UI is disabled we must reactivated it
                     'Change rotor
-                ElseIf (TypeOf myCurrentMDIForm Is IChangeRotor AndAlso Not changeRotorTreated) Then
-                    Dim CurrentMdiChild As IChangeRotor = CType(myCurrentMDIForm, IChangeRotor)
+                ElseIf (TypeOf myCurrentMDIForm Is UiChangeRotor AndAlso Not changeRotorTreated) Then
+                    Dim CurrentMdiChild As UiChangeRotor = CType(myCurrentMDIForm, UiChangeRotor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         changeRotorTreated = True
@@ -1802,8 +1799,8 @@ Partial Public Class IAx00MainMDI
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode button. Else enable it
                     'Sample request
 
-                ElseIf (TypeOf myCurrentMDIForm Is IConditioning AndAlso Not conditioningTreated) Then
-                    Dim CurrentMdiChild As IConditioning = CType(myCurrentMDIForm, IConditioning)
+                ElseIf (TypeOf myCurrentMDIForm Is UiConditioning AndAlso Not conditioningTreated) Then
+                    Dim CurrentMdiChild As UiConditioning = CType(myCurrentMDIForm, UiConditioning)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         'conditioningTreated = True
@@ -1835,7 +1832,7 @@ Partial Public Class IAx00MainMDI
 
             End If
 
-                'AG 17/10/2011
+            'AG 17/10/2011
             If processingBeforeRunning = "0" Then refreshTriggeredFlag = False 'AG 23/01/2012 - special case: enter running process in progress
             If MdiChildIsDisabled AndAlso refreshTriggeredFlag Then
                 'Activate the current mdi child who is disabled once the refresh method is finished
@@ -1848,7 +1845,7 @@ Partial Public Class IAx00MainMDI
                     End If
                 End If
             End If
-                'AG 17/10/2011
+            'AG 17/10/2011
 
             'DL 31/07/2012. Begin 
             Dim linq As New List(Of UIRefreshDS.ReceivedAlarmsRow)
@@ -1868,7 +1865,7 @@ Partial Public Class IAx00MainMDI
             linq = Nothing
 
             'Alarm Messages (Messages do not required ActiveMdiChild) 
-                '--------------------------------------------------------
+            '--------------------------------------------------------
             '(All screens) Finally show message depending the alarms received and update vertical button bar depending the current alarms
             ShowAlarmsOrSensorsWarningMessages(GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, copyRefreshDS) 'DL 16/09/2011 ShowAlarmWarningMessages(pRefreshDS) 
             SetActionButtonsEnableProperty(True)
@@ -1963,14 +1960,14 @@ Partial Public Class IAx00MainMDI
                     '  <or maybe all monitor TAB's (LED's area)>
                     '- Change rotor ... (pRefreshDS.SensorValueChanged contains the information to refresh)
                     'NOTE: All sensor values are available using the property AnalyzerManager.GetSensorValue
-                    If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
-                        Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                    If (TypeOf myCurrentMDIForm Is UiMonitor AndAlso Not monitorTreated) Then
+                        Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         monitorTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IChangeRotor AndAlso Not changeRotorTreated) Then
-                        Dim CurrentMdiChild As IChangeRotor = CType(myCurrentMDIForm, IChangeRotor)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiChangeRotor AndAlso Not changeRotorTreated) Then
+                        Dim CurrentMdiChild As UiChangeRotor = CType(myCurrentMDIForm, UiChangeRotor)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         changeRotorTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
@@ -1979,8 +1976,8 @@ Partial Public Class IAx00MainMDI
                         'AG 12/01/2012
 
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IConditioning AndAlso Not conditioningTreated) Then
-                        Dim CurrentMdiChild As IConditioning = CType(myCurrentMDIForm, IConditioning)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiConditioning AndAlso Not conditioningTreated) Then
+                        Dim CurrentMdiChild As UiConditioning = CType(myCurrentMDIForm, UiConditioning)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         conditioningTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone
@@ -2013,8 +2010,8 @@ Partial Public Class IAx00MainMDI
                         'AG 16/03/2012
 
                         ' XB 24/04/2013
-                    ElseIf (TypeOf myCurrentMDIForm Is IConfigLIS AndAlso Not configSettingsLISTreated) Then
-                        Dim CurrentMdiChild As IConfigLIS = CType(myCurrentMDIForm, IConfigLIS)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiConfigLIS AndAlso Not configSettingsLISTreated) Then
+                        Dim CurrentMdiChild As UiConfigLIS = CType(myCurrentMDIForm, UiConfigLIS)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         configSettingsLISTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone
@@ -2160,8 +2157,8 @@ Partial Public Class IAx00MainMDI
 
                 Else 'AG 23/05/2012 Connection establisment ok refresh monitor.main
                     If Not myCurrentMDIForm Is Nothing Then
-                        If (TypeOf myCurrentMDIForm Is IMonitor) Then
-                            Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                        If (TypeOf myCurrentMDIForm Is UiMonitor) Then
+                            Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                             If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                                 CurrentMdiChild.RefreshAlarmsGlobes(Nothing)
                             End If
@@ -2169,10 +2166,10 @@ Partial Public Class IAx00MainMDI
                     End If
                     'AG 23/05/2012
 
-                    End If
-                    'TR 20/09/2012 Commented by TR. 
-                    'EnableButtonAndMenus(True)
-                    Cursor = Cursors.Default
+                End If
+                'TR 20/09/2012 Commented by TR. 
+                'EnableButtonAndMenus(True)
+                Cursor = Cursors.Default
             End If
             lnqRes = Nothing
 
@@ -2203,8 +2200,8 @@ Partial Public Class IAx00MainMDI
 
             If Not ActiveMdiChild Is Nothing Then
                 '- Monitor (Reactions Rotor) screen ... (pRefreshDS.ReactionWellStatusChanged contains the information to refresh)
-                If (TypeOf ActiveMdiChild Is IMonitor AndAlso Not MonitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                If (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not MonitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                     MonitorTreated = True
                 End If
@@ -2291,8 +2288,8 @@ Partial Public Class IAx00MainMDI
             'Call the RefreshScreen method when the current screen is:
             If Not myCurrentMDIForm Is Nothing Then
                 '- Monitor (Reagents or Sample Rotor) screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
-                If (TypeOf myCurrentMDIForm Is IMonitor AndAlso Not monitorTreated) Then
-                    Dim CurrentMdiChild As IMonitor = CType(myCurrentMDIForm, IMonitor)
+                If (TypeOf myCurrentMDIForm Is UiMonitor AndAlso Not monitorTreated) Then
+                    Dim CurrentMdiChild As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         monitorTreated = True
@@ -2458,7 +2455,7 @@ Partial Public Class IAx00MainMDI
                             'bsAnalyzerStatus.Text = myAutoLISWaitingOrder
                             ShowStatus(Messages.AUTOLIS_WAITING_ORDERS)
 
-                            Using MyForm As New HQBarcode
+                            Using MyForm As New UiHQBarcode
                                 MyForm.AnalyzerID = AnalyzerIDAttribute
                                 MyForm.WorkSessionID = WorkSessionIDAttribute
                                 MyForm.WorkSessionStatus = WSStatusAttribute
@@ -2645,7 +2642,7 @@ Partial Public Class IAx00MainMDI
                     'If current screen <> Change rotor add a new message line
                     Dim addMessageLine As Boolean = True
                     If Not ActiveMdiChild Is Nothing Then
-                        If (TypeOf ActiveMdiChild Is IChangeRotor) Then addMessageLine = False
+                        If (TypeOf ActiveMdiChild Is UiChangeRotor) Then addMessageLine = False
                     End If
 
                     If addMessageLine Then

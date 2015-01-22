@@ -4,10 +4,7 @@ Option Explicit On
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Imports System.Drawing
-Imports DevExpress.XtraCharts
 Imports DevExpress.XtraReports.UI
 
 Public Class QCCumulatedResultsByTestReport
@@ -70,8 +67,8 @@ Public Class QCCumulatedResultsByTestReport
         If Me.DesignMode Then Exit Sub
 
         'Multilanguage support
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim CurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim CurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         'Multilanguage. Get texts from DB.

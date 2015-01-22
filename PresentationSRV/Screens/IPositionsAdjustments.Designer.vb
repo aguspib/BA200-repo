@@ -1,6 +1,4 @@
-﻿Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.CommunicationsSwFw
+﻿
 Imports Biosystems.Ax00.Controls.UserControls
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
@@ -527,34 +525,40 @@ Partial Class IPositionsAdjustments
         ConstantLine17.ShowInLegend = False
         ConstantLine17.Title.Visible = False
         XyDiagram1.AxisX.ConstantLines.AddRange(New DevExpress.XtraCharts.ConstantLine() {ConstantLine1, ConstantLine2, ConstantLine3, ConstantLine4, ConstantLine5, ConstantLine6, ConstantLine7, ConstantLine8, ConstantLine9, ConstantLine10, ConstantLine11, ConstantLine12, ConstantLine13, ConstantLine14, ConstantLine15, ConstantLine16, ConstantLine17})
-        XyDiagram1.AxisX.GridSpacing = 40
-        XyDiagram1.AxisX.GridSpacingAuto = False
+        XyDiagram1.AxisX.NumericScaleOptions.GridSpacing = 40
+        XyDiagram1.AxisX.NumericScaleOptions.AutoGrid = False
         XyDiagram1.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisX.Label.TextColor = System.Drawing.Color.Black
-        XyDiagram1.AxisX.Range.Auto = False
-        XyDiagram1.AxisX.Range.MaxValueSerializable = "400"
-        XyDiagram1.AxisX.Range.MinValueSerializable = "0"
-        XyDiagram1.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
-        XyDiagram1.AxisX.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisX.WholeRange.Auto = False
+        XyDiagram1.AxisX.WholeRange.MaxValueSerializable = "400"
+        XyDiagram1.AxisX.WholeRange.MinValueSerializable = "0"
+        XyDiagram1.AxisX.VisualRange.Auto = False
+        XyDiagram1.AxisX.VisualRange.MaxValueSerializable = "400"
+        XyDiagram1.AxisX.VisualRange.MinValueSerializable = "0"
+        XyDiagram1.AxisX.WholeRange.AutoSideMargins = True
+        XyDiagram1.AxisX.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisX.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisX.Title.Text = "steps"
         XyDiagram1.AxisX.Title.TextColor = System.Drawing.Color.Black
-        XyDiagram1.AxisX.Title.Visible = True
+        XyDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
         XyDiagram1.AxisY.Color = System.Drawing.Color.Gray
         XyDiagram1.AxisY.GridLines.Color = System.Drawing.Color.FromArgb(CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer), CType(CType(192, Byte), Integer))
-        XyDiagram1.AxisY.Label.Antialiasing = True
+        XyDiagram1.AxisY.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.True
         XyDiagram1.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.25!)
         XyDiagram1.AxisY.Label.TextColor = System.Drawing.Color.Black
-        XyDiagram1.AxisY.Range.Auto = False
-        XyDiagram1.AxisY.Range.MaxValueSerializable = "1100000"
-        XyDiagram1.AxisY.Range.MinValueSerializable = "500000"
-        XyDiagram1.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
-        XyDiagram1.AxisY.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisY.WholeRange.Auto = False
+        XyDiagram1.AxisY.WholeRange.MaxValueSerializable = "1100000"
+        XyDiagram1.AxisY.WholeRange.MinValueSerializable = "500000"
+        XyDiagram1.AxisY.VisualRange.Auto = False
+        XyDiagram1.AxisY.VisualRange.MaxValueSerializable = "1100000"
+        XyDiagram1.AxisY.VisualRange.MinValueSerializable = "500000"
+        XyDiagram1.AxisY.WholeRange.AutoSideMargins = True
+        XyDiagram1.AxisY.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisY.Title.Font = New System.Drawing.Font("Verdana", 8.0!)
         XyDiagram1.AxisY.Title.Text = "counts"
         XyDiagram1.AxisY.Title.TextColor = System.Drawing.Color.Black
-        XyDiagram1.AxisY.Title.Visible = True
+        XyDiagram1.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
         XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
         XyDiagram1.DefaultPane.BackColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         XyDiagram1.DefaultPane.BorderColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
@@ -565,7 +569,7 @@ Partial Class IPositionsAdjustments
         Me.AbsorbanceChart.Legend.Antialiasing = True
         Me.AbsorbanceChart.Legend.BackColor = System.Drawing.Color.Transparent
         Me.AbsorbanceChart.Legend.BackImage.Stretch = True
-        Me.AbsorbanceChart.Legend.Border.Visible = False
+        Me.AbsorbanceChart.Legend.Border.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.AbsorbanceChart.Legend.Font = New System.Drawing.Font("Verdana", 8.0!)
         Me.AbsorbanceChart.Legend.TextColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         Me.AbsorbanceChart.Location = New System.Drawing.Point(0, 0)
@@ -577,11 +581,11 @@ Partial Class IPositionsAdjustments
         Me.AbsorbanceChart.PaletteBaseColorNumber = 2
         Me.AbsorbanceChart.PaletteName = "Nature Colors"
         Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel1.LineVisible = True
-        PointSeriesLabel1.Visible = False
+        PointSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.True
         Series1.Label = PointSeriesLabel1
         Series1.LegendText = "Absorbance"
         Series1.Name = "Absorbance"
+        Series1.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
         SplineSeriesView1.Color = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
         SplineSeriesView1.LineMarkerOptions.Size = 3
         SplineSeriesView1.LineStyle.Thickness = 3
@@ -589,20 +593,21 @@ Partial Class IPositionsAdjustments
         Series2.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
         PointSeriesLabel2.BackColor = System.Drawing.Color.SteelBlue
         PointSeriesLabel2.Border.Color = System.Drawing.Color.SteelBlue
-        PointSeriesLabel2.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Hatch
+        PointSeriesLabel2.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Solid
         PointSeriesLabel2.LineColor = System.Drawing.Color.White
-        PointSeriesLabel2.LineVisible = True
+        PointSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.True
         PointSeriesLabel2.TextColor = System.Drawing.Color.White
         Series2.Label = PointSeriesLabel2
         Series2.LegendText = "Encoder"
         Series2.Name = "Encoder"
+        Series2.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True
         SplineSeriesView2.Color = System.Drawing.Color.Silver
         SplineSeriesView2.LineMarkerOptions.Size = 2
         SplineSeriesView2.LineStyle.DashStyle = DevExpress.XtraCharts.DashStyle.Dot
         SplineSeriesView2.LineStyle.Thickness = 1
         Series2.View = SplineSeriesView2
         Me.AbsorbanceChart.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1, Series2}
-        PointSeriesLabel3.LineVisible = True
+        PointSeriesLabel3.LineVisibility = DevExpress.Utils.DefaultBoolean.True
         Me.AbsorbanceChart.SeriesTemplate.Label = PointSeriesLabel3
         SplineSeriesView3.LineStyle.Thickness = 1
         Me.AbsorbanceChart.SeriesTemplate.View = SplineSeriesView3
@@ -613,7 +618,7 @@ Partial Class IPositionsAdjustments
         ChartTitle1.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         ChartTitle1.Text = "Absorbance"
         ChartTitle1.TextColor = System.Drawing.Color.Black
-        ChartTitle1.Visible = False
+        ChartTitle1.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.AbsorbanceChart.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle1})
         '
         'BsOpticAdjustGroupBox
@@ -1748,37 +1753,42 @@ Partial Class IPositionsAdjustments
         SwiftPlotDiagram1.AxisX.ConstantLines.AddRange(New DevExpress.XtraCharts.ConstantLine() {ConstantLine18, ConstantLine19, ConstantLine20, ConstantLine21, ConstantLine22, ConstantLine23, ConstantLine24, ConstantLine25, ConstantLine26, ConstantLine27, ConstantLine28, ConstantLine29})
         SwiftPlotDiagram1.AxisX.GridLines.MinorVisible = True
         SwiftPlotDiagram1.AxisX.GridLines.Visible = True
-        SwiftPlotDiagram1.AxisX.GridSpacing = 80
-        SwiftPlotDiagram1.AxisX.GridSpacingAuto = False
-        SwiftPlotDiagram1.AxisX.Label.Antialiasing = True
+        SwiftPlotDiagram1.AxisX.NumericScaleOptions.GridSpacing = 80
+        SwiftPlotDiagram1.AxisX.NumericScaleOptions.AutoGrid = False
+        SwiftPlotDiagram1.AxisX.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.True
         SwiftPlotDiagram1.AxisX.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         SwiftPlotDiagram1.AxisX.Label.TextColor = System.Drawing.Color.Black
-        SwiftPlotDiagram1.AxisX.Range.Auto = False
-        SwiftPlotDiagram1.AxisX.Range.MaxValueSerializable = "400"
-        SwiftPlotDiagram1.AxisX.Range.MinValueSerializable = "0"
-        SwiftPlotDiagram1.AxisX.Range.ScrollingRange.SideMarginsEnabled = True
-        SwiftPlotDiagram1.AxisX.Range.SideMarginsEnabled = True
+        SwiftPlotDiagram1.AxisX.WholeRange.Auto = False
+        SwiftPlotDiagram1.AxisX.WholeRange.MaxValueSerializable = "400"
+        SwiftPlotDiagram1.AxisX.WholeRange.MinValueSerializable = "0"
+        SwiftPlotDiagram1.AxisX.VisualRange.Auto = False
+        SwiftPlotDiagram1.AxisX.VisualRange.MaxValueSerializable = "400"
+        SwiftPlotDiagram1.AxisX.VisualRange.MinValueSerializable = "0"
+        SwiftPlotDiagram1.AxisX.WholeRange.AutoSideMargins = True
+        SwiftPlotDiagram1.AxisX.VisualRange.AutoSideMargins = True
         SwiftPlotDiagram1.AxisX.Title.Alignment = System.Drawing.StringAlignment.Far
         SwiftPlotDiagram1.AxisX.Title.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         SwiftPlotDiagram1.AxisX.Title.Text = "steps"
         SwiftPlotDiagram1.AxisX.Title.TextColor = System.Drawing.Color.DimGray
-        SwiftPlotDiagram1.AxisX.Title.Visible = True
+        SwiftPlotDiagram1.AxisX.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
         SwiftPlotDiagram1.AxisX.VisibleInPanesSerializable = "-1"
         SwiftPlotDiagram1.AxisY.Color = System.Drawing.Color.Black
-        SwiftPlotDiagram1.AxisY.Label.Antialiasing = True
+        SwiftPlotDiagram1.AxisY.Label.EnableAntialiasing = DevExpress.Utils.DefaultBoolean.True
         SwiftPlotDiagram1.AxisY.Label.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         SwiftPlotDiagram1.AxisY.Label.TextColor = System.Drawing.Color.Black
-        SwiftPlotDiagram1.AxisY.NumericOptions.Precision = 0
-        SwiftPlotDiagram1.AxisY.Range.Auto = False
-        SwiftPlotDiagram1.AxisY.Range.MaxValueSerializable = "1100000"
-        SwiftPlotDiagram1.AxisY.Range.MinValueSerializable = "500000"
-        SwiftPlotDiagram1.AxisY.Range.ScrollingRange.SideMarginsEnabled = True
-        SwiftPlotDiagram1.AxisY.Range.SideMarginsEnabled = False
+        SwiftPlotDiagram1.AxisY.WholeRange.Auto = False
+        SwiftPlotDiagram1.AxisY.WholeRange.MaxValueSerializable = "1100000"
+        SwiftPlotDiagram1.AxisY.WholeRange.MinValueSerializable = "500000"
+        SwiftPlotDiagram1.AxisY.VisualRange.Auto = False
+        SwiftPlotDiagram1.AxisY.VisualRange.MaxValueSerializable = "1100000"
+        SwiftPlotDiagram1.AxisY.VisualRange.MinValueSerializable = "500000"
+        SwiftPlotDiagram1.AxisY.WholeRange.AutoSideMargins = True
+        SwiftPlotDiagram1.AxisY.VisualRange.AutoSideMargins = False
         SwiftPlotDiagram1.AxisY.Title.Alignment = System.Drawing.StringAlignment.Far
         SwiftPlotDiagram1.AxisY.Title.Font = New System.Drawing.Font("Verdana", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         SwiftPlotDiagram1.AxisY.Title.Text = "counts"
         SwiftPlotDiagram1.AxisY.Title.TextColor = System.Drawing.Color.DimGray
-        SwiftPlotDiagram1.AxisY.Title.Visible = True
+        SwiftPlotDiagram1.AxisY.Title.Visibility = DevExpress.Utils.DefaultBoolean.True
         SwiftPlotDiagram1.AxisY.VisibleInPanesSerializable = "-1"
         SwiftPlotDiagram1.DefaultPane.BorderColor = System.Drawing.Color.FromArgb(CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer), CType(CType(0, Byte), Integer))
         SwiftPlotDiagram1.ZoomingOptions.UseKeyboard = False
@@ -1791,10 +1801,10 @@ Partial Class IPositionsAdjustments
         Me.ChartControl1.Legend.Antialiasing = True
         Me.ChartControl1.Legend.BackColor = System.Drawing.Color.Transparent
         Me.ChartControl1.Legend.BackImage.Stretch = True
-        Me.ChartControl1.Legend.Border.Visible = False
+        Me.ChartControl1.Legend.Border.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.ChartControl1.Legend.Font = New System.Drawing.Font("Tahoma", 10.0!, System.Drawing.FontStyle.Bold)
         Me.ChartControl1.Legend.TextColor = System.Drawing.Color.FromArgb(CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer), CType(CType(255, Byte), Integer))
-        Me.ChartControl1.Legend.Visible = False
+        Me.ChartControl1.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.ChartControl1.Location = New System.Drawing.Point(0, 0)
         Me.ChartControl1.Name = "ChartControl1"
         Me.ChartControl1.Padding.Bottom = 10
@@ -1817,7 +1827,7 @@ Partial Class IPositionsAdjustments
         ChartTitle2.Font = New System.Drawing.Font("Verdana", 12.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         ChartTitle2.Text = "Absorbance"
         ChartTitle2.TextColor = System.Drawing.Color.Black
-        ChartTitle2.Visible = False
+        ChartTitle2.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.ChartControl1.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle2})
         '
         'BsLabel1

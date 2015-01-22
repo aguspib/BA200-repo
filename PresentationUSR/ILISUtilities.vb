@@ -1,11 +1,11 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Microsoft.Win32
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports Biosystems.Ax00.CommunicationsSwFw
 
@@ -14,7 +14,7 @@ Public Class ILISUtilities
 
 #Region "Declaration"
     Private LanguageID As String
-    Private MainMDI As IAx00MainMDI
+    Private MainMDI As UiAx00MainMDI
     Private OKImage As String
     Private WrongImage As String
     Private mdiAnalyzerCopy As AnalyzerManager
@@ -53,7 +53,7 @@ Public Class ILISUtilities
             Else
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".bsCancelButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -157,10 +157,10 @@ Public Class ILISUtilities
     ''' <remarks>CREATED BY: TR 22/04/2013</remarks>
     Private Sub ScreenLoad()
         Try
-            MainMDI = CType(Me.MdiParent, IAx00MainMDI)
+            MainMDI = CType(Me.MdiParent, UiAx00MainMDI)
 
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             FillLogLevels()
@@ -217,8 +217,8 @@ Public Class ILISUtilities
             MyClass.RefreshElementsEnabled() 'SG 15/05/2013
 
             'If user level operator read only.
-            Dim myGlobalBase As New GlobalBase
-            CurrentUserLevel = myGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             If CurrentUserLevel = "OPERATOR" Then
                 MainGroupBox.Enabled = False
                 ExecuteActionButton.Enabled = False
@@ -350,7 +350,7 @@ Public Class ILISUtilities
                 rejectedAwosDS = DirectCast(myGlobalDataTO.SetDatos, OrderTestsLISInfoDS)
 
                 If (rejectedAwosDS.twksOrderTestsLISInfo.Rows.Count > 0) Then
-                    IAx00MainMDI.InvokeRejectAwosDelayedLIS(rejectedAwosDS)
+                    UiAx00MainMDI.InvokeRejectAwosDelayedLIS(rejectedAwosDS)
                 End If
 
             End If
@@ -370,7 +370,7 @@ Public Class ILISUtilities
             End If
 
             'TR 02/05/2013.
-            IAx00MainMDI.ActivateLISActionButton()
+            UiAx00MainMDI.ActivateLISActionButton()
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteLISOrders ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -411,9 +411,9 @@ Public Class ILISUtilities
     Private Function SetTraceLevel() As GlobalDataTO
         Dim myGlobalDataTO As New GlobalDataTO
         Try
-            Dim myUtilities As New Utilities
+            'Dim myUtilities As New Utilities
 
-            myGlobalDataTO = myUtilities.SetLISTraceLevel(TraceLevelCombo.SelectedValue.ToString())
+            myGlobalDataTO = Utilities.SetLISTraceLevel(TraceLevelCombo.SelectedValue.ToString())
 
             If Not myGlobalDataTO.HasError Then
                 'Save on tcfgUserSettings the saved value.

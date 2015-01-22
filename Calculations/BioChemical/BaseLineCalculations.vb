@@ -1,6 +1,7 @@
 ﻿Option Strict On
 Option Explicit On
 
+Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -186,15 +187,15 @@ Namespace Biosystems.Ax00.Calculations
         ''' <param name="pWorkSessionID"></param>
         ''' <returns>GlobalDataTo with setDatos as GlobalEnumerates.Alarms</returns>
         ''' <remarks>AG 04/05/2011</remarks>
-        Public Function GetLatestBaseLines(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Public Function GetLatestBaseLines(ByVal pDBConnection As SqlConnection, ByVal pAnalyzerID As String, _
                                             ByVal pWorkSessionID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         myAnalyzerID = pAnalyzerID
@@ -264,8 +265,7 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.GetLatestBaseLines", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.GetLatestBaseLines", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -287,15 +287,15 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' AG 02/05/2011 Creation
         ''' </remarks>
-        Public Function ControlAdjustBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Public Function ControlAdjustBaseLine(ByVal pDBConnection As SqlConnection, _
                                               ByVal pALineDS As BaseLinesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         existsAlightResultsAttribute = True 'AG 20/06/2012
@@ -400,8 +400,7 @@ Namespace Biosystems.Ax00.Calculations
                                 Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
                                 'rejected = False   'AG 18/05/2011 - comment after testing
                                 If resultsRejected Then
-                                    Dim myLogAcciones As New ApplicationLogManager()
-                                    myLogAcciones.CreateLogActivity("ALIGHT Rejected", "BaseLineCalculations.ControlAdjustBaseLine", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
+                                    GlobalBase.CreateLogActivity("ALIGHT Rejected", "BaseLineCalculations.ControlAdjustBaseLine", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
                                     myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
                                 End If
 
@@ -418,8 +417,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.ControlAdjustBaseLine", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.ControlAdjustBaseLine", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -442,11 +441,11 @@ Namespace Biosystems.Ax00.Calculations
         ''' <remarks>
         ''' AG 02/05/2011 Creation
         ''' </remarks>
-        Public Function ControlWellBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Public Function ControlWellBaseLine(ByVal pDBConnection As SqlConnection, _
                                             ByVal pClassInitialization As Boolean, _
                                             ByVal pWellBaseLine As BaseLinesDS) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
             Try
                 'AG 29/06/2012 - Running Cycles lost - Solution!
                 'resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
@@ -713,8 +712,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.ControlWellBaseLine", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.ControlWellBaseLine", EventLogEntryType.Error, False)
             Finally
                 'If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()'AG 29/06/2012 - Running Cycles lost - Solution!
             End Try
@@ -791,8 +790,8 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.InitializationWellRejectionControl", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.InitializationWellRejectionControl", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -920,8 +919,8 @@ Namespace Biosystems.Ax00.Calculations
                         '.initRejected = True
 
                         If .initRejected Then
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Well rejection initialization parameters (FIFO) rejected. " & infoRejection, "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("Well rejection initialization parameters (FIFO) rejected. " & infoRejection, "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
 
                             'If initialization rejected then ... update variable wellsExcludedFromFIFO Then
                             For i As Integer = 0 To .wellUsed.Count - 1
@@ -951,8 +950,8 @@ Namespace Biosystems.Ax00.Calculations
                         If exitRunningTypeAttribute = 0 Then
                             .alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
                             exitRunningTypeAttribute = 2
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Max consecutive initializations rejected limit!!", "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Information, False)
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("Max consecutive initializations rejected limit!!", "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Information, False)
                         End If
                     End If
 
@@ -960,8 +959,8 @@ Namespace Biosystems.Ax00.Calculations
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.TreatInitializationResults", EventLogEntryType.Error, False)
             End Try
             Return wellsExcludedFromFIFO
         End Function
@@ -1045,16 +1044,16 @@ Namespace Biosystems.Ax00.Calculations
                         Next
 
                         If warnMethacrylate Then
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("Update wells rejection parameters (FIFO) rejected. " & infoRejection, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("Update wells rejection parameters (FIFO) rejected. " & infoRejection, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
 
                             .alarm = GlobalEnumerates.Alarms.BASELINE_WELL_WARN
                             '.initRejected = True '????
                         End If
                     Else
                         'Well rejected
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity("Well rejected. " & infoRejection, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity("Well rejected. " & infoRejection, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False) 'AG 14/05/2012 - Add more information
 
                         'AG 04/06/2012
                         consecutiveRejectedWells += 1 'Increment counter
@@ -1062,7 +1061,7 @@ Namespace Biosystems.Ax00.Calculations
                             If exitRunningTypeAttribute = 0 Then
                                 .alarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR
                                 exitRunningTypeAttribute = 1
-                                myLogAcciones.CreateLogActivity("Max consecutive rejected wells limit!!", "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Max consecutive rejected wells limit!!", "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Information, False)
                             End If
                         End If
                         'AG 04/06/2012
@@ -1071,8 +1070,8 @@ Namespace Biosystems.Ax00.Calculations
                 End With
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.TreatWellRejectionResults", EventLogEntryType.Error, False)
             End Try
             Return myExcludedWell
         End Function
@@ -1084,13 +1083,13 @@ Namespace Biosystems.Ax00.Calculations
         ''' <param name="pDBConnection"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Private Function UpdateAnalyzerReactionsRotor(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function UpdateAnalyzerReactionsRotor(ByVal pDBConnection As SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
                     If (Not dbConnection Is Nothing) Then
 
                         'Determine is create or update (this table contains one record for each analyzer)
@@ -1149,16 +1148,16 @@ Namespace Biosystems.Ax00.Calculations
 
                             End With
 
-                        If createFlag Then myDS.tcfgAnalyzerReactionsRotor.AddtcfgAnalyzerReactionsRotorRow(row)
-                        myDS.AcceptChanges()
+                            If createFlag Then myDS.tcfgAnalyzerReactionsRotor.AddtcfgAnalyzerReactionsRotorRow(row)
+                            myDS.AcceptChanges()
 
-                        If createFlag Then
-                            resultData = myAnReactRotorDelg.Create(dbConnection, myDS)
-                        Else
-                            resultData = myAnReactRotorDelg.Update(dbConnection, myDS)
+                            If createFlag Then
+                                resultData = myAnReactRotorDelg.Create(dbConnection, myDS)
+                            Else
+                                resultData = myAnReactRotorDelg.Update(dbConnection, myDS)
+                            End If
+
                         End If
-
-                    End If
 
                         If (Not resultData.HasError) Then
                             'When the Database Connection was opened locally, then the Commit is executed
@@ -1178,8 +1177,8 @@ Namespace Biosystems.Ax00.Calculations
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.UpdateAnalyzerReactionsRotor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.UpdateAnalyzerReactionsRotor", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1229,8 +1228,8 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.InitStructures", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.InitStructures", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -1390,8 +1389,8 @@ Namespace Biosystems.Ax00.Calculations
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.GetClassParameterValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.GetClassParameterValues", EventLogEntryType.Error, False)
             End Try
 
         End Sub
@@ -1441,8 +1440,8 @@ Namespace Biosystems.Ax00.Calculations
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BaseLineCalculations.CalculateStandardDeviation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "BaseLineCalculations.CalculateStandardDeviation", EventLogEntryType.Error, False)
             End Try
             Return myResult
 

@@ -1,19 +1,16 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Controls.UserControls
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports System.Timers
 
-Public Class HQBarcode
+Public Class UiHQBarcode
 
 #Region "Declarations"
     'Global variable to store value of General Setting containing the maximum number of Patient Order Tests that can be created
@@ -299,8 +296,8 @@ Public Class HQBarcode
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -1132,7 +1129,7 @@ Public Class HQBarcode
             End If
 
             'XB 01/08/2013 - Add functionality to disable LIS buttons
-            If (IAx00MainMDI.DisableLISButtons()) Then
+            If (UiAx00MainMDI.DisableLISButtons()) Then
                 bsLIMSImportButton.Enabled = False
             End If
 
@@ -1324,31 +1321,31 @@ Public Class HQBarcode
             'LIS Button
             auxIconName = GetIconName("HQ")
             If (auxIconName <> "") Then
-                bsLIMSImportButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsLIMSImportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                EditButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -1604,12 +1601,12 @@ Public Class HQBarcode
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim TotalStartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            MyClass.currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            MyClass.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If (Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing) Then
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 16/06/2011 - Use the same AnalyzerManager as the MDI
@@ -1688,7 +1685,7 @@ Public Class HQBarcode
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             Me.Name & "." & (New System.Diagnostics.StackTrace()).GetFrame(0).GetMethod().Name, EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
@@ -2143,7 +2140,7 @@ Public Class HQBarcode
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim TotalStartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             If (SaveChanges()) Then
@@ -2197,7 +2194,7 @@ Public Class HQBarcode
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             Me.Name & "." & (New System.Diagnostics.StackTrace()).GetFrame(0).GetMethod().Name, EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
@@ -2262,7 +2259,7 @@ Public Class HQBarcode
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim TotalStartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'If flag raise event Enabled
@@ -2289,7 +2286,7 @@ Public Class HQBarcode
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             Me.Name & "." & (New System.Diagnostics.StackTrace()).GetFrame(0).GetMethod().Name, EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception
@@ -2613,8 +2610,8 @@ Public Class HQBarcode
     Private Sub HQBarcode_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'The screen should appear always centered regarding the Main MDI
-            Dim myLocation As Point = IAx00MainMDI.PointToScreen(Point.Empty)
-            Dim mySize As Size = IAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.PointToScreen(Point.Empty)
+            Dim mySize As Size = UiAx00MainMDI.Size
 
             myNewLocation = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2) - 20) 'AG + RH 03/04/2012 - add - 20
             Me.Location = myNewLocation
@@ -2638,13 +2635,13 @@ Public Class HQBarcode
                 Dim autoProcessUserAnswer As DialogResult = DialogResult.OK
 
                 'Check if there are some patient tube in samples rotor
-                autoProcessUserAnswer = IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(2, Me, bsIncompleteSamplesDataGridView.Rows.Count)
+                autoProcessUserAnswer = UiAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(2, Me, bsIncompleteSamplesDataGridView.Rows.Count)
                 If (autoProcessUserAnswer = DialogResult.Yes) Then
                     'Positive case. No exceptions
 
                     'Then evaluate the 2on level exception rule
                     'Before query by specimen check the LIS status
-                    autoProcessUserAnswer = IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(1, Me)
+                    autoProcessUserAnswer = UiAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess(1, Me)
                     If (autoProcessUserAnswer = DialogResult.Yes) Then
                         If Not bsLIMSImportButton.Enabled Then bsLIMSImportButton.Enabled = True 'AG 19/11/2013 - #1396-c (Protection against bar sample barcodes)
 
@@ -2654,28 +2651,28 @@ Public Class HQBarcode
                         bsExitButton.Enabled = False
 
                         'TR 16/07/2013 - Send the parameter with the number of selected specimens to activate the waiting timer
-                        IAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.Rows.Count)
+                        UiAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.Rows.Count)
                         Cursor = Cursors.WaitCursor
 
                     ElseIf (autoProcessUserAnswer = DialogResult.OK) Then 'User answers stops the automatic process
                         'Automatic process aborted
-                        IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
-                        IAx00MainMDI.InitializeAutoWSFlags()
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
+                        UiAx00MainMDI.InitializeAutoWSFlags()
                         CloseScreen()
 
                     Else 'User answers 'Cancel' -> stop process but continue executing WorkSession
-                        IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
+                        UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
                         CloseScreen()
                     End If
 
                 ElseIf (autoProcessUserAnswer = DialogResult.OK) Then 'User answers stops the automatic process
                     'Automatic process aborted
-                    IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
-                    IAx00MainMDI.InitializeAutoWSFlags()
+                    UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitAutomaticProcesAndStop)
+                    UiAx00MainMDI.InitializeAutoWSFlags()
                     CloseScreen()
 
                 Else 'User answers 'Cancel' -> stop process but continue executing WorkSession
-                    IAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
+                    UiAx00MainMDI.SetAutomateProcessStatusValue(LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning)
                     CloseScreen()
                 End If
             End If
@@ -2707,7 +2704,7 @@ Public Class HQBarcode
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim TotalStartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Dim listBarcodesSentToLis As New List(Of String)
@@ -2746,8 +2743,8 @@ Public Class HQBarcode
             ' XB 26/08/2013
 
             'Request to LIS, AND SET AS ASKING
-            IAx00MainMDI.autoWSCreationWithLISMode = True  'SA 30/07/2013
-            IAx00MainMDI.InvokeLISHostQuery(listBarcodesSentToLis)
+            UiAx00MainMDI.autoWSCreationWithLISMode = True  'SA 30/07/2013
+            UiAx00MainMDI.InvokeLISHostQuery(listBarcodesSentToLis)
 
             'Refresh Grid and Controls
             RepaintGridRows()
@@ -2762,17 +2759,17 @@ Public Class HQBarcode
                 bsHQSellectAllCheckBx.Enabled = False
 
                 'Activate the Main MDI variable that indicates a HQ was sent by a final User
-                IAx00MainMDI.SetHQProcessByUserFlag(True)
-                IAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessAskBySpecimen)
+                UiAx00MainMDI.SetHQProcessByUserFlag(True)
+                UiAx00MainMDI.SetAutomateProcessStatusValue(GlobalEnumerates.LISautomateProcessSteps.subProcessAskBySpecimen)
 
                 'Send the parameter with the number of selected specimens to activate the waiting timer
-                IAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.SelectedRows.Count)
+                UiAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.SelectedRows.Count)
                 IWSRotorPositions.HQButtonUserClick = True
                 Cursor = Cursors.WaitCursor
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Total function time = " & Now.Subtract(TotalStartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             Me.Name & "." & (New System.Diagnostics.StackTrace()).GetFrame(0).GetMethod().Name, EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Catch ex As Exception

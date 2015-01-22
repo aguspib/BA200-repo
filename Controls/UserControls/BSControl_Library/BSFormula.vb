@@ -6,6 +6,7 @@ Imports System.Windows.Forms
 'Imports System.Text.RegularExpressions
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Types.AllowedTestsDS
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.Controls.UserControls
 
@@ -1139,7 +1140,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                         'Validate if the image is in the ImageList control 
                         If (Not imagePathControl.ContainsKey(ImagePathRow("IconPath").ToString())) Then
                             'Add the Image to the ImageList control
-                            myImageList.Images.Add(Image.FromFile(ImagePathRow("IconPath").ToString(), True))
+                            myImageList.Images.Add(ImageUtilities.ImageFromFile(ImagePathRow("IconPath").ToString()))
 
                             'Add ImagePath to the HashTable control as key value 
                             imagePathControl.Add(ImagePathRow("IconPath").ToString(), myImageList.Images.Count - 1)
