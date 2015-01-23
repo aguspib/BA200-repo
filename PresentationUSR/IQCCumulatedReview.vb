@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
+Imports DevExpress.Utils
 Imports DevExpress.XtraCharts
 
 Public Class IQCCumulatedReview
@@ -567,7 +568,6 @@ Public Class IQCCumulatedReview
             'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
             bsMeanChartControl.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
             bsMeanChartControl.RuntimeHitTesting = True
-            CType(bsMeanChartControl.Diagram, XYDiagram).AxisX.VisualRange.SideMarginsValue = 0
 
             Dim myDiagram As New XYDiagram
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
@@ -578,6 +578,9 @@ Public Class IQCCumulatedReview
                     bsMeanChartControl.Series.Add(qcCumResultRow.QCControlLotID.ToString(), ViewType.Line)
                     bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).ShowInLegend = False
                     bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
+
+                    bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).ArgumentScaleType = ScaleType.Qualitative
+                    CType(bsMeanChartControl.Series(qcCumResultRow.QCControlLotID.ToString()).View, LineSeriesView).MarkerVisibility = DefaultBoolean.True
 
                     'Set Serie Color
                     If (bsMeanChartControl.Series.Count = 1) Then
@@ -651,6 +654,8 @@ Public Class IQCCumulatedReview
                 myDiagram = CType(bsMeanChartControl.Diagram, XYDiagram)
                 myDiagram.AxisY.GridLines.Visible = False
                 myDiagram.AxisX.GridLines.Visible = True
+
+                myDiagram.AxisY.VisualRange.SideMarginsValue = 0
 
                 'Remove all Constant lines
                 myDiagram.AxisY.ConstantLines.Clear()
@@ -768,7 +773,7 @@ Public Class IQCCumulatedReview
         Try
             Dim auxIconName As String = ""
             Dim iconPath As String = MyBase.IconsPath
-            Dim myToolTipsControl As New ToolTip
+            Dim myToolTipsControl As New Windows.Forms.ToolTip
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             'SEARCH Button
