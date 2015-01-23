@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IResultsOffSystemsTest
+Partial Class UiResultsOffSystemsTest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -24,7 +24,7 @@ Partial Class IResultsOffSystemsTest
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IResultsOffSystemsTest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiResultsOffSystemsTest))
         Me.bsOffSystemTestsResultsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
         Me.bsOffSystemTestsResultsDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView
         Me.bsOffSystemTestsResultsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel

@@ -12,7 +12,7 @@ Imports System.Drawing
 Imports System.Globalization
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IHisBlankCalibResults
+Public Class UiHisBlankCalibResults
 
 #Region "Events definitions"
 
@@ -1425,7 +1425,7 @@ Public Class IHisBlankCalibResults
                         End If
 
                         'Open the aux screen
-                        Using myCurveForm As New IResultsCalibCurve
+                        Using myCurveForm As New UiResultsCalibCurve
                             With myCurveForm
                                 .ActiveAnalyzer = analyzerID
                                 .ActiveWorkSession = worksessionID

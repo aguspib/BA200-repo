@@ -14,7 +14,7 @@ Imports System.Text
 Imports System.ComponentModel
 Imports LIS.Biosystems.Ax00.LISCommunications
 
-Public Class IResults
+Public Class UiResults
     'RH 13/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)
     '              Substitute every "Or" by "OrElse" (Only in boolean expressions, not in bitwise expressions!)
     'To evaluate the boolean expressions in short circuit and speed up mean processing velocity
@@ -129,7 +129,7 @@ Public Class IResults
     Private LISSamplesHeadImage As Image = Nothing
     Private HeadImageSide As Integer = 16 'Set here the dimensions of the head images
     Private HeadRect As Rectangle = Nothing
-    
+
     Private labelManualRerunIncrease As String = String.Empty
     Private labelManualRerunDecrease As String = String.Empty
     Private labelManualRerunEqual As String = String.Empty
@@ -1248,7 +1248,7 @@ Public Class IResults
     Private Sub SummaryButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SummaryButton.Click
         Try
             'RH 19/10/2010 Introduce the Using statement
-            Using SummaryResult As New IResultsSummaryTable
+            Using SummaryResult As New UiResultsSummaryTable
                 SummaryResult.AverageResultsDS = AverageResultsDS
                 SummaryResult.ExecutionsResultsDS = ExecutionsResultsDS
                 SummaryResult.ActiveAnalyzer = ActiveAnalyzer
@@ -2872,7 +2872,7 @@ Public Class IResults
                 myOffSystemTestsResultsDS = DirectCast(resultData.SetDatos, OffSystemTestsResultsDS)
 
                 'Open the auxiliary screen for results of OffSystem OrderTests
-                Using myAuxOFFSResultsScreen As New IResultsOffSystemsTest
+                Using myAuxOFFSResultsScreen As New UiResultsOffSystemsTest
                     myAuxOFFSResultsScreen.OffSystemTestsList = myOffSystemTestsResultsDS
                     myAuxOFFSResultsScreen.ShowDialog()
                     If (myAuxOFFSResultsScreen.DialogResult = DialogResult.OK) Then
@@ -2968,7 +2968,7 @@ Public Class IResults
         Dim myReturnValue As GlobalEnumerates.PostDilutionTypes = PostDilutionTypes.WITHOUT
         Try
             'RH 19/10/2010 Introduce the Using statement
-            Using myScreen As New IWSManualRepetition
+            Using myScreen As New UiWSManualRepetition
                 myScreen.ActiveAnalyzer = AnalyzerIDField
                 myScreen.ActiveWorkSession = WorkSessionIDField
                 myScreen.ActiveOrderTestID = pOrderTestID
@@ -4476,7 +4476,7 @@ Public Class IResults
                                  ByVal pReplicate As Integer)
 
         Try
-            Using myForm As New IResultsAbsCurve
+            Using myForm As New UiResultsAbsCurve
                 myForm.SourceForm = GlobalEnumerates.ScreenCallsGraphical.RESULTSFRM
                 myForm.AnalyzerID = AnalyzerIDField
                 myForm.WorkSessionID = WorkSessionIDField
@@ -5061,7 +5061,7 @@ Public Class IResults
             Cursor = Cursors.WaitCursor
 
             'RH 19/10/2010 Introduce the Using statement
-            Using myCurveForm As New IResultsCalibCurve
+            Using myCurveForm As New UiResultsCalibCurve
 
                 'Inform the properties
                 Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = _

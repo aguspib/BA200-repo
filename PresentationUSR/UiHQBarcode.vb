@@ -1755,7 +1755,7 @@ Public Class UiHQBarcode
                 FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                 'Inform properties and open the screen of Tests Selection
-                Using myForm As New IWSTestSelectionAuxScreen()
+                Using myForm As New UiWSTestSelectionAuxScreen()
                     myForm.SampleClass = "PATIENT"
                     myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                     myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -2764,7 +2764,7 @@ Public Class UiHQBarcode
 
                 'Send the parameter with the number of selected specimens to activate the waiting timer
                 UiAx00MainMDI.EnableLISWaitTimer(True, bsIncompleteSamplesDataGridView.SelectedRows.Count)
-                IWSRotorPositions.HQButtonUserClick = True
+                UiWSRotorPositions.HQButtonUserClick = True
                 Cursor = Cursors.WaitCursor
             End If
 

@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 'Imports Biosystems.Ax00.Types.AllowedTestsDS
 
-Public Class IProgISETest
+Public Class UiProgISETest
 
 
 #Region "Attributes"
@@ -161,7 +161,7 @@ Public Class IProgISETest
             End If
 
             bsDecimalsUpDown.Text = qTestSamples.First().Decimals.ToString()
-            
+
             ' SlopeFactorA2 and SlopeFactorB2
             If qTestSamples.First().IsSlopeFactorA2Null Then
                 bsSlopeA2UpDown.Value = 0
@@ -3049,7 +3049,7 @@ Public Class IProgISETest
                 End If
 
                 If myDependenciesElementsDS.DependenciesElements.Count > 0 Then
-                    Using myAffectedElementsWarning As New IWarningAfectedElements()
+                    Using myAffectedElementsWarning As New UiWarningAfectedElements()
                         myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                         myAffectedElementsWarning.ShowDialog()
 
@@ -3894,7 +3894,7 @@ Public Class IProgISETest
     Private Sub AddControls_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddControls.Click
         Try
             'Open controls Programming
-            Using myProgControls As New IProgControls
+            Using myProgControls As New UiProgControls
                 myProgControls.AnalyzerID = AnalyzerIDAttribute
                 myProgControls.WorkSessionID = WorkSessionIDAttribute
                 myProgControls.SourceScreen = GlbSourceScreen.TEST_QCTAB.ToString
@@ -4532,7 +4532,7 @@ Public Class IProgISETest
     Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles bsCustomOrderButton.Click
         Try
             'Shown the Positioning Warnings Screen
-            Using AuxMe As New ISortingTestsAux()
+            Using AuxMe As New UiSortingTestsAux()
                 AuxMe.openMode = "TESTSELECTION"
                 AuxMe.screenID = "ISE"
                 AuxMe.ShowDialog()

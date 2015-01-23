@@ -10,7 +10,7 @@ Imports DevExpress.XtraCharts
 Imports Biosystems.Ax00.PresentationCOM
 Imports DevExpress.Utils
 
-Public Class IQCGraphs
+Public Class UiQCGraphs
 
 #Region "Declarations"
     Private LocalPoint As Point

@@ -975,8 +975,8 @@ Partial Public Class UiAx00MainMDI
                         Dim analyzerSettings As New AnalyzerSettingsDelegate
                         Dim resultData As New GlobalDataTO
 
-                        If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                            Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                        If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                            Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                             If Not CurrentMdiChild.bsScanningButton Is Nothing AndAlso CurrentMdiChild.bsScanningButton.Enabled <> bcButtonStatus Then
                                 'CurrentMdiChild.bsScanningButton.Enabled = buttonStatus
                                 If bcButtonStatus Then
@@ -1017,8 +1017,8 @@ Partial Public Class UiAx00MainMDI
                             End If
                             'AG 28/03/2012
 
-                        ElseIf (TypeOf ActiveMdiChild Is IWSSampleRequest) Then
-                            Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                        ElseIf (TypeOf ActiveMdiChild Is UiWSSampleRequest) Then
+                            Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                             If Not CurrentMdiChild.bsScanningButton Is Nothing AndAlso CurrentMdiChild.bsScanningButton.Enabled <> bcButtonStatus Then
                                 If bcButtonStatus Then
                                     'A part from Analyzer status check if barcode reader is enabled

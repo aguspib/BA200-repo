@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 
-Public Class IResultsOffSystemsTest
+Public Class UiResultsOffSystemsTest
 
 #Region "Declarations"
     'Global variable needed to control edition of ResultValue in the grid

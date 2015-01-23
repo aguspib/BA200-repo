@@ -1,7 +1,7 @@
 ﻿Imports DevExpress.Utils
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IISEResultsHistoryGraph
+Partial Class UiISEResultsHistoryGraph
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -26,7 +26,7 @@ Partial Class IISEResultsHistoryGraph
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim SideBySideBarSeriesLabel1 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IISEResultsHistoryGraph))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiISEResultsHistoryGraph))
         Me.bsGraphicalResultsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.bsElectrodesTableLayout = New Biosystems.Ax00.Controls.UserControls.BSTableLayoutPanel()
         Me.bsElectrodeNaCheck = New Biosystems.Ax00.Controls.UserControls.BSCheckbox()

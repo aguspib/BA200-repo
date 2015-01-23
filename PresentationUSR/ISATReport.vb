@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 
 
-Public Class ISATReport
+Public Class UiSATReport
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declaration"

@@ -452,7 +452,7 @@ Public Class bsReception
               Select row).ToList()
             If TestList.Count > 0 Then
                 'RH 19/10/2010 Introduce the Using statement
-                Using myCurveForm As New IResultsCalibCurve
+                Using myCurveForm As New UiResultsCalibCurve
                     With myCurveForm
                         .ActiveAnalyzer = analyzerID
                         .ActiveWorkSession = worksessionID
@@ -500,7 +500,7 @@ Public Class bsReception
             Dim resultData As New GlobalDataTO
 
             'Shown the Positioning Warnings Screen
-            Using AuxMe As New ISortingTestsAux()
+            Using AuxMe As New UiSortingTestsAux()
                 AuxMe.openMode = "TESTSELECTION"
                 AuxMe.screenID = "STD"
                 AuxMe.ShowDialog()

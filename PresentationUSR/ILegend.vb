@@ -14,7 +14,7 @@ Imports Biosystems.Ax00.BL
 
 
 
-Public Class ILegend
+Public Class UiLegend
 
 #Region "Declarations"
 

@@ -17,7 +17,7 @@ Imports DevExpress.XtraGrid.Columns
 Imports Biosystems.Ax00.Types.vwksWSAbsorbanceDS
 
 
-Public Class IResultsAbsCurve
+Public Class UiResultsAbsCurve
 
 #Region "Declarations"
 

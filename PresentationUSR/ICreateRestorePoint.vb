@@ -9,12 +9,12 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class ICreateRestorePoint
+Public Class UiCreateRestorePoint
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Properties"
 
-    
+
 
 #End Region
 
@@ -445,5 +445,5 @@ Public Class ICreateRestorePoint
 
 #End Region
 
-   
+
 End Class

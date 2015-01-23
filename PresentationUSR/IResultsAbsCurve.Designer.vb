@@ -1,7 +1,7 @@
 ﻿Imports DevExpress.Utils
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IResultsAbsCurve
+Partial Class UiResultsAbsCurve
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@ Partial Class IResultsAbsCurve
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim SideBySideBarSeriesLabel1 As DevExpress.XtraCharts.SideBySideBarSeriesLabel = New DevExpress.XtraCharts.SideBySideBarSeriesLabel()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IResultsAbsCurve))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiResultsAbsCurve))
         Me.bsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
         Me.bsGraphToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.bsWell = New DevExpress.XtraEditors.TextEdit()

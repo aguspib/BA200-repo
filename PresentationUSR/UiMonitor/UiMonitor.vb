@@ -2117,7 +2117,7 @@ Public Class UiMonitor
     Private Sub bsReactionsOpenGraph_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsReactionsOpenGraph.Click
         'AG 07/12/2011 - commeted. Call the final graph abs(t) screen
         If bsReacTestTextBox.Text <> "" Then
-            Using myForm As New IResultsAbsCurve
+            Using myForm As New UiResultsAbsCurve
 
                 myForm.AnalyzerID = ActiveAnalyzer
                 myForm.WorkSessionID = ActiveWorkSession

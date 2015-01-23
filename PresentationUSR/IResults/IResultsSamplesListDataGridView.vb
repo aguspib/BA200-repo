@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 
 Imports Biosystems.Ax00.Global.TO 'AG 22/09/2014 - BA-1940
 
-Partial Class IResults
+Partial Class UiResults
 
 #Region "SamplesListDataGridView Methods"
     ''' <summary>

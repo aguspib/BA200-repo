@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class IWSTestSelectionAuxScreen
+Public Class UiWSTestSelectionAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constants"
@@ -1633,7 +1633,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using
@@ -2941,7 +2941,7 @@ Public Class IWSTestSelectionAuxScreen
                                 '    offsystemTestROW.TestProfileID = selTestRow.TestProfileID
                                 '    offsystemTestROW.TestProfileName = selTestRow.TestProfileName
                                 'End If
-                                
+
                                 'For PATIENTS, set value of fields containing Test Profile and Calculated Tests information
                                 If (SampleClassAttribute = "PATIENT") Then
                                     If (Not selTestRow.IsTestProfileIDNull) Then
@@ -3555,7 +3555,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using
@@ -3919,7 +3919,7 @@ Public Class IWSTestSelectionAuxScreen
                     Next
 
                     If (testWithFactoryValues.Length > 0) Then
-                        Using AuxForm As New IWSTestSelectionWarning()
+                        Using AuxForm As New UiWSTestSelectionWarning()
                             AuxForm.Message = testWithFactoryValues.ToString()
                             AuxForm.ShowDialog()
                         End Using
@@ -4923,7 +4923,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using
@@ -5243,7 +5243,7 @@ Public Class IWSTestSelectionAuxScreen
                     If (selectedAction) Then
                         Dim testWithFactoryValues As String = ValidateFactoryValues(e.RowIndex, e.ColumnIndex)
                         If (testWithFactoryValues.Length > 0) Then
-                            Using AuxForm As New IWSTestSelectionWarning()
+                            Using AuxForm As New UiWSTestSelectionWarning()
                                 AuxForm.Message = testWithFactoryValues
                                 AuxForm.ShowDialog()
                             End Using
@@ -5266,7 +5266,7 @@ Public Class IWSTestSelectionAuxScreen
                     If (selectedAction) Then
                         Dim testWithFactoryValues As String = ValidateFactoryValues(e.RowIndex, e.ColumnIndex, SampleTypeAttribute)
                         If (testWithFactoryValues.Length > 0) Then
-                            Using AuxForm As New IWSTestSelectionWarning()
+                            Using AuxForm As New UiWSTestSelectionWarning()
                                 AuxForm.Message = testWithFactoryValues
                                 AuxForm.ShowDialog()
                             End Using
@@ -5680,7 +5680,7 @@ Public Class IWSTestSelectionAuxScreen
                 Next
 
                 If (testWithFactoryValues.Length > 0) Then
-                    Using AuxForm As New IWSTestSelectionWarning()
+                    Using AuxForm As New UiWSTestSelectionWarning()
                         AuxForm.Message = testWithFactoryValues.ToString()
                         AuxForm.ShowDialog()
                     End Using

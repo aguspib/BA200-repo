@@ -8,13 +8,13 @@ Imports DevExpress.XtraCharts
 Imports System.Globalization
 Imports DevExpress.Utils
 
-Public Class IISEResultsHistoryGraph
+Public Class UiISEResultsHistoryGraph
 
 #Region " Declarations "
     ' Language
     Private currentLanguage As String
     Private myCultureInfo As CultureInfo
-    Private myElectrodesFilter As IISEResultsHistory.ElectrodesFilter
+    Private myElectrodesFilter As UiISEResultsHistory.ElectrodesFilter
     Private myDataSource As DataTable
     Private LocalPoint As Point
 
@@ -34,7 +34,7 @@ Public Class IISEResultsHistoryGraph
 #End Region
 
 #Region " Public Methods "
-    Public Sub SetData(ByVal pElectrodesFilter As IISEResultsHistory.ElectrodesFilter, ByVal pDatasource As DataTable)
+    Public Sub SetData(ByVal pElectrodesFilter As UiISEResultsHistory.ElectrodesFilter, ByVal pDatasource As DataTable)
         SetElectrodeFilter(pElectrodesFilter)
         myDataSource = pDatasource
         myCultureInfo = My.Computer.Info.InstalledUICulture
@@ -42,7 +42,7 @@ Public Class IISEResultsHistoryGraph
 #End Region
 
 #Region "Private Methods"
-    Private Sub SetElectrodeFilter(ByVal filter As IISEResultsHistory.ElectrodesFilter)
+    Private Sub SetElectrodeFilter(ByVal filter As UiISEResultsHistory.ElectrodesFilter)
         myElectrodesFilter = filter
 
         bsElectrodeNaCheck.Checked = filter.electrodeNa

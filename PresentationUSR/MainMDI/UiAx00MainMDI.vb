@@ -554,7 +554,7 @@ Partial Public Class UiAx00MainMDI
     Private WithEvents myConfigAnalyzers As IConfigGeneral
     Private WithEvents myConfigUsers As IConfigUsers
     Private WithEvents myConfigBarCode As IBarCodesConfig   ' DL 22/07/2011
-    Private WithEvents mySortingTest As ISortingTestsAux
+    Private WithEvents mySortingTest As UiSortingTestsAux
     Private WithEvents myLogin As IAx00Login
     Private WithEvents myReport As IBandTemplateReport 'RH 15/12/2011
     Private WithEvents mySettings As ISettings    ' XBC 18/01/2012
@@ -1028,9 +1028,9 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub TestsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TestsToolStripMenuItem.Click, BsTSTestButton.Click
         Try
-            IProgTest.AnalyzerModel = AnalyzerModelAttribute
-            IProgTest.AnalyzerID = AnalyzerIDAttribute
-            IProgTest.WorkSessionID = WorkSessionIDAttribute
+            UiProgTest.AnalyzerModel = AnalyzerModelAttribute
+            UiProgTest.AnalyzerID = AnalyzerIDAttribute
+            UiProgTest.WorkSessionID = WorkSessionIDAttribute
 
             'TR 12/04/2010 
             'Dim myTestProgrammingForm As New TestProgramingParammeters
@@ -1043,7 +1043,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgTest)
+            OpenMDIChildForm(UiProgTest)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".TestsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1058,7 +1058,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgCalculatedTest)
+            OpenMDIChildForm(UiProgCalculatedTest)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculatedTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CalculatedTestToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1081,13 +1081,13 @@ Partial Public Class UiAx00MainMDI
             ''The form to be opened should be assigned its AcceptButton property to its default exit button
             'OpenMDIChildForm(ProgContaminations)
 
-            IProgTestContaminations.ActiveWorkSession = WorkSessionIDAttribute
-            IProgTestContaminations.ActiveWSStatus = WSStatusAttribute
+            UiProgTestContaminations.ActiveWorkSession = WorkSessionIDAttribute
+            UiProgTestContaminations.ActiveWSStatus = WSStatusAttribute
 
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgTestContaminations)
+            OpenMDIChildForm(UiProgTestContaminations)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ContaminationsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1104,9 +1104,9 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>AG 21/10/2010</remarks>
     Private Sub ISEModuleToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ISEModuleToolStripMenuItem.Click
         Try
-            IProgISETest.AnalyzerID = AnalyzerIDAttribute
-            IProgISETest.WorkSessionID = WorkSessionIDAttribute
-            OpenMDIChildForm(IProgISETest)
+            UiProgISETest.AnalyzerID = AnalyzerIDAttribute
+            UiProgISETest.WorkSessionID = WorkSessionIDAttribute
+            OpenMDIChildForm(UiProgISETest)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ISEModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1128,8 +1128,8 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub RotorPositionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RotorPositionsToolStripMenuItem.Click
         Try
-            If (IWSSampleRequest.Visible) Then
-                IWSSampleRequest.SaveWSWithPositioning()
+            If (UiWSSampleRequest.Visible) Then
+                UiWSSampleRequest.SaveWSWithPositioning()
             Else
                 OpenRotorPositionsForm(Nothing)
             End If
@@ -1171,7 +1171,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgTestProfiles)
+            OpenMDIChildForm(UiProgTestProfiles)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProfilesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProfilesToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1191,15 +1191,15 @@ Partial Public Class UiAx00MainMDI
             bsTSResetSessionButton.Enabled = True
 
             'Inform screen properties
-            IWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
-            IWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
-            IWSSampleRequest.ActiveWSStatus = WSStatusAttribute
+            UiWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
+            UiWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
+            UiWSSampleRequest.ActiveWSStatus = WSStatusAttribute
 
             'RH 05/21/2010 
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IWSSampleRequest)
+            OpenMDIChildForm(UiWSSampleRequest)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SampleRequestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SampleRequestToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1215,8 +1215,8 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub ManualAssignationOfSamplePosToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSPositionButton.Click
         Try
-            If (IWSSampleRequest.Visible) Then
-                IWSSampleRequest.SaveWSWithPositioning()
+            If (UiWSSampleRequest.Visible) Then
+                UiWSSampleRequest.SaveWSWithPositioning()
             Else
                 OpenRotorPositionsForm(Nothing)
             End If
@@ -1236,7 +1236,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgPatientData)
+            OpenMDIChildForm(UiProgPatientData)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PatientSearchToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PatientSearchToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1252,7 +1252,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(ISATReport)
+            OpenMDIChildForm(UiSATReport)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SATReportsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -1329,8 +1329,8 @@ Partial Public Class UiAx00MainMDI
 
                     'AG 30/05/2013 - Inform this flag before messagebox asking the user (Fix bug #1102)
                     Dim setIsResetToFalse As Boolean = False
-                    If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, IWSSampleRequest.Name, False) = 0)) Then
-                        Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                    If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, UiWSSampleRequest.Name, False) = 0)) Then
+                        Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                         CurrentMdiChild.isWSReset = True
                     End If
                     'AG 30/05/2013
@@ -1358,7 +1358,7 @@ Partial Public Class UiAx00MainMDI
 
                             If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
                                 'Show the auxiliary screen of affected Elements
-                                Using AffectedElement As New IWarningAfectedElements
+                                Using AffectedElement As New UiWarningAfectedElements
                                     AffectedElement.AffectedElements = myDependeciesElementsDS
 
                                     AffectedElement.ShowDialog()
@@ -1525,8 +1525,8 @@ Partial Public Class UiAx00MainMDI
 
                     If (setIsResetToFalse) Then
                         'AG 30/05/2013 - Inform this flag before messagebox asking the user (Fix bug #1102)
-                        If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, IWSSampleRequest.Name, False) = 0)) Then
-                            Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                        If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, UiWSSampleRequest.Name, False) = 0)) Then
+                            Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                             CurrentMdiChild.isWSReset = False
                         End If
                     End If
@@ -1614,16 +1614,16 @@ Partial Public Class UiAx00MainMDI
     Private Sub LIMSImportToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LIMSImportToolStripMenuItem.Click
         Try
             LIMSImportToolStripMenuItem.Enabled = False
-            If (IWSSampleRequest.Visible) Then
-                IWSSampleRequest.ExecuteImportFromLIMSProcess()
+            If (UiWSSampleRequest.Visible) Then
+                UiWSSampleRequest.ExecuteImportFromLIMSProcess()
             Else
                 'Inform the required screen properties and open the screen
-                IWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
-                IWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
-                IWSSampleRequest.ActiveWSStatus = WSStatusAttribute
-                IWSSampleRequest.OpenForLIMSImport = True
+                UiWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
+                UiWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
+                UiWSSampleRequest.ActiveWSStatus = WSStatusAttribute
+                UiWSSampleRequest.OpenForLIMSImport = True
 
-                OpenMDIChildForm(IWSSampleRequest)
+                OpenMDIChildForm(UiWSSampleRequest)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMonitorButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1652,13 +1652,13 @@ Partial Public Class UiAx00MainMDI
 
                 'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
                 'without the compiler be aware of it. Instead compare Types or Properties
-                If (String.Compare(ActiveMdiChild.Name, IWSLoadSaveAuxScreen.Name, False) = 0) Then
-                    If (String.Compare(IWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(IWSLoadSaveAuxScreen.SourceButton, "LOAD", False) = 0) Then
+                If (String.Compare(ActiveMdiChild.Name, UiWSLoadSaveAuxScreen.Name, False) = 0) Then
+                    If (String.Compare(UiWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(UiWSLoadSaveAuxScreen.SourceButton, "LOAD", False) = 0) Then
                         cancelOpening = True
                     Else
                         'Execute the closing code of the screen currently open
-                        IWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                        IWSLoadSaveAuxScreen.AcceptButton.PerformClick()
+                        UiWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                        UiWSLoadSaveAuxScreen.AcceptButton.PerformClick()
                     End If
 
                 ElseIf Not ExistSavedWorkSession() Then 'TR 01/08/2011 -Validate if there're any saved WorkSession.
@@ -1668,10 +1668,10 @@ Partial Public Class UiAx00MainMDI
 
             If (Not cancelOpening) Then
                 'Inform screen properties needed for initial configuration and open the screen as MDIChild
-                IWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
-                IWSLoadSaveAuxScreen.SourceButton = "LOAD"
+                UiWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
+                UiWSLoadSaveAuxScreen.SourceButton = "LOAD"
 
-                OpenMDIChildForm(IWSLoadSaveAuxScreen)
+                OpenMDIChildForm(UiWSLoadSaveAuxScreen)
 
             End If
         Catch ex As Exception
@@ -1697,32 +1697,32 @@ Partial Public Class UiAx00MainMDI
 
             'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
             'without the compiler be aware of it. Instead compare Types or Properties
-            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, IWSLoadSaveAuxScreen.Name, False) = 0) Then
-                If (String.Compare(IWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(IWSLoadSaveAuxScreen.SourceButton, "SAVE", False) = 0) Then
+            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, UiWSLoadSaveAuxScreen.Name, False) = 0) Then
+                If (String.Compare(UiWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(UiWSLoadSaveAuxScreen.SourceButton, "SAVE", False) = 0) Then
                     cancelOpening = True
                 Else
                     'Execute the closing code of the screen currently open
-                    IWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                    IWSLoadSaveAuxScreen.AcceptButton.PerformClick()
+                    UiWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                    UiWSLoadSaveAuxScreen.AcceptButton.PerformClick()
                 End If
             End If
 
             If (Not cancelOpening) Then
                 ' XB 29/08/2014 - BT #1868
-                If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, IWSSampleRequest.Name, False) = 0) Then
+                If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, UiWSSampleRequest.Name, False) = 0) Then
                     ' code when ISampleRequest is active
-                    If IWSSampleRequest.bsSaveWSButton.Enabled Then
-                        IWSSampleRequest.SaveWorkSession()
+                    If UiWSSampleRequest.bsSaveWSButton.Enabled Then
+                        UiWSSampleRequest.SaveWorkSession()
                     End If
                 Else
                     ' old code
                     'Inform screen properties needed for initial configuration and open the screen as MDIChild
-                    IWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
-                    IWSLoadSaveAuxScreen.SourceButton = "SAVE"
-                    IWSLoadSaveAuxScreen.ActiveWorkSession = WorkSessionIDAttribute
-                    IWSLoadSaveAuxScreen.ActiveAnalyzer = AnalyzerIDAttribute
+                    UiWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
+                    UiWSLoadSaveAuxScreen.SourceButton = "SAVE"
+                    UiWSLoadSaveAuxScreen.ActiveWorkSession = WorkSessionIDAttribute
+                    UiWSLoadSaveAuxScreen.ActiveAnalyzer = AnalyzerIDAttribute
 
-                    OpenMDIChildForm(IWSLoadSaveAuxScreen)
+                    OpenMDIChildForm(UiWSLoadSaveAuxScreen)
                 End If
             End If
 
@@ -1748,13 +1748,13 @@ Partial Public Class UiAx00MainMDI
 
             'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
             'without the compiler be aware of it. Instead compare Types or Properties
-            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, IWSDeleteAuxScreen.Name, False) = 0) Then
-                If (String.Compare(IWSDeleteAuxScreen.ScreenUse, "SAVEDWS", False) = 0) Then
+            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, UiWSDeleteAuxScreen.Name, False) = 0) Then
+                If (String.Compare(UiWSDeleteAuxScreen.ScreenUse, "SAVEDWS", False) = 0) Then
                     cancelOpening = True
                 Else
                     'Execute the closing code of the screen currently open
-                    IWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                    IWSDeleteAuxScreen.AcceptButton.PerformClick()
+                    UiWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                    UiWSDeleteAuxScreen.AcceptButton.PerformClick()
                 End If
 
             ElseIf Not ExistSavedWorkSession() Then 'TR 01/08/2011 -Validate if there're any saved WorkSession.
@@ -1765,10 +1765,10 @@ Partial Public Class UiAx00MainMDI
             End If
 
             If (Not cancelOpening) Then
-                IWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
-                IWSDeleteAuxScreen.ScreenUse = "SAVEDWS"
+                UiWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
+                UiWSDeleteAuxScreen.ScreenUse = "SAVEDWS"
 
-                OpenMDIChildForm(IWSDeleteAuxScreen)
+                OpenMDIChildForm(UiWSDeleteAuxScreen)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSessionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1783,9 +1783,9 @@ Partial Public Class UiAx00MainMDI
     Private Sub CalibratorsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CalibratorsToolStripMenuItem.Click
         Try
 
-            IProgCalibrator.AnalyzerID = AnalyzerIDAttribute
-            IProgCalibrator.WorkSessionID = WorkSessionIDAttribute
-            OpenMDIChildForm(IProgCalibrator)
+            UiProgCalibrator.AnalyzerID = AnalyzerIDAttribute
+            UiProgCalibrator.WorkSessionID = WorkSessionIDAttribute
+            OpenMDIChildForm(UiProgCalibrator)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalibratorsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2083,7 +2083,7 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub bsTSReportSATButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSReportSATButton.Click
         Try
-            OpenMDIChildForm(ISATReport)
+            OpenMDIChildForm(UiSATReport)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSReportSATButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2106,27 +2106,27 @@ Partial Public Class UiAx00MainMDI
 
             'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
             'without the compiler be aware of it. Instead compare Types or Properties
-            If (Not ActiveMdiChild Is Nothing) AndAlso String.Equals(ActiveMdiChild.Name, IWSDeleteAuxScreen.Name) Then
-                If String.Equals(IWSDeleteAuxScreen.ScreenUse, "VROTORS") Then
+            If (Not ActiveMdiChild Is Nothing) AndAlso String.Equals(ActiveMdiChild.Name, UiWSDeleteAuxScreen.Name) Then
+                If String.Equals(UiWSDeleteAuxScreen.ScreenUse, "VROTORS") Then
                     cancelOpening = True
                 Else
                     'Execute the closing code of the screen currently open
-                    IWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                    IWSDeleteAuxScreen.AcceptButton.PerformClick()
+                    UiWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                    UiWSDeleteAuxScreen.AcceptButton.PerformClick()
                 End If
             ElseIf Not ExistVirtualSavedRotor() Then
                 cancelOpening = True
             End If
 
             If (Not cancelOpening) Then
-                IWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
-                IWSDeleteAuxScreen.ScreenUse = "VROTORS"
+                UiWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
+                UiWSDeleteAuxScreen.ScreenUse = "VROTORS"
 
                 If (TypeOf ActiveMdiChild Is UiMonitor) Then
                     ActiveMdiChild.Close()
                 End If
 
-                OpenMDIChildForm(IWSDeleteAuxScreen)
+                OpenMDIChildForm(UiWSDeleteAuxScreen)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteVirtualRotorsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2141,9 +2141,9 @@ Partial Public Class UiAx00MainMDI
     Private Sub bsTSResultsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSResultsButton.Click, ResultsToolStripMenuItem.Click
         Try
             'OpenMDIChildForm(New IResults())
-            IResults.ActiveWSStatus = WSStatusAttribute 'AG 20/03/2012 - inform the WS status (used to disable some buttons)
-            IResults.AnalyzerModel = AnalyzerModelAttribute
-            OpenMDIChildForm(IResults)
+            UiResults.ActiveWSStatus = WSStatusAttribute 'AG 20/03/2012 - inform the WS status (used to disable some buttons)
+            UiResults.AnalyzerModel = AnalyzerModelAttribute
+            OpenMDIChildForm(UiResults)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSResultsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSResultsButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2175,8 +2175,8 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub LoadSATReportToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LoadSATReportToolStripMenuItem.Click
         Try
-            ISATReportLoad.RestorePointMode = False
-            OpenMDIChildForm(ISATReportLoad)
+            UiSATReportLoad.RestorePointMode = False
+            OpenMDIChildForm(UiSATReportLoad)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSATReportToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSATReportToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2191,8 +2191,8 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub RestorePreviousDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RestorePreviousDataToolStripMenuItem.Click
         Try
-            ISATReportLoad.RestorePointMode = True
-            OpenMDIChildForm(ISATReportLoad)
+            UiSATReportLoad.RestorePointMode = True
+            OpenMDIChildForm(UiSATReportLoad)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RestorePreviousDataToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2207,7 +2207,7 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub CreateRestorePointToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CreateRestorePointToolStripMenuItem.Click
         Try
-            OpenMDIChildForm(ICreateRestorePoint)
+            OpenMDIChildForm(UiCreateRestorePoint)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RestorePreviousDataToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2222,7 +2222,7 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub OffSystemModuleToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OffSystemModuleToolStripMenuItem.Click
         Try
-            OpenMDIChildForm(IProgOffSystemTest)
+            OpenMDIChildForm(UiProgOffSystemTest)
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2298,46 +2298,46 @@ Partial Public Class UiAx00MainMDI
     'End Sub
 
     Private Sub ControlsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ControlsToolStripMenuItem.Click
-        IProgControls.AnalyzerID = AnalyzerIDAttribute
-        IProgControls.WorkSessionID = WorkSessionIDAttribute
+        UiProgControls.AnalyzerID = AnalyzerIDAttribute
+        UiProgControls.WorkSessionID = WorkSessionIDAttribute
 
-        OpenMDIChildForm(IProgControls)
+        OpenMDIChildForm(UiProgControls)
     End Sub
 
     Private Sub SampleResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SampleResultsToolStripMenuItem.Click
         'SA 01/09/2014
         'BA-1910 ==> Inform the property for the connected Analyzer before open the Historic Patient Results screen
-        IHisResults.ActiveAnalyzer = AnalyzerIDAttribute
+        UiHisResults.ActiveAnalyzer = AnalyzerIDAttribute
 
-        OpenMDIChildForm(IHisResults) 'JB 22/10/2012
+        OpenMDIChildForm(UiHisResults) 'JB 22/10/2012
     End Sub
 
     Private Sub BlankCalibratorResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BlankCalibratorResultsToolStripMenuItem.Click
         'SA 01/09/2014
         'BA-1910 ==> Inform the property for the connected Analyzer before open the Historic Blank&Calibrator Results screen
-        IHisBlankCalibResults.AnalyzerID = AnalyzerIDAttribute
+        UiHisBlankCalibResults.AnalyzerID = AnalyzerIDAttribute
 
-        OpenMDIChildForm(IHisBlankCalibResults)
+        OpenMDIChildForm(UiHisBlankCalibResults)
     End Sub
 
     Private Sub QCResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles QCResultsToolStripMenuItem.Click
-        IQCResultsReview.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IQCResultsReview)
+        UiQCResultsReview.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiQCResultsReview)
     End Sub
 
     Private Sub QCCumulatedResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles QCCumulatedResultsToolStripMenuItem.Click
-        IQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IQCCumulatedReview)
+        UiQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiQCCumulatedReview)
     End Sub
 
     Private Sub ISEResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ISEResultsToolStripMenuItem.Click
-        IISEResultsHistory.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IISEResultsHistory)
+        UiISEResultsHistory.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiISEResultsHistory)
     End Sub
 
     Private Sub HistoricalAnalyzerAlarmsReviewToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HistoricalAnalyzerAlarmsReviewToolStripMenuItem.Click
-        IHisAlarms.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IHisAlarms)
+        UiHisAlarms.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiHisAlarms)
     End Sub
 
     Private Sub bsTSQCResultsReview_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSQCResultsReview.Click
@@ -2345,8 +2345,8 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            IQCResultsReview.AnalyzerID = AnalyzerIDAttribute
-            OpenMDIChildForm(IQCResultsReview)
+            UiQCResultsReview.AnalyzerID = AnalyzerIDAttribute
+            OpenMDIChildForm(UiQCResultsReview)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSQCResultsReview_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSQCResultsReview_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2421,7 +2421,7 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IConfigLISMapping)
+            OpenMDIChildForm(UiConfigLISMapping)
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LISMappingToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LISMappingToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -2452,17 +2452,17 @@ Partial Public Class UiAx00MainMDI
             Dim myLegend As String
 
             Select Case Me.ActiveMdiChild.Name
-                Case IWSRotorPositions.Name
+                Case UiWSRotorPositions.Name
                     myLegend = LEGEND_SOURCE.LEGEND_ROTOR.ToString()
 
-                Case IWSSampleRequest.Name
+                Case UiWSSampleRequest.Name
                     myLegend = LEGEND_SOURCE.LEGEND_PREPARATION.ToString()
 
                 Case Else
                     myLegend = String.Empty 'RH 30/06/2011
             End Select
 
-            Using myForm As New ILegend()
+            Using myForm As New UiLegend()
                 myForm.ParentMDI = Me.Location
                 myForm.SourceForm = myLegend
                 OpeningLegend = False
@@ -2497,8 +2497,8 @@ Partial Public Class UiAx00MainMDI
     End Sub
 
     Private Sub CumulatedButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CumulatedButton.Click
-        IQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IQCCumulatedReview)
+        UiQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiQCCumulatedReview)
     End Sub
 
 
@@ -2789,7 +2789,7 @@ Partial Public Class UiAx00MainMDI
 
     Private Sub TestPrintSortingToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TestPrintSortingToolStripMenuItem.Click
         'mySortingTest = New ISortingTestsAux(Me)
-        mySortingTest = New ISortingTestsAux()
+        mySortingTest = New UiSortingTestsAux()
         OpenMDIChildForm(mySortingTest)
     End Sub
 
@@ -3920,8 +3920,8 @@ Partial Public Class UiAx00MainMDI
                         If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState = LISautomateProcessSteps.initialStatus AndAlso userAnswer = DialogResult.Yes Then
                             'XB 23/07/2013
                             If (Not Me.ActiveMdiChild Is Nothing) Then
-                                If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                                    Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                                If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                                    Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                                     If Not WSExecutionsAlreadyCreated Then
                                         'XB 23/07/2013 - auto HQ
                                         'CurrentMdiChild.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
@@ -4278,12 +4278,12 @@ Partial Public Class UiAx00MainMDI
                             'AG 10/05/2012 - If rotor positions screen is opened create WS executions before call the ManageAnalyzer methods
                             'DisabledMdiForms = Me.ActiveMdiChild
                             'Me.ActiveMdiChild.Enabled = False
-                            If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                            If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                                 'XB 23/07/2013 - auto HQ
                                 'If Not autoWSCreationWithLISModeAttribute Then 'AG 09/07/2013
                                 If Not autoWSCreationWithLISModeAttribute And Not HQProcessByUserFlag Then 'AG 09/07/2013
                                     'XB 23/07/2013
-                                    Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                                    Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
 
                                     ' XBC 12/04/2013
                                     'myGlobal = CurrentMdiChild.CreateExecutionsProcess(False, wsReadyToBeSent)
@@ -4525,7 +4525,7 @@ Partial Public Class UiAx00MainMDI
                                     End If
 
                                     If (updateExecutions) Then
-                                        If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                                        If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                                             Dim myExecutionsDelegate As New ExecutionsDelegate
                                             myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                         End If
@@ -4721,7 +4721,7 @@ Partial Public Class UiAx00MainMDI
                                         ' XB 22/07/2013
 
                                         If (updateExecutions) Then
-                                            If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                                            If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                                                 Dim myExecutionsDelegate As New ExecutionsDelegate
                                                 myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                             End If
@@ -6937,8 +6937,8 @@ Partial Public Class UiAx00MainMDI
 
             If Not ActiveMdiChild Is Nothing Then
                 '- RotorPositions: Some user actions event are allowed or not depending the status
-                If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                    Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                    Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                     CurrentMdiChild.RefreshScreenStatus(MDIAnalyzerManager.AnalyzerStatus.ToString, WSStatusAttribute)
                 End If
 
@@ -7298,28 +7298,28 @@ Partial Public Class UiAx00MainMDI
                         Dim auxScreen As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions) Then
-                        Dim auxScreen As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiWSRotorPositions) Then
+                        Dim auxScreen As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
-                        Dim auxScreen As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiWSSampleRequest) Then
+                        Dim auxScreen As UiWSSampleRequest = CType(myCurrentMDIForm, UiWSSampleRequest)
                         returnValue = auxScreen.ScreenWorkingProcess
 
                     ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
                         Dim auxScreen As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is ISATReport) Then
-                        Dim auxScreen As ISATReport = CType(myCurrentMDIForm, ISATReport)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiSATReport) Then
+                        Dim auxScreen As UiSATReport = CType(myCurrentMDIForm, UiSATReport)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is ISATReportLoad) Then
-                        Dim auxScreen As ISATReportLoad = CType(myCurrentMDIForm, ISATReportLoad)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiSATReportLoad) Then
+                        Dim auxScreen As UiSATReportLoad = CType(myCurrentMDIForm, UiSATReportLoad)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IResults) Then
-                        Dim auxScreen As IResults = CType(myCurrentMDIForm, IResults)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiResults) Then
+                        Dim auxScreen As UiResults = CType(myCurrentMDIForm, UiResults)
                         returnValue = auxScreen.ScreenWorkingProcess
 
                     End If
@@ -7785,7 +7785,7 @@ Partial Public Class UiAx00MainMDI
                 myCurrentMDIForm = DisabledMDIChildAttribute(0)
             End If
 
-            If Not myCurrentMDIForm Is Nothing AndAlso (TypeOf myCurrentMDIForm Is IResultsRecover) Then
+            If Not myCurrentMDIForm Is Nothing AndAlso (TypeOf myCurrentMDIForm Is UiResultsRecover) Then
                 specialModeForRecoveryResultsScreenFlag = True
             End If
             'AG 30/09/2012
@@ -8214,20 +8214,20 @@ Partial Public Class UiAx00MainMDI
                 ' XB 22/11/2013 - Task #1394
                 DisplayISELockedPreparationsWarningAttribute = False
 
-                IWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
-                IWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
-                IWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
-                IWSRotorPositions.WorkSessionStatus(MDIAnalyzerManager.AnalyzerStatus.ToString) = WSStatusAttribute
-                IWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
+                UiWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
+                UiWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
+                UiWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
+                UiWSRotorPositions.WorkSessionStatus(MDIAnalyzerManager.AnalyzerStatus.ToString) = WSStatusAttribute
+                UiWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
 
                 ' XB 17/07/2013 - Auto WS process
                 'XB 23/07/2013 - auto HQ
                 'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
-                IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
+                UiWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
                 'XB 23/07/2013
 
                 'AG 09/07/2013
-                IWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
+                UiWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
                 'XB 23/07/2013 - auto HQ
                 ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
                 If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
@@ -8238,13 +8238,13 @@ Partial Public Class UiAx00MainMDI
                 'AG 09/07/2013
 
                 If FormToClose Is Nothing Then
-                    OpenMDIChildForm(IWSRotorPositions)
+                    OpenMDIChildForm(UiWSRotorPositions)
                 Else
                     'RH 16/12/2010 Directly opens the Rotor Positioning form and closes the calling form
-                    IWSRotorPositions.MdiParent = Me
-                    IWSRotorPositions.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-                    IWSRotorPositions.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-                    IWSRotorPositions.Show()
+                    UiWSRotorPositions.MdiParent = Me
+                    UiWSRotorPositions.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+                    UiWSRotorPositions.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+                    UiWSRotorPositions.Show()
                     Application.DoEvents()
                     FormToClose.Close()
                 End If
@@ -8760,15 +8760,15 @@ Partial Public Class UiAx00MainMDI
                 'Buttons over analyzer not in Vertical Buttons Bar
                 'Barcode button
                 If Not ActiveMdiChild Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                        Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                    If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                        Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                         If Not CurrentMdiChild.bsScanningButton Is Nothing Then CurrentMdiChild.bsScanningButton.Enabled = pEnable
                         If Not CurrentMdiChild.bsCheckRotorVolumeButton Is Nothing Then CurrentMdiChild.bsCheckRotorVolumeButton.Enabled = pEnable
                         If Not CurrentMdiChild.bsReagentsCheckVolumePosButton Is Nothing Then CurrentMdiChild.bsReagentsCheckVolumePosButton.Enabled = pEnable
                         'CurrentMdiChild.bsSamplesCheckVolumePosButton.Enabled = pEnable
 
-                    ElseIf (TypeOf ActiveMdiChild Is IWSSampleRequest) Then
-                        Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                    ElseIf (TypeOf ActiveMdiChild Is UiWSSampleRequest) Then
+                        Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                         If Not CurrentMdiChild.bsScanningButton Is Nothing Then CurrentMdiChild.bsScanningButton.Enabled = pEnable
                     End If
                 End If
@@ -10836,10 +10836,10 @@ Partial Public Class UiAx00MainMDI
             If refreshFlag AndAlso Not ActiveMdiChild Is Nothing Then
                 If (TypeOf ActiveMdiChild Is UiMonitor) Then
                     UiMonitor.UpdateWSState(New UIRefreshDS)
-                ElseIf (TypeOf ActiveMdiChild Is IResults) Then
-                    IResults.RefreshExportStatusChanged()
-                ElseIf (TypeOf ActiveMdiChild Is IHisResults) Then
-                    IHisResults.RefreshScreen(Nothing, Nothing)
+                ElseIf (TypeOf ActiveMdiChild Is UiResults) Then
+                    UiResults.RefreshExportStatusChanged()
+                ElseIf (TypeOf ActiveMdiChild Is UiHisResults) Then
+                    UiHisResults.RefreshScreen(Nothing, Nothing)
                 End If
                 CreateLogActivity("LIS notification refresh triggered!!", Me.Name & ".ManageNewLISNotification", EventLogEntryType.Information, False)
             End If
@@ -10874,8 +10874,8 @@ Partial Public Class UiAx00MainMDI
 
                 'LIS Utilities
                 If Not ActiveMdiChild Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is ILISUtilities) Then
-                        ILISUtilities.RefreshElementsEnabled()
+                    If (TypeOf ActiveMdiChild Is UiLISUtilities) Then
+                        UiLISUtilities.RefreshElementsEnabled()
                     End If
                 End If
 
@@ -11192,7 +11192,7 @@ Partial Public Class UiAx00MainMDI
                 'Open the Rotor positions and the LIS monitor screen for monitoring the last host query
                 If Not MDILISManager Is Nothing Then
                     Dim openScreenFlag As Boolean = True
-                    If Not ActiveMdiChild Is Nothing AndAlso (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                    If Not ActiveMdiChild Is Nothing AndAlso (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                         'Do not open rotor positions screen is already open
                         openScreenFlag = False
                     End If
@@ -11202,7 +11202,7 @@ Partial Public Class UiAx00MainMDI
                         OpenRotorPositionsForm(Nothing, True)
                     Else
                         'Current screen is rotor positioning -> Show popup screen
-                        Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                        Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                         If CurrentMdiChild.BarcodeWarningButton.Visible AndAlso CurrentMdiChild.BarcodeWarningButton.Enabled Then
                             CurrentMdiChild.BarcodeWarningButton.PerformClick()
                         End If
@@ -11599,10 +11599,10 @@ Partial Public Class UiAx00MainMDI
                             Case 1
                                 'New samples are added but no set to position then open the Sample Request Screen
                                 'Inform screen properties
-                                IWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
-                                IWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
-                                IWSSampleRequest.ActiveWSStatus = WSStatusAttribute
-                                OpenMDIChildForm(IWSSampleRequest)
+                                UiWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
+                                UiWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
+                                UiWSSampleRequest.ActiveWSStatus = WSStatusAttribute
+                                OpenMDIChildForm(UiWSSampleRequest)
 
                                 'XB 23/07/2013 - auto HQ
                                 'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
@@ -11636,7 +11636,7 @@ Partial Public Class UiAx00MainMDI
                                 Exit Select
                             Case 2
                                 'If at least one of the order lis is set to position then open the Rotor Position Screen
-                                If (IWSSampleRequest.Visible) Then
+                                If (UiWSSampleRequest.Visible) Then
                                     'It is not possible because we have close the current MDI so there is not any screen open but the mdi (empty, only the mdi frame)
                                     'XB 23/07/2013 - auto HQ
                                     'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then 'Inform the automatic process send to position + create executions
@@ -11650,10 +11650,10 @@ Partial Public Class UiAx00MainMDI
                                         End If
                                         'AG 07/04/20014
 
-                                        IWSSampleRequest.OpenByAutomaticProcess = True
+                                        UiWSSampleRequest.OpenByAutomaticProcess = True
                                         GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest + auto send to positioning", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
                                     End If
-                                    IWSSampleRequest.SaveWSWithPositioning()
+                                    UiWSSampleRequest.SaveWSWithPositioning()
                                 Else
                                     'AG 10/07/2013 - evaluate if open rotor positions in manual or automatic mode
                                     'XB 23/07/2013 - auto HQ
@@ -11739,7 +11739,7 @@ Partial Public Class UiAx00MainMDI
     Private Sub LISUtilitiesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LISUtilitiesToolStripMenuItem.Click
         'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
         'The form to be opened should be assigned its AcceptButton property to its default exit button
-        OpenMDIChildForm(ILISUtilities)
+        OpenMDIChildForm(UiLISUtilities)
     End Sub
 
 #End Region

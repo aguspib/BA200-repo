@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
-Public Class IWSLoadSaveAuxScreen
+Public Class UiWSLoadSaveAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Attributes"
@@ -342,13 +342,13 @@ Public Class IWSLoadSaveAuxScreen
                 UiAx00MainMDI.bsTSResetSessionButton.Enabled = True
 
                 'A Saved WS was loaded, open the screen of WS Preparation after inform the needed properties
-                IWSSampleRequest.ActiveAnalyzer = UiAx00MainMDI.ActiveAnalyzer
-                IWSSampleRequest.ActiveWorkSession = UiAx00MainMDI.ActiveWorkSession
-                IWSSampleRequest.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
-                IWSSampleRequest.WSLoadedID = IDProperty
-                IWSSampleRequest.WSLoadedName = NameProperty
+                UiWSSampleRequest.ActiveAnalyzer = UiAx00MainMDI.ActiveAnalyzer
+                UiWSSampleRequest.ActiveWorkSession = UiAx00MainMDI.ActiveWorkSession
+                UiWSSampleRequest.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
+                UiWSSampleRequest.WSLoadedID = IDProperty
+                UiWSSampleRequest.WSLoadedName = NameProperty
 
-                UiAx00MainMDI.OpenMDIChildForm(IWSSampleRequest)
+                UiAx00MainMDI.OpenMDIChildForm(UiWSSampleRequest)
             End If
             Me.Close()
         Catch ex As Exception

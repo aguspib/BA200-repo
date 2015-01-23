@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.CommunicationsSwFw
 
 
-Public Class IWSIncompleteSamplesAuxScreen
+Public Class UiWSIncompleteSamplesAuxScreen
     Inherits BSBaseForm
 
 #Region "Declarations"
@@ -1101,7 +1101,7 @@ Public Class IWSIncompleteSamplesAuxScreen
                 FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                 'Inform properties and open the screen of Tests Selection
-                Using myForm As New IWSTestSelectionAuxScreen()
+                Using myForm As New UiWSTestSelectionAuxScreen()
                     myForm.SampleClass = "PATIENT"
                     myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                     myForm.SampleTypeName = bsSampleTypeComboBox.Text

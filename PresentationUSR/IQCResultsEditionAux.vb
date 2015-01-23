@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class IQCResultsEditionAux
+Public Class UiQCResultsEditionAux
 
 #Region "Declarations"
     Private LocalChange As Boolean = False

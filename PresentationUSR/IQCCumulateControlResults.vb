@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Types
 'Imports System.Configuration
 'Imports Biosystems.Ax00.BL.Framework
 
-Public Class IQCCumulateControlResults
+Public Class UiQCCumulateControlResults
 
 #Region "Declarations"
     Private isLoading As Boolean = False                 'To avoid show warning message of not QC Results pending to cumulate when the is screen is still loading    
@@ -198,8 +198,8 @@ Public Class IQCCumulateControlResults
             If (IQCResultReviewGoneAttribute) Then
                 Me.Close()
                 If Not UiAx00MainMDI.ActiveMdiChild Is Nothing Then
-                    If (TypeOf UiAx00MainMDI.ActiveMdiChild Is IQCResultsReview) Then
-                        Dim CurrentMdiChild As IQCResultsReview = CType(UiAx00MainMDI.ActiveMdiChild, IQCResultsReview)
+                    If (TypeOf UiAx00MainMDI.ActiveMdiChild Is UiQCResultsReview) Then
+                        Dim CurrentMdiChild As UiQCResultsReview = CType(UiAx00MainMDI.ActiveMdiChild, UiQCResultsReview)
                         CurrentMdiChild.ReloadScreen()
                     End If
                 End If
@@ -432,7 +432,7 @@ Public Class IQCCumulateControlResults
     ''' </remarks>
     Private Sub OpenQCResultsReview(ByVal pQCTestSampleID As Integer)
         Try
-            Dim myForm As New IQCResultsReview
+            Dim myForm As New UiQCResultsReview
 
             myForm.QCTestSampleIDValue = pQCTestSampleID
             myForm.AnalyzerID = AnalyzerIDAttribute

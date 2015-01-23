@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSManualRepetition
+Partial Class UiWSManualRepetition
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -23,7 +23,7 @@ Partial Class IWSManualRepetition
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSManualRepetition))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSManualRepetition))
         Me.bsScreenToolTips = New System.Windows.Forms.ToolTip(Me.components)
         Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()

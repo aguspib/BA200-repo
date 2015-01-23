@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IProgPatientData
+Public Class UiProgPatientData
 
 #Region "Constructor"
     Public Sub New()

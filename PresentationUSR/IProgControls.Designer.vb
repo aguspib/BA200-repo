@@ -1,6 +1,6 @@
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgControls
+Partial Class UiProgControls
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -12,7 +12,7 @@ Partial Class IProgControls
         MyBase.Dispose(disposing)
     End Sub
 
- 
+
 
     'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
@@ -27,7 +27,7 @@ Partial Class IProgControls
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgControls))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiProgControls))
         Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsNewButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
