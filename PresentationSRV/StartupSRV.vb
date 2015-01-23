@@ -16,17 +16,17 @@ Public NotInheritable Class StartupSRV
         'SGM 09/01/2012 - activation of compatibility between Framework 4.5 and Mixed Mode Assemblies
         'AG 21/02/2014 - #1516 at this point services can be stopped (move to the Load event)
         'IMPORTANT!!! Leave the call to x because otherwise some processes like load rsat fails
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
         If RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully Then
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
         Else
-            'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupSRV.New", EventLogEntryType.Error, False)
+            'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - LegacyV2RuntimeEnabled error", "StartupSRV.New", EventLogEntryType.Error, False)
         End If
         'end SGM 09/01/2012
 
         ''SGM 07/11/2012 - log Application Startup
-        'Dim myLogAcciones As New ApplicationLogManager()
-        'myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
+        ''Dim myLogAcciones As New ApplicationLogManager()
+        'GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - Application STARTUP", "StartupSRV.New", EventLogEntryType.Information, False)
         ''end SGM 07/11/2012
 
     End Sub
@@ -68,14 +68,14 @@ Public NotInheritable Class StartupSRV
 #Else
                 ShowBackground = True
 #End If
-                Dim myBackForm As New IBackground(Ax00ServiceMainMDI, Nothing)
+                Dim myBackForm As New IBackground(TryCast(Ax00ServiceMainMDI, Form), Nothing)
                 myBackForm.ShowMDI(ShowBackground)
             End If
         End Using
 
         'AG 21/02/2014 - #1516 at this point services are running. Do not use here the method RuntimePolicyHelper.LegacyV2RuntimeEnabledSuccessfully because fails
-        Dim myLogAcciones As New ApplicationLogManager()
-        myLogAcciones.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationSRV STARTUP", "Startup_Load (service)", EventLogEntryType.Information, False)
+        'Dim myLogAcciones As New ApplicationLogManager()
+        GlobalBase.CreateLogActivity(My.Application.Info.ProductName & " - ApplicationSRV STARTUP", "Startup_Load (service)", EventLogEntryType.Information, False)
 
         Me.Close()
     End Sub

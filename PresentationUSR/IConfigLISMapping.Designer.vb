@@ -33,35 +33,35 @@ Partial Class IConfigLISMapping
         Me.LISMappingDataGridView = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
         Me.bsLISMappingLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.CancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.ButtonCancel = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.EditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.FilterComboBox = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
         Me.BsLISMappingTypeLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.bsErrorProvider1 = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
-        Me.bsLISMappingGroupBox.SuspendLayout
-        CType(Me.LISMappingDataGridView,System.ComponentModel.ISupportInitialize).BeginInit
-        CType(Me.bsErrorProvider1,System.ComponentModel.ISupportInitialize).BeginInit
-        Me.SuspendLayout
+        Me.bsLISMappingGroupBox.SuspendLayout()
+        CType(Me.LISMappingDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.bsErrorProvider1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.SuspendLayout()
         '
         'CloseButton
         '
-        Me.CloseButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.CloseButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.CloseButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
         Me.CloseButton.Location = New System.Drawing.Point(923, 614)
         Me.CloseButton.Name = "CloseButton"
         Me.CloseButton.Size = New System.Drawing.Size(32, 32)
         Me.CloseButton.TabIndex = 169
-        Me.CloseButton.UseVisualStyleBackColor = true
+        Me.CloseButton.UseVisualStyleBackColor = True
         '
         'bsLISMappingGroupBox
         '
-        Me.bsLISMappingGroupBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
-            Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.bsLISMappingGroupBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.bsLISMappingGroupBox.Controls.Add(Me.LISMappingDataGridView)
         Me.bsLISMappingGroupBox.Controls.Add(Me.bsLISMappingLabel)
         Me.bsLISMappingGroupBox.Controls.Add(Me.SaveButton)
-        Me.bsLISMappingGroupBox.Controls.Add(Me.CancelButton)
+        Me.bsLISMappingGroupBox.Controls.Add(Me.ButtonCancel)
         Me.bsLISMappingGroupBox.Controls.Add(Me.EditButton)
         Me.bsLISMappingGroupBox.Controls.Add(Me.FilterComboBox)
         Me.bsLISMappingGroupBox.Controls.Add(Me.BsLISMappingTypeLabel)
@@ -70,22 +70,22 @@ Partial Class IConfigLISMapping
         Me.bsLISMappingGroupBox.Name = "bsLISMappingGroupBox"
         Me.bsLISMappingGroupBox.Size = New System.Drawing.Size(956, 594)
         Me.bsLISMappingGroupBox.TabIndex = 173
-        Me.bsLISMappingGroupBox.TabStop = false
+        Me.bsLISMappingGroupBox.TabStop = False
         '
         'LISMappingDataGridView
         '
-        Me.LISMappingDataGridView.AllowUserToAddRows = false
-        Me.LISMappingDataGridView.AllowUserToDeleteRows = false
-        Me.LISMappingDataGridView.AllowUserToResizeRows = false
+        Me.LISMappingDataGridView.AllowUserToAddRows = False
+        Me.LISMappingDataGridView.AllowUserToDeleteRows = False
+        Me.LISMappingDataGridView.AllowUserToResizeRows = False
         DataGridViewCellStyle1.BackColor = System.Drawing.Color.White
-        DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+        DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         DataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black
         DataGridViewCellStyle1.SelectionBackColor = System.Drawing.Color.LightSlateGray
         DataGridViewCellStyle1.SelectionForeColor = System.Drawing.Color.White
         DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
         Me.LISMappingDataGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle1
-        Me.LISMappingDataGridView.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom)  _
-            Or System.Windows.Forms.AnchorStyles.Left),System.Windows.Forms.AnchorStyles)
+        Me.LISMappingDataGridView.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
         Me.LISMappingDataGridView.BackgroundColor = System.Drawing.Color.LightGray
         Me.LISMappingDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
         Me.LISMappingDataGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.None
@@ -159,14 +159,14 @@ Partial Class IConfigLISMapping
         '
         'CancelButton
         '
-        Me.CancelButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-        Me.CancelButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
-        Me.CancelButton.Enabled = False
-        Me.CancelButton.Location = New System.Drawing.Point(910, 552)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 174
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
+        Me.ButtonCancel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ButtonCancel.Enabled = False
+        Me.ButtonCancel.Location = New System.Drawing.Point(910, 552)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 174
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'EditButton
         '
@@ -191,7 +191,7 @@ Partial Class IConfigLISMapping
         '
         'BsLISMappingTypeLabel
         '
-        Me.BsLISMappingTypeLabel.AutoSize = true
+        Me.BsLISMappingTypeLabel.AutoSize = True
         Me.BsLISMappingTypeLabel.BackColor = System.Drawing.Color.Transparent
         Me.BsLISMappingTypeLabel.Font = New System.Drawing.Font("Verdana", 8.25!)
         Me.BsLISMappingTypeLabel.ForeColor = System.Drawing.Color.Black
@@ -200,7 +200,7 @@ Partial Class IConfigLISMapping
         Me.BsLISMappingTypeLabel.Size = New System.Drawing.Size(98, 13)
         Me.BsLISMappingTypeLabel.TabIndex = 75
         Me.BsLISMappingTypeLabel.Text = "*Mapping Type:"
-        Me.BsLISMappingTypeLabel.Title = false
+        Me.BsLISMappingTypeLabel.Title = False
         '
         'bsErrorProvider1
         '
@@ -211,37 +211,37 @@ Partial Class IConfigLISMapping
         '
         Me.AcceptButton = Me.CloseButton
         Me.Appearance.BackColor = System.Drawing.Color.Gainsboro
-        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0,Byte))
+        Me.Appearance.Font = New System.Drawing.Font("Verdana", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Appearance.GradientMode = System.Drawing.Drawing2D.LinearGradientMode.ForwardDiagonal
-        Me.Appearance.Options.UseBackColor = true
-        Me.Appearance.Options.UseFont = true
+        Me.Appearance.Options.UseBackColor = True
+        Me.Appearance.Options.UseFont = True
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None
         Me.ClientSize = New System.Drawing.Size(978, 654)
-        Me.ControlBox = false
+        Me.ControlBox = False
         Me.Controls.Add(Me.bsLISMappingGroupBox)
         Me.Controls.Add(Me.CloseButton)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
-        Me.Icon = CType(resources.GetObject("$this.Icon"),System.Drawing.Icon)
+        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.LookAndFeel.SkinName = "Blue"
-        Me.LookAndFeel.UseDefaultLookAndFeel = false
-        Me.MaximizeBox = false
-        Me.MinimizeBox = false
+        Me.LookAndFeel.UseDefaultLookAndFeel = False
+        Me.MaximizeBox = False
+        Me.MinimizeBox = False
         Me.Name = "IConfigLISMapping"
-        Me.ShowInTaskbar = false
+        Me.ShowInTaskbar = False
         Me.Text = ""
-        Me.bsLISMappingGroupBox.ResumeLayout(false)
-        Me.bsLISMappingGroupBox.PerformLayout
-        CType(Me.LISMappingDataGridView,System.ComponentModel.ISupportInitialize).EndInit
-        CType(Me.bsErrorProvider1,System.ComponentModel.ISupportInitialize).EndInit
-        Me.ResumeLayout(false)
+        Me.bsLISMappingGroupBox.ResumeLayout(False)
+        Me.bsLISMappingGroupBox.PerformLayout()
+        CType(Me.LISMappingDataGridView, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.bsErrorProvider1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ResumeLayout(False)
 
-End Sub
+    End Sub
     Friend WithEvents CloseButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsLISMappingGroupBox As Biosystems.Ax00.Controls.UserControls.BSGroupBox
     Friend WithEvents LISMappingDataGridView As Biosystems.Ax00.Controls.UserControls.BSDataGridView
     Friend WithEvents bsLISMappingLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents SaveButton As Biosystems.Ax00.Controls.UserControls.BSButton
-    Friend WithEvents CancelButton As Biosystems.Ax00.Controls.UserControls.BSButton
+    Friend WithEvents ButtonCancel As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents EditButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents FilterComboBox As Biosystems.Ax00.Controls.UserControls.BSComboBox
     Friend WithEvents BsLISMappingTypeLabel As Biosystems.Ax00.Controls.UserControls.BSLabel

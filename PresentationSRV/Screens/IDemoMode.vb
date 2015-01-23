@@ -224,12 +224,12 @@ Public Class IDemoMode
             ' For Tooltips...
 
             If myScreenDelegate.StatusStressMode = STRESS_STATUS.UNFINISHED Then
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
             Else
-                MyBase.bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
             End If
 
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -247,12 +247,12 @@ Public Class IDemoMode
         Try
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'MyBase.SetButtonImage(BsExitButton, "CANCEL")
@@ -262,7 +262,7 @@ Public Class IDemoMode
             ''EXIT Button
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -270,14 +270,14 @@ Public Class IDemoMode
             ' ''TEST Button
             ''auxIconName = GetIconName("ADJUSTMENT")
             ''If System.IO.File.Exists(iconPath & auxIconName) Then
-            ''    BsTestButton_TODELETE.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            ''    BsTestButton_TODELETE.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             ''    BsTestButton_TODELETE.BackgroundImageLayout = ImageLayout.Center
             ''End If
 
             ''ABORT TEST Button
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    'BsTestButton.BackgroundImageLayout = ImageLayout.Center
             'End If
             '' XBC 24/11/2011 - Unify buttons Start and Stop Demo
@@ -285,7 +285,7 @@ Public Class IDemoMode
             ''Info Button
             'auxIconName = GetIconName("RIGHT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
-            '    Me.BsInfoExpandButton.BackgroundImage = Image.FromFile(iconPath & auxIconName)
+            '    Me.BsInfoExpandButton.BackgroundImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             '    Me.BsInfoExpandButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
 
@@ -597,8 +597,8 @@ Public Class IDemoMode
             MyClass.myScreenDelegate = New DemoModeDelegate(MyBase.myServiceMDI.ActiveAnalyzer, myFwScriptDelegate)
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             GetScreenLabels()
@@ -768,7 +768,7 @@ Public Class IDemoMode
     Private Sub PrepareTestButton()
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
@@ -781,16 +781,16 @@ Public Class IDemoMode
                 auxIconName = GetIconName("ADJUSTMENT")
             End If
             If (auxIconName <> "") Then
-                BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Dim myNewImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
 
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myNewImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else

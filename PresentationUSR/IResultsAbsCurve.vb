@@ -1,5 +1,6 @@
 ﻿Option Explicit On
-Option Strict Off
+Option Strict On
+Option Infer On
 
 Imports System.Threading
 Imports Biosystems.Ax00.Global
@@ -51,10 +52,10 @@ Public Class IResultsAbsCurve
     Private CurrentID As Integer
     '
     'Global variables for chart control
-    Private ReadOnly SizeMarker = 4
-    Private ReadOnly SizeLineSelected = 3
-    Private ReadOnly SizeLineNormal = 1
-    Private ReadOnly KindMarker = MarkerKind.Cross
+    Private ReadOnly SizeMarker As Integer = 4
+    Private ReadOnly SizeLineSelected As Integer = 3
+    Private ReadOnly SizeLineNormal As Integer = 1
+    Private ReadOnly KindMarker As MarkerKind = MarkerKind.Cross
     '
     Private LBL_CYCLE As String = ""
     Private LBL_ABS As String = ""
@@ -212,8 +213,8 @@ Public Class IResultsAbsCurve
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -258,7 +259,7 @@ Public Class IResultsAbsCurve
                 'DL 18/11/2011
 
                 If e.Series.Name = SerieNameSeleceted Then
-                    If e.SeriesPoint.Argument = ReadingSelected Then
+                    If e.SeriesPoint.Argument = ReadingSelected.ToString Then
                         e.SeriesDrawOptions.Color = Color.Blue
 
                         'RH 24/02/2012
@@ -274,12 +275,12 @@ Public Class IResultsAbsCurve
             '//Changes for TASK + BUGS Tracking  #1331
             '//15/10/2013 - CF -v3 We check the "TAG" attribute, if it's true, then we change the marker kind for this point
 
-            Dim drawOptions As PointDrawOptions = e.SeriesDrawOptions
-            If (IsNothing(drawOptions)) Then
-                Exit Sub
-            End If
+            'Dim drawOptions As PointDrawOptions = e.SeriesDrawOptions
+            'If (IsNothing(drawOptions)) Then
+            '    Exit Sub
+            'End If
 
-            If (e.SeriesPoint.Tag = True) Then
+            If (CBool(e.SeriesPoint.Tag) = True) Then
                 DirectCast(e.SeriesDrawOptions, PointDrawOptions).Marker.Kind = MarkerKind.Triangle
                 DirectCast(e.SeriesDrawOptions, PointDrawOptions).Marker.BorderColor = Color.Black
                 'DirectCast(e.SeriesDrawOptions, PointDrawOptions).Marker.Kind = Kind.Diamond
@@ -394,7 +395,7 @@ Public Class IResultsAbsCurve
                 Cursor = Cursors.Hand
 
                 Dim mySerie As Series = TryCast(e.Object, Series)
-                Dim SerieToArray() As String = mySerie.Name.Split(".")
+                Dim SerieToArray() As String = mySerie.Name.Split("."c)
                 Dim Replicate As String = SerieToArray(0)
                 Dim Cycle As String = myPoint.NumericalArgument.ToString("#0.####")
                 Dim Absorbance As String = myPoint.Values(0).ToString("#0.####")
@@ -441,9 +442,9 @@ Public Class IResultsAbsCurve
                     If SourceReplicate = -1 Then
                         SourceReplicate = Min
                     ElseIf SourceReplicate > Max Then 'DL 30/05/2012
-                        SourceReplicate = ReplicateUpDown.Maximum 'DL 30/05/2012
+                        SourceReplicate = CInt(ReplicateUpDown.Maximum) 'DL 30/05/2012
                     ElseIf SourceReplicate < Min Then 'DL 30/05/2012
-                        SourceReplicate = ReplicateUpDown.Minimum 'DL 30/05/2012
+                        SourceReplicate = CInt(ReplicateUpDown.Minimum) 'DL 30/05/2012
                     End If
 
                     ReplicateUpDown.Value = SourceReplicate '1 'ReplicateAttribute 'descomentar
@@ -576,13 +577,13 @@ Public Class IResultsAbsCurve
 
         Try
             Dim mySerieName As String
-            Dim mySerie As Series
+            Dim mySerie As Series = Nothing
             Dim Min As Single
             Dim Max As Single
             Dim FilterAbs As List(Of GraphDS.tReplicatesRow)
 
             If Not ReplicateDS Is Nothing AndAlso ReplicateDS.tReplicates.Count > 0 Then
-                Dim qReplicateFilter As List(Of GraphDS.tReplicatesRow)
+                Dim qReplicateFilter As List(Of GraphDS.tReplicatesRow) = Nothing
 
                 CreateChartControl()
 
@@ -628,8 +629,9 @@ Public Class IResultsAbsCurve
 
                     End Select
 
-                    For iReplicate As Integer = 0 To qReplicates.Count - 1
-                        mySerieName = qReplicates(iReplicate) & ". " & myGraph
+                    For indexReplicate As Integer = 0 To qReplicates.Count - 1
+                        Dim auxIndexReplicate = indexReplicate
+                        mySerieName = qReplicates(auxIndexReplicate) & ". " & myGraph
 
                         Select Case myGraph
                             Case "Abs1"
@@ -641,7 +643,7 @@ Public Class IResultsAbsCurve
 
                                 'RH 24/02/2012 Do not convert apples into apples
                                 qReplicateFilter = (From row As GraphDS.tReplicatesRow In ReplicateDS.tReplicates _
-                                                    Where row.Replicate = qReplicates(iReplicate) AndAlso Not row.IsAbs1Null _
+                                                    Where row.Replicate = qReplicates(auxIndexReplicate) AndAlso Not row.IsAbs1Null _
                                                     Select row).ToList
 
                             Case "Abs2"
@@ -653,7 +655,7 @@ Public Class IResultsAbsCurve
 
                                 'RH 24/02/2012 Do not convert apples into apples
                                 qReplicateFilter = (From row As GraphDS.tReplicatesRow In ReplicateDS.tReplicates _
-                                                    Where row.Replicate = qReplicates(iReplicate) AndAlso Not row.IsAbs2Null _
+                                                    Where row.Replicate = qReplicates(auxIndexReplicate) AndAlso Not row.IsAbs2Null _
                                                     Select row).ToList
 
                         End Select
@@ -695,7 +697,7 @@ Public Class IResultsAbsCurve
 
                         ResultChartControl.Series.AddRange(New Series() {mySerie})
 
-                    Next iReplicate
+                    Next
 
                     CreateDiagram(Min, Max)
 
@@ -737,13 +739,13 @@ Public Class IResultsAbsCurve
                             FilterAbs = (From row In ReplicateDS.tReplicates Where Not row.IsAbs1Null AndAlso row.Abs1 <> "Error" Select row).ToList()
 
                             If FilterAbs.Count > 0 Then
-                                Min = (From row In ReplicateDS.tReplicates _
+                                Min = CSng((From row In ReplicateDS.tReplicates _
                                        Where Not row.IsAbs1Null AndAlso row.Abs1 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                       Select CType(row.Abs1, Single?)).Min
+                                       Select CType(row.Abs1, Single?)).Min)
 
-                                Max = (From row In ReplicateDS.tReplicates _
+                                Max = CSng((From row In ReplicateDS.tReplicates _
                                        Where Not row.IsAbs1Null AndAlso row.Abs1 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                       Select CType(row.Abs1, Single?)).Max
+                                       Select CType(row.Abs1, Single?)).Max)
                             End If
 
 
@@ -777,13 +779,13 @@ Public Class IResultsAbsCurve
                             FilterAbs = (From row In ReplicateDS.tReplicates Where Not row.IsAbs2Null AndAlso row.Abs2 <> "Error" Select row).ToList()
 
                             If FilterAbs.Count > 0 Then
-                                Min = (From row In ReplicateDS.tReplicates _
+                                Min = CSng((From row In ReplicateDS.tReplicates _
                                        Where Not row.IsAbs2Null AndAlso row.Abs2 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                       Select CType(row.Abs2, Single?)).Min
+                                       Select CType(row.Abs2, Single?)).Min)
 
-                                Max = (From row In ReplicateDS.tReplicates _
+                                Max = CSng((From row In ReplicateDS.tReplicates _
                                        Where Not row.IsAbs2Null AndAlso row.Abs2 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                       Select CType(row.Abs2, Single?)).Max
+                                       Select CType(row.Abs2, Single?)).Max)
                             End If
 
                             qReplicateFilter = (From row As GraphDS.tReplicatesRow In ReplicateDS.tReplicates _
@@ -816,13 +818,13 @@ Public Class IResultsAbsCurve
                             FilterAbs = (From row In ReplicateDS.tReplicates Where Not row.IsAbs1Null AndAlso row.Abs1 <> "Error" Select row).ToList()
 
                             If FilterAbs.Count > 0 Then
-                                Min = (From row In ReplicateDS.tReplicates _
+                                Min = CSng((From row In ReplicateDS.tReplicates _
                                        Where Not row.IsAbs1Null AndAlso row.Abs1 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                       Select CType(row.Abs1, Single?)).Min
+                                       Select CType(row.Abs1, Single?)).Min)
 
-                                Max = (From row In ReplicateDS.tReplicates _
+                                Max = CSng((From row In ReplicateDS.tReplicates _
                                        Where Not row.IsAbs1Null AndAlso row.Abs1 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                       Select CType(row.Abs1, Single?)).Max
+                                       Select CType(row.Abs1, Single?)).Max)
                             End If
 
 
@@ -832,13 +834,13 @@ Public Class IResultsAbsCurve
                             Dim Max1 As Single
 
                             If FilterAbs.Count > 0 Then
-                                Min1 = (From row In ReplicateDS.tReplicates _
+                                Min1 = CSng((From row In ReplicateDS.tReplicates _
                                         Where Not row.IsAbs2Null AndAlso row.Abs2 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                        Select CType(row.Abs2, Single?)).Min
+                                        Select CType(row.Abs2, Single?)).Min)
 
-                                Max1 = (From row In ReplicateDS.tReplicates _
+                                Max1 = CSng((From row In ReplicateDS.tReplicates _
                                         Where Not row.IsAbs2Null AndAlso row.Abs2 <> "Error" AndAlso row.Replicate = ReplicateUpDown.Value _
-                                        Select CType(row.Abs2, Single?)).Max
+                                        Select CType(row.Abs2, Single?)).Max)
                             End If
 
                             If Min > Min1 Then Min = Min1
@@ -889,13 +891,13 @@ Public Class IResultsAbsCurve
 
                         Case "Abs1 - Abs2"
 
-                            Min = (From row In ReplicateDS.tReplicates _
+                            Min = CSng((From row In ReplicateDS.tReplicates _
                                    Where Not row.IsDiffNull AndAlso row.Replicate = ReplicateUpDown.Value _
-                                   Select CType(row.Diff, Single?)).Min
+                                   Select CType(row.Diff, Single?)).Min)
 
-                            Max = (From row In ReplicateDS.tReplicates _
+                            Max = CSng((From row In ReplicateDS.tReplicates _
                                    Where Not row.IsDiffNull AndAlso row.Replicate = ReplicateUpDown.Value _
-                                   Select CType(row.Diff, Single?)).Max
+                                   Select CType(row.Diff, Single?)).Max)
 
                             qReplicateFilter = (From row As GraphDS.tReplicatesRow In ReplicateDS.tReplicates _
                                                 Where row.Replicate = ReplicateUpDown.Value AndAlso Not row.IsDiffNull _
@@ -936,7 +938,7 @@ Public Class IResultsAbsCurve
     Private Sub ReplicateUpDown_ValueChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ReplicateUpDown.ValueChanged
 
         If ReplicateUpDown.Value >= ReplicateUpDown.Minimum And ReplicateUpDown.Value <= ReplicateUpDown.Maximum Then
-            SourceReplicate = ReplicateUpDown.Value
+            SourceReplicate = CInt(ReplicateUpDown.Value)
 
             FilterComboBox_SelectedIndexChanged(Nothing, Nothing)
         End If
@@ -956,7 +958,7 @@ Public Class IResultsAbsCurve
         '//CF: Add this "IF" statement if only one of the row's cells has to change colour. Use the FieldName property to filter. 
         If (e.RowHandle = currentView.FocusedRowHandle) Then Exit Sub
         Dim r As Rectangle = e.Bounds '//Get the cell's size
-        Dim paused As Boolean = currentView.GetRowCellValue(e.RowHandle, currentView.Columns("Pause")) '//Check the pause column for true or false
+        Dim paused As Boolean = CBool(currentView.GetRowCellValue(e.RowHandle, currentView.Columns("Pause"))) '//Check the pause column for true or false
         If (paused) Then '//if true-> change the colour of the current cell. 
             Dim colorBrush = Brushes.LightGray
             e.Graphics.FillRectangle(colorBrush, r)
@@ -1003,8 +1005,8 @@ Public Class IResultsAbsCurve
             bsRerunTextLocation = bsRerunText.Location
 
             'RH 29/02/2012 Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             'RH 29/02/2012 Initialize myMultiLangResourcesDelegate
             myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate()
@@ -1237,7 +1239,7 @@ Public Class IResultsAbsCurve
         Try
             If isClosingFlag Then Return 'AG 03/08/2012
 
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim StartTime As DateTime = Now 'AG 13/06/2012 - time estimation
             Dim qUIRefresh As List(Of vwksWSAbsorbanceDS.vwksWSAbsorbanceRow)
             Dim workingThread As New Threading.Thread(AddressOf GetDataForAbsCurve)
@@ -1364,7 +1366,7 @@ Public Class IResultsAbsCurve
 
             End If
 
-            myLogAcciones.CreateLogActivity("Refresh Abs(t) Graph screen: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "IResultsAbsCurve.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
+            GlobalBase.CreateLogActivity("Refresh Abs(t) Graph screen: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "IResultsAbsCurve.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
             Cursor = Cursors.Default
@@ -1422,13 +1424,14 @@ Public Class IResultsAbsCurve
             ResultChartControl.RefreshDataOnRepaint = False
             ResultChartControl.CacheToMemory = True
             ResultChartControl.RuntimeHitTesting = False
-            ResultChartControl.Legend.Visible = False
+            ResultChartControl.Legend.Visibility = DefaultBoolean.False
 
             ResultChartControl.ClearCache()
             ResultChartControl.Series.Clear()
             ResultChartControl.BackColor = Color.White
             ResultChartControl.AppearanceName = "Light"
 
+            ResultChartControl.CrosshairEnabled = DefaultBoolean.False
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateChartControl", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1449,8 +1452,7 @@ Public Class IResultsAbsCurve
         Try
             mySerie = New Series(pName, ViewType.Line)
             mySerie.Name = pName
-            mySerie.Label.Visible = False
-            mySerie.PointOptions.PointView = PointView.ArgumentAndValues
+            mySerie.LabelsVisibility = DefaultBoolean.False
             mySerie.ArgumentDataMember = "Cycle"
             mySerie.ArgumentScaleType = ScaleType.Numerical
             mySerie.ValueScaleType = ScaleType.Numerical
@@ -1461,6 +1463,7 @@ Public Class IResultsAbsCurve
             Dim myView As XtraCharts.LineSeriesView
             myView = TryCast(mySerie.View, XtraCharts.LineSeriesView)
             myView.LineMarkerOptions.Size = SizeMarker
+            myView.MarkerVisibility = DefaultBoolean.True
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateSerie ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1478,6 +1481,9 @@ Public Class IResultsAbsCurve
     ''' <remarks>DL 25/10/2011</remarks>
     Private Sub CreateDiagram(ByVal Min As Single, ByVal Max As Single)
         Try
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            ResultChartControl.CrosshairEnabled = DefaultBoolean.False
+            ResultChartControl.RuntimeHitTesting = True
 
             'Dim myDiagram As New XYDiagram
             Dim myDiagram As XYDiagram
@@ -1487,7 +1493,7 @@ Public Class IResultsAbsCurve
             With myDiagram
                 'my Customize the appearance of the Y-axis title.
                 .AxisY.Title.Text = LBL_ABS
-                .AxisY.Title.Visible = True
+                .AxisY.Title.Visibility = DefaultBoolean.True
                 .AxisY.Title.Alignment = StringAlignment.Center
                 .AxisY.Title.TextColor = Color.Black ' Color.Blue
                 .AxisY.Title.Antialiasing = True
@@ -1495,24 +1501,31 @@ Public Class IResultsAbsCurve
 
                 ' Customize the appearance of the X-axis title.
                 .AxisX.Title.Text = LBL_CYCLE
-                .AxisX.Title.Visible = True
+                .AxisX.Title.Visibility = DefaultBoolean.True
                 .AxisX.Title.Alignment = StringAlignment.Center
                 .AxisX.Title.TextColor = Color.Black 'Color.Red
                 .AxisX.Title.Antialiasing = True
                 .AxisX.Title.Font = New Font("Verdana", 8, FontStyle.Regular)
                 '
                 If IntervalABS = -1 Then
-                    .AxisY.Range.Auto = True
+                    .AxisY.WholeRange.Auto = True
+                    .AxisY.VisualRange.Auto = True
                 Else
-                    .AxisY.Range.SetMinMaxValues(Min - IntervalABS, Max + IntervalABS)
+                    .AxisY.WholeRange.SetMinMaxValues(Min - IntervalABS, Max + IntervalABS)
+                    .AxisY.VisualRange.SetMinMaxValues(Min - IntervalABS, Max + IntervalABS)
                 End If
 
                 '//Changes for TASK + BUGS Tracking  #1331
                 '//14/10/2013 - cf - v3.0.0 -  Added the MaxValueForXAxis variable to adjust the graph's limits. 
 
-                .AxisX.Range.SetMinMaxValues(0, MaxValueForXAxis + 5)
+                .AxisX.WholeRange.SetMinMaxValues(0, MaxValueForXAxis + 5)
+                .AxisX.VisualRange.SetMinMaxValues(0, MaxValueForXAxis + 5)
 
-                .AxisY.Visible = True
+                .AxisY.Visibility = DefaultBoolean.True
+
+                'IT'S MANDATORY TO DEFINE SIDEMARGINSVALUE = 0 FOR PREVENTING LEAVING SPACES IN THE AXES.
+                .AxisX.VisualRange.SideMarginsValue = 0
+                .AxisY.VisualRange.SideMarginsValue = 0
             End With
 
             ' Set some properties to get a nice-looking chart.
@@ -1700,51 +1713,51 @@ Public Class IResultsAbsCurve
             ' close Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCloseButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCloseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' print button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' next button
             auxIconName = GetIconName("RIGHT")
             If auxIconName <> "" Then
-                bsNextButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNextButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' previous button
             auxIconName = GetIconName("LEFT")
             If auxIconName <> "" Then
-                bsPreviousButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPreviousButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             ' Last Button
             auxIconName = GetIconName("FORWARDL")
             If auxIconName <> "" Then
-                bsLastButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsLastButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'First Button
             auxIconName = GetIconName("BACKWARDL")
             If auxIconName <> "" Then
-                bsFirstButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsFirstButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Expand Button
             auxIconName = GetIconName("FORWARD")
             If auxIconName <> "" Then
-                bsExpandButton.Image = Image.FromFile(iconPath & auxIconName)
-                ExpandImage = Image.FromFile(iconPath & auxIconName)
+                bsExpandButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                ExpandImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Collapse Button
             auxIconName = GetIconName("BACKWARD")
             If auxIconName <> "" Then
-                bsCollapseButton.Image = Image.FromFile(iconPath & auxIconName)
-                CollapseImage = Image.FromFile(iconPath & auxIconName)
+                bsCollapseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                CollapseImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             PATIENT_IconName = GetIconName("ROUTINES")
@@ -1871,10 +1884,11 @@ Public Class IResultsAbsCurve
         Try
             If Not pAbsRow.SampleClass = "BLANK" Then
                 'TR 16/03/2012 -Change the locations for controls.
-                bsTestLabel.Location = New Point(bsTestLabelLocation)
-                bsTestText.Location = New Point(bsTestTextLocation)
-                bsRerunLabel.Location = New Point(bsRerunLabelLocation)
-                bsRerunText.Location = New Point(bsRerunTextLocation)
+                bsTestLabel.Location = New Point(bsTestLabelLocation.X, bsTestLabelLocation.Y)
+
+                bsTestText.Location = New Point(bsTestTextLocation.X, bsTestTextLocation.Y)
+                bsRerunLabel.Location = New Point(bsRerunLabelLocation.X, bsRerunLabelLocation.Y)
+                bsRerunText.Location = New Point(bsRerunTextLocation.X, bsRerunTextLocation.Y)
                 'TR 16/03/2012 -END
             End If
 
@@ -2341,7 +2355,7 @@ Public Class IResultsAbsCurve
             If (Not IsNothing(ReplicateDS)) Then
                 Dim dr As DataRow = ReplicateDS.Tables(0).Select("Cycle = MAX(Cycle)").FirstOrDefault()
                 If (dr IsNot Nothing) Then
-                    MaxValueForXAxis = dr("Cycle")
+                    MaxValueForXAxis = CInt(dr("Cycle"))
                 End If
             Else
                 MaxValueForXAxis = 75
@@ -2448,6 +2462,7 @@ Public Class IResultsAbsCurve
     ''' <remarks>
     ''' Created by: RH 24/02/2012 Optimization on a previous version by DL.
     ''' </remarks>
+
     Private Sub GetData()
         Try
             Dim myGlobalDataTO As GlobalDataTO
@@ -2502,16 +2517,22 @@ Public Class IResultsAbsCurve
 
                     'Search in DS the source data
                     For i As Integer = 0 To Rows.Count - 1
-                        Dim NewRow As strOrderTest
-                        NewRow.OrderTestID = (Rows(i)(0)).OrderTestID
-                        NewRow.MultiItemNumber = (Rows(i)(0)).MultiItemNumber
-                        NewRow.RerunNumber = (Rows(i)(0)).RerunNumber
 
-                        OrderTestGrouped.Add(NewRow)
+                        Dim castRow = TryCast(Rows(i), Global.System.Data.DataRow())
+                        If castRow Is Nothing Then Continue For
+                        Dim castColumn = TryCast(castRow(0), IMonitorCurveResultsRow)
+                        Dim newRow As New strOrderTest
+                        If castColumn IsNot Nothing Then
+                            newRow.OrderTestID = castColumn.OrderTestID 'castRow(0).OrderTestID
+                            newRow.MultiItemNumber = castColumn.MultiItemNumber '(Rows(i)(0)).MultiItemNumber
+                            newRow.RerunNumber = castColumn.RerunNumber '(Rows(i)(0)).RerunNumber
+                        End If
 
-                        If (NewRow.OrderTestID = OrderTestIDAttribute) AndAlso _
-                           (NewRow.MultiItemNumber = MultiItemNumberAttribute) AndAlso _
-                           (NewRow.RerunNumber = RerunAttribute) Then
+                        OrderTestGrouped.Add(newRow)
+
+                        If (newRow.OrderTestID = OrderTestIDAttribute) AndAlso _
+                           (newRow.MultiItemNumber = MultiItemNumberAttribute) AndAlso _
+                           (newRow.RerunNumber = RerunAttribute) Then
 
                             CurrentID = OrderTestGrouped.Count - 1
 
@@ -2531,6 +2552,98 @@ Public Class IResultsAbsCurve
         End Try
 
     End Sub
+
+
+
+    'Private Sub GetData()
+    '    Try
+    '        Dim myGlobalDataTO As GlobalDataTO
+    '        Dim myExecutionsDelegate As New ExecutionsDelegate
+
+    '        'Get all different order testid with executions closed
+    '        myGlobalDataTO = myExecutionsDelegate.GetOrderTestWithExecutionStatus( _
+    '                                Nothing, SourceFormAttribute, RerunAttribute, _
+    '                                OrderTestIDAttribute, AnalyzerIDAttribute, WorkSessionIDAttribute)
+
+    '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
+    '            AbsDS = CType(myGlobalDataTO.SetDatos, vwksWSAbsorbanceDS)
+
+    '            If AbsDS.vwksWSAbsorbance.Count > 0 Then
+    '                'Group ds in lists by ordertestid, rerunnumber, multitemnumber
+
+    '                Dim Rows As IList = Nothing
+
+    '                Select Case SourceFormAttribute
+    '                    Case ScreenCallsGraphical.RESULTSFRM
+
+    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                    Case ScreenCallsGraphical.WS_STATES
+
+    '                        Rows = (From row As ExecutionsDS.vwksWSExecutionsMonitorRow In ExecutionsAttribute _
+    '                                Where row.ExecutionType = "PREP_STD" AndAlso row.TestType = "STD" _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                        'DL 15/05/2012
+    '                    Case ScreenCallsGraphical.CURVEFRM
+
+    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber, row.RerunNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                        'DL 15/05/2012
+
+    '                    Case Else
+
+    '                        Rows = (From row As vwksWSAbsorbanceDS.vwksWSAbsorbanceRow In AbsDS.vwksWSAbsorbance _
+    '                                Where row.OrderTestID = OrderTestIDAttribute _
+    '                                Group row By row.OrderTestID, row.MultiItemNumber _
+    '                                Into grp = Group Select grp Distinct).ToList()
+
+    '                End Select
+
+    '                OrderTestGrouped = New List(Of strOrderTest)
+
+    '                'Search in DS the source data
+    '                For i As Integer = 0 To Rows.Count - 1
+
+    '                    Dim castRow = TryCast(Rows(i), Global.System.Data.DataRow())
+    '                    If castRow Is Nothing Then Continue For
+    '                    Dim castColumn = TryCast(castRow(0), IMonitorCurveResultsRow)
+    '                    Dim newRow As New strOrderTest
+    '                    If castColumn IsNot Nothing Then
+    '                        newRow.OrderTestID = castColumn.OrderTestID 'castRow(0).OrderTestID
+    '                        newRow.MultiItemNumber = castColumn.MultiItemNumber '(Rows(i)(0)).MultiItemNumber
+    '                        newRow.RerunNumber = castColumn.RerunNumber '(Rows(i)(0)).RerunNumber
+    '                    End If
+
+    '                    OrderTestGrouped.Add(newRow)
+
+    '                    If (newRow.OrderTestID = OrderTestIDAttribute) AndAlso _
+    '                       (newRow.MultiItemNumber = MultiItemNumberAttribute) AndAlso _
+    '                       (newRow.RerunNumber = RerunAttribute) Then
+
+    '                        CurrentID = OrderTestGrouped.Count - 1
+
+    '                    End If
+    '                Next
+
+    '                FindData()
+
+    '            Else
+    '                FindWithOutData()
+    '            End If
+    '        End If
+
+    '    Catch ex As Exception
+    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & "GetData", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
+    '    End Try
+
+    'End Sub
 
 #End Region
 

@@ -1,6 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
-
+Option Infer On
 
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
@@ -29,19 +29,19 @@ Public Class ApplicationLogView
             'LOAD 
             auxIconName = GetIconName("OPEN")
             If (auxIconName <> "") Then
-                OpenFileDialogButton.Image = Image.FromFile(iconPath & auxIconName)
+                OpenFileDialogButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'Export 
             auxIconName = GetIconName("EXPORTSCRIPT")
             If (auxIconName <> "") Then
-                GenerateXmlButton.Image = Image.FromFile(iconPath & auxIconName)
+                GenerateXmlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -59,9 +59,9 @@ Public Class ApplicationLogView
     Private Sub GenerateLogXml()
         Try
             Dim myGlobalDataTO As New GlobalDataTO
-            Dim myApplicationLogManager As New ApplicationLogManager
+            'Dim MyApplicationLogManager As New ApplicationLogManager
 
-            myGlobalDataTO = myApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, 90)
+            myGlobalDataTO = ApplicationLogManager.ExportLogToXml(WorkSessionIDAttribute, 90)
 
             If (myGlobalDataTO.HasError) Then
                 ShowMessage(Me.Name, myGlobalDataTO.ErrorMessage)

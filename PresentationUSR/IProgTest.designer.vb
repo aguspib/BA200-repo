@@ -40,7 +40,7 @@ Partial Class IProgTest
         Dim DataGridViewCellStyle28 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgTest))
         Me.SaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
-        Me.CancelButton = New System.Windows.Forms.Button()
+        Me.ButtonCancel = New System.Windows.Forms.Button()
         Me.SampleTypePlus2 = New Biosystems.Ax00.Controls.UserControls.BSPictureBox()
         Me.SelectedSampleTypeCombo = New Biosystems.Ax00.Controls.UserControls.BSComboBox()
         Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
@@ -329,11 +329,11 @@ Partial Class IProgTest
         '
         'CancelButton
         '
-        Me.CancelButton.Location = New System.Drawing.Point(674, 562)
-        Me.CancelButton.Name = "CancelButton"
-        Me.CancelButton.Size = New System.Drawing.Size(32, 32)
-        Me.CancelButton.TabIndex = 24
-        Me.CancelButton.UseVisualStyleBackColor = True
+        Me.ButtonCancel.Location = New System.Drawing.Point(674, 562)
+        Me.ButtonCancel.Name = "CancelButton"
+        Me.ButtonCancel.Size = New System.Drawing.Size(32, 32)
+        Me.ButtonCancel.TabIndex = 24
+        Me.ButtonCancel.UseVisualStyleBackColor = True
         '
         'SampleTypePlus2
         '
@@ -2825,7 +2825,7 @@ Partial Class IProgTest
         Me.BsGroupBox2.Controls.Add(Me.BsLabel1)
         Me.BsGroupBox2.Controls.Add(Me.TestDescriptionTextBox)
         Me.BsGroupBox2.Controls.Add(Me.SaveButton)
-        Me.BsGroupBox2.Controls.Add(Me.CancelButton)
+        Me.BsGroupBox2.Controls.Add(Me.ButtonCancel)
         Me.BsGroupBox2.Controls.Add(Me.SelectedSampleTypeCombo)
         Me.BsGroupBox2.Controls.Add(Me.SampleTypePlus2)
         Me.BsGroupBox2.Controls.Add(Me.TestDetailsTabs)
@@ -3304,7 +3304,7 @@ Partial Class IProgTest
     Friend WithEvents ShortNameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
     Friend WithEvents TestNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents NameLabel As Biosystems.Ax00.Controls.UserControls.BSLabel
-    Friend WithEvents CancelButton As System.Windows.Forms.Button
+    Friend WithEvents ButtonCancel As System.Windows.Forms.Button
     Friend WithEvents CalibratorLotTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents CalibratorNameTextBox As Biosystems.Ax00.Controls.UserControls.BSTextBox
     Friend WithEvents LBL_CalibratorName As Biosystems.Ax00.Controls.UserControls.BSLabel

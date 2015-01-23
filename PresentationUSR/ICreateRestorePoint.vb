@@ -1,18 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports System.IO
 'Imports System.Configuration
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.PresentationCOM
-Imports Biosystems.Ax00.Global.TO
 
 Public Class ICreateRestorePoint
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -58,13 +53,13 @@ Public Class ICreateRestorePoint
             'OK Button
             auxIconName = GetIconName("CREATE_REP_SAT")
             If (auxIconName <> "") Then
-                bsCreateButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCreateButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -132,7 +127,7 @@ Public Class ICreateRestorePoint
     Private Function CreateRestorePoint() As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Dim tempFolder As String = ""
         Dim mySATUtil As New SATReportUtilities
 
@@ -147,11 +142,11 @@ Public Class ICreateRestorePoint
             SATThread.Start()
 
             While Me.CreatingRestorePoint 'RH 16/11/2010
-                IAx00MainMDI.InitializeMarqueeProgreesBar()
+                UiAx00MainMDI.InitializeMarqueeProgreesBar()
                 Application.DoEvents()
                 Threading.Thread.Sleep(100)
             End While
-            IAx00MainMDI.StopMarqueeProgressBar()
+            UiAx00MainMDI.StopMarqueeProgressBar()
 
             SATThread.Join()
 
@@ -274,8 +269,8 @@ Public Class ICreateRestorePoint
                     'DL 02/07/2012. End 
 
                     ' XBC 04/07/2012
-                    IAx00MainMDI.ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
-                    IAx00MainMDI.ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
+                    UiAx00MainMDI.ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
+                    UiAx00MainMDI.ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.LOADRSAT_NOTALLOWED.ToString)
                     ' XBC 04/07/2012
                 End If
             End If
@@ -337,8 +332,8 @@ Public Class ICreateRestorePoint
             PrepareButtons()
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels(CurrentLanguage)
@@ -408,7 +403,7 @@ Public Class ICreateRestorePoint
             Else
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
         Catch ex As Exception
@@ -429,7 +424,7 @@ Public Class ICreateRestorePoint
             Dim myGlobal As New GlobalDataTO
             Me.bsCreateButton.Enabled = False
             Me.bsCancelButton.Enabled = False
-            IAx00MainMDI.EnableButtonAndMenus(False)
+            UiAx00MainMDI.EnableButtonAndMenus(False)
             myGlobal = MyClass.CreateRestorePoint()
             If Not myGlobal.HasError Then
                 ShowMessage(Me.Name & bsTitle.Text, GlobalEnumerates.Messages.CREATE_RESTOREPOINT_SUCCESS.ToString) 'PENDING MESSAGE
@@ -444,7 +439,7 @@ Public Class ICreateRestorePoint
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCreateButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsCreateButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         Finally
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
         End Try
     End Sub
 

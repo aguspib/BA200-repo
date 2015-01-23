@@ -61,8 +61,9 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>BA400User.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -71,8 +72,9 @@
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>BA400User.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -80,20 +82,22 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x86\Debug\</OutputPath>
     <DocumentationFile>BA400User.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x86\Release\</OutputPath>
     <DocumentationFile>BA400User.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
     <DebugSymbols>true</DebugSymbols>
@@ -101,42 +105,50 @@
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x64\Debug\</OutputPath>
     <DocumentationFile>BA400User.xml</DocumentationFile>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\x64\Release\</OutputPath>
     <DocumentationFile>BA400User.xml</DocumentationFile>
     <Optimize>true</Optimize>
-    <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022,42353,42354,42355</NoWarn>
+    <NoWarn>42353,42354,42355</NoWarn>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
+    <WarningsAsErrors>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OptionStrict>On</OptionStrict>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DevExpress.Charts.v13.2.Core, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.Printing.v13.2.Core, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.Data.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.Utils.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraBars.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraCharts.v13.2.Wizard, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraCharts.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.XtraCharts.v13.2.UI, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraEditors.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraGrid.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraNavBar.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraPrinting.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.PivotGrid.v13.2.Core, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.Sparkline.v13.2.Core, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.Utils.v13.2.UI, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraReports.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraReports.v13.2.Extensions, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
-    <Reference Include="DevExpress.Office.v13.2.Core, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.RichEdit.v13.2.Core, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
-    <Reference Include="DevExpress.XtraRichEdit.v13.2, Version=13.2.8.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Charts.v14.2.Core, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Printing.v14.2.Core, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Data.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Utils.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraBars.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraCharts.v14.2.Wizard, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraCharts.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.XtraCharts.v14.2.UI, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraEditors.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraGrid.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraNavBar.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraPrinting.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.PivotGrid.v14.2.Core, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Sparkline.v14.2.Core, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.Utils.v14.2.UI, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraReports.v14.2.Extensions, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a" />
+    <Reference Include="DevExpress.Office.v14.2.Core, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.RichEdit.v14.2.Core, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
+    <Reference Include="DevExpress.XtraRichEdit.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SqlServer.Smo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Visual Studio 2012\Projects\UpdateModuleTest\UpdateModuleTest\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
@@ -180,16 +192,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
-    <Compile Include="HQBarcode.Designer.vb">
-      <DependentUpon>HQBarcode.vb</DependentUpon>
+    <Compile Include="UiConfigLIS.Designer.vb">
+      <DependentUpon>UiConfigLIS.vb</DependentUpon>
     </Compile>
-    <Compile Include="HQBarcode.vb">
+    <Compile Include="UiConfigLIS.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IConfigLIS.Designer.vb">
-      <DependentUpon>IConfigLIS.vb</DependentUpon>
+    <Compile Include="UiHQBarcode.Designer.vb">
+      <DependentUpon>UiHQBarcode.vb</DependentUpon>
     </Compile>
-    <Compile Include="IConfigLIS.vb">
+    <Compile Include="UiHQBarcode.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IConfigLISMapping.Designer.vb">
@@ -216,10 +228,10 @@
     <Compile Include="IHisResults.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IConditioning.Designer.vb">
-      <DependentUpon>IConditioning.vb</DependentUpon>
+    <Compile Include="UiConditioning.Designer.vb">
+      <DependentUpon>UiConditioning.vb</DependentUpon>
     </Compile>
-    <Compile Include="IConditioning.vb">
+    <Compile Include="UiConditioning.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IHisAlarms.Designer.vb">
@@ -312,40 +324,40 @@
     <Compile Include="IWarningAfectedElements.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\Historycal.Designer.vb">
+    <Compile Include="UiMonitor\Historycal.Designer.vb">
       <DependentUpon>Historycal.vb</DependentUpon>
     </Compile>
-    <Compile Include="IMonitor\Historycal.vb">
+    <Compile Include="UiMonitor\Historycal.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorRotors.vb">
+    <Compile Include="UiMonitor\UiMonitorRotors.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorISETab.vb">
+    <Compile Include="UiMonitor\UiMonitorISETab.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorReactionsTab.vb">
+    <Compile Include="UiMonitor\UiMonitorReactionsTab.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorAlarmsTab.vb">
+    <Compile Include="UiMonitor\UiMonitorAlarmsTab.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitor.Designer.vb">
-      <DependentUpon>IMonitor.vb</DependentUpon>
+    <Compile Include="UiMonitor\UiMonitor.Designer.vb">
+      <DependentUpon>UiMonitor.vb</DependentUpon>
     </Compile>
-    <Compile Include="IMonitor\IMonitor.vb">
+    <Compile Include="UiMonitor\UiMonitor.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorMainTab.vb">
+    <Compile Include="UiMonitor\UiMonitorMainTab.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorReagentsTab.vb">
+    <Compile Include="UiMonitor\UiMonitorReagentsTab.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorSamplesTab.vb">
+    <Compile Include="UiMonitor\UiMonitorSamplesTab.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IMonitor\IMonitorStatesTab.vb">
+    <Compile Include="UiMonitor\UiMonitorStatesTab.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IProgControls.vb">
@@ -375,10 +387,10 @@
     <Compile Include="IQCResultsReview.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IChangeRotor.Designer.vb">
-      <DependentUpon>IChangeRotor.vb</DependentUpon>
+    <Compile Include="UiChangeRotor.Designer.vb">
+      <DependentUpon>UiChangeRotor.vb</DependentUpon>
     </Compile>
-    <Compile Include="IChangeRotor.vb">
+    <Compile Include="UiChangeRotor.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IQCCumulatedReview.vb">
@@ -557,10 +569,10 @@
     <Compile Include="TestForms\Ax00MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainMDI\IAx00MainMDI.designer.vb">
-      <DependentUpon>IAx00MainMDI.vb</DependentUpon>
+    <Compile Include="MainMDI\UiAx00MainMDI.designer.vb">
+      <DependentUpon>UiAx00MainMDI.vb</DependentUpon>
     </Compile>
-    <Compile Include="MainMDI\IAx00MainMDI.vb">
+    <Compile Include="MainMDI\UiAx00MainMDI.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="IWSManualRepetition.Designer.vb">
@@ -673,11 +685,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="HQBarcode.resx">
-      <DependentUpon>HQBarcode.vb</DependentUpon>
+    <EmbeddedResource Include="UiConfigLIS.resx">
+      <DependentUpon>UiConfigLIS.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IConfigLIS.resx">
-      <DependentUpon>IConfigLIS.vb</DependentUpon>
+    <EmbeddedResource Include="UiHQBarcode.resx">
+      <DependentUpon>UiHQBarcode.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="IConfigLISMapping.resx">
       <DependentUpon>IConfigLISMapping.vb</DependentUpon>
@@ -692,8 +704,8 @@
     <EmbeddedResource Include="IHisResults.resx">
       <DependentUpon>IHisResults.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IConditioning.resx">
-      <DependentUpon>IConditioning.vb</DependentUpon>
+    <EmbeddedResource Include="UiConditioning.resx">
+      <DependentUpon>UiConditioning.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="IHisAlarms.resx">
@@ -738,15 +750,16 @@
     <EmbeddedResource Include="IWarningAfectedElements.resx">
       <DependentUpon>IWarningAfectedElements.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IMonitor\Historycal.resx">
+    <EmbeddedResource Include="UiMonitor\Historycal.resx">
       <DependentUpon>Historycal.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="IWSIncompleteSamplesAuxScreen.resx">
       <DependentUpon>IWSIncompleteSamplesAuxScreen.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\licenses.licx" />
-    <EmbeddedResource Include="IMonitor\IMonitor.resx">
-      <DependentUpon>IMonitor.vb</DependentUpon>
+    <EmbeddedResource Include="UiMonitor\UiMonitor.resx">
+      <DependentUpon>UiMonitor.vb</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="IProgControls.resx">
       <DependentUpon>IProgControls.vb</DependentUpon>
@@ -755,8 +768,8 @@
     <EmbeddedResource Include="IQCResultsEditionAux.resx">
       <DependentUpon>IQCResultsEditionAux.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="IChangeRotor.resx">
-      <DependentUpon>IChangeRotor.vb</DependentUpon>
+    <EmbeddedResource Include="UiChangeRotor.resx">
+      <DependentUpon>UiChangeRotor.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="IQCCumulatedReview.resx">
@@ -861,8 +874,8 @@
       <DependentUpon>Ax00MainForm.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="MainMDI\IAx00MainMDI.resx">
-      <DependentUpon>IAx00MainMDI.vb</DependentUpon>
+    <EmbeddedResource Include="MainMDI\UiAx00MainMDI.resx">
+      <DependentUpon>UiAx00MainMDI.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="IWSManualRepetition.resx">
@@ -913,7 +926,7 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
-      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <Generator>PublicVbMyResourcesResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>

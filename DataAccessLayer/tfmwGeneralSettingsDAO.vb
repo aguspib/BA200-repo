@@ -1,8 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports System.Data.SqlClient
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
@@ -30,7 +28,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
-                    Dim myGlobalBase As New GlobalBase
+                    ''Dim myGlobalbase As New GlobalBase
                     Dim cmdText As String = String.Empty
                     cmdText &= " UPDATE tfmwGeneralSettings" & Environment.NewLine
                     cmdText &= " SET  CurrentValue = '" & pCurrentValue & "'" & Environment.NewLine
@@ -49,8 +47,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.UpdateCurrValBySettingID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.UpdateCurrValBySettingID", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobalDataTO
@@ -119,8 +117,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwGeneralSettingsDAO.ReadBySettingIDAndStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

@@ -1,5 +1,6 @@
-﻿Option Explicit On
-Option Strict On
+﻿Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -167,7 +168,7 @@ Public Class IProgTest
 #Region "Attributes"    'AG 10/03/10
     Private WorkSessionIDAttribute As String
     Private WorkSessionStatusAttribute As String
-    Private AnalyzerModelAttribute As String
+    Private AnalyzerModelAttribute1 As String
     Private AnalyzerIDAttribute As String
 
 #End Region             'AG 10/03/10
@@ -189,15 +190,6 @@ Public Class IProgTest
         End Get
         Set(ByVal value As String)
             WorkSessionStatusAttribute = value
-        End Set
-    End Property
-
-    Public Property AnalyzerModel() As String
-        Get
-            Return AnalyzerModelAttribute
-        End Get
-        Set(ByVal value As String)
-            AnalyzerModelAttribute = value
         End Set
     End Property
 
@@ -839,7 +831,8 @@ Public Class IProgTest
 
             'Find changes for all sample types defined
             If qtestSample.Count > 0 Then
-                For i As Integer = 0 To qtestSample.Count - 1
+                For i2 As Integer = 0 To qtestSample.Count - 1
+                    Dim i = i2  'LINQ safeness usage.
                     If qtestSample.Item(i).SampleVolume.ToString.Trim <> SampleVolUpDown.Value.ToString.Trim Then
                         codeToReturn = 2
                     End If
@@ -868,7 +861,7 @@ Public Class IProgTest
                     End If
 
                     If codeToReturn = 2 Then Exit For
-                Next i
+                Next
             End If
 
         Catch ex As Exception
@@ -1859,7 +1852,7 @@ Public Class IProgTest
                                 isSortTestListAllowed = False
                                 SaveButton.Enabled = True
                                 'TR 08/11/2010
-                                CancelButton.Enabled = True
+                                ButtonCancel.Enabled = True
 
                                 'ExitButton1.Enabled = True
                                 ExitButton.Enabled = True
@@ -1881,7 +1874,7 @@ Public Class IProgTest
                                 SaveButton.Enabled = False
 
                                 'TR 08/11/2010
-                                CancelButton.Enabled = False
+                                ButtonCancel.Enabled = False
 
                                 'ExitButton1.Enabled = True
                                 ExitButton.Enabled = True
@@ -1903,7 +1896,7 @@ Public Class IProgTest
                             SaveButton.Enabled = False
 
                             'TR 08/11/2010
-                            CancelButton.Enabled = False
+                            ButtonCancel.Enabled = False
 
                             'ExitButton1.Enabled = True
                             ExitButton.Enabled = True
@@ -1927,7 +1920,7 @@ Public Class IProgTest
                         SaveButton.Enabled = True
 
                         'TR 08/11/2010
-                        CancelButton.Enabled = True
+                        ButtonCancel.Enabled = True
 
                         'ExitButton1.Enabled = True
                         ExitButton.Enabled = True
@@ -1952,7 +1945,7 @@ Public Class IProgTest
                 isSortTestListAllowed = False
                 SaveButton.Enabled = False
                 'TR 08/11/2010
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 DeleteSampleTypeButton.Enabled = False
                 isEditTestAllowed = False
                 EditButton.Enabled = False
@@ -1972,8 +1965,8 @@ Public Class IProgTest
 
                 If Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing Then
                     Dim myCreatedTest As Integer = DirectCast(myGlobalDataTO.SetDatos, TestsDS).tparTests.Count
-                    Dim MyGlobalBase As New GlobalBase
-                    If myCreatedTest >= MyGlobalBase.GetSessionInfo.MaxTestsNumber Then
+                    'Dim myGlobalbase As New GlobalBase
+                    If myCreatedTest >= GlobalBase.GetSessionInfo.MaxTestsNumber Then
                         'disable add button and copy button 
                         CopyTestButton.Enabled = False
                         BsCustomOrderButton.Enabled = True 'AG 05/09/2014 - BA-1869
@@ -1990,7 +1983,7 @@ Public Class IProgTest
             Else
                 SaveButton.Enabled = False
                 'TR 08/11/2010
-                CancelButton.Enabled = False
+                ButtonCancel.Enabled = False
                 DeleteSampleTypeButton.Enabled = False
             End If
 
@@ -2459,7 +2452,7 @@ Public Class IProgTest
                                 Case "TESTICON", "INUSETEST", "USERTEST", "INUSUSTEST"
                                     If IO.File.Exists(MyBase.IconsPath & PreMasterRow.FixedItemDesc) Then
                                         testIconList.Images.Add(PreMasterRow.ItemID, _
-                                                Image.FromFile(MyBase.IconsPath & PreMasterRow.FixedItemDesc))
+                                                ImageUtilities.ImageFromFile(MyBase.IconsPath & PreMasterRow.FixedItemDesc))
                                     End If
                                     Exit Select
                                 Case Else
@@ -2949,7 +2942,7 @@ Public Class IProgTest
         Try
             Dim myGlobalDataTO As New GlobalDataTO()
             Dim mySwParametersDelegate As New SwParametersDelegate()
-            myGlobalDataTO = mySwParametersDelegate.ReadByAnalyzerModel(Nothing, AnalyzerModelAttribute)
+            myGlobalDataTO = mySwParametersDelegate.ReadByAnalyzerModel(Nothing, AnalyzerModel())
             If Not myGlobalDataTO.HasError Then
                 SwParametersDS = CType(myGlobalDataTO.SetDatos, ParametersDS)
             End If
@@ -3035,7 +3028,7 @@ Public Class IProgTest
             Dim cycleMachineSeconds As Integer = 0
             Dim qswParameter As List(Of ParametersDS.tfmwSwParametersRow) = (From a In SwParametersDS.tfmwSwParameters _
                                                                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                                                          AndAlso String.Compare(a.AnalyzerModel, AnalyzerModelAttribute, False) = 0 _
+                                                                          AndAlso String.Compare(a.AnalyzerModel, AnalyzerModel(), False) = 0 _
                                                                            Select a).ToList()
             If (qswParameter.Count > 0) Then cycleMachineSeconds = CType(qswParameter.First().ValueNumeric, Integer)
 
@@ -3267,8 +3260,8 @@ Public Class IProgTest
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             GetScreenLabels()
 
@@ -3484,14 +3477,15 @@ Public Class IProgTest
             'DL 13/01/2012. Begin
             Dim qSelectedSample As New List(Of TestSamplesDS.tparTestSamplesRow)
             For i As Integer = 0 To SampleTypeCheckList.Items.Count - 1
+                Dim aux_i = i
                 qSelectedSample = (From a In SelectedTestSamplesDS.tparTestSamples _
-                                   Where a.SampleType = SampleTypeCheckList.Items(i).ToString _
+                                   Where a.SampleType = SampleTypeCheckList.Items(aux_i).ToString _
                                    Select a).ToList()
 
                 If qSelectedSample.Count > 0 Then
-                    SampleTypeCheckList.SetItemChecked(i, True)
+                    SampleTypeCheckList.SetItemChecked(aux_i, True)
                 Else
-                    SampleTypeCheckList.SetItemChecked(i, False)
+                    SampleTypeCheckList.SetItemChecked(aux_i, False)
                 End If
 
             Next i
@@ -3991,7 +3985,7 @@ Public Class IProgTest
             'Get the Cycle machine
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                            Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                           AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                           AndAlso a.AnalyzerModel = AnalyzerModel() _
                            Select a).ToList()
 
 
@@ -4010,7 +4004,7 @@ Public Class IProgTest
                     'TIME SEC 1
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                     Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                    AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                    AndAlso a.AnalyzerModel = AnalyzerModel() _
                                     Select a).ToList()
                     If qswParameter.Count > 0 Then
                         FirstReadingSecUpDown.Minimum = CType((FirstReadingCycleUpDown.Minimum - 1) * _
@@ -4146,7 +4140,7 @@ Public Class IProgTest
                     'TIME SEC 1
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                     Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                    AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                    AndAlso a.AnalyzerModel = AnalyzerModel() _
                                     Select a).ToList()
 
                     If qswParameter.Count > 0 Then
@@ -4178,7 +4172,7 @@ Public Class IProgTest
                     'TIME SEC 1
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                    Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                   AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                   AndAlso a.AnalyzerModel = AnalyzerModel() _
                                    Select a).ToList()
                     If qswParameter.Count > 0 Then
                         FirstReadingSecUpDown.Minimum = CType((FirstReadingCycleUpDown.Minimum - 1) * _
@@ -7153,7 +7147,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
             If qswParameter.Count > 0 Then
                 FirstReadingSecUpDown.ResetText()
@@ -7178,7 +7172,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
             If qswParameter.Count > 0 Then
                 SecondReadingSecUpDown.ResetText()
@@ -7910,7 +7904,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
 
             If qswParameter.Count > 0 Then
@@ -8013,7 +8007,7 @@ Public Class IProgTest
                         'TR 14/03/2011 -Add the analyzer model on the query.
                         qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                         Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                        AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                        AndAlso a.AnalyzerModel = AnalyzerModel() _
                                         Select a).ToList()
                         If qswParameter.Count > 0 Then
                             MachineCycle = CType(qswParameter.First().ValueNumeric, Integer)
@@ -8188,7 +8182,7 @@ Public Class IProgTest
                     'TR 14/03/2011 -Add the analyzer model on the query.
                     qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                                     Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                                    AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                                    AndAlso a.AnalyzerModel = AnalyzerModel() _
                                     Select a).ToList()
 
                     If qswParameter.Count > 0 Then
@@ -8581,7 +8575,7 @@ Public Class IProgTest
                 DeleteButton.Enabled = False
                 SaveButton.Enabled = False
 
-                CancelButton.Enabled = False 'TR 08/11/2010
+                ButtonCancel.Enabled = False 'TR 08/11/2010
             End If
             'DL 15/07/2010. End
 
@@ -8848,18 +8842,18 @@ Public Class IProgTest
             'ADD AddButton, AddSampleTypeButton, AddCalibratorButton, BSReferenceRanges-Add Range Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                AddButton.Image = Image.FromFile(iconPath & auxIconName)
-                'AddSampleTypeButton.Image = Image.FromFile(iconPath & auxIconName)'TR 10/05/2011 commented
-                AddCalibratorButton.Image = Image.FromFile(iconPath & auxIconName)
+                AddButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                'AddSampleTypeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)'TR 10/05/2011 commented
+                AddCalibratorButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 'TR 06/04/2011 -Add image for Add control button.
-                AddControls.Image = Image.FromFile(iconPath & auxIconName)
+                AddControls.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             End If
 
             'EDIT EditButton
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                EditButton.Image = Image.FromFile(iconPath & auxIconName)
+                EditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'TR 10/05/2011 -Add sampletype icon
@@ -8869,7 +8863,7 @@ Public Class IProgTest
             'DL 27/09/2011
             'auxIconName = GetIconName("DROPDOWN")
             'If (auxIconName <> "") Then
-            'AddSampleTypeButton.Image = Image.FromFile(iconPath & auxIconName)
+            'AddSampleTypeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
             'DL 11/01/2012. End
             'TR 10/05/2011 -END
@@ -8877,19 +8871,19 @@ Public Class IProgTest
             'DELETE DeleteButton; DeleteSampleTypeButton; DeleteGenderAgeButton; BSReferenceRanges-Delete Ranges Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                DeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                DeleteSampleTypeButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                DeleteSampleTypeButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 'TR 06/04/2011 -Add image to Delete control button.
-                DeleteControlButton.Image = Image.FromFile(iconPath & auxIconName)
+                DeleteControlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT PrintTestButton
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                PrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             PrintTestButton.Visible = False
@@ -8897,32 +8891,32 @@ Public Class IProgTest
             'TR 09/01/2012 -Get the copy test button icon.
             auxIconName = GetIconName("COPY")
             If (auxIconName <> "") Then
-                CopyTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                CopyTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'TR 09/01/2012 -END.
 
             'AG 05/09/2014 - BA-1869
             auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
-                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE SaveButton
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                SaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                SaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                CancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                ButtonCancel.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EXIT ExitButton
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -9516,7 +9510,7 @@ Public Class IProgTest
             'bsScreenToolTips.SetToolTip(BsButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CLIABV_Values", currentLanguage))
 
             bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            bsScreenToolTips.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
             bsScreenToolTips.SetToolTip(ExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenTooltips ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -10019,7 +10013,7 @@ Public Class IProgTest
             ShortNameLabel = Nothing
             TestNameTextBox = Nothing
             NameLabel = Nothing
-            CancelButton = Nothing
+            ButtonCancel = Nothing
             CalibratorLotTextBox = Nothing
             CalibratorNameTextBox = Nothing
             LBL_CalibratorName = Nothing
@@ -10228,7 +10222,7 @@ Public Class IProgTest
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
             'TR 14/03/2011 -Set the Analyzer Model
-            myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.VOLUME_PREDILUTION.ToString, AnalyzerModelAttribute)
+            myGlobalDataTO = myParams.ReadNumValueByParameterName(Nothing, GlobalEnumerates.SwParameters.VOLUME_PREDILUTION.ToString, AnalyzerModel())
             If Not myGlobalDataTO.HasError And Not myGlobalDataTO.SetDatos Is Nothing Then
                 myVolume = CSng(myGlobalDataTO.SetDatos)
             Else
@@ -10836,11 +10830,11 @@ Public Class IProgTest
         Try
             If Not Me.DesignMode Then
                 If e.KeyCode = Keys.Escape Then
-                    If CancelButton.Enabled Then
-                        CancelButton.PerformClick()
+                    If ButtonCancel.Enabled Then
+                        ButtonCancel.PerformClick()
                     Else
                         'RH 17/12/2010
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     End If
                 ElseIf e.KeyCode = Keys.F1 Then ' TR 07/11/2011 -Search the Help File and  Chapter
                     'Help.ShowHelp(Me, GetHelpFilePath(HELP_FILE_TYPE.MANUAL, currentLanguage), GetScreenChapter(Me.Name))
@@ -10862,8 +10856,8 @@ Public Class IProgTest
                 'END AG 10/03/10
 
                 'TR 29/03/2012 -Get the current level
-                Dim MyGlobalBase As New GlobalBase
-                CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+                'Dim myGlobalbase As New GlobalBase
+                CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
                 'TR 29/03/2012 -END
 
                 bsTestRefRanges.UserLevel = CurrentUserLevel 'JV 23/01/2014 #1013
@@ -11079,7 +11073,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where String.Compare(a.ParameterName, GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString, False) = 0 _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
             If qswParameter.Count > 0 Then
                 FirstReadingCycleUpDown.Value = CType((FirstReadingSecUpDown.Value / qswParameter.First().ValueNumeric) + 1, Integer)
@@ -11107,7 +11101,7 @@ Public Class IProgTest
             'TR 14/03/2011 -Add the analyzer model on the query.
             qswParameter = (From a In SwParametersDS.tfmwSwParameters _
                             Where a.ParameterName = GlobalEnumerates.SwParameters.CYCLE_MACHINE.ToString _
-                            AndAlso a.AnalyzerModel = AnalyzerModelAttribute _
+                            AndAlso a.AnalyzerModel = AnalyzerModel() _
                             Select a).ToList()
 
             If qswParameter.Count > 0 Then
@@ -11260,7 +11254,7 @@ Public Class IProgTest
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
             'END AG 11/11/2010
@@ -11372,7 +11366,7 @@ Public Class IProgTest
                 SaveButton.Enabled = True
 
                 'TR 08/11/2010
-                CancelButton.Enabled = True
+                ButtonCancel.Enabled = True
 
                 'focus on the testname textbox
                 TestNameTextBox.Select()
@@ -12511,7 +12505,7 @@ Public Class IProgTest
                         AddButton.Enabled = False
                         SaveButton.Enabled = False
                         'TR 08/11/2010 -Add new button cancel.
-                        CancelButton.Enabled = False
+                        ButtonCancel.Enabled = False
 
                         TestListView.MultiSelect = True
                     Else
@@ -12816,7 +12810,7 @@ Public Class IProgTest
         End Try
     End Sub
 
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         CancelEdition()
 
     End Sub
@@ -12872,7 +12866,7 @@ Public Class IProgTest
                         End If
 
                         'TR 01/07/2010 -Implementatation SA
-                        IAx00MainMDI.SetNumOfTests(TestListView.Items.Count)
+                        UiAx00MainMDI.SetNumOfTests(TestListView.Items.Count)
 
                         'AG 12/11/2010
                         'If closeScreen Then Me.Close()
@@ -13585,7 +13579,7 @@ Public Class IProgTest
             Me.ShortNameTextBox.Text = ""
 
             Me.SaveButton.Enabled = True
-            Me.CancelButton.Enabled = True
+            Me.ButtonCancel.Enabled = True
             Me.TestNameTextBox.Enabled = True
             Me.CopyTestButton.Enabled = False 'disable the copy button
             Me.ShortNameTextBox.Enabled = True

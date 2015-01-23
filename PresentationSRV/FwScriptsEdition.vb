@@ -48,19 +48,19 @@ Public Class FwScriptsEdition
 
 #Region "Properties"
 
-    Private ReadOnly Property SimulationMode() As Boolean
-        Get
-            If GlobalConstants.REAL_DEVELOPMENT_MODE = 1 Then
-                SimulationModeAttr = True ' Simulation mode
-            ElseIf GlobalConstants.REAL_DEVELOPMENT_MODE = 2 Then
-                SimulationModeAttr = False ' Developer mode
-            Else
-                SimulationModeAttr = False ' Real mode
-            End If
-
-            Return SimulationModeAttr
-        End Get
-    End Property
+    'already implemented in base class. Inheritance is your friend!
+    'Private ReadOnly Property SimulationMode() As Boolean
+    '    Get
+    '        If GlobalConstants.REAL_DEVELOPMENT_MODE = 1 Then
+    '            SimulationModeAttr = True ' Simulation mode
+    '        ElseIf GlobalConstants.REAL_DEVELOPMENT_MODE = 2 Then
+    '            SimulationModeAttr = False ' Developer mode
+    '        Else
+    '            SimulationModeAttr = False ' Real mode
+    '        End If
+    '        Return SimulationModeAttr
+    '    End Get
+    'End Property
 
     Private Property CurrentScreenMode() As ScreenModes
         Get
@@ -391,13 +391,13 @@ Public Class FwScriptsEdition
             'SCREEN Image
             auxIconName = GetIconName("GRID")   ' SCREEN PDT !!! i totes les icones !!!
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BStreeScreenIcons.Images.Add("SCREEN", Image.FromFile(iconPath & auxIconName))
+                BStreeScreenIcons.Images.Add("SCREEN", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             'ACTION Image
             auxIconName = GetIconName("ADJUSTMENT") ' ACTION
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                BStreeScreenIcons.Images.Add("ACTION", Image.FromFile(iconPath & auxIconName))
+                BStreeScreenIcons.Images.Add("ACTION", ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             Me.BsScreenActionsTreeView.ImageList = BStreeScreenIcons
@@ -409,49 +409,6 @@ Public Class FwScriptsEdition
     End Sub
 
     ''' <summary>
-    ''' Loads resized the button images
-    ''' </summary>
-    ''' <param name="pButton"></param>
-    ''' <param name="pImageName"></param>
-    ''' <param name="pWidth"></param>
-    ''' <param name="pHeight"></param>
-    ''' <remarks></remarks>
-    Private Sub SetButtonImage(ByVal pButton As Button, ByVal pImageName As String, _
-                              Optional ByVal pWidth As Integer = 28, _
-                              Optional ByVal pHeight As Integer = 28)
-
-        Dim auxIconName As String = ""
-        Dim iconPath As String = MyBase.IconsPath
-        Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
-
-        Try
-
-            Dim myButtonImage As Image
-
-            auxIconName = GetIconName(pImageName)
-            If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
-
-                myGlobal = myUtil.ResizeImage(myImage, New Size(pWidth, pHeight))
-                If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
-                    myButtonImage = CType(myGlobal.SetDatos, Bitmap)
-                Else
-                    myButtonImage = CType(myImage, Bitmap)
-                End If
-
-                pButton.BackgroundImage = myButtonImage
-                pButton.BackgroundImageLayout = ImageLayout.Stretch
-
-            End If
-
-        Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetButtonImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".SetButtonImage", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
-    End Sub
-    ''' <summary>
     ''' Loads the icons and tooltips used for painting the buttons
     ''' </summary>
     ''' <remarks>SG 19/09/2010</remarks>
@@ -459,7 +416,7 @@ Public Class FwScriptsEdition
         'Dim auxIconName As String = ""
         'Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             Dim auxIconName As String = ""
@@ -467,55 +424,55 @@ Public Class FwScriptsEdition
 
 
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then BsCheckButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsCheckButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("VOLUME")
-            If (auxIconName <> "") Then BsTestButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                BsRemoveButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsUnTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsRemoveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUnTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsSaveAllButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsSaveAllButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("EDIT")
-            If (auxIconName <> "") Then BsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("FACTORY")
-            If (auxIconName <> "") Then BsRestoreButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsRestoreButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("IMPORTSCRIPT")
-            If (auxIconName <> "") Then BsImportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsImportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("EXPORTSCRIPT")
-            If (auxIconName <> "") Then BsExportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("UNDO")
-            If (auxIconName <> "") Then BsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("OPEN")
-            If (auxIconName <> "") Then BsImportAllButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsImportAllButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("ADD")
-            If (auxIconName <> "") Then BsAddButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsAddButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CHANGEROTORB")
-            If (auxIconName <> "") Then BsMoveUpButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsMoveUpButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("DECREASEBUT")
-            If (auxIconName <> "") Then BsMoveDownButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsMoveDownButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("READADJ")
-            If (auxIconName <> "") Then BsExportAllToFileButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then BsExportAllToFileButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MyClass.SetButtonImage(BsCheckButton, "ACCEPT1")
             'MyClass.SetButtonImage(BsTestButton, "VOLUME")
@@ -565,21 +522,21 @@ Public Class FwScriptsEdition
             BsActionScriptLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_SCRIPT_EDIT_ActionScript", LanguageID)
             BsInstructionsLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_SCRIPT_EDIT_Instructions", LanguageID)
 
-            bsScreenToolTips.SetToolTip(BsCheckButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Check", LanguageID))
-            bsScreenToolTips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Test", LanguageID))
-            bsScreenToolTips.SetToolTip(BsRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Restore", LanguageID))
-            bsScreenToolTips.SetToolTip(BsImportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Import", LanguageID))
-            bsScreenToolTips.SetToolTip(BsExportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Export", LanguageID))
-            bsScreenToolTips.SetToolTip(BsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", LanguageID))
-            bsScreenToolTips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", LanguageID))
-            bsScreenToolTips.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", LanguageID))
-            bsScreenToolTips.SetToolTip(BsAddButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", LanguageID))
-            bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", LanguageID))
-            bsScreenToolTips.SetToolTip(BsMoveDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveDown", LanguageID))
-            bsScreenToolTips.SetToolTip(BsMoveUpButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveUp", LanguageID))
-            bsScreenToolTips.SetToolTip(BsImportAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_ImportAll", LanguageID))
-            bsScreenToolTips.SetToolTip(BsRemoveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", LanguageID))
-            bsScreenToolTips.SetToolTip(BsSaveAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_SaveAll", LanguageID))
+            ScreenTooltips.SetToolTip(BsCheckButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Check", LanguageID))
+            ScreenTooltips.SetToolTip(BsTestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Test", LanguageID))
+            ScreenTooltips.SetToolTip(BsRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Restore", LanguageID))
+            ScreenTooltips.SetToolTip(BsImportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Import", LanguageID))
+            ScreenTooltips.SetToolTip(BsExportButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_Export", LanguageID))
+            ScreenTooltips.SetToolTip(BsEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Edit", LanguageID))
+            ScreenTooltips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", LanguageID))
+            ScreenTooltips.SetToolTip(BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel&Close", LanguageID))
+            ScreenTooltips.SetToolTip(BsAddButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", LanguageID))
+            ScreenTooltips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save&Close", LanguageID))
+            ScreenTooltips.SetToolTip(BsMoveDownButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveDown", LanguageID))
+            ScreenTooltips.SetToolTip(BsMoveUpButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_MoveUp", LanguageID))
+            ScreenTooltips.SetToolTip(BsImportAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_ImportAll", LanguageID))
+            ScreenTooltips.SetToolTip(BsRemoveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", LanguageID))
+            ScreenTooltips.SetToolTip(BsSaveAllButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SCRIPT_EDIT_SaveAll", LanguageID))
 
 
 
@@ -2168,7 +2125,7 @@ Public Class FwScriptsEdition
     Private Function CheckGrid(Optional ByVal pShowMessage As Boolean = False) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim CopyOfSelectedScript As FwScriptTO
+        Dim CopyOfSelectedScript As FwScriptTO = Nothing
         Dim SyntaxOK As Boolean = True
         Dim SequenceOK As Boolean = True
         Dim myPreviousScreenMode As ScreenModes = MyClass.CurrentScreenMode
@@ -3088,7 +3045,7 @@ Public Class FwScriptsEdition
 
             MyClass.CurrentScreenMode = ScreenModes.GRIDCHANGING
 
-            Dim myCell As DataGridViewCell
+            Dim myCell As DataGridViewCell = Nothing
             If bsInstructionsListDataGridView.SelectedCells.Count > 0 Then
                 myCell = bsInstructionsListDataGridView.SelectedCells(0)
             End If
@@ -3285,8 +3242,8 @@ Public Class FwScriptsEdition
     Private Sub FormScriptsManager_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             Me.Location = New Point(0, 0)
 
@@ -4221,212 +4178,212 @@ Public Class FwScriptsEdition
     '************************************************************
 #Region "Not Used"
 
-    ''' <summary>
-    ''' Sorting rows instructions 
-    ''' </summary>
-    ''' <param name="pDirection">(up and down)</param>
-    ''' <remarks>
-    ''' Created by XBC 29/09/2010
-    ''' Modified by XBC 17/11/2010 - add EnableEdition hidden column
-    ''' Modified by XBC 24/11/2010 - Add functionality to Not Editable Instruction
-    ''' </remarks>
-    Private Function Sort(ByVal pDirection As String) As GlobalDataTO
-        Dim myInstruction As InstructionTO = Nothing
-        Dim myInstructionTmp As InstructionTO = Nothing
-        'Dim tableTemp As DataTable = Nothing
-        Dim seleccion As String = ""
-        Dim seleccioOk As Boolean
+    ' ''' <summary>
+    ' ''' Sorting rows instructions 
+    ' ''' </summary>
+    ' ''' <param name="pDirection">(up and down)</param>
+    ' ''' <remarks>
+    ' ''' Created by XBC 29/09/2010
+    ' ''' Modified by XBC 17/11/2010 - add EnableEdition hidden column
+    ' ''' Modified by XBC 24/11/2010 - Add functionality to Not Editable Instruction
+    ' ''' </remarks>
+    'Private Function Sort(ByVal pDirection As String) As GlobalDataTO
+    '    Dim myInstruction As InstructionTO = Nothing
+    '    Dim myInstructionTmp As InstructionTO = Nothing
+    '    'Dim tableTemp As DataTable = Nothing
+    '    Dim seleccion As String = ""
+    '    Dim seleccioOk As Boolean
 
-        Dim myGlobal As New GlobalDataTO
+    '    Dim myGlobal As New GlobalDataTO
 
-        Try
+    '    Try
 
-            If Me.bsInstructionsListDataGridView.SelectedRows.Count > 0 Then
-                If Me.bsInstructionsListDataGridView.SelectedRows(0).IsNewRow Then Exit Function
-            End If
+    '        If Me.bsInstructionsListDataGridView.SelectedRows.Count > 0 Then
+    '            If Me.bsInstructionsListDataGridView.SelectedRows(0).IsNewRow Then Exit Function
+    '        End If
 
-            If Me.bsInstructionsListDataGridView.SelectedCells.Count > 0 Then
-                If Me.bsInstructionsListDataGridView.SelectedCells(0).IsInEditMode Then Exit Function
-            End If
+    '        If Me.bsInstructionsListDataGridView.SelectedCells.Count > 0 Then
+    '            If Me.bsInstructionsListDataGridView.SelectedCells(0).IsInEditMode Then Exit Function
+    '        End If
 
-            If MyClass.CurrentScreenMode = ScreenModes.MODIFYING And Me.bsInstructionsListDataGridView.Rows.Count > 0 Then
+    '        If MyClass.CurrentScreenMode = ScreenModes.MODIFYING And Me.bsInstructionsListDataGridView.Rows.Count > 0 Then
 
-                For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                    For Each cellsort As DataGridViewCell In rdsort2.Cells
-                        If cellsort.Selected Then
-                            rdsort2.Selected = True
-                            seleccion = rdsort2.Cells("InstructionID").Value.ToString
-                            seleccioOk = True
-                            Exit For
-                        End If
-                    Next
-                    If seleccioOk Then Exit For
-                Next
+    '            For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                For Each cellsort As DataGridViewCell In rdsort2.Cells
+    '                    If cellsort.Selected Then
+    '                        rdsort2.Selected = True
+    '                        seleccion = rdsort2.Cells("InstructionID").Value.ToString
+    '                        seleccioOk = True
+    '                        Exit For
+    '                    End If
+    '                Next
+    '                If seleccioOk Then Exit For
+    '            Next
 
-                If Not Me.SelectedFwScript.Instructions Is Nothing Then
-                    Dim myInstructionsAux As New List(Of InstructionTO)
+    '            If Not Me.SelectedFwScript.Instructions Is Nothing Then
+    '                Dim myInstructionsAux As New List(Of InstructionTO)
 
-                    Select Case pDirection
-                        Case "UP"
-                            For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                                If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
-                                    If rsort.Index = 0 Then
-                                        ' if wish to sort to up, first element is already sorted
-                                        Exit Function
-                                    Else
-                                        ' selected
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                        '// adding previous item if exists
-                                        If Not myInstructionTmp Is Nothing Then
-                                            myInstructionsAux.Add(myInstructionTmp)
-                                        End If
-                                    End If
-                                Else
-                                    If rsort.Index + 1 <= Me.bsInstructionsListDataGridView.Rows.Count - 1 AndAlso _
-                                       Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index + 1).Cells(0).Value.ToString) Then
-                                        '//Save previous element to the selected item Temporaly
-                                        myInstructionTmp = New InstructionTO
-                                        myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                    Else
-                                        '// inserting the other items
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                    End If
-                                End If
-                            Next
+    '                Select Case pDirection
+    '                    Case "UP"
+    '                        For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                            If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
+    '                                If rsort.Index = 0 Then
+    '                                    ' if wish to sort to up, first element is already sorted
+    '                                    Exit Function
+    '                                Else
+    '                                    ' selected
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                    '// adding previous item if exists
+    '                                    If Not myInstructionTmp Is Nothing Then
+    '                                        myInstructionsAux.Add(myInstructionTmp)
+    '                                    End If
+    '                                End If
+    '                            Else
+    '                                If rsort.Index + 1 <= Me.bsInstructionsListDataGridView.Rows.Count - 1 AndAlso _
+    '                                   Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index + 1).Cells(0).Value.ToString) Then
+    '                                    '//Save previous element to the selected item Temporaly
+    '                                    myInstructionTmp = New InstructionTO
+    '                                    myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                Else
+    '                                    '// inserting the other items
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                End If
+    '                            End If
+    '                        Next
 
-                            ' New sorted assignation
-                            MyClass.SelectedFwScript.Instructions = myInstructionsAux
-                            myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
+    '                        ' New sorted assignation
+    '                        MyClass.SelectedFwScript.Instructions = myInstructionsAux
+    '                        myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
 
-                        Case "DOWN"
-                            For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                                If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
-                                    If rsort.Index = Me.bsInstructionsListDataGridView.Rows.Count - 1 Then
-                                        ' if wish to sort to down, last element is already sorted
-                                        Exit Function
-                                    Else
-                                        '// Selected
-                                        '// Save selected item Temporaly
-                                        myInstructionTmp = New InstructionTO
-                                        myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                    End If
-                                Else
-                                    If rsort.Index > 0 AndAlso Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index - 1).Cells(0).Value.ToString) Then
-                                        '// adding following selected item
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                        '// adding selected item previously saved
-                                        If Not myInstructionTmp Is Nothing Then
-                                            myInstructionsAux.Add(myInstructionTmp)
-                                        End If
-                                    Else
-                                        '// inserting the other items
-                                        myInstruction = New InstructionTO
-                                        myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
-                                        myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
-                                        myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
-                                        myInstruction.Code = CStr(rsort.Cells("Code").Value)
-                                        myInstruction.Params = CStr(rsort.Cells("Params").Value)
-                                        myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
-                                        myInstructionsAux.Add(myInstruction)
-                                    End If
-                                End If
-                            Next
+    '                    Case "DOWN"
+    '                        For Each rsort As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                            If Me.SelectedRow(rsort.Cells(0).Value.ToString) Then
+    '                                If rsort.Index = Me.bsInstructionsListDataGridView.Rows.Count - 1 Then
+    '                                    ' if wish to sort to down, last element is already sorted
+    '                                    Exit Function
+    '                                Else
+    '                                    '// Selected
+    '                                    '// Save selected item Temporaly
+    '                                    myInstructionTmp = New InstructionTO
+    '                                    myInstructionTmp.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstructionTmp.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstructionTmp.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstructionTmp.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstructionTmp.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstructionTmp.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                End If
+    '                            Else
+    '                                If rsort.Index > 0 AndAlso Me.SelectedRow(Me.bsInstructionsListDataGridView.Rows(rsort.Index - 1).Cells(0).Value.ToString) Then
+    '                                    '// adding following selected item
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                    '// adding selected item previously saved
+    '                                    If Not myInstructionTmp Is Nothing Then
+    '                                        myInstructionsAux.Add(myInstructionTmp)
+    '                                    End If
+    '                                Else
+    '                                    '// inserting the other items
+    '                                    myInstruction = New InstructionTO
+    '                                    myInstruction.InstructionID = CInt(rsort.Cells("InstructionID").Value)
+    '                                    myInstruction.Sequence = CInt(rsort.Cells("Sequence").Value)
+    '                                    myInstruction.Timer = CInt(rsort.Cells("Timer").Value)
+    '                                    myInstruction.Code = CStr(rsort.Cells("Code").Value)
+    '                                    myInstruction.Params = CStr(rsort.Cells("Params").Value)
+    '                                    myInstruction.EnableEdition = CBool(rsort.Cells("EnableEdition").Value)
+    '                                    myInstructionsAux.Add(myInstruction)
+    '                                End If
+    '                            End If
+    '                        Next
 
-                            ' New sorted assignation
-                            MyClass.SelectedFwScript.Instructions = myInstructionsAux
-                            myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
-                    End Select
+    '                        ' New sorted assignation
+    '                        MyClass.SelectedFwScript.Instructions = myInstructionsAux
+    '                        myGlobal = MyClass.ShowInstructions(Me.SelectedFwScript.Instructions)
+    '                End Select
 
-                    'uncheck the Syntax OK
-                    Me.SelectedFwScript.SyntaxOK = False
-                    Me.SelectedFwScript.TestedOK = False
-                    For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                        R.Cells("SyntaxOK").Value = False
-                        R.Cells("TestedOK").Value = False
-                    Next
+    '                'uncheck the Syntax OK
+    '                Me.SelectedFwScript.SyntaxOK = False
+    '                Me.SelectedFwScript.TestedOK = False
+    '                For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                    R.Cells("SyntaxOK").Value = False
+    '                    R.Cells("TestedOK").Value = False
+    '                Next
 
-                    MyClass.CurrentScreenMode = ScreenModes.MODIFIED
+    '                MyClass.CurrentScreenMode = ScreenModes.MODIFIED
 
-                End If
-
-
-                '// Ending with sorted item Focused
-                If seleccion.Length > 0 Then
-                    For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                        If rdsort2.Cells(0).Value.ToString = seleccion Then
-                            Me.bsInstructionsListDataGridView.CurrentCell = rdsort2.Cells(3)
-                            rdsort2.Selected = True
-                        End If
-                    Next
-                End If
+    '            End If
 
 
-                'SG 10/11/10 Validate changes
-                'myGlobal = MyClass.ValidateEditionChanges()
+    '            '// Ending with sorted item Focused
+    '            If seleccion.Length > 0 Then
+    '                For Each rdsort2 As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                    If rdsort2.Cells(0).Value.ToString = seleccion Then
+    '                        Me.bsInstructionsListDataGridView.CurrentCell = rdsort2.Cells(3)
+    '                        rdsort2.Selected = True
+    '                    End If
+    '                Next
+    '            End If
 
-                If Not myGlobal.HasError Then
-                    ' XBC 24/11/2010
-                    For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
-                        If Not CBool(R.Cells("EnableEdition").Value) Then
-                            R.Cells("Sequence").ReadOnly = False
-                            R.Cells("Code").ReadOnly = True
-                            R.Cells("Params").ReadOnly = True
-                            R.Cells("SyntaxOK").ReadOnly = True
-                            R.Cells("TestedOK").ReadOnly = True
-                        End If
-                    Next R
-                    ' XBC 24/11/2010
 
-                    Me.bsInstructionsListDataGridView.Focus()
-                    'END SG 10/11/10
+    '            'SG 10/11/10 Validate changes
+    '            'myGlobal = MyClass.ValidateEditionChanges()
 
-                    MyClass.CurrentScreenMode = ScreenModes.MODIFIED
-                End If
+    '            If Not myGlobal.HasError Then
+    '                ' XBC 24/11/2010
+    '                For Each R As DataGridViewRow In Me.bsInstructionsListDataGridView.Rows
+    '                    If Not CBool(R.Cells("EnableEdition").Value) Then
+    '                        R.Cells("Sequence").ReadOnly = False
+    '                        R.Cells("Code").ReadOnly = True
+    '                        R.Cells("Params").ReadOnly = True
+    '                        R.Cells("SyntaxOK").ReadOnly = True
+    '                        R.Cells("TestedOK").ReadOnly = True
+    '                    End If
+    '                Next R
+    '                ' XBC 24/11/2010
 
-            End If
+    '                Me.bsInstructionsListDataGridView.Focus()
+    '                'END SG 10/11/10
 
-        Catch ex As Exception
-            myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-            myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".Sort", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            MyBase.ShowMessage(Me.Name & ".Sort", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
-        End Try
+    '                MyClass.CurrentScreenMode = ScreenModes.MODIFIED
+    '            End If
 
-        Return myGlobal
+    '        End If
 
-    End Function
+    '    Catch ex As Exception
+    '        myGlobal.HasError = True
+    '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+    '        myGlobal.ErrorMessage = ex.Message
+    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".Sort", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        MyBase.ShowMessage(Me.Name & ".Sort", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
+    '    End Try
+
+    '    Return myGlobal
+
+    'End Function
 
 
     ''' <summary>

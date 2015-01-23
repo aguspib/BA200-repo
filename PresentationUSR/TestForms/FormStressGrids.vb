@@ -1,4 +1,8 @@
-﻿Imports System.Text
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports System.Text
 
 Public Class FormStressGrids
     Private myDataTable As DataTable
@@ -135,7 +139,7 @@ Public Class FormStressGrids
 
         lblAction.Text = "Creating DataTable..."
         lblAction.Refresh()
-        InsertRandomDataToDataTable(numRows.Value)
+        InsertRandomDataToDataTable(CInt(numRows.Value))
 
         lblAction.Text = "Ready"
         lblAction.Refresh()

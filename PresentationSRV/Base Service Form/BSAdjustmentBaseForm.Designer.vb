@@ -25,8 +25,8 @@ Partial Class BSAdjustmentBaseForm
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.BsAutoInfoLoader = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker
+        Me.BsAutoInfoLoader = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker()
+        Me.bsScreenToolTipsControl = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.SuspendLayout()
         '
         'BSAdjustmentBaseForm
@@ -47,6 +47,6 @@ Partial Class BSAdjustmentBaseForm
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents BsAutoInfoLoader As Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker
+    Friend WithEvents bsScreenToolTipsControl As Biosystems.Ax00.Controls.UserControls.BSToolTip
 End Class

@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.Global.GlobalEnumerates
+﻿Option Infer On
+Option Strict On
+Option Explicit On
+
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -82,7 +86,7 @@ Public Class ISortingTestsAux
         Try
             Dim myGlobalDataTO As New GlobalDataTO
             Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
-            Dim myReportsTestsSortingList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow)
+            Dim myReportsTestsSortingList As List(Of ReportsTestsSortingDS.tcfgReportsTestsSortingRow) = Nothing
             Dim myDefaultSortedTestDS As New ReportsTestsSortingDS
 
             'AG 03/09/2014 - BA-1869
@@ -187,7 +191,7 @@ Public Class ISortingTestsAux
     Private Function GetSortedTestList() As ReportsTestsSortingDS
         Dim myReportsTestsSortingDS As New ReportsTestsSortingDS
         Try
-            Dim myGlobalDataTO As GlobalDataTO
+            Dim myGlobalDataTO As GlobalDataTO = Nothing
 
             'AG 02/09/2014 - BA-1869
             'Dim myReportsTestsSortingDelegate As New ReportsTestsSortingDelegate
@@ -263,7 +267,7 @@ Public Class ISortingTestsAux
                     Select Case preMasterRow.ItemID
                         Case "TESTICON", "USERTEST", "TCALC", "TISE_SYS", "TOFF_SYS", "TPROFILES"
                             If (IO.File.Exists(MyBase.IconsPath & preMasterRow.FixedItemDesc)) Then
-                                TestIconList.Images.Add(preMasterRow.ItemID, Image.FromFile(MyBase.IconsPath & preMasterRow.FixedItemDesc))
+                                TestIconList.Images.Add(preMasterRow.ItemID, ImageUtilities.ImageFromFile(MyBase.IconsPath & preMasterRow.FixedItemDesc))
                             End If
                             Exit Select
                         Case Else
@@ -331,8 +335,8 @@ Public Class ISortingTestsAux
                 mySize = Me.Parent.Size
                 myLocation = Me.Parent.Location
             Else 'Test selection sort (popup,  use the MDI)
-                mySize = IAx00MainMDI.Size
-                myLocation = IAx00MainMDI.Location
+                mySize = UiAx00MainMDI.Size
+                myLocation = UiAx00MainMDI.Location
             End If
             'AG 02/09/2014 - BA-1869
 
@@ -340,8 +344,8 @@ Public Class ISortingTestsAux
             Me.Location = NewScreenLocation
 
             'Get the current application Language
-            Dim currentLanguageGlobal As New GlobalBase
-            CurrentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            CurrentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Configure all screen controls (icons, texts in current language, ListView properties)
             PrepareButtons()
@@ -379,44 +383,44 @@ Public Class ISortingTestsAux
 
             'MOVE UP SELECTED TESTS Button
             auxIconName = GetIconName("UPARROW")
-            If (auxIconName <> "") Then UpPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then UpPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MOVE DOWN SELECTED TESTS Button
             auxIconName = GetIconName("DOWNARROW")
-            If (auxIconName <> "") Then DownPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then DownPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MOVE SELECTED TESTS TO FIRST POSITION Button
             auxIconName = GetIconName("TOPARROW")
-            If (auxIconName <> "") Then FirstPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then FirstPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'MOVE SELECTED TESTS TO LAST POSITION Button
             auxIconName = GetIconName("BOTTOMARROW")
-            If (auxIconName <> "") Then LastPosButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then LastPosButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'DEFAULT SORTING RECOVERY Button
             'auxIconName = GetIconName("UPDOWNROW") 'DL 21/02/2012
             auxIconName = GetIconName("UNDO")       'DL 21/02/2012
-            If (auxIconName <> "") Then DefaultSortingButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then DefaultSortingButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SAVE Button
             auxIconName = GetIconName("ACCEPT1")
-            If (auxIconName <> "") Then bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> "") Then CloseButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> "") Then CloseButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'AG 04/09/2014 - BA-1869
             'CHECK icon in grid header
             auxIconName = GetIconName("CHECKL")
             If (auxIconName <> "") Then
-                checkImage = Image.FromFile(iconPath & auxIconName)
+                checkImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'UNCHECK icon in grid header
             auxIconName = GetIconName("UNCHECKL")
             If (auxIconName <> "") Then
-                uncheckImage = Image.FromFile(iconPath & auxIconName)
+                uncheckImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'AG 04/09/2014 - BA-1869
 
@@ -508,8 +512,8 @@ Public Class ISortingTestsAux
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
                 Else 'Test selection sort (popup,  use the MDI)
-                    mySize = IAx00MainMDI.Size
-                    myLocation = IAx00MainMDI.Location
+                    mySize = UiAx00MainMDI.Size
+                    myLocation = UiAx00MainMDI.Location
                 End If
                 'AG 02/09/2014 - BA-1869
 
@@ -566,7 +570,7 @@ Public Class ISortingTestsAux
     Private Sub UpPosButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles UpPosButton.Click
         Try
             'MoveItemsInListView(TestListView, True)
-            MoveItemsInListInGrid(bsTestListGrid, True) 'AG 03/09/2014 - BA-1869
+            MoveItemsInListInGrid(TryCast(bsTestListGrid, DataGridView), True) 'AG 03/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UpPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UpPosButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -576,7 +580,7 @@ Public Class ISortingTestsAux
     Private Sub DownPosButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles DownPosButton.Click
         Try
             'MoveItemsInListView(TestListView, False)
-            MoveItemsInListInGrid(bsTestListGrid, False) 'AG 03/09/2014 - BA-1869
+            MoveItemsInListInGrid(TryCast(bsTestListGrid, DataGridView), False) 'AG 03/09/2014 - BA-1869
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DownPosButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DownPosButton_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
@@ -629,7 +633,7 @@ Public Class ISortingTestsAux
                     'IAx00MainMDI.OpenMonitorForm(Me)
                     If openModeAttribute = String.Empty Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         Me.Close()
                     End If
@@ -681,9 +685,19 @@ Public Class ISortingTestsAux
                         Dim dgv As BSDataGridView = bsTestListGrid
 
                         'Some not available new value = avaliable ALL // all available new value = available NONE
-                        Dim disabledRows As List(Of DataGridViewRow) = (From a As DataGridViewRow In dgv.Rows _
-                                                    Where a.Cells("Available").Value = False Select a).ToList
+                        'Dim disabledRows As IEnumerable(Of DataGridViewRow) = (From a As DataGridViewRow In dgv.Rows _
+                        '                            Where a.Cells("Available").Value = False Select a)
 
+                        Dim disabledRows As New List(Of DataGridViewRow)
+                        For Each item In dgv.Rows
+                            If item Is Nothing Then Continue For
+                            Dim dataGridRow = TryCast(item, DataGridViewRow)
+                            If dataGridRow Is Nothing Then Continue For
+                            Dim cell = dataGridRow.Cells("Available")
+                            If cell IsNot Nothing AndAlso CBool(cell.Value) = False Then
+                                disabledRows.Add(dataGridRow)
+                            End If
+                        Next
 
                         If disabledRows.Count > 0 Then
                             'Some disable ... set all available
@@ -694,7 +708,7 @@ Public Class ISortingTestsAux
                         Else
                             'All enable ... set disable
                             For Each row As DataGridViewRow In dgv.Rows
-                                If row.Cells("Available").Value Then
+                                If CBool(row.Cells("Available").Value) Then
                                     row.Cells("Available").Value = False
                                 End If
                             Next
@@ -726,8 +740,8 @@ Public Class ISortingTestsAux
 
 
                 If e.ColumnIndex = AvailableIndex Then
-                    HeadRect = New Rectangle(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2, _
-                                             e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2, _
+                    HeadRect = New Rectangle(CInt(e.CellBounds.Left + (e.CellBounds.Width - HeadImageSide) / 2), _
+                                             CInt(e.CellBounds.Top + (e.CellBounds.Height - HeadImageSide) / 2), _
                                              HeadImageSide, HeadImageSide)
 
                     e.Paint(HeadRect, DataGridViewPaintParts.All And Not DataGridViewPaintParts.ContentForeground)
@@ -935,7 +949,7 @@ Public Class ISortingTestsAux
     ''' </remarks>
     Private Sub MoveTopOrBottomItemsInGrid(ByVal pGridView As DataGridView, ByVal pMoveTop As Boolean)
         Try
-            Dim dgv As BSDataGridView = pGridView
+            Dim dgv As BSDataGridView = TryCast(pGridView, BSDataGridView)
 
             'If tests are moving to botton, set index to the last element in list
             'If tests are moving to top, set index to the first element in list
@@ -1019,7 +1033,7 @@ Public Class ISortingTestsAux
     ''' </remarks>
     Private Sub MoveItemsInListInGrid(ByRef pGridView As DataGridView, ByVal pMoveUp As Boolean)
         Try
-            Dim dgv As BSDataGridView = pGridView
+            Dim dgv = TryCast(pGridView, BSDataGridView)
 
             'Get the list of selected positions (indexes)
             Dim selectedIndexesList As New List(Of Integer)
@@ -1335,7 +1349,7 @@ Public Class ISortingTestsAux
             Select Case level
                 Case USER_LEVEL.lBIOSYSTEMS, USER_LEVEL.lADMINISTRATOR, USER_LEVEL.lSUPERVISOR
                     'AG 18/09/2014 - BA-1869 If exists worksession screen in read only mode depending the tests types
-                    If (IAx00MainMDI.ActiveStatus <> "EMPTY") Then
+                    If (UiAx00MainMDI.ActiveStatus <> "EMPTY") Then
                         'Std, ISE, CALC or OFFS read only if current WS contains tests for this test type
                         'Profiles read only if current WS is not empty
 
@@ -1344,7 +1358,7 @@ Public Class ISortingTestsAux
 
                             'Look for tests in current WS filtering by test type. If any normal mode
                             Dim myDlg As New OrderTestsDelegate
-                            Dim myGlobalDataTo As GlobalDataTO = myDlg.GetOrderTestsByWorkSession(Nothing, IAx00MainMDI.ActiveWorkSession, ScreenIDAttribute)
+                            Dim myGlobalDataTo As GlobalDataTO = myDlg.GetOrderTestsByWorkSession(Nothing, UiAx00MainMDI.ActiveWorkSession, ScreenIDAttribute)
                             If Not myGlobalDataTo.HasError AndAlso Not myGlobalDataTo.SetDatos Is Nothing Then
                                 If DirectCast(myGlobalDataTo.SetDatos, OrderTestsDS).twksOrderTests.Rows.Count = 0 Then
                                     readOnlyFlag = False

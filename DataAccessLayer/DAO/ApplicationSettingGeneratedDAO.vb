@@ -6,12 +6,9 @@ Option Strict On
 
 Imports System
 Imports System.Data
-Imports System.Data.Common
-Imports System.Configuration
 Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.TO
 
 
 Namespace Biosystems.Ax00.DAL.DAO
@@ -58,8 +55,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDAO.Read", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO.Read", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -87,8 +84,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
             End Try
 
             Try
@@ -107,16 +104,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Next
 
             Catch ex As ArgumentException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
 
             Catch ex As InvalidOperationException
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDAO", EventLogEntryType.Error, False)
 
             Finally
 

@@ -1421,7 +1421,7 @@ Public Class IPositionsAdjustments
     Private Sub PrepareStirrerButton(ByRef pButton As BSButton)
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Dim auxIconName As String = String.Empty
         Dim iconPath As String = MyBase.IconsPath
@@ -1440,9 +1440,9 @@ Public Class IPositionsAdjustments
             If System.IO.File.Exists(iconPath & auxIconName) Then
 
                 Dim myImage As Image
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-                myGlobal = myUtil.ResizeImage(myImage, New Size(24, 24))
+                myGlobal = Utilities.ResizeImage(myImage, New Size(24, 24))
                 If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                     myNewImage = CType(myGlobal.SetDatos, Bitmap)
                 Else
@@ -1609,14 +1609,20 @@ Public Class IPositionsAdjustments
                 ''end SGM 05/12/2012
 
                 If MyBase.SimulationMode Then
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MinValue = 0
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MaxValue = (AbsorbanceData.Max * 100000) + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = (AbsorbanceData.Max * 100000) + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = (AbsorbanceData.Max * 100000) + 200000
                 Else
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MinValue = 0
-                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.Range.MaxValue = AbsorbanceData.Max + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.WholeRange.MaxValue = AbsorbanceData.Max + 200000
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MinValue = 0
+                    CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.MaxValue = AbsorbanceData.Max + 200000
                 End If
 
-
+                'ADDED THOSE INSTRUCTIONS TO AVOID AUTOGRID
+                CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.NumericScaleOptions.AutoGrid = False
+                CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.DateTimeScaleOptions.AutoGrid = False
 
                 ' Generate a data table and bind the COUNTS serie to it.
                 AbsorbanceChart.Series(0).DataSource = MyClass.CreateChartDataCounts()
@@ -1626,6 +1632,7 @@ Public Class IPositionsAdjustments
                 AbsorbanceChart.Series(0).ArgumentDataMember = "Argument"
                 AbsorbanceChart.Series(0).ValueScaleType = ScaleType.Numerical
                 AbsorbanceChart.Series(0).ValueDataMembers.AddRange(New String() {"Value"})
+                CType(AbsorbanceChart.Series(0).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
 
 
                 ' Generate a data table and bind the ENCODER serie to it.
@@ -1636,6 +1643,7 @@ Public Class IPositionsAdjustments
                 AbsorbanceChart.Series(1).ArgumentDataMember = "Argument"
                 AbsorbanceChart.Series(1).ValueScaleType = ScaleType.Numerical
                 AbsorbanceChart.Series(1).ValueDataMembers.AddRange(New String() {"Value"})
+                CType(AbsorbanceChart.Series(1).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
 
                 MyClass.CalculateDistances()
                 ' XBC 02/01/2012 - Add Encoder functionality
@@ -1836,8 +1844,17 @@ Public Class IPositionsAdjustments
             'CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisX.Range.MinValue = myMin
             'CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram).AxisX.Range.MaxValue = myMax
             ' Y Axis
-            CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisX.Range.MinValue = myMin
-            CType(Me.AbsorbanceChart.Diagram, XYDiagram).AxisX.Range.MaxValue = myMax
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.WholeRange.MinValue = myMin
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.WholeRange.MaxValue = myMax
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.VisualRange.MinValue = myMin
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.VisualRange.MaxValue = myMax
+
+            'ADDITIONAL CONFIGURATION BECAUSE OF BEHAVIOUR CHANGES IN NEW LIBRARY VERSION
+            AbsorbanceChart.CrosshairEnabled = DevExpress.Utils.DefaultBoolean.False
+            AbsorbanceChart.RuntimeHitTesting = True
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisY.VisualRange.SideMarginsValue = 0
+            CType(AbsorbanceChart.Diagram, XYDiagram).AxisX.VisualRange.SideMarginsValue = 0
 
             ' Constant lines x wall well
             'Dim myDiagram As SwiftPlotDiagram = CType(Me.AbsorbanceChart.Diagram, SwiftPlotDiagram)
@@ -2183,7 +2200,7 @@ Public Class IPositionsAdjustments
     ''' <remarks>Created by XBC 14/01/2011</remarks>
     Private Sub PrepareLoadingMode()
         Dim myResultData As New GlobalDataTO
-        'Dim myGlobalbase As New GlobalBase
+        ''Dim myGlobalbase As New GlobalBase
         Try
             ' Initializations
             'me.LEDCurrent = GlobalBase.OpticalCenteringCurrentLed
@@ -3972,7 +3989,7 @@ Public Class IPositionsAdjustments
         Dim auxIconName As String = ""
         Dim iconPath As String = MyBase.IconsPath
         'Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
             ' XBC 02/01/2012 - Add Encoder functionality
@@ -3981,49 +3998,49 @@ Public Class IPositionsAdjustments
             'dl 20/04/2012
             auxIconName = GetIconName("ADJUSTMENT")
             If (auxIconName <> "") Then
-                BsOpticAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsWSAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsOpticAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsWSAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UPDOWN")
             If (auxIconName <> "") Then
-                BsUpDownWSButton1.Image = Image.FromFile(iconPath & auxIconName)
-                BsUpDownWSButton2.Image = Image.FromFile(iconPath & auxIconName)
-                BsUpDownWSButton3.Image = Image.FromFile(iconPath & auxIconName)
+                BsUpDownWSButton1.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUpDownWSButton2.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsUpDownWSButton3.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             MyBase.SetButtonImage(BsOpticStopButton, "STOP", 24, 24) 'SGM 09/05/2012
             'auxIconName = GetIconName("STOP")
             'If (auxIconName <> "") Then
-            '    BsOpticStopButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    BsOpticStopButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             auxIconName = GetIconName("ESPIRAL")
             If (auxIconName <> "") Then
-                BsStirrer1Button.Image = Image.FromFile(iconPath & auxIconName)
-                BsStirrer2Button.Image = Image.FromFile(iconPath & auxIconName)
+                BsStirrer1Button.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsStirrer2Button.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                BsOpticCancelButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsWSCancelButton.Image = Image.FromFile(iconPath & auxIconName)
-                BsArmsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsOpticCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsWSCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                BsArmsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                BsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                BsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                BsArmsOkButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsArmsOkButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'dl 20/04/2012
 
@@ -4050,17 +4067,17 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsOpticAdjustButton.Image = myImage
             '    BsWSAdjustButton.Image = myImage
-            '    'BsArmsAdjustButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    'BsArmsAdjustButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             ''CANCEL Button
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsOpticCancelButton.Image = myImage
             '    BsWSCancelButton.Image = myImage
             '    BsArmsCancelButton.Image = myImage
@@ -4073,7 +4090,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(32, 32)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(32, 32)).SetDatos, Image)
             '    BsSaveButton.Image = myImage
             '    'BsSaveButton.BackgroundImageLayout = ImageLayout.Center
             'End If
@@ -4083,7 +4100,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    'BsExitButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
@@ -4091,7 +4108,7 @@ Public Class IPositionsAdjustments
             auxIconName = GetIconName("ACCEPTF")
             If System.IO.File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-                myImage = CType(myUtil.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
+                myImage = CType(Utilities.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
                 Me.BsGridSample.OkImage = myImage
                 Me.BsGridReagent1.OkImage = myImage
                 Me.BsGridReagent2.OkImage = myImage
@@ -4121,7 +4138,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If auxIconName <> "" Then
             '    'Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    'myImage = CType(myUtil.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
+            '    'myImage = CType(Utilities.ResizeImage(myImage, New Size(16, 16)).SetDatos, Image)
             '    'Me.BsGridSample.AdjustButtonImage = myImage
             '    'Me.BsGridReagent1.AdjustButtonImage = myImage
             '    'Me.BsGridReagent2.AdjustButtonImage = myImage
@@ -4136,9 +4153,9 @@ Public Class IPositionsAdjustments
             'Dim myMixerImage As Image
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image
-            '    myImage = Image.FromFile(iconPath & auxIconName)
+            '    myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
-            '    myGlobal = myUtil.ResizeImage(myImage, New Size(20, 20))
+            '    myGlobal = Utilities.ResizeImage(myImage, New Size(20, 20))
             '    If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
             '        myMixerImage = CType(myGlobal.SetDatos, Bitmap)
             '    Else
@@ -4156,7 +4173,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("UPDOWN")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(20, 20)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(20, 20)).SetDatos, Image)
             '    Me.BsUpDownWSButton1.Image = myImage
             '    Me.BsUpDownWSButton2.Image = myImage
             '    Me.BsUpDownWSButton3.Image = myImage
@@ -4167,7 +4184,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    BsOpticStopButton.Image = myImage
             '    'BsStopButton.BackgroundImageLayout = ImageLayout.Stretch
             'End If
@@ -4177,7 +4194,7 @@ Public Class IPositionsAdjustments
             'auxIconName = GetIconName("ACCEPT1")
             'If auxIconName <> "" Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    Me.BsArmsOkButton.Image = myImage
             'End If
 
@@ -5887,25 +5904,25 @@ Public Class IPositionsAdjustments
 
             ' For Tooltips...
 
-            MyBase.bsScreenToolTips.SetToolTip(BsOpticAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTips.SetToolTip(BsOpticCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsOpticStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsOpticAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsOpticCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsOpticStopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(BsWSAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTips.SetToolTip(BsWSCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsWSAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsWSCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
             'MyBase.bsScreenToolTips.SetToolTip(BsArmsAdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTips.SetToolTip(BsArmsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsArmsOkButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SAVE_LOCAL", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsArmsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsArmsOkButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_SAVE_LOCAL", currentLanguage))
 
 
-            MyBase.bsScreenToolTips.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsSaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
             ' XBC 30/11/2011
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(BsUpDownWSButton3, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton1, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton2, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsUpDownWSButton3, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_UPDOWN_WS", currentLanguage))
 
 
         Catch ex As Exception
@@ -7848,12 +7865,12 @@ Public Class IPositionsAdjustments
 
     Private Sub PositionsAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
 
             'Get the current user level
             'Dim CurrentUserLevel As String = ""
-            'CurrentUserLevel = myGlobalbase.GetSessionInfo.UserLevel
+            'CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'Dim myUsersLevel As New UsersLevelDelegate
             'If CurrentUserLevel <> "" Then  'When user level exists then find his numerical level
             '    myGlobal = myUsersLevel.GetUserNumericLevel(Nothing, CurrentUserLevel)
@@ -7865,7 +7882,7 @@ Public Class IPositionsAdjustments
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            Me.currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            Me.currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels and get Icons for graphical Buttons
             Me.GetScreenLabels(currentLanguage)

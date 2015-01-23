@@ -23,22 +23,21 @@ Partial Class IChangeRotorSRV
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container
+        Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IChangeRotorSRV))
-        Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
-        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsWSUpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsChangeRotorGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox
-        Me.BsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsChangeRotorLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsStatusImage = New System.Windows.Forms.PictureBox
-        Me.bsNewAdjLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel
-        Me.bsNewRotorButton = New Biosystems.Ax00.Controls.UserControls.BSButton
-        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider
-        Me.BsBorderedPanel1 = New bsBorderedPanel
-        Me.BsProgressBar = New Biosystems.Ax00.Controls.UserControls.BSProgressBar
+        Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsWSUpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsChangeRotorGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
+        Me.BsProgressBar = New Biosystems.Ax00.Controls.UserControls.BSProgressBar()
+        Me.BsLabel2 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsChangeRotorLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.BsLabel1 = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsStatusImage = New System.Windows.Forms.PictureBox()
+        Me.bsNewAdjLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
+        Me.bsNewRotorButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
+        Me.bsScreenErrorProvider = New Biosystems.Ax00.Controls.UserControls.BSErrorProvider()
+        Me.BsBorderedPanel1 = New bsBorderedPanel()
         Me.BsNewRotorProcessTimer = New System.Windows.Forms.Timer(Me.components)
         Me.bsChangeRotorGroupBox.SuspendLayout()
         CType(Me.bsStatusImage, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -96,6 +95,14 @@ Partial Class IChangeRotorSRV
         Me.bsChangeRotorGroupBox.Size = New System.Drawing.Size(397, 170)
         Me.bsChangeRotorGroupBox.TabIndex = 14
         Me.bsChangeRotorGroupBox.TabStop = False
+        '
+        'BsProgressBar
+        '
+        Me.BsProgressBar.Location = New System.Drawing.Point(72, 143)
+        Me.BsProgressBar.Name = "BsProgressBar"
+        Me.BsProgressBar.Size = New System.Drawing.Size(189, 16)
+        Me.BsProgressBar.TabIndex = 34
+        Me.BsProgressBar.Visible = False
         '
         'BsLabel2
         '
@@ -181,14 +188,6 @@ Partial Class IChangeRotorSRV
         Me.BsBorderedPanel1.Size = New System.Drawing.Size(416, 229)
         Me.BsBorderedPanel1.TabIndex = 33
         '
-        'BsProgressBar
-        '
-        Me.BsProgressBar.Location = New System.Drawing.Point(72, 143)
-        Me.BsProgressBar.Name = "BsProgressBar"
-        Me.BsProgressBar.Size = New System.Drawing.Size(189, 16)
-        Me.BsProgressBar.TabIndex = 34
-        Me.BsProgressBar.Visible = False
-        '
         'BsNewRotorProcessTimer
         '
         Me.BsNewRotorProcessTimer.Interval = 1000
@@ -226,7 +225,6 @@ Partial Class IChangeRotorSRV
 
     End Sub
 
-    Friend WithEvents bsScreenToolTips As Biosystems.Ax00.Controls.UserControls.BSToolTip
     Friend WithEvents bsExitButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsWSUpDownButton As Biosystems.Ax00.Controls.UserControls.BSButton
     Friend WithEvents bsTitleLabel As Biosystems.Ax00.Controls.UserControls.BSLabel

@@ -308,7 +308,7 @@ Public Class IInstrumentUpdateUtil
                 Else
                     MyClass.AdjustmentsEditionChangesMade = False
                     Me.BsAdjustmentsRTextBox.BackColor = Color.LightYellow
-                    MyClass.HideCaret(Me.BsAdjustmentsRTextBox.Handle)
+                    HideCaret(Me.BsAdjustmentsRTextBox.Handle)
                 End If
             End If
 
@@ -388,21 +388,21 @@ Public Class IInstrumentUpdateUtil
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
             ' For Tooltips...
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjOpenFileButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_OPEN", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjSaveAsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_SAVE", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjBackupButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_BK", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_RES", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjRestoreFactoryButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_FAC", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsFwUpdateButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_FW_UPT", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjOpenFileButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_OPEN", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjSaveAsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_SAVE", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjBackupButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_BK", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjRestoreButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_RES", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjRestoreFactoryButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_FAC", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsFwUpdateButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_FW_UPT", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", currentLanguage))
 
             If MyClass.EditionAllowed Then
-                MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjNewButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_NEW", currentLanguage))
-                MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_EDIT", currentLanguage))
-                MyBase.bsScreenToolTips.SetToolTip(Me.BsAdjUndoButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_UNDO", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjNewButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_NEW", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjEditButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_EDIT", currentLanguage))
+                MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsAdjUndoButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJ_UNDO", currentLanguage))
             End If
 
-            MyBase.bsScreenToolTips.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(Me.BsCancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -729,7 +729,7 @@ Public Class IInstrumentUpdateUtil
 
 
                 'deserialize decrypted data
-                Dim myUtility As New Utilities
+                'Dim Utilities As New Utilities
                 Dim myOpenAdjustmentsDS As New SRVAdjustmentsDS
                 myTempPath = path.Replace(FwAdjustmentsDelegate.AdjustmentCryptedFileExtension, FwAdjustmentsDelegate.AdjustmentDecryptedFileExtension)
 
@@ -830,7 +830,7 @@ Public Class IInstrumentUpdateUtil
 
         Dim resultData As New GlobalDataTO
 
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
 
         Try
             'delete if previously exists
@@ -857,8 +857,8 @@ Public Class IInstrumentUpdateUtil
                 'encrypt the file
                 If File.Exists(pTempFilePath) Then
 
-                    Dim myUtil As New Utilities
-                    resultData = myUtil.EncryptFile(pTempFilePath, pFilePath)
+                    'Dim Utilities As New Utilities
+                    resultData = Utilities.EncryptFile(pTempFilePath, pFilePath)
 
                 Else
                     Throw New Exception(GlobalEnumerates.Messages.SYSTEM_ERROR.ToString)
@@ -892,7 +892,7 @@ Public Class IInstrumentUpdateUtil
     ''' <remarks>Created by SGM 23/06/2011</remarks>
     Private Function ImportAdjustmentsDataset(ByVal pAdjustmentsDatasetType As Type, ByVal pFilePath As String, ByVal pTempFilePath As String, ByVal pDecrypt As Boolean) As GlobalDataTO
         Dim resultData As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
         ' 
         Dim FS As FileStream = Nothing
 
@@ -906,7 +906,7 @@ Public Class IInstrumentUpdateUtil
                     File.Delete(pTempFilePath)
                 End If
 
-                resultData = myUtil.DecryptFile(pFilePath, pTempFilePath)
+                resultData = Utilities.DecryptFile(pFilePath, pTempFilePath)
 
                 If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                     If File.Exists(pTempFilePath) Then
@@ -1046,12 +1046,12 @@ Public Class IInstrumentUpdateUtil
     '    Dim myGlobal As New GlobalDataTO
 
     '    Try
-    '        Dim myGlobalbase As New GlobalBase
+    '        'Dim myGlobalbase As New GlobalBase
 
 
     '        With Me.BackupFileDialog
     '            .Title = "Backup Adjustments"
-    '            .InitialDirectory = Directory.GetDirectoryRoot(Application.StartupPath & myGlobalbase.FwAdjustmentsPath)
+    '            .InitialDirectory = Directory.GetDirectoryRoot(Application.StartupPath & GlobalBase.FwAdjustmentsPath)
     '            .Filter = "Text files|*.txt|All files|*.*"
     '            .CheckPathExists = True
     '            .OverwritePrompt = True
@@ -1507,7 +1507,7 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myGlobalbase As New GlobalBase
+            'Dim myGlobalbase As New GlobalBase
 
             With Me.OpenFwFileDialog
                 .Title = Me.BsTabPagesControl.TabPages(1).Text ' "Update Firmware"
@@ -3023,8 +3023,8 @@ Public Class IInstrumentUpdateUtil
         Dim myGlobal As New GlobalDataTO
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'user permissions
             MyBase.GetUserNumericalLevel()
@@ -3734,7 +3734,7 @@ Public Class IInstrumentUpdateUtil
     Private Sub BsOpenFileButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsFwOpenFileButton.Click
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        'Dim Utilities As New Utilities
 
         Try
 

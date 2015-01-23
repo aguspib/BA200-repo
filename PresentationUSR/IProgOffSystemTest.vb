@@ -1,5 +1,6 @@
 Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -490,7 +491,7 @@ Public Class IProgOffSystemTest
                     Close()
                 Else
                     'Normal button click - open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 bsFullNameTextbox.Focus()
@@ -977,13 +978,13 @@ Public Class IProgOffSystemTest
             'Get the Icon defined for OFF-SYSTEM Tests that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("TOFF_SYS")
             If (String.Compare(notInUseIcon, "", False) <> 0) Then
-                myIcons.Images.Add("TOFF_SYS", Image.FromFile(IconsPath & notInUseIcon))
+                myIcons.Images.Add("TOFF_SYS", ImageUtilities.ImageFromFile(IconsPath & notInUseIcon))
             End If
 
             'Get the Icon defined for OFF-SYSTEM Tests that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSEOFFS")
             If (String.Compare(inUseIcon, "", False) <> 0) Then
-                myIcons.Images.Add("INUSEOFFS", Image.FromFile(IconsPath & inUseIcon))
+                myIcons.Images.Add("INUSEOFFS", ImageUtilities.ImageFromFile(IconsPath & inUseIcon))
             End If
 
             'Assign the Icons to the OFF-SYSTEM Tests List View
@@ -1308,26 +1309,26 @@ Public Class IProgOffSystemTest
             'NEW Button
             auxIconName = GetIconName("ADD")
             If auxIconName <> "" Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If auxIconName <> "" Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsTestRefRanges.DeleteButtonImage = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsTestRefRanges.DeleteButtonImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
@@ -1335,25 +1336,25 @@ Public Class IProgOffSystemTest
             'CUSTOM SORT Button AG 04/09/2014 - BA-1869
             auxIconName = GetIconName("ORDER_TESTS")
             If (auxIconName <> "") Then
-                BsCustomOrderButton.Image = Image.FromFile(iconPath & auxIconName)
+                BsCustomOrderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (String.Compare(auxIconName, "", False) <> 0) Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1639,7 +1640,7 @@ Public Class IProgOffSystemTest
                 'Get from the User Control of Reference Ranges the defined ones
                 SelectedTestRefRangesDS = DirectCast(bsTestRefRanges.DefinedTestRangesDS, TestRefRangesDS) 'bsTestRefRanges.DefinedTestRangesDS
 
-                'Dim myGlobalBase As New GlobalBase
+                ''Dim myGlobalbase As New GlobalBase
                 ''Dim myTestRefRanges As New List(Of TestRefRangesDS.tparTestRefRangesRow)
                 'Dim myTestRefRanges As List(Of TestRefRangesDS.tparTestRefRangesRow)
 
@@ -1650,7 +1651,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1665,7 +1666,7 @@ Public Class IProgOffSystemTest
 
                 'For i As Integer = 0 To myTestRefRanges.Count - 1
                 '    myTestRefRanges(0).BeginEdit()
-                '    myTestRefRanges(0).TS_User = myGlobalBase.GetSessionInfo.UserName
+                '    myTestRefRanges(0).TS_User = GlobalBase.GetSessionInfo.UserName
                 '    myTestRefRanges(0).TS_DateTime = Now
                 '    myTestRefRanges(0).EndEdit()
 
@@ -1718,7 +1719,7 @@ Public Class IProgOffSystemTest
         Try
             'Gets from the Session the Username of the connected User
             Dim currentSession As New ApplicationSessionManager
-            Dim currentUser As String = currentSession.GetSessionInfo().UserName
+            Dim currentUser As String = GlobalBase.GetSessionInfo().UserName
 
             'Fill OffSystem Test basic data
             Dim offSystemTestData As New OffSystemTestsDS
@@ -1815,8 +1816,8 @@ Public Class IProgOffSystemTest
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for graphical buttons
             PrepareButtons()
@@ -2074,8 +2075,8 @@ Public Class IProgOffSystemTest
     Private Sub ProgOffSystemTest_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         Try
             'TR 20/04/2012 - Get the Level of the Current User
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
 
             ScreenLoad()
         Catch ex As Exception

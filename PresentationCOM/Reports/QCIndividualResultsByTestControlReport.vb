@@ -7,6 +7,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports DevExpress.XtraCharts
 Imports System.Drawing
+Imports DevExpress.Utils
 
 Public Class QCIndividualResultsByTestControlReport
     Private mControlsRow As OpenQCResultsDS.tOpenResultsRow
@@ -34,8 +35,8 @@ Public Class QCIndividualResultsByTestControlReport
         If (Me.DesignMode) Then Exit Sub
 
         'Get all Multilanguage texts for the report
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         XrLabelControlName.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Control_Name", mCurrentLanguage)
@@ -175,8 +176,8 @@ Public Class QCIndividualResultsByTestControlReport
     Private Sub PrepareLJGraph()
 
         'Get all multilanguage labels
-        Dim currentLanguageGlobal As New GlobalBase
-        Dim mCurrentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        Dim mCurrentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage
         Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
         mLabelSD = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SD", mCurrentLanguage)
@@ -186,7 +187,7 @@ Public Class QCIndividualResultsByTestControlReport
 
         'Initialize the Graphic control
         XrLJGraph.Series.Clear()
-        XrLJGraph.Legend.Visible = True
+        XrLJGraph.Legend.Visibility = DefaultBoolean.True
         XrLJGraph.SeriesTemplate.ValueScaleType = ScaleType.Numerical
 
         'Get RunNumbers to be used as Axis-X values for the Control to graph
@@ -202,19 +203,20 @@ Public Class QCIndividualResultsByTestControlReport
         'Create the Graph Serie for the Control
         XrLJGraph.Series.Add(mControlsRow.ControlNameLotNum, ViewType.Line)
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ShowInLegend = False
-        XrLJGraph.Series(mControlsRow.ControlNameLotNum).Label.Visible = False
-        XrLJGraph.Series(mControlsRow.ControlNameLotNum).PointOptions.PointView = PointView.ArgumentAndValues
+        XrLJGraph.Series(mControlsRow.ControlNameLotNum).LabelsVisibility = DefaultBoolean.False
+        XrLJGraph.Series(mControlsRow.ControlNameLotNum).Label.TextPattern = "{A}: {V}"
 
         'Set the Diagram properties
         Dim myDiagram As New XYDiagram
         myDiagram = CType(XrLJGraph.Diagram, XYDiagram)
         myDiagram.AxisY.ConstantLines.Clear()
         myDiagram.AxisX.ConstantLines.Clear()
-        myDiagram.AxisX.Range.Auto = True
+        myDiagram.AxisX.WholeRange.Auto = True
+        myDiagram.AxisX.VisualRange.Auto = True
         myDiagram.AxisY.GridLines.Visible = False
         myDiagram.AxisX.GridLines.Visible = False
-        myDiagram.AxisX.Title.Visible = False
-        myDiagram.AxisY.Title.Visible = False
+        myDiagram.AxisX.Title.Visibility = DefaultBoolean.False
+        myDiagram.AxisY.Title.Visibility = DefaultBoolean.False
 
         'In this Report, the LJ Graph is drawn individually for each Control
         Dim myUsedMean As Double = mControlsRow.Mean
@@ -263,14 +265,20 @@ Public Class QCIndividualResultsByTestControlReport
                 maxRelError = mRejectionCriteria
             End If
 
-            myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(myUsedMean - (maxRelError * mControlsRow.SD), 3) - 10, _
+            myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(myUsedMean - (maxRelError * mControlsRow.SD), 3) - 10, _
+                                                  Math.Round(myUsedMean + (maxRelError * mControlsRow.SD), 3) + 10)
+            myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(myUsedMean - (maxRelError * mControlsRow.SD), 3) - 10, _
                                                   Math.Round(myUsedMean + (maxRelError * mControlsRow.SD), 3) + 10)
         Else
             If (mControlsRow.SD > 0) Then
-                myDiagram.AxisY.Range.SetMinMaxValues(Math.Round(myUsedMean - (4 * mControlsRow.SD), 3), _
+                myDiagram.AxisY.WholeRange.SetMinMaxValues(Math.Round(myUsedMean - (4 * mControlsRow.SD), 3), _
+                                                      Math.Round(myUsedMean + (4 * mControlsRow.SD), 3))
+                myDiagram.AxisY.VisualRange.SetMinMaxValues(Math.Round(myUsedMean - (4 * mControlsRow.SD), 3), _
                                                       Math.Round(myUsedMean + (4 * mControlsRow.SD), 3))
             End If
         End If
+
+        myDiagram.AxisY.VisualRange.SideMarginsValue = 0
 
         Dim minQCSeries = 50
         Dim validResultValues As List(Of QCResultsDS.tqcResultsRow)
@@ -291,6 +299,9 @@ Public Class QCIndividualResultsByTestControlReport
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).DataSource = myDataSourceTable
         XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentDataMember = "Argument"
 
+        'ADDED THIS FOR CORRECT SCALING
+        XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative
+
         'BA-1885 - When the number of results to plot is greater than 50, this property has to be used to avoid overlapping of values in X-Axis
         If (myDataSourceTable.Rows.Count > minQCSeries) Then XrLJGraph.Series(mControlsRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
 
@@ -305,14 +316,14 @@ Public Class QCIndividualResultsByTestControlReport
         myDiagram.Margins.Right = 5
 
         'Set the Title for each axis
-        myDiagram.AxisX.Title.Visible = True
+        myDiagram.AxisX.Title.Visibility = DefaultBoolean.True
         myDiagram.AxisX.Title.Antialiasing = False
         myDiagram.AxisX.Title.TextColor = Color.Black
         myDiagram.AxisX.Title.Alignment = StringAlignment.Center
         myDiagram.AxisX.Title.Font = New Font("Verdana", 8.25, FontStyle.Regular)
         myDiagram.AxisX.Title.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Serie", mCurrentLanguage)
 
-        myDiagram.AxisY.Title.Visible = True
+        myDiagram.AxisY.Title.Visibility = DefaultBoolean.True
         myDiagram.AxisY.Title.Antialiasing = False
         myDiagram.AxisY.Title.TextColor = Color.Black
         myDiagram.AxisY.Title.Alignment = StringAlignment.Center
@@ -329,8 +340,8 @@ Public Class QCIndividualResultsByTestControlReport
                 myDiagram.AxisX.ConstantLines.Clear()
 
                 'Remove all axis titles
-                myDiagram.AxisX.Title.Visible = False
-                myDiagram.AxisY.Title.Visible = False
+                myDiagram.AxisX.Title.Visibility = DefaultBoolean.False
+                myDiagram.AxisY.Title.Visibility = DefaultBoolean.False
             End If
         End If
     End Sub

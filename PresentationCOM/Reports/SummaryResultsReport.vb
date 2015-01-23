@@ -6,7 +6,7 @@ Public Class SummaryResultsReport
         'XrHeaderLabel.Text = aText
     End Sub
 
-    Public Sub SetDataSource(ByVal aDataSource As DataTable)
+    Public Overloads Sub SetDataSource(ByVal aDataSource As DataTable)
         DataSource = aDataSource
         Dim detailDataMember As String = String.Format("{0}.{1}", aDataSource.TableName,
                 aDataSource.ChildRelations("Values").RelationName)

@@ -1,33 +1,20 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Microsoft.Win32
-Imports System.Configuration
-Imports System.Globalization
 Imports System.Management
-Imports System.Data.Sql
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.Windows.Forms
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.BL
 Imports System.IO
-Imports System.Threading
-Imports Biosystems.Ax00.PresentationCOM
 
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.Global.TO
 
-Imports System.Xml.Serialization
-
 Imports Biosystems.Ax00.InfoAnalyzer
-
-Imports System.Xml
 
 Imports System.Runtime.CompilerServices
 
@@ -51,8 +38,8 @@ Public Class FormSergio
 
     Private Sub FormSergio_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
         Try
-            Dim myUtil As New Utilities
-            myUtil.TaskBarState = InitialTaskBarState
+            'Dim myUtil As New Utilities.
+            Utilities.TaskBarState = InitialTaskBarState
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -65,8 +52,8 @@ Public Class FormSergio
         Try
             Dim myProdName As String = My.Application.Info.ProductName
 
-            Dim myUtil As New Utilities
-            InitialTaskBarState = myUtil.TaskBarState
+            'Dim myUtil As New Utilities.
+            InitialTaskBarState = Utilities.TaskBarState
 
             RefreshTaskbarState()
 
@@ -74,9 +61,9 @@ Public Class FormSergio
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("ADJUSTMENT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
-                    myGlobal = myUtil.ResizeImage(myImage, New Size(16, 16))
+                    myGlobal = Utilities.ResizeImage(myImage, New Size(16, 16))
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myImage = CType(myGlobal.SetDatos, Image)
                         BsButton14.Image = myImage
@@ -418,14 +405,14 @@ Public Class FormSergio
 
     Private Sub BsButton4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton4.Click
         Try
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
 
-            Select Case myUtil.TaskBarState
+            Select Case Utilities.TaskBarState
                 Case Utilities.TaskBarStates.AUTOHIDE, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP, Utilities.TaskBarStates.AUTOHIDE_CLOCK, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
-                    myUtil.TaskBarAutoHide = False
+                    Utilities.TaskBarAutoHide = False
                    
                 Case Else
-                    myUtil.TaskBarAutoHide = True
+                    Utilities.TaskBarAutoHide = True
 
             End Select
 
@@ -438,13 +425,13 @@ Public Class FormSergio
 
     Private Sub BsButton5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton5.Click
         Try
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
 
-            Select Case myUtil.TaskBarState
+            Select Case Utilities.TaskBarState
                 Case Utilities.TaskBarStates.ALWAYSONTOP, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP, Utilities.TaskBarStates.ALWAYSONTOP_CLOCK, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
-                    myUtil.TaskBarAlwaysOnTop = False
+                    Utilities.TaskBarAlwaysOnTop = False
                 Case Else
-                    myUtil.TaskBarAlwaysOnTop = True
+                    Utilities.TaskBarAlwaysOnTop = True
             End Select
 
             RefreshTaskbarState()
@@ -457,8 +444,8 @@ Public Class FormSergio
    
     Private Sub RefreshTaskbarState()
         Try
-            Dim myUtil As New Utilities
-            Select Case myUtil.TaskBarState
+            'Dim myUtil As New Utilities.
+            Select Case Utilities.TaskBarState
                 Case Utilities.TaskBarStates.AUTOHIDE, Utilities.TaskBarStates.AUTOHIDE_CLOCK
                     BsButton4.Text = "Not Auto Hide"
                     BsButton5.Text = "Always On Top"
@@ -627,7 +614,7 @@ Public Class FormSergio
             End With
             myInstruction.Add(myPar4)
 
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim myAnalyzer As New AnalyzerManager("", "")
             myAnalyzer.ISE_Manager = New ISEManager(myAnalyzer, "SN0000099999_Ax400", "A400")
             myGlobal = myAnalyzer.ProcessRecivedISEResult(myInstruction)
@@ -885,14 +872,14 @@ Public Class FormSergio
     Private Sub BsDataGridView1_CellPainting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellPaintingEventArgs) Handles BsDataGridView1.CellPainting
         Dim myGlobal As New GlobalDataTO
         Try
-            Dim myUtil As New Utilities
-            Dim myImage As Image
+            'Dim myUtil As New Utilities.
+            Dim myImage As Image = Nothing
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("ADJUSTMENT")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                myImage = Image.FromFile(iconPath & auxIconName)
+                myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
-                    myGlobal = myUtil.ResizeImage(myImage, New Size(16, 16))
+                    myGlobal = Utilities.ResizeImage(myImage, New Size(16, 16))
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myImage = CType(myGlobal.SetDatos, Image)
                         BsButton14.Image = myImage
@@ -1030,7 +1017,7 @@ Public Class FormSergio
             End With
             myInstruction.Add(myPar6)
 
-            Dim myUtil As New Utilities
+            'Dim myUtil As New Utilities.
             Dim myAnalyzer As New AnalyzerManager("", "")
             myAnalyzer.ISE_Manager = New ISEManager(myAnalyzer, "SN0000099999_Ax400", "A400")
             myGlobal = myAnalyzer.ProcessANSUTILReceived(myInstruction)

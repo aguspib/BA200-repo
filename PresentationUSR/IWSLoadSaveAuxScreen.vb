@@ -1,10 +1,10 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 
 Public Class IWSLoadSaveAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
@@ -96,8 +96,8 @@ Public Class IWSLoadSaveAuxScreen
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
 
-                Dim mySize As Size = IAx00MainMDI.Size
-                Dim myLocation As Point = IAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
                 If (Not Me.MdiParent Is Nothing) Then
                     mySize = Me.Parent.Size
                     myLocation = Me.Parent.Location
@@ -137,7 +137,7 @@ Public Class IWSLoadSaveAuxScreen
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Select Case SourceButtonAttribute
@@ -149,7 +149,7 @@ Public Class IWSLoadSaveAuxScreen
                     End If
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen Save WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen Save WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "IWSLoadSaveAuxScreen.AcceptSelection", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -161,7 +161,7 @@ Public Class IWSLoadSaveAuxScreen
                         LoadWorkSession()
                     End If
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen LOAD WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen LOAD WS (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "IWSLoadSaveAuxScreen.AcceptSelection", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -233,8 +233,8 @@ Public Class IWSLoadSaveAuxScreen
         Try
 
             'Center the screen regarding its parent
-            Dim mySize As Size = IAx00MainMDI.Size
-            Dim myLocation As Point = IAx00MainMDI.Location
+            Dim mySize As Size = UiAx00MainMDI.Size
+            Dim myLocation As Point = UiAx00MainMDI.Location
             If (Not Me.MdiParent Is Nothing) Then
                 mySize = Me.Parent.Size
                 myLocation = Me.Parent.Location
@@ -242,8 +242,8 @@ Public Class IWSLoadSaveAuxScreen
             Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Get Icons for Screen Buttons
             PrepareButtons()
@@ -315,7 +315,7 @@ Public Class IWSLoadSaveAuxScreen
             Me.DialogResult = Windows.Forms.DialogResult.OK
             If (Not Me.MdiParent Is Nothing) Then
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             Else
                 Me.Close()
             End If
@@ -339,16 +339,16 @@ Public Class IWSLoadSaveAuxScreen
             Me.DialogResult = Windows.Forms.DialogResult.OK
             If (Not Me.MdiParent Is Nothing) Then
                 'Before opening WS Preparation Screen, activate button for Reset WS
-                IAx00MainMDI.bsTSResetSessionButton.Enabled = True
+                UiAx00MainMDI.bsTSResetSessionButton.Enabled = True
 
                 'A Saved WS was loaded, open the screen of WS Preparation after inform the needed properties
-                IWSSampleRequest.ActiveAnalyzer = IAx00MainMDI.ActiveAnalyzer
-                IWSSampleRequest.ActiveWorkSession = IAx00MainMDI.ActiveWorkSession
-                IWSSampleRequest.ActiveWSStatus = IAx00MainMDI.ActiveStatus
+                IWSSampleRequest.ActiveAnalyzer = UiAx00MainMDI.ActiveAnalyzer
+                IWSSampleRequest.ActiveWorkSession = UiAx00MainMDI.ActiveWorkSession
+                IWSSampleRequest.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
                 IWSSampleRequest.WSLoadedID = IDProperty
                 IWSSampleRequest.WSLoadedName = NameProperty
 
-                IAx00MainMDI.OpenMDIChildForm(IWSSampleRequest)
+                UiAx00MainMDI.OpenMDIChildForm(IWSSampleRequest)
             End If
             Me.Close()
         Catch ex As Exception
@@ -372,13 +372,13 @@ Public Class IWSLoadSaveAuxScreen
             'ACCEPT Button
             auxIconName = GetIconName("ACCEPT1")
             If (auxIconName <> "") Then
-                bsAcceptButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsAcceptButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -482,7 +482,7 @@ Public Class IWSLoadSaveAuxScreen
 
                     If (Not Me.MdiParent Is Nothing) Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         Me.Close()
                     End If
@@ -498,7 +498,7 @@ Public Class IWSLoadSaveAuxScreen
                             'SavedWS was saved; the screen is closed
                             If (Not Me.MdiParent Is Nothing) Then
                                 'Open the WS Monitor form and close this one
-                                IAx00MainMDI.OpenMonitorForm(Me)
+                                UiAx00MainMDI.OpenMonitorForm(Me)
                             Else
                                 Me.Close()
                             End If
@@ -545,7 +545,7 @@ Public Class IWSLoadSaveAuxScreen
 
                     If (Not Me.MdiParent Is Nothing) Then
                         'Open the WS Monitor form and close this one
-                        IAx00MainMDI.OpenMonitorForm(Me)
+                        UiAx00MainMDI.OpenMonitorForm(Me)
                     Else
                         'Me.Opacity = 0 'Because the form could be still opening, so avoid the flickering.
                         Application.DoEvents()
@@ -632,13 +632,13 @@ Public Class IWSLoadSaveAuxScreen
     Private Sub IWSLoadSaveAuxScreen_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         InitializeScreen()
 
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IWSLoadSaveAuxScreen Load\Save WS Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        GlobalBase.CreateLogActivity("IWSLoadSaveAuxScreen Load\Save WS Screen (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                         "IWSLoadSaveAuxScreen.IWSLoadSaveAuxScreen_Load", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -678,7 +678,7 @@ Public Class IWSLoadSaveAuxScreen
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             Else
                 Me.Close()

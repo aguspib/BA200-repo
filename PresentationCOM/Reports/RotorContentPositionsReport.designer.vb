@@ -37,8 +37,6 @@ Partial Public Class RotorContentPositionsReport
         Me.XrLabelBarcode = New DevExpress.XtraReports.UI.XRLabel()
         Me.XrLabel1 = New DevExpress.XtraReports.UI.XRLabel()
         Me.XrHeaderLabel = New DevExpress.XtraReports.UI.XRLabel()
-        Me.DetailReport = New DevExpress.XtraReports.UI.DetailReportBand()
-        Me.Detail1 = New DevExpress.XtraReports.UI.DetailBand()
         Me.XrTable1 = New DevExpress.XtraReports.UI.XRTable()
         Me.XrTableRow1 = New DevExpress.XtraReports.UI.XRTableRow()
         Me.XrTableCell2 = New DevExpress.XtraReports.UI.XRTableCell()
@@ -59,7 +57,9 @@ Partial Public Class RotorContentPositionsReport
         '
         'Detail
         '
-        Me.Detail.HeightF = 0.0!
+        Me.Detail.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrTable1})
+        Me.Detail.HeightF = 22.0!
+        Me.Detail.KeepTogether = True
         Me.Detail.Name = "Detail"
         Me.Detail.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.Detail.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -125,7 +125,7 @@ Partial Public Class RotorContentPositionsReport
         'XrPanel2
         '
         Me.XrPanel2.Borders = DevExpress.XtraPrinting.BorderSide.Bottom
-        Me.XrPanel2.BorderWidth = 1
+        Me.XrPanel2.BorderWidth = 1.0!
         Me.XrPanel2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelRemainingTests, Me.XrLabelBottle, Me.XrLabelVolume, Me.XrLabelExpDate, Me.XrLabelName, Me.XrLabelCell, Me.XrLabelStatus, Me.XrLabelBarcode, Me.XrLabel1})
         Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 45.62499!)
         Me.XrPanel2.Name = "XrPanel2"
@@ -292,24 +292,10 @@ Partial Public Class RotorContentPositionsReport
         Me.XrHeaderLabel.Text = "XrHeaderLabel"
         Me.XrHeaderLabel.TextAlignment = DevExpress.XtraPrinting.TextAlignment.MiddleLeft
         '
-        'DetailReport
-        '
-        Me.DetailReport.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail1})
-        Me.DetailReport.DataMember = "ReportTable"
-        Me.DetailReport.DataSource = Me.CellPositionInformationDS1
-        Me.DetailReport.Level = 0
-        Me.DetailReport.Name = "DetailReport"
-        '
-        'Detail1
-        '
-        Me.Detail1.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrTable1})
-        Me.Detail1.HeightF = 22.0!
-        Me.Detail1.Name = "Detail1"
-        '
         'XrTable1
         '
         Me.XrTable1.Font = New System.Drawing.Font("Times New Roman", 9.75!)
-        Me.XrTable1.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
+        Me.XrTable1.LocationFloat = New DevExpress.Utils.PointFloat(0.00002384186!, 0.0!)
         Me.XrTable1.Name = "XrTable1"
         Me.XrTable1.Rows.AddRange(New DevExpress.XtraReports.UI.XRTableRow() {Me.XrTableRow1})
         Me.XrTable1.SizeF = New System.Drawing.SizeF(744.0!, 22.0!)
@@ -457,14 +443,14 @@ Partial Public Class RotorContentPositionsReport
         '
         'RotorContentPositionsReport
         '
-        Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1, Me.DetailReport})
+        Me.Bands.AddRange(New DevExpress.XtraReports.UI.Band() {Me.Detail, Me.TopMargin, Me.BottomMargin, Me.GroupHeader1})
         Me.Font = New System.Drawing.Font("Times New Roman", 9.75!, System.Drawing.FontStyle.Italic)
         Me.FormattingRuleSheet.AddRange(New DevExpress.XtraReports.UI.FormattingRule() {Me.Few, Me.Depleted})
         Me.Margins = New System.Drawing.Printing.Margins(38, 45, 40, 33)
         Me.PageHeight = 1169
         Me.PageWidth = 827
         Me.PaperKind = System.Drawing.Printing.PaperKind.A4
-        Me.Version = "13.1"
+        Me.Version = "14.2"
         CType(Me.XrTable1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.CellPositionInformationDS1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me, System.ComponentModel.ISupportInitialize).EndInit()
@@ -496,8 +482,6 @@ Partial Public Class RotorContentPositionsReport
     Friend WithEvents XrTableCell2 As DevExpress.XtraReports.UI.XRTableCell
     Friend WithEvents XrTableRow1 As DevExpress.XtraReports.UI.XRTableRow
     Friend WithEvents XrTable1 As DevExpress.XtraReports.UI.XRTable
-    Friend WithEvents Detail1 As DevExpress.XtraReports.UI.DetailBand
-    Friend WithEvents DetailReport As DevExpress.XtraReports.UI.DetailReportBand
     Friend WithEvents CellPositionInformationDS1 As Biosystems.Ax00.Types.CellPositionInformationDS
     Friend WithEvents Few As DevExpress.XtraReports.UI.FormattingRule
     Friend WithEvents Depleted As DevExpress.XtraReports.UI.FormattingRule

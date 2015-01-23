@@ -1,24 +1,20 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalConstants
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
-Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
-Imports Biosystems.Ax00.Controls.UserControls
-Imports System.Globalization
-Imports LIS.Biosystems.Ax00.LISCommunications 'AG 25/02/2013 - for LIS communications
-Imports System.Xml 'AG 25/02/2013 - for LIS communications
-Imports System.Threading 'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
-Imports System.Timers
+'AG 25/02/2013 - for LIS communications
+'AG 25/02/2013 - for LIS communications
+'AG 25/02/2013 - for LIS communications (release MDILISManager object in MDI closing event)
 
 
 'Refactoring code in VericalButtons partial class inherits form MDI (specially method ActivateActionButtonBarOrSendNewAction)
-Partial Public Class IAx00MainMDI
+Partial Public Class UiAx00MainMDI
 
 #Region "Action Buttons managenement business"
 
@@ -608,8 +604,8 @@ Partial Public Class IAx00MainMDI
 
                                 ' XBC 04/07/2012
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMonitor) Then
-                                        Dim CurrentMdiChild As IMonitor = CType(ActiveMdiChild, IMonitor)
+                                    If (TypeOf ActiveMdiChild Is UiMonitor) Then
+                                        Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                                         CurrentMdiChild.TimeWarmUpProgressBar.Position = 0
                                         ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
                                         ErrorStatusLabel.Text = GetMessageText(GlobalEnumerates.Messages.ALIGHT_REQUIRED.ToString)
@@ -948,8 +944,8 @@ Partial Public Class IAx00MainMDI
                     ElseIf myAx00Ready AndAlso Not WarmUpFinishedAttribute Then
                         bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag 'AG 23/07/2012
 
-                        If ActiveMdiChild Is IMonitor Then
-                            Dim myMonitor As IMonitor = CType(ActiveMdiChild, IMonitor)
+                        If ActiveMdiChild Is UiMonitor Then
+                            Dim myMonitor As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                             If myMonitor.IsEndWarmUpButtonVisible Then
                                 bsTSShutdownButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.SHUT_DOWN) 'AG 14/05/2012 True 
                                 WithShutToolStripMenuItem.Enabled = bsTSShutdownButton.Enabled  'DL 04/06/2012
@@ -1040,8 +1036,8 @@ Partial Public Class IAx00MainMDI
                             End If
 
                             'AG 22/02/2012 - Update button in change rotor utility
-                        ElseIf (TypeOf ActiveMdiChild Is IChangeRotor) Then
-                            Dim CurrentMdiChild As IChangeRotor = CType(ActiveMdiChild, IChangeRotor)
+                        ElseIf (TypeOf ActiveMdiChild Is UiChangeRotor) Then
+                            Dim CurrentMdiChild As UiChangeRotor = CType(ActiveMdiChild, UiChangeRotor)
                             If String.Compare(MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess), "PAUSED", False) = 0 Then
                                 bsTSChangeBottlesConfirm.Enabled = enableChangeBottlesConfirmFlag
                                 'AG 28/03/2012

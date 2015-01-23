@@ -88,7 +88,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Public Overridable Function UpdateFromFactoryUpdates(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -135,7 +135,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryUpdates", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryUpdates", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -153,7 +153,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Public Overridable Function UpdateFromFactoryRemoves(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -202,7 +202,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryRemoves", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.UpdateFromFactoryRemoves", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -235,7 +235,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Protected Overridable Function DoItemActionFromFactoryUpdates(ByVal pDBConnection As SqlClient.SqlConnection, pItemRow As DataRow) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -288,7 +288,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryUpdates", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryUpdates", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -307,7 +307,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
         ''' AG 31/01/2013 - use the proper template
         ''' </remarks>
         Protected Overridable Function DoItemActionFromFactoryRemoves(ByVal pDBConnection As SqlClient.SqlConnection, pItemRow As DataRow) As GlobalDataTO
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             Dim myDataSet As DataSet = Nothing
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -360,7 +360,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
-                myLogAcciones.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryRemoves", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "UpdateElementParent.DoItemActionFromFactoryRemoves", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -394,8 +394,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("Elememt Update Error.", "UpdateElementParent.GetActionFromFactoryUpdates", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("Elememt Update Error.", "UpdateElementParent.GetActionFromFactoryUpdates", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message
@@ -430,8 +430,8 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                 End If
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity("CALC Test Update Error.", "UpdateElementParent.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity("CALC Test Update Error.", "UpdateElementParent.GetActionFromFactoryRemoves", EventLogEntryType.Error, False)
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message

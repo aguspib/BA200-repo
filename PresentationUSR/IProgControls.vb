@@ -1,5 +1,6 @@
 Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -492,7 +493,7 @@ Public Class IProgControls
             If (ShowMessage(Me.Name, GlobalEnumerates.Messages.DELETE_CONFIRMATION.ToString) = Windows.Forms.DialogResult.Yes) Then
                 'Get the current User from the Application Session
                 Dim currentSession As New ApplicationSessionManager
-                Dim loggedUser As String = currentSession.GetSessionInfo().UserName
+                Dim loggedUser As String = GlobalBase.GetSessionInfo().UserName
 
                 'Load all selected Controls in a typed DataSet controlDS
                 Dim myControlsDS As New ControlsDS
@@ -714,7 +715,7 @@ Public Class IProgControls
                 Me.Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
         Catch ex As Exception
@@ -967,7 +968,7 @@ Public Class IProgControls
 
             'Gets from the Session the Username of the connected User; get also the current datetime
             Dim currentSession As New ApplicationSessionManager
-            controlRow.TS_User = currentSession.GetSessionInfo().UserName
+            controlRow.TS_User = GlobalBase.GetSessionInfo().UserName
             controlRow.TS_DateTime = Now
 
             controlData.tparControls.Rows.Add(controlRow)
@@ -993,13 +994,13 @@ Public Class IProgControls
             'Get the Icon defined for controls that are not in use in the current Work Session
             Dim notInUseIcon As String = GetIconName("CTRL")
             If (notInUseIcon <> "") Then
-                myIcons.Images.Add("CTRL", Image.FromFile(MyBase.IconsPath & notInUseIcon))
+                myIcons.Images.Add("CTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
             End If
 
             'Get the Icon defined for Controls that are not in use in the current Work Session
             Dim inUseIcon As String = GetIconName("INUSECTRL")
             If (inUseIcon <> "") Then
-                myIcons.Images.Add("INUSECTRL", Image.FromFile(MyBase.IconsPath & inUseIcon))
+                myIcons.Images.Add("INUSECTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & inUseIcon))
             End If
 
             'Assign the Icons to the Controls
@@ -1267,27 +1268,27 @@ Public Class IProgControls
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsNewButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsNewLotButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsNewButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsNewLotButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'DELETE Buttons
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
-                bsDelTest.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                bsDelTest.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
             'JB 30/08/2012 - Hide Print button
             bsPrintButton.Visible = False
@@ -1296,19 +1297,19 @@ Public Class IProgControls
             'SAVE Button
             auxIconName = GetIconName("SAVE")
             If (auxIconName <> "") Then
-                bsSaveButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1709,15 +1710,15 @@ Public Class IProgControls
     Private Sub ScreenLoad()
         Try
             If (String.Compare(SourceScreenAttribute, GlbSourceScreen.TEST_QCTAB.ToString, False) = 0) Then
-                Dim myLocation As Point = IAx00MainMDI.Location
-                Dim mySize As Size = IAx00MainMDI.Size
+                Dim myLocation As Point = UiAx00MainMDI.Location
+                Dim mySize As Size = UiAx00MainMDI.Size
 
                 Me.Location = New Point(myLocation.X + CInt((mySize.Width - Me.Width) / 2), myLocation.Y + CInt((mySize.Height - Me.Height) / 2))
             End If
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels()
@@ -2369,8 +2370,8 @@ Public Class IProgControls
             If (m.Msg = WM_WINDOWPOSCHANGING) Then
                 Dim pos As WINDOWPOS = DirectCast(Runtime.InteropServices.Marshal.PtrToStructure(m.LParam, GetType(WINDOWPOS)), WINDOWPOS)
                 If (SourceScreenAttribute = GlbSourceScreen.TEST_QCTAB.ToString) Then
-                    Dim myLocation As Point = IAx00MainMDI.Location
-                    Dim mySize As Size = IAx00MainMDI.Size
+                    Dim myLocation As Point = UiAx00MainMDI.Location
+                    Dim mySize As Size = UiAx00MainMDI.Size
 
                     pos.x = myLocation.X + CInt((mySize.Width - Me.Width) / 2) 'Me.Left
                     pos.y = myLocation.Y + CInt((mySize.Height - Me.Height) / 2) ' Me.Top
@@ -2423,8 +2424,8 @@ Public Class IProgControls
     Private Sub ProgControls_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             'TR 20/04/2012 get the current user level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo().UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             'TR 20/04/2012 -END.
 
             ScreenLoad()

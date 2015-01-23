@@ -1,14 +1,10 @@
 ﻿'Put here your business code for the tab AlarmsTab inside Monitor Form
-
 Option Explicit On
-'Option Strict On
+Option Strict On
+Option Infer On
 
-Imports DevExpress.XtraGrid
-Imports DevExpress.XtraGrid.Columns
-Imports DevExpress.XtraGrid.Views.Base
 Imports DevExpress.XtraGrid.Views.Grid
 Imports DevExpress.XtraGrid.Views.Grid.ViewInfo
-Imports DevExpress.XtraGrid.Repository
 Imports DevExpress.XtraEditors.Controls
 Imports DevExpress.Utils
 
@@ -18,7 +14,7 @@ Imports Biosystems.Ax00.BL
 'Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
 #Region "Declarations"
 
@@ -485,8 +481,8 @@ Partial Public Class IMonitor
             Dim myGlobalDataTO As New GlobalDataTO
 
             If (LanguageID Is Nothing) Then
-                Dim currentLanguageGlobal As New GlobalBase
-                LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+                'Dim currentLanguageGlobal As New GlobalBase
+                LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
                 myMultiLangResourcesDelegate = New MultilanguageResourcesDelegate
             End If
@@ -618,20 +614,16 @@ Partial Public Class IMonitor
             If Not e.SelectedControl Is AlarmsXtraGrid Then Return
 
             'Get the view at the current mouse position
-            Dim view As GridView = AlarmsXtraGrid.GetViewAt(e.ControlMousePosition)
+            Dim view = TryCast(AlarmsXtraGrid.GetViewAt(e.ControlMousePosition), GridView)
             If view Is Nothing Then Return
 
             'Get the view's element information that resides at the current position
-            Dim hi As GridHitInfo = view.CalcHitInfo(e.ControlMousePosition)
+            Dim hi = view.CalcHitInfo(e.ControlMousePosition)
 
             If hi.InRowCell Then
-                'Dim o As Object = hi.HitTest.ToString() + hi.RowHandle.ToString()
-                'Dim text As String = "Row " + hi.RowHandle.ToString()
-                'info = New ToolTipControlInfo(o, text)
 
                 'This is how to get the DataRow behind the GridViewRow
-                Dim CurrentRow As WSAnalyzerAlarmsDS.vwksAlarmsMonitorRow
-                CurrentRow = CType(view.GetDataRow(hi.RowHandle), WSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
+                Dim CurrentRow = CType(view.GetDataRow(hi.RowHandle), WSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
 
                 'RH 23/05/2012
                 Select Case hi.Column.Name

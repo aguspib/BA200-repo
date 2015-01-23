@@ -1,17 +1,13 @@
 ﻿Option Explicit On
 Option Strict On
 
-Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
-Imports Biosystems.Ax00.InfoAnalyzer
-Imports System.Timers
 Imports System.Data
-Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+Imports System.Data.SqlClient
+'AG 20/04/2011 - added when create instance to an BackGroundWorker
 
 Namespace Biosystems.Ax00.CommunicationsSwFw
 
@@ -165,8 +161,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessConnection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessConnection", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -265,8 +261,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.ManageSendAndSearchNext", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -295,7 +291,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Try
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
 
                 Dim iseStatusOK As Boolean = False
                 Dim iseInstalledFlag As Boolean = False
@@ -343,7 +339,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.SKIP)
                                 actionAlreadySent = True
 
-                                myLogAcciones.CreateLogActivity("SKIP sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                GlobalBase.CreateLogActivity("SKIP sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                             End If
                         End If
 
@@ -356,7 +352,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 actionAlreadySent = True
                                 If Not myGlobal.HasError Then
                                     AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
-                                    myLogAcciones.CreateLogActivity("WRUN cuvette sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    GlobalBase.CreateLogActivity("WRUN cuvette sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 Else
                                     'AG 27/09/2012 - the instruction could not be sent because empty fields. The cuvette must continue marked as Contamianted, so nothing to do
                                     ' except remove the error flag and code
@@ -407,7 +403,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             'AG 27/09/2012
                                         End If
 
-                                        myLogAcciones.CreateLogActivity("ISETEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                        GlobalBase.CreateLogActivity("ISETEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                     End If 'If myAnManagerDS.nextPreparation(0).IsExecutionIDNull Then
                                 End If
 
@@ -424,7 +420,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 If Not myGlobal.HasError Then
                                     AddNewSentPreparationsList(Nothing, myAnManagerDS, pNextWell) 'Update sent instructions DS
-                                    myLogAcciones.CreateLogActivity("WRUN reagents sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    GlobalBase.CreateLogActivity("WRUN reagents sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 Else
                                     Dim sendWRUNErrorCode As String = myGlobal.ErrorCode 'AG 27/09/2012
 
@@ -546,7 +542,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     End If
                                     'AG 31/05/2012
 
-                                    myLogAcciones.CreateLogActivity("TEST or PTEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
+                                    GlobalBase.CreateLogActivity("TEST or PTEST sent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SendNextPreparation", EventLogEntryType.Information, False) 'AG 28/06/2012
                                 End If 'If myAnManagerDS.nextPreparation(0).IsExecutionIDNull Then
                             End If 'If Not myAnManagerDS.nextPreparation(0).IsExecutionTypeNull Then
                         End If 'If Not actionAlreadySent And Not endRunToSend Then
@@ -624,8 +620,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendNextPreparation", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -647,22 +643,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 12/07/2012 - add parameter (optional pLookForISEExecutionsFlag). This parameter is informed only when call this method from ManageSendAndSearchNext
         '''                 and the ise requests is FALSE (I:0)
         ''' </remarks>
-        Private Function SearchNextPreparation(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
+        Private Function SearchNextPreparation(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, Optional ByVal pLookForISEExecutionsFlag As Boolean = True) As GlobalDataTO
 
             'Dim resultData As New GlobalDataTO
             'Dim dbConnection As New SqlClient.SqlConnection
 
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 Dim StartTimeTotal As DateTime = Now
                 Dim StartTime As DateTime = Now 'AG 11/06/2012 - time estimation
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         Dim nextPreparationDS As New AnalyzerManagerDS
@@ -701,7 +697,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         If Not rejectedWell Then '(2.0)
                             resultData = Me.CheckRejectedContaminatedNextWell(dbConnection, pNextWell, rejectedWell, contaminatedWell, WashSol1, WashSol2)
-                            myLogAcciones.CreateLogActivity("SearchNextPreparation (CheckRejectedContaminatedNextWell): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("SearchNextPreparation (CheckRejectedContaminatedNextWell): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(2.1)
@@ -760,7 +756,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         If Not rejectedWell AndAlso Not contaminatedWell AndAlso pLookForISEExecutionsFlag Then '(3.0)
                             resultData = Me.SearchNextISEPreparationNEW(dbConnection)
-                            myLogAcciones.CreateLogActivity("SearchNextPreparation (SearchNextISEPreparationNEW): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("SearchNextPreparation (SearchNextISEPreparationNEW): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(3.1)
@@ -800,7 +796,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim sampleClassFound As String = ""
 
                             resultData = Me.SearchNextSTDPreparation(dbConnection, executionFound, existContamination, WashSol1, WashSol2, sampleClassFound)
-                            myLogAcciones.CreateLogActivity("SearchNextPreparation (SearchNextSTDPreparation): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("SearchNextPreparation (SearchNextSTDPreparation): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
                             StartTime = Now
 
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then '(4.1)
@@ -861,7 +857,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If '(2)
                 End If '(1)
 
-                myLogAcciones.CreateLogActivity("SearchNextPreparation (Complete): " & Now.Subtract(StartTimeTotal).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("SearchNextPreparation (Complete): " & Now.Subtract(StartTimeTotal).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Information, False)
 
 
             Catch ex As Exception
@@ -870,8 +866,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextPreparation", EventLogEntryType.Error, False)
             End Try
 
             'We have used Exit Try so we have to be sure the connection becomes properly closed here
@@ -890,14 +886,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pRejected " ></param>
         ''' <returns>GlobalDataTo with error or not. ByRef prejected updated</returns>
         ''' <remarks>AG 17/01/2011</remarks>
-        Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
+        Private Function CheckOpticalNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, ByRef pRejected As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         pRejected = False
@@ -927,8 +923,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckOpticalNextWell", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -949,16 +945,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/0/2011
         ''' AG 24/11/2011 - Priority 1st Contaminated well, 2on Rejected Well + change the business to prepare the contaminated well washing</remarks>
-        Private Function CheckRejectedContaminatedNextWell(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNextWell As Integer, _
+        Private Function CheckRejectedContaminatedNextWell(ByVal pDBConnection As SqlConnection, ByVal pNextWell As Integer, _
                                                     ByRef pRejectedWell As Boolean, ByRef pContaminatedWell As Boolean, _
                                                     ByRef pWashSol1 As String, ByRef pWashSol2 As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         pContaminatedWell = False 'Initialize return byref variables
@@ -1075,8 +1071,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.CheckRejectedContaminatedNextWell", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.CheckRejectedContaminatedNextWell", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1093,14 +1089,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pExecutionISEFound"></param>
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/01/2011</remarks>
-        Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
+        Private Function SearchNextISEPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionISEFound As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         If ISEModuleIsReadyAttribute Then '(3) 'Search ISE prep only when the ISE module is ready
@@ -1120,8 +1116,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparation", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1140,15 +1136,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by: RH 26/06/2012
         ''' AG 11/07/2012 - remove IseModuleIsReadyAttribute from IF (now Sw search next using the status accepted instruction and this instruction contains the field I:0)
         ''' </remarks>
-        Private Function SearchNextISEPreparationNEW(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function SearchNextISEPreparationNEW(ByVal pDBConnection As SqlConnection) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
-            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Dim dbConnection As SqlConnection = Nothing
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
 
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     'If (Not dbConnection Is Nothing) AndAlso ISEModuleIsReadyAttribute Then
                     If (Not dbConnection Is Nothing) Then
@@ -1167,8 +1163,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparationNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextISEPreparationNEW", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1191,16 +1187,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pSampleClassFound" ></param>
         ''' <returns>GolbalDataTo indicates if error or not. If no error use the byref parameters</returns>
         ''' <remarks>AG 18/01/2011</remarks>
-        Private Function SearchNextSTDPreparation(ByVal pDBConnection As SqlClient.SqlConnection, ByRef pExecutionSTDFound As Integer, _
+        Private Function SearchNextSTDPreparation(ByVal pDBConnection As SqlConnection, ByRef pExecutionSTDFound As Integer, _
                                                   ByRef pReagentWashFlag As Boolean, ByRef pWashSol1 As String, _
                                                   ByRef pWashSol2 As String, ByRef pSampleClassFound As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         'Initialize byRef variables (parameters)
@@ -1329,8 +1325,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1347,15 +1343,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pNextWell"></param>
         ''' <returns></returns>
         ''' <remarks>Modified AG 10/01/2014</remarks>
-        Private Function AddNewSentPreparationsList(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pNewPreparationSent As AnalyzerManagerDS, ByVal pNextWell As Integer) As GlobalDataTO
+        Private Function AddNewSentPreparationsList(ByVal pDBConnection As SqlConnection, ByVal pNewPreparationSent As AnalyzerManagerDS, ByVal pNextWell As Integer) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
 
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
                         If pNewPreparationSent.nextPreparation.Rows.Count > 0 Then '(3)
@@ -1497,8 +1493,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SearchNextSTDPreparation", EventLogEntryType.Error, False)
 
                 'Finally
             End Try
@@ -1527,7 +1523,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pHighContaminationPersitance"></param>
         ''' <returns>AnalyzerManager.searchNext inside a GlobalDataTo</returns>
         ''' <remarks>AG 25/01/2011 - Created</remarks>
-        Private Function GetNextExecution(ByVal pDBConnection As SqlClient.SqlConnection, _
+        Private Function GetNextExecution(ByVal pDBConnection As SqlConnection, _
                                           ByRef pFound As Boolean, _
                                           ByVal pSTDExecutionList As ExecutionsDS, _
                                           ByVal pOrderID As String, _
@@ -1538,12 +1534,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                           ByVal pHighContaminationPersitance As Integer) As GlobalDataTO
 
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then '(1)
-                    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = DirectCast(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then '(2)
 
@@ -1583,7 +1579,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 allOrderTestsDS = DirectCast(resultData.SetDatos, OrderTestsForExecutionsDS)
 
                                 Dim auxOrderTestID As Integer = -1
-                                Dim otInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                Dim otInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                 For Each row As ExecutionsDS.twksWSExecutionsRow In toSendList
                                     If row.OrderTestID <> auxOrderTestID Then
@@ -1625,9 +1621,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             '1) Search contamination between previous reagents and the first in toSendList
                             Dim previousReagentIDSentList As List(Of AnalyzerManagerDS.sentPreparationsRow) 'The last reagents used are in the higher array indexes
-                            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow)
+                            Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
                             Dim contaminationFound As Boolean = False
-                            Dim myLogAcciones As New ApplicationLogManager() 'Add temporal traces 'AG 28/03/2014 - #1563
+                            'Dim myLogAcciones As New ApplicationLogManager() 'Add temporal traces 'AG 28/03/2014 - #1563
 
                             previousReagentIDSentList = (From a As AnalyzerManagerDS.sentPreparationsRow In mySentPreparationsDS.sentPreparations _
                                                      Where a.ExecutionType = "PREP_STD" Select a).ToList
@@ -1697,7 +1693,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                     If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
                                                         Exit For
                                                     ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
-                                                        myLogAcciones.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
+                                                        GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
                                                     End If
                                                     'AG 28/03/2014 - #1563 
                                                 Next
@@ -1858,7 +1854,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                     If Not mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull AndAlso previousExecutionsIDSent = mySentPreparationsDS.sentPreparations(i).ExecutionID Then
                                                         Exit For
                                                     ElseIf mySentPreparationsDS.sentPreparations(i).IsExecutionIDNull Then
-                                                        myLogAcciones.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
+                                                        GlobalBase.CreateLogActivity("Protection! Otherwise the bug #1563 was triggered", "AnalyzerManager.GetNextExecution", EventLogEntryType.Information, False)
                                                     End If
                                                     'AG 28/03/2014 - #1563 
                                                 Next
@@ -1943,8 +1939,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = "SYSTEM_ERROR" 'AG 19/06/2012
                 resultData.ErrorMessage = ex.Message 'AG 19/06/2012
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextExecution", EventLogEntryType.Error, False)
             End Try
             Return resultData
         End Function
@@ -2007,8 +2003,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SendAdjustLightInstruction", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SendAdjustLightInstruction", EventLogEntryType.Error, False)
             End Try
             Return myGlobal
         End Function
@@ -2029,15 +2025,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by AG ?
         ''' Modified by AG 03/01/2011 - if pBaseLineWithAdjust = true (if ANSAL get current baselineid from twksWSBLines, else (FALSE) get from twksWSBLinesByWell
         ''' </remarks>
-        Private Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Private Function GetCurrentBaseLineID(ByVal pdbConnection As SqlConnection, ByVal pAnalyzerID As String, _
                                              ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pdbConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         If pBaseLineWithAdjust Then 'Base line with adjust (ANSAL instruction received)
@@ -2059,8 +2055,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2085,13 +2081,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by AG 20/05/2010
         ''' AG 03/01/2011 - new parameter pBaseLineWithAdjust if ANSAL then save into twksWSBLines, else save into twksWSBLinesByWell
         ''' </remarks>
-        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
             Try
                 myGlobal = DAOBase.GetOpenDBTransaction(pdbConnection)
                 If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
-                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(myGlobal.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         ' Method business
@@ -2150,8 +2146,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myGlobal.HasError = True
                 myGlobal.ErrorCode = "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SaveBaseLineResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.SaveBaseLineResults", EventLogEntryType.Error, False)
 
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2180,15 +2176,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by AG 21/05/2010
         ''' AG 03/01/2011 - use twksWSBLines or twksWSBLinesByWell depending pBaseLineWithAdjust parameter value
         ''' </remarks>
-        Private Function GetNextBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+        Private Function GetNextBaseLineID(ByVal pdbConnection As SqlConnection, ByVal pAnalyzerID As String, _
                                            ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
             Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As New SqlConnection
 
             Try
                 resultData = DAOBase.GetOpenDBConnection(pdbConnection)
                 If (Not resultData.HasError) And (Not resultData.SetDatos Is Nothing) Then
-                    dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
+                    dbConnection = CType(resultData.SetDatos, SqlConnection)
 
                     If (Not dbConnection Is Nothing) Then
                         Dim currBaseLineID As Integer = 0
@@ -2249,8 +2245,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
             Finally
 
             End Try

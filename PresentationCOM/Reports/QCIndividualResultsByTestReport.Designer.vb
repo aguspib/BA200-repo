@@ -1,3 +1,5 @@
+Imports DevExpress.Utils
+
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Public Class QCIndividualResultsByTestReport
     Inherits DevExpress.XtraReports.UI.XtraReport
@@ -338,9 +340,9 @@ Partial Public Class QCIndividualResultsByTestReport
             Or DevExpress.XtraPrinting.BorderSide.Right) _
             Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         XyDiagram1.AxisX.GridLines.Visible = True
-        XyDiagram1.AxisX.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisX.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram1.AxisY.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisY.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
         Me.XrYoudenGraph.Diagram = XyDiagram1
         Me.XrYoudenGraph.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Gradient
@@ -356,22 +358,22 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrYoudenGraph.PaletteBaseColorNumber = 4
         Me.XrYoudenGraph.PaletteName = "Black and White"
         Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel1.LineVisible = True
-        PointSeriesLabel1.Visible = False
+        PointSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.True
         Series1.Label = PointSeriesLabel1
-        Series1.LegendPointOptions = PointOptions1
+        Series1.LabelsVisibility = DefaultBoolean.False
+        Series1.LegendTextPattern = "{V}"
         Series1.Name = "Series 1"
         PointOptions2.PointView = DevExpress.XtraCharts.PointView.ArgumentAndValues
-        Series1.PointOptions = PointOptions2
+        Series1.Label.TextPattern = "{A}: {V}"
         Series1.ShowInLegend = False
         Series1.SynchronizePointOptions = False
         LineSeriesView1.LineMarkerOptions.BorderVisible = False
         LineSeriesView1.LineMarkerOptions.Size = 1
         Series1.View = LineSeriesView1
         Me.XrYoudenGraph.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1}
-        PointSeriesLabel2.LineVisible = True
+        PointSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.True
         Me.XrYoudenGraph.SeriesTemplate.Label = PointSeriesLabel2
-        Me.XrYoudenGraph.SeriesTemplate.LegendPointOptions = PointOptions3
+        Me.XrYoudenGraph.SeriesTemplate.LegendTextPattern = "{V}"
         Me.XrYoudenGraph.SeriesTemplate.SynchronizePointOptions = False
         Me.XrYoudenGraph.SeriesTemplate.View = LineSeriesView2
         Me.XrYoudenGraph.SizeF = New System.Drawing.SizeF(681.0!, 384.7917!)
@@ -380,7 +382,7 @@ Partial Public Class QCIndividualResultsByTestReport
         Me.XrYoudenGraph.StylePriority.UseBorders = False
         ChartTitle1.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         ChartTitle1.Text = "Linear"
-        ChartTitle1.Visible = False
+        ChartTitle1.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.XrYoudenGraph.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle1})
         '
         'QCIndividualResultsByTestReport

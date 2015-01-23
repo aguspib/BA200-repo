@@ -49,8 +49,8 @@
 
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.LoadISEErrorsDataHT", EventLogEntryType.Error, False)
 '            End Try
 
 '        End Sub
@@ -104,8 +104,8 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetResultErrors", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetResultErrors", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -166,8 +166,8 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetCancelError", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetCancelError", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function
@@ -200,8 +200,8 @@
 '                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.ConvertISEResultToISEResultTO", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobalDataTO
@@ -354,8 +354,8 @@
 '        '        myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 '        '        myGlobalDataTO.ErrorMessage = ex.Message
 
-'        '        Dim myLogAcciones As New ApplicationLogManager()
-'        '        myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
+'        '        'Dim myLogAcciones As New ApplicationLogManager()
+'        '        GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
 '        '    End Try
 
 '        '    Return myGlobalDataTO
@@ -469,8 +469,8 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeSimpleISETESTResult", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -515,8 +515,8 @@
 '                myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
 '                myGlobalDataTO.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.DecodeComplexISETESTResult", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobalDataTO
@@ -683,8 +683,8 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetLiNaKClValues", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetLiNaKClValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -765,8 +765,8 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetPumpCalibrationValues", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetPumpCalibrationValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -847,8 +847,8 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEDecodeDelegate.GetBubbleDetectorCalibrationValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1012,8 +1012,8 @@
 '                myGlobal.ErrorCode = "SYSTEM_ERROR"
 '                myGlobal.ErrorMessage = ex.Message
 
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.FillISEResultValues", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.FillISEResultValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1047,8 +1047,8 @@
 
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetIoneValue", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetIoneValue", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return returnValue
@@ -1090,8 +1090,8 @@
 '                    End If
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetPumpValue", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetPumpValue", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return returnValue
@@ -1123,8 +1123,8 @@
 '                    End If
 '                End If
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetBubbleValue", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetBubbleValue", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return returnValue
@@ -1141,7 +1141,7 @@
 '        Private Function GetDallasSNValues(ByVal pDataStr As String) As GlobalDataTO
 
 '            Dim myGlobal As New GlobalDataTO
-'            Dim myUtil As New Utilities
+'            'Dim myUtil As New Utilities.
 
 '            Try
 '                Dim myDallasSNData As New ISEDallasSNTO
@@ -1154,19 +1154,19 @@
 '                    .SNDataString = pDataStr.Trim
 
 '                    'Family Code
-'                    myGlobal = myUtil.ConvertHexToString(myFamilyCodeHex)
+'                    myGlobal = Utilities.ConvertHexToString(myFamilyCodeHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .FamilyCode = CStr(myGlobal.SetDatos)
 '                    End If
 
 '                    'Serial Number
-'                    myGlobal = myUtil.ConvertHexToString(mySerialNumberHex)
+'                    myGlobal = Utilities.ConvertHexToString(mySerialNumberHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .SerialNumber = CStr(myGlobal.SetDatos)
 '                    End If
 
 '                    'CRC Tester
-'                    myGlobal = myUtil.ConvertHexToString(myCRCHex)
+'                    myGlobal = Utilities.ConvertHexToString(myCRCHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .CRC = CStr(myGlobal.SetDatos)
 '                    End If
@@ -1175,8 +1175,8 @@
 '                myGlobal.SetDatos = myDallasSNData
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasSNValues", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasSNValues", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1192,7 +1192,7 @@
 '        Private Function GetDallasPage00Values(ByVal pDataStr As String) As GlobalDataTO
 
 '            Dim myGlobal As New GlobalDataTO
-'            Dim myUtil As New Utilities
+'            'Dim myUtil As New Utilities.
 
 '            Try
 '                Dim myDallas00Data As New ISEDallasPage00TO
@@ -1211,37 +1211,37 @@
 '                    .Page00DataString = pDataStr.Trim
 
 '                    'LotNumber
-'                    myGlobal = myUtil.ConvertHexToUInt32(myLotNumberHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myLotNumberHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .LotNumber = CInt(myGlobal.SetDatos).ToString
 '                    End If
 
 '                    'ExpirationDay
-'                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationDayHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationDayHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .ExpirationDay = CInt(myGlobal.SetDatos)
 '                    End If
 
 '                    'ExpirationMonth
-'                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationMonthHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationMonthHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .ExpirationMonth = CInt(myGlobal.SetDatos)
 '                    End If
 
 '                    'ExpirationYear
-'                    myGlobal = myUtil.ConvertHexToUInt32(myExpirationYearHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myExpirationYearHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .ExpirationYear = 2000 + CInt(myGlobal.SetDatos)
 '                    End If
 
 '                    'InitialCalibAVolume (mililitres)
-'                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibAVolumeHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibAVolumeHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .InitialCalibAVolume = 10 * CInt(myGlobal.SetDatos)
 '                    End If
 
 '                    'InitialCalibBVolume (mililitres)
-'                    myGlobal = myUtil.ConvertHexToUInt32(myInitialCalibBVolumeHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myInitialCalibBVolumeHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .InitialCalibBVolume = 10 * CInt(myGlobal.SetDatos)
 '                    End If
@@ -1261,8 +1261,8 @@
 '                myGlobal.SetDatos = myDallas00Data
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage00Values", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage00Values", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1278,7 +1278,7 @@
 '        Private Function GetDallasPage01Values(ByVal pDataStr As String) As GlobalDataTO
 
 '            Dim myGlobal As New GlobalDataTO
-'            Dim myUtil As New Utilities
+'            'Dim myUtil As New Utilities.
 
 '            Try
 '                Dim myDallas01Data As New ISEDallasPage01TO
@@ -1295,19 +1295,19 @@
 '                    .Page01DataString = pDataStr.Trim
 
 '                    'InstallationDay
-'                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationDayHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationDayHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .InstallationDay = CInt(myGlobal.SetDatos)
 '                    End If
 
 '                    'InstallationMonth
-'                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationMonthHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationMonthHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .InstallationMonth = CInt(myGlobal.SetDatos)
 '                    End If
 
 '                    'InstallationYear
-'                    myGlobal = myUtil.ConvertHexToUInt32(myInstallationYearHex)
+'                    myGlobal = Utilities.ConvertHexToUInt32(myInstallationYearHex)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        .InstallationYear = 2000 + CInt(myGlobal.SetDatos)
 '                    End If
@@ -1332,8 +1332,8 @@
 '                myGlobal.SetDatos = myDallas01Data
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage01Values", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetDallasPage01Values", EventLogEntryType.Error, False)
 '            End Try
 
 '            Return myGlobal
@@ -1352,7 +1352,7 @@
 
 '            Try
 '                Dim myConsumption As Integer
-'                Dim myUtil As New Utilities
+'                'Dim myUtil As New Utilities.
 
 '                'each byte (2 char) represents 8%, one per bit
 '                Dim myBytes As New List(Of String)
@@ -1361,7 +1361,7 @@
 '                Next
 '                For Each B As String In myBytes
 '                    Dim myBinaryString As String
-'                    myGlobal = myUtil.ConvertHexToBinaryString(B)
+'                    myGlobal = Utilities.ConvertHexToBinaryString(B)
 '                    If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
 '                        myBinaryString = CStr(myGlobal.SetDatos)
 '                        Dim myHighWord As String = myBinaryString.Substring(0, 4)
@@ -1387,8 +1387,8 @@
 '                myGlobal.SetDatos = myConsumption
 
 '            Catch ex As Exception
-'                Dim myLogAcciones As New ApplicationLogManager()
-'                myLogAcciones.CreateLogActivity(ex.Message, "ISEResultDecode.GetConsumptionVolume", EventLogEntryType.Error, False)
+'                'Dim myLogAcciones As New ApplicationLogManager()
+'                GlobalBase.CreateLogActivity(ex.Message, "ISEResultDecode.GetConsumptionVolume", EventLogEntryType.Error, False)
 '            End Try
 '            Return myGlobal
 '        End Function

@@ -1,9 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Types
 Imports System.Windows.Forms
 
 Public Class IBackground

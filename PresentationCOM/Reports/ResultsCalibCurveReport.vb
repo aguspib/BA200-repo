@@ -1,4 +1,4 @@
-Imports DevExpress.XtraReports.UI
+
 Imports DevExpress.XtraCharts
 
 Public Class ResultsCalibCurveReport

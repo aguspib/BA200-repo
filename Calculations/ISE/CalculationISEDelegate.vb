@@ -124,8 +124,8 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculatePreloadedConcentrationCorrection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculatePreloadedConcentrationCorrection", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -157,8 +157,8 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.GetSlopeValues", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationISEDelegate.GetSlopeValues", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function
@@ -213,8 +213,8 @@ Namespace Biosystems.Ax00.Calculations
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculateUserDefinedConcentrationCorrection", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "CalculationISEDelegate.CalculateUserDefinedConcentrationCorrection", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

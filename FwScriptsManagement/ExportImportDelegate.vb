@@ -5,16 +5,8 @@ Option Explicit On
 
 
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.IO
-Imports System.Configuration
-Imports System.Text
-
 
 
 Namespace Biosystems.Ax00.FwScriptsManagement
@@ -72,8 +64,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/10/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportTextInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportTextInstructions", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -126,8 +118,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/10/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportInstructions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportInstructions", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -163,8 +155,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/11/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportFwScript", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ExportFwScript", EventLogEntryType.Error, False)
             End Try
 
             Return myGlobal
@@ -183,7 +175,7 @@ Namespace Biosystems.Ax00.FwScriptsManagement
         Public Function ImportFwScript(ByVal pImportPath As String, ByVal pTargetFwScriptsData As FwScriptsDataTO) As GlobalDataTO
 
             Dim myGlobal As New GlobalDataTO
-            Dim TextFileReader As StreamReader
+            Dim TextFileReader As StreamReader = Nothing
             Try
                 If File.Exists(pImportPath) Then
                     TextFileReader = New StreamReader(pImportPath)
@@ -242,8 +234,8 @@ Namespace Biosystems.Ax00.FwScriptsManagement
                 myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString 'PG 15/11/2010 "SYSTEM_ERROR"
                 myGlobal.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExportImportDelegate.ImportFwScript", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExportImportDelegate.ImportFwScript", EventLogEntryType.Error, False)
 
             Finally
                 If TextFileReader IsNot Nothing Then

@@ -1,12 +1,12 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 'Imports System.Configuration
 'Imports Biosystems.Ax00.BL.Framework
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Public Class IQCCumulateControlResults
 
@@ -197,9 +197,9 @@ Public Class IQCCumulateControlResults
         Try
             If (IQCResultReviewGoneAttribute) Then
                 Me.Close()
-                If Not IAx00MainMDI.ActiveMdiChild Is Nothing Then
-                    If (TypeOf IAx00MainMDI.ActiveMdiChild Is IQCResultsReview) Then
-                        Dim CurrentMdiChild As IQCResultsReview = CType(IAx00MainMDI.ActiveMdiChild, IQCResultsReview)
+                If Not UiAx00MainMDI.ActiveMdiChild Is Nothing Then
+                    If (TypeOf UiAx00MainMDI.ActiveMdiChild Is IQCResultsReview) Then
+                        Dim CurrentMdiChild As IQCResultsReview = CType(UiAx00MainMDI.ActiveMdiChild, IQCResultsReview)
                         CurrentMdiChild.ReloadScreen()
                     End If
                 End If
@@ -210,7 +210,7 @@ Public Class IQCCumulateControlResults
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
         Catch ex As Exception
@@ -261,7 +261,7 @@ Public Class IQCCumulateControlResults
             Dim myIcons As New ImageList
             Dim notInUseIcon As String = GetIconName("CTRL")
             If (notInUseIcon <> "") Then
-                myIcons.Images.Add("CTRL", Image.FromFile(MyBase.IconsPath & notInUseIcon))
+                myIcons.Images.Add("CTRL", ImageUtilities.ImageFromFile(MyBase.IconsPath & notInUseIcon))
             End If
 
             'Initialization of control List
@@ -436,7 +436,7 @@ Public Class IQCCumulateControlResults
 
             myForm.QCTestSampleIDValue = pQCTestSampleID
             myForm.AnalyzerID = AnalyzerIDAttribute
-            myForm.MdiParent = IAx00MainMDI
+            myForm.MdiParent = UiAx00MainMDI
             myForm.Show()
 
             Me.Close()
@@ -461,31 +461,31 @@ Public Class IQCCumulateControlResults
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CUMULATE Button
             auxIconName = GetIconName("QCCUM")
             If (auxIconName <> "") Then
-                bsCumulateButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCumulateButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("UNDO")
             If (auxIconName <> "") Then
-                bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CLOSE Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -979,8 +979,8 @@ Public Class IQCCumulateControlResults
     Private Sub ScreenLoad()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Load the multilanguage texts for all Screen Labels
             GetScreenLabels()

@@ -284,8 +284,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ProcessVolumeMissing", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ProcessVolumeMissing", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -332,8 +332,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetByOrderTestID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetByOrderTestID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -371,8 +371,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecution", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -408,8 +408,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecution", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -510,8 +510,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetCalibratorData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetCalibratorData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -556,8 +556,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionByPreparationID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionByPreparationID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -606,8 +606,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadByOrderTestIDandRerunNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadByOrderTestIDandRerunNumber", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -650,8 +650,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetOrderTestWithExecutionStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetOrderTestWithExecutionStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -702,8 +702,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetResultsOrderTestReplicate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetResultsOrderTestReplicate", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -763,8 +763,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SaveExecutionsResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SaveExecutionsResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -818,8 +818,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -870,8 +870,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByExecutionID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByExecutionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -946,8 +946,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByOrderTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByOrderTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1001,8 +1001,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1062,13 +1062,14 @@ Namespace Biosystems.Ax00.BL
                     'If not low contaminations exists then evaluate if a high contamination exits (only if optional parameter informed)
                     'Search for contamination (only HIGH level contamination)
                     For highIndex As Integer = pHighContaminationPersistance - 1 To 1
-                        If (myIndex - highIndex) >= 0 Then 'Avoid overflow
+                        Dim auxHighIndex = highIndex
+                        If (myIndex - auxHighIndex) >= 0 Then 'Avoid overflow
                             contaminations = (From wse In pContaminationsDS.tparContaminations _
-                                              Where wse.ReagentContaminatorID = pExecutions(myIndex - highIndex).ReagentID _
+                                              Where wse.ReagentContaminatorID = pExecutions(myIndex - auxHighIndex).ReagentID _
                                               AndAlso wse.ReagentContaminatedID = pExecutions(myIndex + 1).ReagentID _
                                               AndAlso Not wse.IsWashingSolutionR1Null _
-                                              AndAlso pExecutions(myIndex - highIndex).ExecutionStatus = "PENDING" _
-                                              AndAlso pExecutions(myIndex - highIndex).ExecutionType = "PREP_STD" _
+                                              AndAlso pExecutions(myIndex - auxHighIndex).ExecutionStatus = "PENDING" _
+                                              AndAlso pExecutions(myIndex - auxHighIndex).ExecutionType = "PREP_STD" _
                                               AndAlso pExecutions(myIndex + 1).ExecutionStatus = "PENDING" _
                                               AndAlso pExecutions(myIndex + 1).ExecutionType = "PREP_STD" _
                                               Select wse).ToList()
@@ -1153,13 +1154,14 @@ Namespace Biosystems.Ax00.BL
                     'Sort the different ordertest inside pExecutions to minimize contaminations (move down the contaminated until becomes not contaminated)
                     For i As Integer = 1 To sortedOTList.Count - 1
                         'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
+                        Dim auxIndex = i
                         ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                    Where a.OrderTestID = sortedOTList(auxIndex - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                         MainContaminatorID = ReagentContaminatorID
 
                         contaminatedOrderTest = sortedOTList(i)
                         ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                    Where a.OrderTestID = sortedOTList(auxIndex) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
                                              Where wse.ReagentContaminatorID = ReagentContaminatorID _
@@ -1171,7 +1173,7 @@ Namespace Biosystems.Ax00.BL
                         If contaminations.Count = 0 Then
                             Dim maxReplicates As Integer = 1
                             maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                             Where a.OrderTestID = sortedOTList(i - 1) Select a.ReplicateNumber).Max
+                                             Where a.OrderTestID = sortedOTList(auxIndex - 1) Select a.ReplicateNumber).Max
                             If maxReplicates < pHighContaminationPersistance Then
                                 If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
                                     contaminations = (From wse In pContaminationsDS.tparContaminations _
@@ -1181,7 +1183,7 @@ Namespace Biosystems.Ax00.BL
                                                       Select wse).ToList()
                                 ElseIf i > 1 Then
                                     ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                            Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                            Where a.OrderTestID = sortedOTList(auxIndex - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                     contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                       Where wse.ReagentContaminatorID = ReagentContaminatorID _
@@ -1206,7 +1208,7 @@ Namespace Biosystems.Ax00.BL
                                 'offset = pHighContaminationPersistance
                                 If i + offset <= sortedOTList.Count - 1 Then
                                     maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                     Where a.OrderTestID = sortedOTList(i + offset) Select a.ReplicateNumber).Max
+                                                     Where a.OrderTestID = sortedOTList(auxIndex + offset) Select a.ReplicateNumber).Max
                                     If maxReplicates < pHighContaminationPersistance Then
                                         offset = pHighContaminationPersistance
                                     End If
@@ -1217,6 +1219,8 @@ Namespace Biosystems.Ax00.BL
 
                             'For j As Integer = i + 1 To sortedOTList.Count - 1
                             For j As Integer = i + offset To sortedOTList.Count - 1
+                                ' ReSharper disable once InconsistentNaming
+                                Dim aux_j = j
                                 'AG 28/11/2011
                                 ''Next contamination to analyze is between OrderTest(i+1) --> OrderTest(i) / OrderTest(i+2) --> OrderTest(i) / ... /
                                 ''until an OrderTest that not contaminates OrderTest(i) is found
@@ -1230,12 +1234,14 @@ Namespace Biosystems.Ax00.BL
 
                                 'Move the contaminated where it is not contaminated (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                                 'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = j To j - pHighContaminationPersistance - 1 Step -1
-                                    If jj >= 0 Then
+                                For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
+                                    ' ReSharper disable once InconsistentNaming
+                                    Dim aux_jj = jj
+                                    If aux_jj >= 0 Then
                                         ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                 Where a.OrderTestID = sortedOTList(jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                 Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        If jj = j Then 'search for contamination (low or high level)
+                                        If aux_jj = aux_j Then 'search for contamination (low or high level)
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = ReagentContaminatorID _
                                                                 AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
@@ -1252,9 +1258,9 @@ Namespace Biosystems.Ax00.BL
 
                                         'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                                         'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If jj = j Then
+                                        If aux_jj = aux_j Then
                                             maxReplicates = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(jj) Select b.ReplicateNumber).Max
+                                                             Where b.OrderTestID = sortedOTList(aux_jj) Select b.ReplicateNumber).Max
                                             If maxReplicates >= pHighContaminationPersistance Then
                                                 Exit For 'Do not evaluate high contamination persistance
                                             End If
@@ -1277,7 +1283,7 @@ Namespace Biosystems.Ax00.BL
                                     Dim newContaminatedID As Integer
                                     If i < sortedOTList.Count - 1 Then
                                         newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(i + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                Where a.OrderTestID = sortedOTList(auxIndex + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                         contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                             Where wse.ReagentContaminatorID = MainContaminatorID _
@@ -1288,9 +1294,9 @@ Namespace Biosystems.Ax00.BL
                                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2)
                                     'Simplication: In this point do not take care about High contamination persistance
                                     If contaminations.Count = 0 Then
-                                        If j < sortedOTList.Count - 1 Then
+                                        If aux_j < sortedOTList.Count - 1 Then
                                             newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                               Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = ReagentContaminatedID _
                                                                 AndAlso wse.ReagentContaminatedID = newContaminatedID _
@@ -1301,8 +1307,8 @@ Namespace Biosystems.Ax00.BL
 
                                     If contaminations.Count = 0 Then
                                         '(i < j)
-                                        If sortedOTList.Count - 1 > j Then
-                                            sortedOTList.Insert(j + 1, contaminatedOrderTest)
+                                        If sortedOTList.Count - 1 > aux_j Then
+                                            sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
                                         Else
                                             sortedOTList.Add(contaminatedOrderTest)
                                         End If
@@ -1436,14 +1442,16 @@ Namespace Biosystems.Ax00.BL
 
                     'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminated until becomes not contaminated)
                     For i As Integer = 1 To sortedOTList.Count - 1
+                        ' ReSharper disable once InconsistentNaming
+                        Dim aux_i = i
                         'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
                         ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                    Where a.OrderTestID = sortedOTList(aux_i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                         MainContaminatorID = ReagentContaminatorID
 
-                        contaminatedOrderTest = sortedOTList(i)
+                        contaminatedOrderTest = sortedOTList(aux_i)
                         ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                    Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                         Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
                                              Where wse.ReagentContaminatorID = ReagentContaminatorID _
@@ -1455,17 +1463,17 @@ Namespace Biosystems.Ax00.BL
                         If contaminations.Count = 0 Then
                             Dim maxReplicates As Integer = 1
                             maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                             Where a.OrderTestID = sortedOTList(i - 1) Select a.ReplicateNumber).Max
+                                             Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
                             If maxReplicates < pHighContaminationPersistance Then
-                                If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
+                                If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
                                     contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                       Where wse.ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) _
                                                       AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
                                                       AndAlso Not wse.IsWashingSolutionR1Null _
                                                       Select wse).ToList()
-                                ElseIf i > 1 Then
+                                ElseIf aux_i > 1 Then
                                     ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                            Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                            Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                     contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                       Where wse.ReagentContaminatorID = ReagentContaminatorID _
@@ -1484,7 +1492,9 @@ Namespace Biosystems.Ax00.BL
                             Dim upperLimit As Integer = 0
                             If Not pPreviousReagentID Is Nothing Then upperLimit = 1
 
-                            For j As Integer = i - 2 To upperLimit Step -1
+                            For j As Integer = aux_i - 2 To upperLimit Step -1
+                                Dim aux_j = j  'Datatyp3e inference
+
                                 'AG 25/11/2011
                                 ''Next contamination to analyze is between OrderTest(i-2) --> OrderTest(i) / OrderTest(i-3) --> OrderTest(i) / ... /
                                 ''until an OrderTest that not contaminates OrderTest(i) is found
@@ -1498,14 +1508,15 @@ Namespace Biosystems.Ax00.BL
 
                                 'Move the contaminated reagent where not contaminated is (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                                 'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = j To j - pHighContaminationPersistance - 1 Step -1
+                                For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
+                                    Dim aux_jj = jj
                                     'Next contamination to analyze is between OrderTest(i-2) --> OrderTest(i) / OrderTest(i-3) --> OrderTest(i) / ... /
                                     'until an OrderTest that not contaminates OrderTest(i) is found
-                                    If jj >= upperLimit Then
+                                    If aux_jj >= upperLimit Then
                                         ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                Where a.OrderTestID = sortedOTList(aux_jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        If jj = j Then 'search for contamination (low or high level)
+                                        If aux_jj = aux_j Then 'search for contamination (low or high level)
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = ReagentContaminatorID _
                                                                AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
@@ -1522,9 +1533,9 @@ Namespace Biosystems.Ax00.BL
 
                                         'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                                         'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If jj = j Then
+                                        If aux_jj = aux_j Then
                                             Dim maxReplicates As Integer = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(jj) Select b.ReplicateNumber).Max
+                                                             Where b.OrderTestID = sortedOTList(aux_jj) Select b.ReplicateNumber).Max
                                             If maxReplicates >= pHighContaminationPersistance Then
                                                 Exit For 'Do not evaluate high contamination persistance
                                             End If
@@ -1544,9 +1555,9 @@ Namespace Biosystems.Ax00.BL
                                     'Only when the OrderTest(i-1) (the MainContaminatorID, and future OrderTest(i)) does not contaminates the OrderTest(i+1)
                                     'Simplication: In this point do not take care about High contamination persistance
                                     Dim newContaminatedID As Integer
-                                    If i < sortedOTList.Count - 1 Then
+                                    If aux_i < sortedOTList.Count - 1 Then
                                         newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(i + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                Where a.OrderTestID = sortedOTList(aux_i + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                         contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                             Where wse.ReagentContaminatorID = MainContaminatorID _
@@ -1557,9 +1568,9 @@ Namespace Biosystems.Ax00.BL
                                     'Before move OrderTest(i) (the Contaminated one, and future OrderTest(j+1)) also be carefull does not contaminates the current OrderTest(j+1) (the future OrderTest(j+2))
                                     'Simplication: In this point do not take care about High contamination persistance
                                     If contaminations.Count = 0 Then
-                                        If j < sortedOTList.Count - 1 Then
+                                        If aux_j < sortedOTList.Count - 1 Then
                                             newContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                               Where a.OrderTestID = sortedOTList(aux_j + 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = ReagentContaminatedID _
                                                                 AndAlso wse.ReagentContaminatedID = newContaminatedID _
@@ -1570,7 +1581,7 @@ Namespace Biosystems.Ax00.BL
                                     If contaminations.Count = 0 Then
                                         '(j < i)
                                         sortedOTList.Remove(contaminatedOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
-                                        sortedOTList.Insert(j + 1, contaminatedOrderTest)
+                                        sortedOTList.Insert(aux_j + 1, contaminatedOrderTest)
                                         Exit For
                                     End If
                                 End If
@@ -1705,13 +1716,15 @@ Namespace Biosystems.Ax00.BL
 
                     'Sort the different ordertest inside pExecutions to minimize contaminations (move down the contaminator until it does not contaminates)
                     For i As Integer = initialLimit To sortedOTList.Count - 1
+                        ' ReSharper disable once InconsistentNaming
+                        Dim aux_i = i
                         'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
                         ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
-                        contaminatorOrderTest = sortedOTList(i - 1)
+                                                    Where a.OrderTestID = sortedOTList(aux_i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                        contaminatorOrderTest = sortedOTList(aux_i - 1)
 
                         ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                    Where a.OrderTestID = sortedOTList(i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                    Where a.OrderTestID = sortedOTList(aux_i) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                         MainContaminatedID = ReagentContaminatedID
 
                         Dim contaminations = (From wse In pContaminationsDS.tparContaminations _
@@ -1724,18 +1737,18 @@ Namespace Biosystems.Ax00.BL
                         If contaminations.Count = 0 Then
                             Dim maxReplicates As Integer = 1
                             maxReplicates = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                             Where a.OrderTestID = sortedOTList(i - 1) Select a.ReplicateNumber).Max
+                                             Where a.OrderTestID = sortedOTList(aux_i - 1) Select a.ReplicateNumber).Max
                             If maxReplicates < pHighContaminationPersistance Then
-                                If i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
+                                If aux_i = 1 AndAlso Not pPreviousReagentID Is Nothing Then
                                     'This code has no sense, in current policy we are trying to move the contaminator and it belongs to another SAMPLE (it can not be move NOW!!!)
                                     'contaminations = (From wse In pContaminationsDS.tparContaminations _
                                     '                  Where wse.ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) _
                                     '                  AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
                                     '                  AndAlso Not wse.IsWashingSolutionR1Null _
                                     '                  Select wse).ToList()
-                                ElseIf i > 1 Then
+                                ElseIf aux_i > 1 Then
                                     Dim highContaminatorID As Integer = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                            Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                            Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                                     contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                       Where wse.ReagentContaminatorID = highContaminatorID _
                                                       AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
@@ -1748,7 +1761,8 @@ Namespace Biosystems.Ax00.BL
 
                         'OrderTest(i-1) contaminates OrderTest(i) ... so try move OrderTes(i-1) down until it does not contaminates
                         If contaminations.Count > 0 Then
-                            For j As Integer = i + 1 To sortedOTList.Count - 1
+                            For j = aux_i + 1 To sortedOTList.Count - 1
+                                Dim auxJ = j
                                 'AG 25/11/2011 
                                 ''Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i+1) / OrderTest(i-1) --> OrderTest(i+2) / ... /
                                 ''until an OrderTest that not has contaminated by OrderTest(i-1) is found
@@ -1765,14 +1779,15 @@ Namespace Biosystems.Ax00.BL
                                 If pHighContaminationPersistance > 1 Then offset = pHighContaminationPersistance
 
                                 'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = j To j + pHighContaminationPersistance - 1
+                                For jj = auxJ To auxJ + pHighContaminationPersistance - 1
+                                    Dim auxJj = jj
                                     'Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i+1) / OrderTest(i-1) --> OrderTest(i+2) / ... /
                                     'until an OrderTest that not has contaminated by OrderTest(i-1) is found
-                                    If jj <= sortedOTList.Count - 1 Then
+                                    If auxJj <= sortedOTList.Count - 1 Then
                                         ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        If jj = j Then 'search for contamination (low or high level)
+                                        If auxJj = auxJ Then 'search for contamination (low or high level)
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = ReagentContaminatorID _
                                                                 AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
@@ -1789,9 +1804,9 @@ Namespace Biosystems.Ax00.BL
 
                                         'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                                         'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If jj = j Then
+                                        If auxJj = auxJ Then
                                             Dim maxReplicates As Integer = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(jj) Select b.ReplicateNumber).Max
+                                                             Where b.OrderTestID = sortedOTList(auxJj) Select b.ReplicateNumber).Max
                                             If maxReplicates >= pHighContaminationPersistance Then
                                                 Exit For 'Do not evaluate high contamination persistance
                                             End If
@@ -1811,9 +1826,9 @@ Namespace Biosystems.Ax00.BL
                                     'Only when OrderTest(i-2) does not contaminates the OrderTest(i) (the MainContaminated and future OrderTest(i-1))
                                     'Simplication: In this point do not take care about High contamination persistance
                                     Dim newContaminatorID As Integer
-                                    If i > 1 Then
+                                    If aux_i > 1 Then
                                         newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                Where a.OrderTestID = sortedOTList(aux_i - 2) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
                                         contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                             Where wse.ReagentContaminatorID = newContaminatorID _
@@ -1824,9 +1839,9 @@ Namespace Biosystems.Ax00.BL
                                     'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j)) be carefull is not contaminated by current OrderTest(j-1)
                                     'Simplication: In this point do not take care about High contamination persistance
                                     If contaminations.Count = 0 Then
-                                        If j > 0 Then
+                                        If auxJ > 0 Then
                                             newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(j - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                               Where a.OrderTestID = sortedOTList(auxJ - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = newContaminatorID _
                                                                 AndAlso wse.ReagentContaminatedID = ReagentContaminatorID _
@@ -1836,8 +1851,8 @@ Namespace Biosystems.Ax00.BL
 
                                     If contaminations.Count = 0 Then
                                         '(i < j)
-                                        If sortedOTList.Count - 1 > j - 1 Then
-                                            sortedOTList.Insert(j, contaminatorOrderTest)
+                                        If sortedOTList.Count - 1 > auxJ - 1 Then
+                                            sortedOTList.Insert(auxJ, contaminatorOrderTest)
                                         Else
                                             sortedOTList.Add(contaminatorOrderTest)
                                         End If
@@ -1975,7 +1990,8 @@ Namespace Biosystems.Ax00.BL
                     If Not pPreviousReagentID Is Nothing Then initialLimit = 2
 
                     'Sort the different ordertest inside pExecutions to minimize contaminations (move up the contaminator until it does not contaminates)
-                    For i As Integer = initialLimit To sortedOTList.Count - 1
+                    For i2 = initialLimit To sortedOTList.Count - 1
+                        Dim i = i2
                         'First contamination to analyze is between OrderTest(i-1) --> OrderTest(i)
                         ReagentContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
                                                     Where a.OrderTestID = sortedOTList(i - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
@@ -2049,7 +2065,8 @@ Namespace Biosystems.Ax00.BL
                             'AG 25/11/2011
 
 
-                            For j As Integer = i - 2 - offset To upperLimit Step -1
+                            For j = i - 2 - offset To upperLimit Step -1
+                                Dim aux_j = j
                                 'AG 28/11/2011
                                 ''Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i-2) / OrderTest(i-1) --> OrderTest(i-3) / ... /
                                 ''until an OrderTest that it is not contaminated bytOrderTest(i) is found
@@ -2063,14 +2080,15 @@ Namespace Biosystems.Ax00.BL
 
                                 'Move the contaminator where not contaminates (taking care about HIGH contaminations persistance inside the Element group OrderTests)
                                 'NOTE: index 'j' is equivalent to low persistance, so in next loop the limit is pHighContaminationPersistance - 1
-                                For jj = j To j - pHighContaminationPersistance - 1 Step -1
-                                    If jj >= 0 Then
+                                For jj = aux_j To aux_j - pHighContaminationPersistance - 1 Step -1
+                                    Dim auxJj = jj
+                                    If auxJj >= 0 Then
                                         'Next contamination to analyze is between OrderTest(i-1) --> OrderTest(i-2) / OrderTest(i-1) --> OrderTest(i-3) / ... /
                                         'until an OrderTest that it is not contaminated bytOrderTest(i) is found
                                         ReagentContaminatedID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                Where a.OrderTestID = sortedOTList(jj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                Where a.OrderTestID = sortedOTList(auxJj) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
 
-                                        If jj = j Then 'search for contamination (low or high level)
+                                        If auxJj = aux_j Then 'search for contamination (low or high level)
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = ReagentContaminatorID _
                                                                 AndAlso wse.ReagentContaminatedID = ReagentContaminatedID _
@@ -2087,9 +2105,9 @@ Namespace Biosystems.Ax00.BL
 
                                         'AG 19/12/2011 - Evaluate only HIGH contamination persistance when OrderTest(jj) has MaxReplicates < pHighContaminationPersistance
                                         'If this condition is FALSE ... Exit For (do not evaluate high contamination persistance)
-                                        If jj = j Then
+                                        If auxJj = aux_j Then
                                             maxReplicates = (From b As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                             Where b.OrderTestID = sortedOTList(jj) Select b.ReplicateNumber).Max
+                                                             Where b.OrderTestID = sortedOTList(auxJj) Select b.ReplicateNumber).Max
                                             If maxReplicates >= pHighContaminationPersistance Then
                                                 Exit For 'Do not evaluate high contamination persistance
                                             End If
@@ -2123,9 +2141,9 @@ Namespace Biosystems.Ax00.BL
                                     'Before move OrderTest(i-1) (the contaminator one, and future OrderTest(j-1)) be carefull is not contaminated by OrderTest(j-1) (and future OrderTest(j-2))
                                     'Simplication: In this point do not take care about High contamination persistance
                                     If contaminations.Count = 0 Then
-                                        If j > 0 Then
+                                        If aux_j > 0 Then
                                             newContaminatorID = (From a As ExecutionsDS.twksWSExecutionsRow In pExecutions _
-                                                                               Where a.OrderTestID = sortedOTList(j - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
+                                                                               Where a.OrderTestID = sortedOTList(aux_j - 1) AndAlso a.ExecutionStatus = "PENDING" Select a.ReagentID).First
                                             contaminations = (From wse In pContaminationsDS.tparContaminations _
                                                                 Where wse.ReagentContaminatorID = newContaminatorID _
                                                                 AndAlso wse.ReagentContaminatedID = ReagentContaminatorID _
@@ -2138,8 +2156,8 @@ Namespace Biosystems.Ax00.BL
                                         sortedOTList.Remove(contaminatorOrderTest) 'Remove the first ocurrence of contaminatedOrderTest
                                         'AG 30/05/2012 - Fix system error (index out of bounds when j = 0)
                                         'sortedOTList.Insert(j - 1, contaminatorOrderTest)
-                                        If j > 0 Then
-                                            sortedOTList.Insert(j - 1, contaminatorOrderTest)
+                                        If aux_j > 0 Then
+                                            sortedOTList.Insert(aux_j - 1, contaminatorOrderTest)
                                         Else
                                             sortedOTList.Insert(0, contaminatorOrderTest)
                                         End If
@@ -2254,8 +2272,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupTime", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupTime", EventLogEntryType.Error, False)
 
             End Try
             Return resultData
@@ -2347,8 +2365,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionsResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionsResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2443,8 +2461,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionsResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionsResults", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2481,8 +2499,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionResultAlarms", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionResultAlarms", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2579,8 +2597,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionsMonitor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetWSExecutionsMonitor", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2677,8 +2695,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdatePaused", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdatePaused", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2734,8 +2752,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateThermoWarningFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateThermoWarningFlag", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2793,8 +2811,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateClotValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateClotValue", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2834,8 +2852,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionStatusChangeInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionStatusChangeInfo", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -2949,8 +2967,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEPatientExecution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEPatientExecution", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3088,8 +3106,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEExecutionNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEExecutionNEW", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3233,8 +3251,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEExecution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNextPendingISEExecution", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3273,8 +3291,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetSendPreparationDataByExecution", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetSendPreparationDataByExecution", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3316,8 +3334,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetPendingExecutionForSendNextProcess", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetPendingExecutionForSendNextProcess", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3379,8 +3397,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetAffectedISEExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetAffectedISEExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3419,8 +3437,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionContaminationCuvette", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionContaminationCuvette", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3485,8 +3503,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CalculateIfBottleLevelsAreSufficientForWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CalculateIfBottleLevelsAreSufficientForWS", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3532,8 +3550,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionsByStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionsByStatus", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3646,8 +3664,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.EncodeAdditionalInfo", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.EncodeAdditionalInfo", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3688,8 +3706,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetByOrderTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetByOrderTest", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3727,8 +3745,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetByElementID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetByElementID", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -3772,8 +3790,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CountExecutionsUsingAdjustBaseLine", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CountExecutionsUsingAdjustBaseLine", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3815,8 +3833,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CountNotClosedSTDExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CountNotClosedSTDExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3880,7 +3898,7 @@ Namespace Biosystems.Ax00.BL
                         Dim offSet As Integer = 0
                         Dim remainingTime As Single = 0
                         Dim previousTestID As Integer = -1
-                        Dim myReadingNumbersDS As TimeEstimationDS
+                        Dim myReadingNumbersDS As TimeEstimationDS = Nothing
                         Dim mytwksWSExecutionsDAO As New twksWSExecutionsDAO
 
                         If (Not resultData.HasError) Then
@@ -4042,8 +4060,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetSTDTestsTimeEstimation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetSTDTestsTimeEstimation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4256,8 +4274,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetISETestsTimeEstimation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetISETestsTimeEstimation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4324,8 +4342,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetElementInfoByExecutionID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetElementInfoByExecutionID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4377,8 +4395,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4434,8 +4452,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByISETestType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusByISETestType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4613,8 +4631,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ChangeINPROCESSStatusByCollision", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ChangeINPROCESSStatusByCollision", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4661,8 +4679,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateValidAndCompleteReadings", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateValidAndCompleteReadings", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -4720,8 +4738,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExportedExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExportedExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4757,8 +4775,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedByLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedByLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4808,8 +4826,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UnlockLISExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UnlockLISExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4843,8 +4861,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetMaxRerunNumber", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetMaxRerunNumber", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4959,8 +4977,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ExistCriticalPauseTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ExistCriticalPauseTests", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -5062,8 +5080,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetDataForMonitorTabWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetDataForMonitorTabWS", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -5101,8 +5119,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CountByExecutionStatus", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CountByExecutionStatus", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5150,16 +5168,17 @@ Namespace Biosystems.Ax00.BL
                                         Dim newRow As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow
                                         Dim existsLnq As List(Of WSPausedOrderTestsDS.twksWSPausedOrderTestsRow)
                                         For i As Integer = 0 To pOrderTestID.Count - 1
-                                            If pOrderTestID.Count >= i OrElse pRerunNumber.Count >= i Then
+                                            Dim aux_i = i
+                                            If pOrderTestID.Count >= aux_i OrElse pRerunNumber.Count >= aux_i Then
                                                 existsLnq = (From a As WSPausedOrderTestsDS.twksWSPausedOrderTestsRow In pausedOTsDS.twksWSPausedOrderTests _
-                                                             Where a.OrderTestID = pOrderTestID(i) AndAlso a.RerunNumber = pRerunNumber(i) Select a).ToList
+                                                             Where a.OrderTestID = pOrderTestID(aux_i) AndAlso a.RerunNumber = pRerunNumber(aux_i) Select a).ToList
                                                 If existsLnq.Count = 0 Then 'Add
                                                     'Create new row if ok. in twksWSPausedOrderTests
                                                     newRow = orderTestsToAddDS.twksWSPausedOrderTests.NewtwksWSPausedOrderTestsRow()
                                                     newRow.AnalyzerID = pAnalyzerID
                                                     newRow.WorkSessionID = pWorkSessionID
-                                                    newRow.OrderTestID = pOrderTestID(i)
-                                                    newRow.RerunNumber = pRerunNumber(i)
+                                                    newRow.OrderTestID = pOrderTestID(aux_i)
+                                                    newRow.RerunNumber = pRerunNumber(aux_i)
                                                     orderTestsToAddDS.twksWSPausedOrderTests.AddtwksWSPausedOrderTestsRow(newRow)
                                                 End If
                                             End If
@@ -5201,8 +5220,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdatePaused #2", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdatePaused #2", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5240,8 +5259,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionMultititem", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionMultititem", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5277,8 +5296,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetSendISETestsForTimeCalculation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetSendISETestsForTimeCalculation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5371,8 +5390,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedCalibrator", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedCalibrator", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5434,8 +5453,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedBlank", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.VerifyLockedBlank", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5484,8 +5503,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateNewRerunSentPostdilutionType", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateNewRerunSentPostdilutionType", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5641,8 +5660,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ProcessVolumeMissingBySampleClass", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ProcessVolumeMissingBySampleClass", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5734,8 +5753,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.LockRelatedExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.LockRelatedExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5791,8 +5810,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.LockExecutionsByLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.LockExecutionsByLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5845,8 +5864,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.LockPatientPredilutionsByDiluentCode", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.LockPatientPredilutionsByDiluentCode", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5915,7 +5934,7 @@ Namespace Biosystems.Ax00.BL
                 Dim ReagentContaminatorID = pPreviousReagentID(pPreviousReagentID.Count - 1) 'Last Reagent in previous element group (reverse order)
                 Dim ReagentContaminatedID As Integer = -1
                 Dim myExecLinqByOT As List(Of ExecutionsDS.twksWSExecutionsRow)
-                Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow)
+                Dim contaminations As List(Of ContaminationsDS.tparContaminationsRow) = Nothing
 
                 If myOTListLinq.Count > 1 Then
                     Dim itera As Integer = 0
@@ -6175,15 +6194,15 @@ Namespace Biosystems.Ax00.BL
             Try
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                     GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
                     GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                 End If
 
                 'AG 19/03/2014 - #1545 - Do not open transaction, use the parameter as connection
@@ -6233,7 +6252,7 @@ Namespace Biosystems.Ax00.BL
                     End If
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                     StartTime = Now
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6256,7 +6275,7 @@ Namespace Biosystems.Ax00.BL
                     resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                     StartTime = Now
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6281,7 +6300,7 @@ Namespace Biosystems.Ax00.BL
                                 myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                 Dim myOrderTestID As Integer = -1
-                                Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                 For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
                                     If (rowBlank.OrderTestID <> myOrderTestID) Then
@@ -6308,13 +6327,13 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                             'Get all executions for CALIBRATORS included in the WorkSession
-                            Dim myCalibratorExecutionsDS As ExecutionsDS
+                            Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
 
                             If (Not resultData.HasError) Then
                                 resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -6322,7 +6341,7 @@ Namespace Biosystems.Ax00.BL
                                     myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                     Dim myOrderTestID As Integer = -1
-                                    Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                     For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
                                         'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -6352,13 +6371,13 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                             'Get all executions for CONTROLS included in the WorkSession
-                            Dim myControlExecutionsDS As ExecutionsDS
+                            Dim myControlExecutionsDS As ExecutionsDS = Nothing
 
                             If (Not resultData.HasError) Then
                                 resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -6366,7 +6385,7 @@ Namespace Biosystems.Ax00.BL
                                     myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                     Dim myOrderTestID As Integer = -1
-                                    Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                     For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
                                         'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -6398,13 +6417,13 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                             'Get all executions for PATIENT SAMPLES included in the WorkSession
-                            Dim myPatientExecutionsDS As ExecutionsDS
+                            Dim myPatientExecutionsDS As ExecutionsDS = Nothing
 
                             If (Not resultData.HasError) Then
                                 resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -6412,7 +6431,7 @@ Namespace Biosystems.Ax00.BL
                                     myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                     Dim myOrderTestID As Integer = -1
-                                    Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                    Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                     For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
                                         'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -6445,7 +6464,7 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6517,7 +6536,7 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Locks for BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Locks for BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6596,7 +6615,7 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Locks for CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Locks for CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6692,7 +6711,7 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Mark STATS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Mark STATS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6776,7 +6795,7 @@ Namespace Biosystems.Ax00.BL
                                 'AG 15/09/2011
 
                                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                myLogAcciones.CreateLogActivity("Unify all Pending and Locked " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                GlobalBase.CreateLogActivity("Unify all Pending and Locked " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                 "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                                 StartTime = Now
                                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6845,7 +6864,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6866,7 +6885,7 @@ Namespace Biosystems.Ax00.BL
                                 End If
 
                                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                myLogAcciones.CreateLogActivity("Save all LOCKED " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                GlobalBase.CreateLogActivity("Save all LOCKED " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                 "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                                 StartTime = Now
                                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6987,7 +7006,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                 StartTime = Now
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7018,8 +7037,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Error, False)
             Finally
                 'If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close() 'AG 19/03/2014 - #1545 - New method does not open transaction, so do not close it
 
@@ -7027,8 +7046,8 @@ Namespace Biosystems.Ax00.BL
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
                     GlobalSemaphores.createWSExecutionsSemaphore.Release()
                     GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutionsMultipleTransactions", EventLogEntryType.Information, False)
                 End If
 
             End Try
@@ -7081,8 +7100,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.DeleteNotInCourseExecutionsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.DeleteNotInCourseExecutionsNEW", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -7131,8 +7150,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.Create", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.Create", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -7207,15 +7226,15 @@ Namespace Biosystems.Ax00.BL
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                 Dim StartTime As DateTime = Now
-                Dim myLogAcciones As New ApplicationLogManager()
+                'Dim myLogAcciones As New ApplicationLogManager()
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                 'AG 02/06/2014 #1644 - Set the semaphore to busy value (EXCEPT when called from auto rerun business)
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Waiting (timeout = " & GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS.ToString & ")", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
                     GlobalSemaphores.createWSExecutionsSemaphore.WaitOne(GlobalConstants.SEMAPHORE_TOUT_CREATE_EXECUTIONS)
                     GlobalSemaphores.createWSExecutionsQueue = 1 'Only 1 thread is allowed, so set to 1 instead of increment ++1 'GlobalSemaphores.createWSExecutionsQueue += 1
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Passed through, semaphore busy", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
                 End If
 
                 resultData = DAOBase.GetOpenDBTransaction(pDBConnection)
@@ -7259,7 +7278,7 @@ Namespace Biosystems.Ax00.BL
                             End If
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Not RUNNING: Search and Delete NOT IN COURSE " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7282,7 +7301,7 @@ Namespace Biosystems.Ax00.BL
                             resultData = RecalculateStatusForNotDeletedExecutionsNEW(dbConnection, pAnalyzerID, pWorkSessionID, pWorkInRunningMode, pPauseMode)
 
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                            myLogAcciones.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                            GlobalBase.CreateLogActivity("Recalculate Status " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                             StartTime = Now
                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7307,7 +7326,7 @@ Namespace Biosystems.Ax00.BL
                                         myBlankExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                         Dim myOrderTestID As Integer = -1
-                                        Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                        Dim blankInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                         For Each rowBlank As ExecutionsDS.twksWSExecutionsRow In myBlankExecutionsDS.twksWSExecutions
                                             If (rowBlank.OrderTestID <> myOrderTestID) Then
@@ -7334,13 +7353,13 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Get Executions For BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                                     'Get all executions for CALIBRATORS included in the WorkSession
-                                    Dim myCalibratorExecutionsDS As ExecutionsDS
+                                    Dim myCalibratorExecutionsDS As ExecutionsDS = Nothing
 
                                     If (Not resultData.HasError) Then
                                         resultData = CreateCalibratorExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -7348,7 +7367,7 @@ Namespace Biosystems.Ax00.BL
                                             myCalibratorExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                             Dim myOrderTestID As Integer = -1
-                                            Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                            Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                             For Each rowCalib As ExecutionsDS.twksWSExecutionsRow In myCalibratorExecutionsDS.twksWSExecutions
                                                 'Dim calibInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -7378,13 +7397,13 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Get Executions For CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                                     'Get all executions for CONTROLS included in the WorkSession
-                                    Dim myControlExecutionsDS As ExecutionsDS
+                                    Dim myControlExecutionsDS As ExecutionsDS = Nothing
 
                                     If (Not resultData.HasError) Then
                                         resultData = CreateControlExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -7392,7 +7411,7 @@ Namespace Biosystems.Ax00.BL
                                             myControlExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                             Dim myOrderTestID As Integer = -1
-                                            Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                            Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                             For Each rowControl As ExecutionsDS.twksWSExecutionsRow In myControlExecutionsDS.twksWSExecutions
                                                 'Dim controlInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -7424,13 +7443,13 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Get Executions For CONTROLS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                                     'Get all executions for PATIENT SAMPLES included in the WorkSession
-                                    Dim myPatientExecutionsDS As ExecutionsDS
+                                    Dim myPatientExecutionsDS As ExecutionsDS = Nothing
 
                                     If (Not resultData.HasError) Then
                                         resultData = CreatePatientExecutions(dbConnection, pAnalyzerID, pWorkSessionID, pOrderTestID, pPostDilutionType)
@@ -7438,7 +7457,7 @@ Namespace Biosystems.Ax00.BL
                                             myPatientExecutionsDS = DirectCast(resultData.SetDatos, ExecutionsDS)
 
                                             Dim myOrderTestID As Integer = -1
-                                            Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
+                                            Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow) = Nothing
 
                                             For Each rowPatient As ExecutionsDS.twksWSExecutionsRow In myPatientExecutionsDS.twksWSExecutions
                                                 'Dim patientInfo As List(Of OrderTestsForExecutionsDS.OrderTestsForExecutionsTableRow)
@@ -7471,7 +7490,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Get Executions For PATIENTS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7543,7 +7562,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Locks for BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Locks for BLANKS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7622,7 +7641,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Locks for CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Locks for CALIBRATORS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7718,7 +7737,7 @@ Namespace Biosystems.Ax00.BL
                                     End If
 
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                    myLogAcciones.CreateLogActivity("Mark STATS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                    GlobalBase.CreateLogActivity("Mark STATS " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                     "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                     StartTime = Now
                                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7802,7 +7821,7 @@ Namespace Biosystems.Ax00.BL
                                         'AG 15/09/2011
 
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        myLogAcciones.CreateLogActivity("Unify all Pending and Locked " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                        GlobalBase.CreateLogActivity("Unify all Pending and Locked " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                         "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                         StartTime = Now
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7869,7 +7888,7 @@ Namespace Biosystems.Ax00.BL
                                             End If
 
                                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                            myLogAcciones.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            GlobalBase.CreateLogActivity("Sort and create all PENDING " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                             "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                             StartTime = Now
                                             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7886,7 +7905,7 @@ Namespace Biosystems.Ax00.BL
                                         End If
 
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                                        myLogAcciones.CreateLogActivity("Save all LOCKED " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                        GlobalBase.CreateLogActivity("Save all LOCKED " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                                         "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                                         StartTime = Now
                                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -7988,7 +8007,7 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        myLogAcciones.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Final Processing " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Information, False)
                         StartTime = Now
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -8014,8 +8033,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateWSExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
 
@@ -8023,8 +8042,8 @@ Namespace Biosystems.Ax00.BL
                 If GlobalConstants.CreateWSExecutionsWithSemaphore AndAlso pManualRerunFlag Then
                     GlobalSemaphores.createWSExecutionsSemaphore.Release()
                     GlobalSemaphores.createWSExecutionsQueue = 0 'Only 1 thread is allowed, so reset to 0 instead of decrement --1 'GlobalSemaphores.createWSExecutionsQueue -= 1
-                    Dim myLogAcciones As New ApplicationLogManager()
-                    myLogAcciones.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
+                    'Dim myLogAcciones As New ApplicationLogManager()
+                    GlobalBase.CreateLogActivity("CreateWSExecutions semaphore: Released, semaphore free", "AnalyzerManager.CreateWSExecutions", EventLogEntryType.Information, False)
                 End If
 
             End Try
@@ -8083,7 +8102,7 @@ Namespace Biosystems.Ax00.BL
                             Dim SampleClasses() As String = {"BLANK", "CALIB", "CTRL", "PATIENT"}
 
                             'TR 27/05/2013 -Get a list of sample types separated by commas
-                            Dim SampleTypes() As String
+                            Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
                             resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
                             If Not resultData.HasError Then
@@ -8126,7 +8145,7 @@ Namespace Biosystems.Ax00.BL
                                                         Dim SType As String = sortedSampleType
 
                                                         Dim AllTestTypeOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests executions
-                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'Only STD test order tests executions
+                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) = Nothing  'Only STD test order tests executions
 
                                                         'NEW: When a patient OR CTRL has Ise & std test executions the ISE executions are the first
                                                         If SClass = "PATIENT" OrElse SClass = "CTRL" Then 'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type
@@ -8310,8 +8329,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByContamination", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByContamination", EventLogEntryType.Error, False)
 
             End Try
 
@@ -8454,8 +8473,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateBlankExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateBlankExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -8601,8 +8620,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateCalibratorExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateCalibratorExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -8784,8 +8803,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateControlExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreateControlExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -8980,8 +8999,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreatePatientExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.CreatePatientExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -9043,7 +9062,7 @@ Namespace Biosystems.Ax00.BL
                             Dim Stats() As Boolean = {True, False}
                             Dim SampleClasses() As String = {"BLANK", "CALIB", "CTRL", "PATIENT"}
                             'TR 27/05/2013 -Get a list of sample types separated by commas
-                            Dim SampleTypes() As String
+                            Dim SampleTypes() As String = Nothing
                             Dim myMasterDataDelegate As New MasterDataDelegate
 
                             resultData = myMasterDataDelegate.GetSampleTypes(dbConnection)
@@ -9097,7 +9116,7 @@ Namespace Biosystems.Ax00.BL
                                                         Dim SType As String = sortedSampleType
 
                                                         Dim AllTestTypeOrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'All test type order tests
-                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) 'Only STD test order tests
+                                                        Dim OrderTests As List(Of ExecutionsDS.twksWSExecutionsRow) = Nothing  'Only STD test order tests
 
                                                         'NEW: When a patient or ctrl has Ise & std test executions the ISE executions are the first
                                                         If SClass = "PATIENT" OrElse SClass = "CTRL" Then 'Apply OrderBy sample type order {"SER", "URI", "PLM", "WBL", "CSF"} (case one PATIENT with several sample types) + execution type
@@ -9171,9 +9190,10 @@ Namespace Biosystems.Ax00.BL
 
                                                                             'Evaluate if the last reagents sent contaminates (HIGH contamination) the first pending to be sent
                                                                             For highIndex As Integer = PreviousReagentsIDList.Count - highContaminationPersitance To PreviousReagentsIDList.Count - 2
-                                                                                If highIndex >= 0 Then 'Avoid overflow
+                                                                                Dim auxHighIndex = highIndex
+                                                                                If auxHighIndex >= 0 Then 'Avoid overflow
                                                                                     existContamination = (From wse In contaminationsDataDS.tparContaminations _
-                                                                                                      Where wse.ReagentContaminatorID = PreviousReagentsIDList(highIndex) _
+                                                                                                      Where wse.ReagentContaminatorID = PreviousReagentsIDList(auxHighIndex) _
                                                                                                       AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(0).ReagentID _
                                                                                                       AndAlso Not wse.IsWashingSolutionR1Null _
                                                                                                       Select wse).ToList()
@@ -9190,10 +9210,11 @@ Namespace Biosystems.Ax00.BL
                                                                                                                     Select wse.ReplicateNumber).Max
                                                                                 If newPendingOrderTestMaxReplicates < highContaminationPersitance Then
                                                                                     For i = 1 To highContaminationPersitance - 1
-                                                                                        If i <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
+                                                                                        Dim aux_i = i
+                                                                                        If aux_i <= pendingOrderTestInNewElement.Count - 1 Then 'Avoid overflow
                                                                                             existContamination = (From wse In contaminationsDataDS.tparContaminations _
                                                                                                               Where wse.ReagentContaminatorID = PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) _
-                                                                                                              AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(i).ReagentID _
+                                                                                                              AndAlso wse.ReagentContaminatedID = pendingOrderTestInNewElement(aux_i).ReagentID _
                                                                                                               AndAlso Not wse.IsWashingSolutionR1Null _
                                                                                                               Select wse).ToList()
                                                                                             If existContamination.Count > 0 Then
@@ -9306,23 +9327,24 @@ Namespace Biosystems.Ax00.BL
                                                                 'AG 19/12/2011 - Inform the list of reagents and replicates using the executions of the last element group
                                                                 'The last reagentID used has the higher indexes
                                                                 Dim maxReplicates As Integer
-                                                                For item As Integer = 0 To OrderTests.Count - 1
+                                                                For item = 0 To OrderTests.Count - 1
+                                                                    Dim itemIndex = item
                                                                     maxReplicates = (From wse In returnDS.twksWSExecutions _
-                                                                                                        Where wse.OrderTestID = OrderTests(item).OrderTestID _
+                                                                                                        Where wse.OrderTestID = OrderTests(itemIndex).OrderTestID _
                                                                                                         Select wse.ReplicateNumber).Max
 
                                                                     If PreviousReagentsIDList.Count = 0 Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(item).ReagentID)
+                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
                                                                         previousOrderTestMaxReplicatesList.Add(maxReplicates)
 
                                                                         'When reagent changes
-                                                                    ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(item).ReagentID Then
-                                                                        PreviousReagentsIDList.Add(OrderTests(item).ReagentID)
+                                                                    ElseIf PreviousReagentsIDList(PreviousReagentsIDList.Count - 1) <> OrderTests(itemIndex).ReagentID Then
+                                                                        PreviousReagentsIDList.Add(OrderTests(itemIndex).ReagentID)
                                                                         previousOrderTestMaxReplicatesList.Add(maxReplicates)
                                                                     End If
 
-                                                                    If item = OrderTests.Count - 1 Then
-                                                                        previousElementLastReagentID = OrderTests(item).ReagentID
+                                                                    If itemIndex = OrderTests.Count - 1 Then
+                                                                        previousElementLastReagentID = OrderTests(itemIndex).ReagentID
                                                                         previousElementLastMaxReplicates = maxReplicates
                                                                     End If
                                                                     'AG 19/12/2011
@@ -9378,8 +9400,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.SortWSExecutionsByElementGroupContaminationNew", EventLogEntryType.Error, False)
 
             End Try
             'AG 19/02/2014 - #1514
@@ -9433,8 +9455,8 @@ Namespace Biosystems.Ax00.BL
         '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '                Dim myLogAcciones As New ApplicationLogManager()
-        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetClosedExecutionsRelated", EventLogEntryType.Error, False)
+        '                'Dim myLogAcciones As New ApplicationLogManager()
+        '                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetClosedExecutionsRelated", EventLogEntryType.Error, False)
         '            Finally
         '                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         '            End Try
@@ -9472,8 +9494,8 @@ Namespace Biosystems.Ax00.BL
         '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '                Dim myLogAcciones As New ApplicationLogManager()
-        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNumberOfMultititem", EventLogEntryType.Error, False)
+        '                'Dim myLogAcciones As New ApplicationLogManager()
+        '                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetNumberOfMultititem", EventLogEntryType.Error, False)
 
         '            Finally
         '                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -9525,8 +9547,8 @@ Namespace Biosystems.Ax00.BL
         '        '        resultData.ErrorCode = "SYSTEM_ERROR"
         '        '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedExecutions", EventLogEntryType.Error, False)
+        '        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedExecutions", EventLogEntryType.Error, False)
         '        '    Finally
         '        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '        '    End Try
@@ -9725,8 +9747,8 @@ Namespace Biosystems.Ax00.BL
         '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '                Dim myLogAcciones As New ApplicationLogManager()
-        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
+        '                'Dim myLogAcciones As New ApplicationLogManager()
+        '                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
         '            Finally
         '                If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
         '            End Try
@@ -9791,8 +9813,8 @@ Namespace Biosystems.Ax00.BL
         '                resultData.ErrorCode = "SYSTEM_ERROR"
         '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '                Dim myLogAcciones As New ApplicationLogManager()
-        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateInUse", EventLogEntryType.Error, False)
+        '                'Dim myLogAcciones As New ApplicationLogManager()
+        '                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateInUse", EventLogEntryType.Error, False)
         '            Finally
         '                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '            End Try
@@ -9838,8 +9860,8 @@ Namespace Biosystems.Ax00.BL
         '                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '                resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '                Dim myLogAcciones As New ApplicationLogManager()
-        '                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateReadingsFields", EventLogEntryType.Error, False)
+        '                'Dim myLogAcciones As New ApplicationLogManager()
+        '                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateReadingsFields", EventLogEntryType.Error, False)
         '            Finally
         '                If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '            End Try
@@ -10010,8 +10032,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusClosedNOK", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusClosedNOK", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -10056,8 +10078,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetClosedExecutionsRelatedNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetClosedExecutionsRelatedNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10102,8 +10124,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSExecutionsDelegate.GetExecutionMultiItemsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WSExecutionsDelegate.GetExecutionMultiItemsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10143,8 +10165,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDele.GetNumberOfMultiItemNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDele.GetNumberOfMultiItemNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10215,8 +10237,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedExecutionsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedExecutionsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10256,8 +10278,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedCtrlPatientExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ReadAffectedCtrlPatientExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10515,8 +10537,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.RecalculateStatusForNotDeletedExecutions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10566,8 +10588,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateInUse", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateInUse", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10615,8 +10637,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateReadingsFieldsNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateReadingsFieldsNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10766,8 +10788,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusClosedNOK_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateStatusClosedNOK_NEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10834,8 +10856,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.PrepareISEExecutionsAfterConditioning", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.PrepareISEExecutionsAfterConditioning", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -10876,8 +10898,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionsForHistoricTable", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetExecutionsForHistoricTable", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -10918,8 +10940,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetOrderTestsLockedByLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.GetOrderTestsLockedByLIS", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -10971,8 +10993,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateLockedByLIS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.UpdateLockedByLIS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -11016,8 +11038,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ExistsLISWorkordersPendingToExecute", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "ExecutionsDelegate.ExistsLISWorkordersPendingToExecute", EventLogEntryType.Error, False)
 
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -11375,8 +11397,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExecutionsDelegate.GetDataForMonitorTabWS_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExecutionsDelegate.GetDataForMonitorTabWS_NEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -11459,8 +11481,8 @@ Namespace Biosystems.Ax00.BL
                     resultData.SetDatos = Nothing
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExecutionsDelegate.CalculateChildRowColor", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExecutionsDelegate.CalculateChildRowColor", EventLogEntryType.Error, False)
             End Try
             Return rowColor
         End Function
@@ -11531,8 +11553,8 @@ Namespace Biosystems.Ax00.BL
                 pHeaderRow.Index = pHeaderRowIndex
                 pHeaderRow.EndEdit()
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExecutionsDelegate.ConfigureHeaderRow", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExecutionsDelegate.ConfigureHeaderRow", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -11598,8 +11620,8 @@ Namespace Biosystems.Ax00.BL
                 pChildRow.HeaderRowIndex = pHeaderRowIndex
                 pChildRow.EndEdit()
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ExecutionsDelegate.ConfigureChildRow", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ExecutionsDelegate.ConfigureChildRow", EventLogEntryType.Error, False)
             End Try
         End Sub
 

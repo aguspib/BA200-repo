@@ -1,10 +1,8 @@
 ﻿Option Explicit On
-Option Strict Off
+Option Strict On
+Option Infer On
 
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Global
-
-Partial Public Class IConfigLIS
+Partial Public Class UiConfigLIS
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 End Class

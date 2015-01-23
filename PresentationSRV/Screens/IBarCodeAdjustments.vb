@@ -372,7 +372,7 @@ Public Class IBarCodeAdjustments
             With MyBase.myScreenLayout
 
                 .ButtonsPanel.SaveButton = Me.SaveButton
-                .ButtonsPanel.CancelButton = Me.CancelButton
+                .ButtonsPanel.CancelButton = Me.ButtonCancel
                 .ButtonsPanel.ExitButton = Me.BsExitButton
 
                 .MessagesPanel.Container = Me.BsMessagesPanel
@@ -419,7 +419,7 @@ Public Class IBarCodeAdjustments
             If MyBase.CurrentUserNumericalLevel = USER_LEVEL.lOPERATOR Then
                 Me.AdjustButton.Visible = False
                 Me.SaveButton.Visible = False
-                Me.CancelButton.Visible = False
+                Me.ButtonCancel.Visible = False
             End If
 
         Catch ex As Exception
@@ -470,16 +470,16 @@ Public Class IBarCodeAdjustments
 
             ' For Tooltips...
 
-            MyBase.bsScreenToolTips.SetToolTip(AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
-            MyBase.bsScreenToolTips.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(CancelButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(AdjustButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_ADJUST", currentLanguage)) 'JB 01/10/2012 - Resource String unification
+            MyBase.bsScreenToolTipsControl.SetToolTip(SaveButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Save", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(ButtonCancel, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Cancel", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(StartReadingButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", currentLanguage))
-            MyBase.bsScreenToolTips.SetToolTip(StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(StartReadingButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStart", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(StopButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_TestStop", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(TestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(TestButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "SRV_BTN_Test", currentLanguage))
 
-            MyBase.bsScreenToolTips.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
+            MyBase.bsScreenToolTipsControl.SetToolTip(BsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", currentLanguage))
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Name & ".GetScreenTooltip ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -494,12 +494,12 @@ Public Class IBarCodeAdjustments
     Private Sub PrepareButtons()
         'Dim auxIconName As String = ""
         'Dim iconPath As String = MyBase.IconsPath
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         Try
 
             MyBase.SetButtonImage(AdjustButton, "ADJUSTMENT")
             MyBase.SetButtonImage(SaveButton, "SAVE")
-            MyBase.SetButtonImage(CancelButton, "UNDO")
+            MyBase.SetButtonImage(ButtonCancel, "UNDO")
             MyBase.SetButtonImage(StartReadingButton, "ADJUSTMENT")
             MyBase.SetButtonImage(StopButton, "STOP", 24, 24)
             MyBase.SetButtonImage(TestButton, "ADJUSTMENT")
@@ -510,7 +510,7 @@ Public Class IBarCodeAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    AdjustButton.Image = myImage
             '    AdjustButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -519,7 +519,7 @@ Public Class IBarCodeAdjustments
             'auxIconName = GetIconName("SAVE")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    SaveButton.Image = myImage
             '    SaveButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -528,7 +528,7 @@ Public Class IBarCodeAdjustments
             'auxIconName = GetIconName("UNDO") 'CANCEL
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    CancelButton.Image = myImage
             '    CancelButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -537,7 +537,7 @@ Public Class IBarCodeAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    StartReadingButton.Image = myImage
             '    StartReadingButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -546,7 +546,7 @@ Public Class IBarCodeAdjustments
             'auxIconName = GetIconName("STOP")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(24, 24)).SetDatos, Image)
             '    StopButton.Image = myImage
             '    StopButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -555,7 +555,7 @@ Public Class IBarCodeAdjustments
             'auxIconName = GetIconName("ADJUSTMENT")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    TestButton.Image = myImage
             '    TestButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -564,7 +564,7 @@ Public Class IBarCodeAdjustments
             'auxIconName = GetIconName("CANCEL")
             'If System.IO.File.Exists(iconPath & auxIconName) Then
             '    Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
-            '    myImage = CType(myUtil.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
+            '    myImage = CType(Utilities.ResizeImage(myImage, New Size(28, 28)).SetDatos, Image)
             '    BsExitButton.Image = myImage
             '    BsExitButton.ImageAlign = ContentAlignment.MiddleCenter
             'End If
@@ -972,7 +972,7 @@ Public Class IBarCodeAdjustments
             Me.BsAdjust.Enabled = False
             Me.AdjustButton.Enabled = True
             Me.SaveButton.Enabled = False
-            Me.CancelButton.Enabled = False
+            Me.ButtonCancel.Enabled = False
 
             ' READING AREA
             'Me.ReadingBCGroupBox.Enabled = True
@@ -1032,7 +1032,7 @@ Public Class IBarCodeAdjustments
 
             MyBase.ActivateMDIMenusButtons(True)
             Me.AdjustButton.Enabled = False
-            Me.CancelButton.Enabled = True
+            Me.ButtonCancel.Enabled = True
             MyBase.DisplayMessage(Messages.SRV_ADJUSTMENTS_READY.ToString)
 
         Catch ex As Exception
@@ -1077,7 +1077,7 @@ Public Class IBarCodeAdjustments
             Me.ChangedValue = True
 
             Me.SaveButton.Enabled = True
-            Me.CancelButton.Enabled = True
+            Me.ButtonCancel.Enabled = True
             Me.BsExitButton.Enabled = True
 
             Me.Enabled = True
@@ -1319,12 +1319,12 @@ Public Class IBarCodeAdjustments
     End Sub
 
     Private Sub PopulateEditionValues()
-        Dim myUtilities As New Utilities
+        'Dim myUtilities As New Utilities
         Try
             Dim value As String
             With Me.EditedValue
                 value = ReadSpecificAdjustmentData(GlobalEnumerates.AXIS.ROTOR).Value
-                .LastValue = myUtilities.FormatToSingle(value)
+                .LastValue = Utilities.FormatToSingle(value)
                 .CurrentValue = .LastValue
                 .NewValue = .LastValue
             End With
@@ -1952,14 +1952,14 @@ Public Class IBarCodeAdjustments
 
     Private Sub IBarCodeAdjustments_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Dim myGlobal As New GlobalDataTO
-        Dim myGlobalbase As New GlobalBase
+        'Dim myGlobalbase As New GlobalBase
         Try
             MyBase.MyBase_Load(sender, e)
 
             MyBase.GetUserNumericalLevel()
 
             'Get the current Language from the current Application Session
-            currentLanguage = myGlobalbase.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             'Screen delegate
             MyClass.myScreenDelegate = New BarCodeAdjustmentDelegate(MyBase.myServiceMDI.ActiveAnalyzer, MyBase.myFwScriptDelegate)
@@ -2174,7 +2174,7 @@ Public Class IBarCodeAdjustments
         End Try
     End Sub
 
-    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CancelButton.Click
+    Private Sub CancelButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonCancel.Click
         'Dim myGlobal As New GlobalDataTO
         Dim dialogResultToReturn As DialogResult = Windows.Forms.DialogResult.No
         Try

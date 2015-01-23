@@ -1,7 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL
@@ -50,8 +49,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.HasError = True
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "GeneralSettingsDelegate.UpdateCurrValBySettingID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "GeneralSettingsDelegate.UpdateCurrValBySettingID", EventLogEntryType.Error, False)
             Finally
 
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -103,8 +102,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = "SYSTEM_ERROR"
                 dataToReturn.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "GeneralSettingsDelegate.GetGeneralSettingValue", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "GeneralSettingsDelegate.GetGeneralSettingValue", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing And Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

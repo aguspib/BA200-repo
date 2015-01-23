@@ -1,7 +1,8 @@
 ﻿'Created by AG 10/08/2010 - Based on ResultFormAG
 
-Option Explicit On
 Option Strict On
+Option Explicit On
+Option Infer On
 
 Imports System.Text
 Imports Biosystems.Ax00.BL
@@ -800,8 +801,8 @@ Public Class IResultsCalibCurve
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
                 mdiAnalyzerCopy = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager) 'AG 22/06/2012 - Use the same AnalyzerManager as the MDI
@@ -1293,12 +1294,12 @@ Public Class IResultsCalibCurve
 
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("FREECELL")
@@ -1619,7 +1620,7 @@ Public Class IResultsCalibCurve
             Dim Remark As String = String.Empty
 
             'XB 30/07/2014 - BA-1863
-            Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow)
+            Dim TestList As List(Of ExecutionsDS.vwksWSExecutionsResultsRow) = Nothing
             Dim myOrderTestID As Integer
             Dim myTestVersion As Integer
             ' XB 30/07/2014 - BA-1863
@@ -2070,10 +2071,10 @@ Public Class IResultsCalibCurve
                 'myForm.SourceCalled = GraphicalAbsScreenCallMode.CURVE_RESULTS_MULTIPLE
                 'End If
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 'myForm.ShowInfo()  ' 25/05/2011
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
             End Using
 
         Catch ex As Exception
@@ -2378,8 +2379,8 @@ Public Class IResultsCalibCurve
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChangesNEW", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "RecalculateResultsDelegate.RecalculateCurveAfterDefinitionChangesNEW", EventLogEntryType.Error, False)
         Finally
             Me.Cursor = Cursors.Default
         End Try

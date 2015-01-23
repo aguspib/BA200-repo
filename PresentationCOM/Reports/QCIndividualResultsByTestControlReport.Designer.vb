@@ -1,3 +1,5 @@
+Imports DevExpress.Utils
+
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Public Class QCIndividualResultsByTestControlReport
     Inherits DevExpress.XtraReports.UI.XtraReport
@@ -619,9 +621,9 @@ Partial Public Class QCIndividualResultsByTestControlReport
             Or DevExpress.XtraPrinting.BorderSide.Right) _
             Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         XyDiagram1.AxisX.GridLines.Visible = True
-        XyDiagram1.AxisX.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisX.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram1.AxisY.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisY.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
         Me.XrLJGraph.Diagram = XyDiagram1
         Me.XrLJGraph.EmptyChartText.Font = New System.Drawing.Font("Verdana", 12.0!)
@@ -634,28 +636,27 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrLJGraph.Legend.AlignmentVertical = DevExpress.XtraCharts.LegendAlignmentVertical.Bottom
         Me.XrLJGraph.Legend.Direction = DevExpress.XtraCharts.LegendDirection.LeftToRight
         Me.XrLJGraph.Legend.EquallySpacedItems = False
-        Me.XrLJGraph.Legend.Visible = False
+        Me.XrLJGraph.Legend.Visibility = DefaultBoolean.False
         Me.XrLJGraph.LocationFloat = New DevExpress.Utils.PointFloat(9.999974!, 55.2083!)
         Me.XrLJGraph.Name = "XrLJGraph"
         Me.XrLJGraph.PaletteBaseColorNumber = 4
         Me.XrLJGraph.PaletteName = "Black and White"
         Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel1.LineVisible = True
-        PointSeriesLabel1.Visible = False
+        PointSeriesLabel1.LineVisibility = DefaultBoolean.True
         Series1.Label = PointSeriesLabel1
-        Series1.LegendPointOptions = PointOptions1
+        Series1.LegendTextPattern = "{V}"
         Series1.Name = "Series 1"
         PointOptions2.PointView = DevExpress.XtraCharts.PointView.ArgumentAndValues
-        Series1.PointOptions = PointOptions2
+        Series1.Label.TextPattern = "{V}"
         Series1.ShowInLegend = False
         Series1.SynchronizePointOptions = False
         LineSeriesView1.LineMarkerOptions.BorderVisible = False
         LineSeriesView1.LineMarkerOptions.Size = 1
         Series1.View = LineSeriesView1
         Me.XrLJGraph.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1}
-        PointSeriesLabel2.LineVisible = True
+        PointSeriesLabel2.LineVisibility = DefaultBoolean.True
         Me.XrLJGraph.SeriesTemplate.Label = PointSeriesLabel2
-        Me.XrLJGraph.SeriesTemplate.LegendPointOptions = PointOptions3
+        Me.XrLJGraph.SeriesTemplate.LegendTextPattern = "{V}"
         Me.XrLJGraph.SeriesTemplate.SynchronizePointOptions = False
         Me.XrLJGraph.SeriesTemplate.View = LineSeriesView2
         Me.XrLJGraph.SizeF = New System.Drawing.SizeF(681.0!, 296.4583!)
@@ -664,7 +665,7 @@ Partial Public Class QCIndividualResultsByTestControlReport
         Me.XrLJGraph.StylePriority.UseBorders = False
         ChartTitle1.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         ChartTitle1.Text = "Linear"
-        ChartTitle1.Visible = False
+        ChartTitle1.Visibility = DefaultBoolean.False
         Me.XrLJGraph.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle1})
         '
         'XrPanel3

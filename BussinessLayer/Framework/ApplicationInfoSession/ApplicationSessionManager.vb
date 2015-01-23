@@ -1,13 +1,8 @@
 Option Explicit On
 Option Strict On
 
-Imports System.IO
-Imports Microsoft.Win32
-Imports System.Globalization
-Imports System.Configuration
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.TO
-Imports System.Security.Cryptography
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -31,8 +26,8 @@ Namespace Biosystems.Ax00.BL.Framework
             Try
                 result = (Not AppDomain.CurrentDomain.GetData("ApplicationInfoSession") Is Nothing)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.SessionExist", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.SessionExist", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -55,8 +50,8 @@ Namespace Biosystems.Ax00.BL.Framework
                     result = True 'change the result value to true because operation was OK.
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function
@@ -84,7 +79,7 @@ Namespace Biosystems.Ax00.BL.Framework
                 myApplicationInfoSession.ActivateSystemLog = GlobalBase.WriteToSystemLog
 
                 'Application Setting area
-                Dim myApplicationSetting As New ApplicationSettingDelegate()
+                'Dim myApplicationSetting As New ApplicationSettingDelegate()
                 'myApplicationInfoSession.ApplicationVersion = myApplicationSetting.GetApplicationSettingCurrentValueBySettingID("ApplicationVersion")
                 'myApplicationInfoSession.DatabaseVersion = myApplicationSetting.GetApplicationSettingCurrentValueBySettingID("DatabaseVersion")
 
@@ -117,8 +112,8 @@ Namespace Biosystems.Ax00.BL.Framework
                 'IT 18/09/2014 #BA-1946 - FIN
 
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.FillApplicationInfoSessionTO", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.FillApplicationInfoSessionTO", EventLogEntryType.Error, False)
             End Try
             Return myApplicationInfoSession
         End Function
@@ -138,8 +133,8 @@ Namespace Biosystems.Ax00.BL.Framework
                     result = True
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.InitializeSession", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function

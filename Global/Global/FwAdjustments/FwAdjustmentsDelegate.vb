@@ -3,12 +3,8 @@ Option Explicit On
 
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
-Imports Biosystems.Ax00.Global.TO
-Imports System.Configuration
 Imports System.Windows.Forms
 Imports System.IO
-Imports System.Xml.Serialization
 
 Public Class FwAdjustmentsDelegate
 
@@ -82,8 +78,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.Clone", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.Clone", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -105,8 +101,8 @@ Public Class FwAdjustmentsDelegate
             myHeader &= "--Date & Time: " & vbTab & myReadedDatetime & vbCrLf
             myHeader &= "---------------------------------------------------------------------------------" & vbCrLf & vbCrLf
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.MakeAdjustmentsFileHeader", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.MakeAdjustmentsFileHeader", EventLogEntryType.Error, False)
         End Try
         Return myHeader
     End Function
@@ -121,19 +117,19 @@ Public Class FwAdjustmentsDelegate
                                    Optional ByVal pEncrypt As Boolean = False) As GlobalDataTO
 
         Dim resultData As New GlobalDataTO
-        Dim myStreamWriter As StreamWriter
+        Dim myStreamWriter As StreamWriter = Nothing
 
         Try
 
 
-            resultData = MyClass.ConvertDSToString()
+            resultData = Me.ConvertDSToString()
             If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                 Dim myText As String = CType(resultData.SetDatos, String)
 
-                Dim myGlobalbase As New GlobalBase
+                'Dim myGlobalbase As New GlobalBase
                 Dim myPath As String
 
-                Dim myHeader As String = MyClass.MakeAdjustmentsFileHeader()
+                Dim myHeader As String = Me.MakeAdjustmentsFileHeader()
 
                 myText = myHeader & myText
 
@@ -143,13 +139,13 @@ Public Class FwAdjustmentsDelegate
 
                 Else
                     If pAnalyzerSN.Length > 0 Then
-                        Dim myDir As String = Application.StartupPath & myGlobalbase.FwAdjustmentsPath  'SGM 24/11/2011
+                        Dim myDir As String = Application.StartupPath & GlobalBase.FwAdjustmentsPath  'SGM 24/11/2011
                         myPath = myDir & "Adj_" & pAnalyzerSN & ".txt"
                     Else
                         If pPath.Length > 0 Then
                             myPath = pPath
                         Else
-                            myPath = Application.StartupPath & myGlobalbase.FwAdjustmentsPath & "FwAdjustments.txt"
+                            myPath = Application.StartupPath & GlobalBase.FwAdjustmentsPath & "FwAdjustments.txt"
                         End If
                     End If
                 End If
@@ -162,7 +158,7 @@ Public Class FwAdjustmentsDelegate
                 myStreamWriter.Close()
 
                 If pEncrypt Then
-                    resultData = MyClass.EncryptAdjustmentsFile(myPath)
+                    resultData = Me.EncryptAdjustmentsFile(myPath)
                 End If
 
                 resultData.SetDatos = myPath
@@ -174,8 +170,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ExportDSToFile", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ExportDSToFile", EventLogEntryType.Error, False)
         End Try
 
         If myStreamWriter IsNot Nothing Then
@@ -195,7 +191,7 @@ Public Class FwAdjustmentsDelegate
     Public Function EncryptAdjustmentsFile(ByVal pTextPath As String) As GlobalDataTO
 
         Dim myGlobal As New GlobalDataTO
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Try
 
@@ -209,7 +205,7 @@ Public Class FwAdjustmentsDelegate
 
                 If File.Exists(pTextPath) Then
 
-                    myGlobal = myUtil.EncryptFile(pTextPath, myCryptFilePath)
+                    myGlobal = Utilities.EncryptFile(pTextPath, myCryptFilePath)
                 Else
                     Throw New FileNotFoundException
                 End If
@@ -222,8 +218,8 @@ Public Class FwAdjustmentsDelegate
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.EncryptAdjustmentsFile", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.EncryptAdjustmentsFile", EventLogEntryType.Error, False)
         End Try
 
         Return myGlobal
@@ -234,7 +230,7 @@ Public Class FwAdjustmentsDelegate
 
         Dim myGlobal As New GlobalDataTO
         'Dim objReader As System.IO.StreamReader
-        Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
 
         Try
             'Dim myData As String
@@ -242,7 +238,7 @@ Public Class FwAdjustmentsDelegate
             Dim myTempDirPath As String = New FileInfo(pCryptFilePath).DirectoryName
             If Not myTempDirPath.EndsWith("\") Then myTempDirPath &= "\"
             Dim myDecryptFilePath As String = myTempDirPath & FileName.Replace(FwAdjustmentsDelegate.AdjustmentCryptedFileExtension, FwAdjustmentsDelegate.AdjustmentDecryptedFileExtension)
-            myGlobal = myUtil.DecryptFile(pCryptFilePath, myDecryptFilePath)
+            myGlobal = Utilities.DecryptFile(pCryptFilePath, myDecryptFilePath)
 
             If Not myGlobal.HasError And myGlobal.SetDatos IsNot Nothing Then
                 If Not File.Exists(myDecryptFilePath) Then
@@ -255,8 +251,8 @@ Public Class FwAdjustmentsDelegate
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.DecryptAdjustmentsFile", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.DecryptAdjustmentsFile", EventLogEntryType.Error, False)
         End Try
 
         'If objReader IsNot Nothing Then
@@ -338,8 +334,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertDSToString", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertDSToString", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -366,8 +362,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentValueByCode", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentValueByCode", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -395,8 +391,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentValueByGroupAndAxis", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentValueByGroupAndAxis", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -441,8 +437,8 @@ Public Class FwAdjustmentsDelegate
     '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '        resultData.ErrorMessage = ex.Message
 
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentsByGroupID", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentsByGroupID", EventLogEntryType.Error, False)
     '    End Try
     '    Return resultData
     'End Function
@@ -491,8 +487,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentsByGroupIDs", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ReadAdjustmentsByGroupIDs", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -524,7 +520,7 @@ Public Class FwAdjustmentsDelegate
             myAdjustmentsDS.AcceptChanges()
 
             'export the updated data to the external file
-            resultData = MyClass.ExportDSToFile(pAnalyzerID)
+            resultData = Me.ExportDSToFile(pAnalyzerID)
             If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
                 resultData.SetDatos = myAdjustmentsDS
             End If
@@ -537,8 +533,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.UpdateAdjustments", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.UpdateAdjustments", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -564,14 +560,14 @@ Public Class FwAdjustmentsDelegate
             pAdjustmentsDS.AcceptChanges()
 
             resultData.SetDatos = pAdjustmentsDS
-            
+
         Catch ex As Exception
             resultData.HasError = True
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.UpdateFwVersion", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.UpdateFwVersion", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -618,8 +614,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertReceivedDataToDS", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertReceivedDataToDS", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -690,8 +686,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertStringDataToDS", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertStringDataToDS", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -705,10 +701,10 @@ Public Class FwAdjustmentsDelegate
     'Public Function ConvertReceivedDataToDS(ByVal pAdjustmentsData As String) As GlobalDataTO
     '    Dim resultData As New GlobalDataTO
     '    Dim CopyOfAdjustmentsDS As SRVAdjustmentsDS = myAdjustmentsDS
-    '    Dim myUtil As New Utilities
+    '    'Dim myUtil As New Utilities.
     '    Try
 
-    '        resultData = myUtil.ConvertAdjustmentsTextToDS(pAdjustmentsData)
+    '        resultData = Utilities.ConvertAdjustmentsTextToDS(pAdjustmentsData)
 
     '        If Not resultData.HasError AndAlso resultData.SetDatos IsNot Nothing Then
 
@@ -725,8 +721,8 @@ Public Class FwAdjustmentsDelegate
     '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '        resultData.ErrorMessage = ex.Message
 
-    '        Dim myLogAcciones As New ApplicationLogManager()
-    '        myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertReceivedDataToDS", EventLogEntryType.Error, False)
+    '        'Dim myLogAcciones As New ApplicationLogManager()
+    '        GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertReceivedDataToDS", EventLogEntryType.Error, False)
     '    End Try
     '    Return resultData
     'End Function
@@ -747,7 +743,7 @@ Public Class FwAdjustmentsDelegate
         Try
 
             'SGM 01/11/2011
-            resultData = MyClass.Clone(MyClass.myAdjustmentsDS)
+            resultData = Me.Clone(Me.myAdjustmentsDS)
             If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                 CopyOfAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
 
@@ -881,12 +877,12 @@ Public Class FwAdjustmentsDelegate
                     resultData.SetDatos = CopyOfAdjustmentsDS
 
                     'SGM 01/11/2011
-                    resultData = MyClass.Clone(CopyOfAdjustmentsDS)
+                    resultData = Me.Clone(CopyOfAdjustmentsDS)
                     If Not resultData.HasError And resultData.SetDatos IsNot Nothing Then
                         If pExternalDS IsNot Nothing Then
                             pExternalDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
                         Else
-                            MyClass.myAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
+                            Me.myAdjustmentsDS = CType(resultData.SetDatos, SRVAdjustmentsDS)
                         End If
                     End If
 
@@ -905,8 +901,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertReceivedDataToDS", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.ConvertReceivedDataToDS", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function
@@ -963,8 +959,8 @@ Public Class FwAdjustmentsDelegate
             resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             resultData.ErrorMessage = ex.Message
 
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.AddNewRowToDS", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message, "FwAdjustmentsDelegate.AddNewRowToDS", EventLogEntryType.Error, False)
         End Try
         Return resultData
     End Function

@@ -1,4 +1,5 @@
 Imports System.Windows.Forms
+Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.Controls.UserControls
     Public Class BSDataGridView
@@ -49,8 +50,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BSDataGridView.OnPaint", EventLogEntryType.Error, False)
+
+                GlobalBase.CreateLogActivity(ex.Message, "BSDataGridView.OnPaint", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 
@@ -92,8 +93,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 ' XB 10/03/2014 - Add Try Catch section
             Catch ex As Exception
                 ' Write into Log
-                Dim myLogAcciones As New Biosystems.Ax00.Global.ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "BSDataGridView.ProcessDialogKey", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "BSDataGridView.ProcessDialogKey", EventLogEntryType.Error, False)
                 ' Throw ex --> Do not work, no business catch this throw, just MyApplication_UnhandledException !
             End Try
 

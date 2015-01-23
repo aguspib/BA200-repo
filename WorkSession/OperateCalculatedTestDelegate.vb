@@ -119,8 +119,8 @@ Namespace Biosystems.Ax00.BL
 
                                 If (requiredOrderCalculatedTests.vwksOrderCalculatedTests.Rows.Count > 0) Then
                                     'Get the logged User
-                                    Dim currentSession As New GlobalBase
-                                    Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                                    'Dim currentSession As New GlobalBase
+                                    Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                                     Dim orderTestsDS As New ViewOrderCalculatedTestsDS
                                     Dim operateCalculatedTestDS As New OperateCalculatedTestDS
@@ -344,8 +344,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.ExecuteCalculatedTest", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.ExecuteCalculatedTest", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -383,8 +383,8 @@ Namespace Biosystems.Ax00.BL
                 End With
                 pResultAlarmsDS.twksResultAlarms.AddtwksResultAlarmsRow(resultAlarmRow)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.AddResultAlarm", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.AddResultAlarm", EventLogEntryType.Error, False)
                 Throw ex
             End Try
         End Sub
@@ -465,8 +465,8 @@ Namespace Biosystems.Ax00.BL
                 '... and finally save the generated Alarms
                 If (myResultAlarmsDS.twksResultAlarms.Rows.Count > 0) Then resultData = myResultAlarmsDelegate.Add(dbConnection, myResultAlarmsDS)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.CreateAlarms", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.CreateAlarms", EventLogEntryType.Error, False)
                 Throw ex
             End Try
         End Sub
@@ -502,8 +502,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.GetAcceptedResultsByOrderTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.GetAcceptedResultsByOrderTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -555,8 +555,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.Evaluate", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "OperateCalculatedTestDelegate.Evaluate", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try

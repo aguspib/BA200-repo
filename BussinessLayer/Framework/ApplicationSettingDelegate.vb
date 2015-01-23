@@ -5,7 +5,6 @@ Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.DAL.DAO
-Imports Biosystems.Ax00.Global.TO
 Imports System.Data.SqlClient
 
 Namespace Biosystems.Ax00.BL.Framework
@@ -26,7 +25,6 @@ Namespace Biosystems.Ax00.BL.Framework
         Public Function GetApplicationSettingBySettingID(ByVal pDBConnection As SqlClient.SqlConnection, ByVal SettingID As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
-
             Try
                 resultData = DAOBase.GetOpenDBConnection(pDBConnection)
                 If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
@@ -43,8 +41,8 @@ Namespace Biosystems.Ax00.BL.Framework
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingBySettingID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingBySettingID", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -71,8 +69,8 @@ Namespace Biosystems.Ax00.BL.Framework
                     myCurrentValue = myApplicationSettingDS.ApplicationSetting.Rows(0)(myApplicationSettingDS.ApplicationSetting.CurrentValueColumn).ToString()
                 End If
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingCurrentValueBySettingID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.GetApplicationSettingCurrentValueBySettingID", EventLogEntryType.Error, False)
             End Try
             Return myCurrentValue
         End Function
@@ -105,8 +103,8 @@ Namespace Biosystems.Ax00.BL.Framework
                 ' Update the database value. and assigned the value to the result
                 result = MyApplicationSettingDAO.Update(myApplicationSettingDS, Conn, Nothing)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.UpdateCurrentValueBySettingID", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSettingDelegate.UpdateCurrentValueBySettingID", EventLogEntryType.Error, False)
             End Try
             Return result
         End Function

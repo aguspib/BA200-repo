@@ -1,4 +1,8 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Option Strict On
+Option Explicit On
+Option Infer On
+
+Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global.GlobalEnumerates
@@ -253,12 +257,12 @@ Public Class IQCResultsReview
                 If (myHistoryTestSampleDS.tqcHistoryTestSamples.Count > 0) Then
                     '** Bind Calculation Mode, Number of Series and Rejection Criteria...
                     bsCalculationModeCombo.SelectedValue = myHistoryTestSampleDS.tqcHistoryTestSamples(0).CalculationMode
-                    If (bsCalculationModeCombo.SelectedValue = "MANUAL") Then
+                    If (CStr(bsCalculationModeCombo.SelectedValue) = "MANUAL") Then
                         bsNumberOfSeriesNumeric.ResetText()
                     Else
-                        bsNumberOfSeriesNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).NumberOfSeries
+                        bsNumberOfSeriesNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).NumberOfSeries.ToString
                     End If
-                    bsRejectionNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).RejectionCriteria
+                    bsRejectionNumeric.Text = myHistoryTestSampleDS.tqcHistoryTestSamples(0).RejectionCriteria.ToString
 
                     'Bind Multirules...
                     BindMultirulesControls(pQCTestSampleID)
@@ -723,11 +727,11 @@ Public Class IQCResultsReview
                     myResultInformationRow.RunsGroupNumber = CInt(bsResultControlLotGridView.SelectedRows(0).Cells("RunsGroupNumber").Value)
                     myResultInformationRow.NumberOfSeries = CInt(bsResultsDetailsGridView.SelectedRows(0).Cells("RunNumber").Value)
                     myResultInformationRow.CalNumberSeries = CInt(bsResultsDetailsGridView.SelectedRows(0).Cells("CalcRunNumber").Value)
-                    myResultInformationRow.ResultValue = CDbl(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultValue").Value)
+                    myResultInformationRow.ResultValue = CSng(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultValue").Value)
                     myResultInformationRow.Excluded = CBool(bsResultsDetailsGridView.SelectedRows(0).Cells("Excluded").Value)
 
                     If (Not bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value Is DBNull.Value) Then
-                        myResultInformationRow.ResultComment = bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value
+                        myResultInformationRow.ResultComment = CStr(bsResultsDetailsGridView.SelectedRows(0).Cells("ResultComment").Value)
                     End If
                     myResultInformationRow.ManualResultValue = 0
                     myResultInformationDS.tResultInformation.AddtResultInformationRow(myResultInformationRow)
@@ -862,9 +866,9 @@ Public Class IQCResultsReview
 
                     'Add the Test/Sample Type to the ListView
                     bsTestSampleListView.Items.Add(historyTestSampRow.TestName, myIconNameVar).SubItems.Add(historyTestSampRow.SampleType)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestID)
-                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.DecimalsAllowed)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.QCTestSampleID.ToString)
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(CStr(historyTestSampRow.TestID))
+                    bsTestSampleListView.Items(myIndex).SubItems.Add(CStr(historyTestSampRow.DecimalsAllowed))
                     bsTestSampleListView.Items(myIndex).SubItems.Add(historyTestSampRow.TestType)
 
                     myIndex += 1
@@ -1057,8 +1061,8 @@ Public Class IQCResultsReview
     Private Sub InitializeScreen()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString()
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString()
 
             GetScreenLabels(currentLanguage)
             PrepareButtons(currentLanguage)
@@ -1151,8 +1155,8 @@ Public Class IQCResultsReview
 
             If (pInitialScreenLoad) Then
                 'TR 20/04/2012 - Get level of the connected User
-                Dim myGlobalBase As New GlobalBase
-                CurrentUserLevel = myGlobalBase.GetSessionInfo().UserLevel
+                'Dim myGlobalbase As New GlobalBase
+                CurrentUserLevel = GlobalBase.GetSessionInfo().UserLevel
             End If
 
             If (bsTestSampleListView.Items.Count = 0) Then
@@ -1216,56 +1220,56 @@ Public Class IQCResultsReview
             'SEARCH Button
             auxIconName = GetIconName("FIND")
             If (auxIconName <> "") Then
-                bsSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsSearchButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Search", pLanguageID))
             End If
 
             'NEW Button
             auxIconName = GetIconName("ADD")
             If (auxIconName <> "") Then
-                bsAddButtom.Image = Image.FromFile(iconPath & auxIconName)
+                bsAddButtom.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsAddButtom, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_AddNew", pLanguageID))
             End If
 
             'EDIT Button
             auxIconName = GetIconName("EDIT")
             If (auxIconName <> "") Then
-                bsEditButtom.Image = Image.FromFile(iconPath & auxIconName)
+                bsEditButtom.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsEditButtom, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_EDIT", pLanguageID))
             End If
 
             'DELETE Button
             auxIconName = GetIconName("REMOVE")
             If (auxIconName <> "") Then
-                bsDeleteButtom.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButtom.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsDeleteButtom, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Delete", pLanguageID))
             End If
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsExitButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_CloseScreen", pLanguageID))
             End If
 
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsPrintButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_Print", pLanguageID))
             End If
 
             'LJ & YOUDEN GRAPHS Button
             auxIconName = GetIconName("ABS_GRAPH")
             If (auxIconName <> "") Then
-                bsGraphsButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsGraphsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsGraphsButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Graph", pLanguageID))
             End If
 
             'CUMULATE RESULTS Button
             auxIconName = GetIconName("QCCUM")
             If (auxIconName <> "") Then
-                bsCumulateButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsCumulateButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 myToolTipsControl.SetToolTip(bsCumulateButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_Cumulate_Results", pLanguageID))
             End If
         Catch ex As Exception
@@ -1589,9 +1593,9 @@ Public Class IQCResultsReview
             Dim myTestIconList As New ImageList
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-            myTestIconList.Images.Add("TESTICON", Image.FromFile(MyBase.IconsPath & GetIconName("TESTICON")))
-            myTestIconList.Images.Add("USERTEST", Image.FromFile(MyBase.IconsPath & GetIconName("USERTEST")))
-            myTestIconList.Images.Add("TISE_SYS", Image.FromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
+            myTestIconList.Images.Add("TESTICON", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TESTICON")))
+            myTestIconList.Images.Add("USERTEST", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("USERTEST")))
+            myTestIconList.Images.Add("TISE_SYS", ImageUtilities.ImageFromFile(MyBase.IconsPath & GetIconName("TISE_SYS")))
 
             bsTestSampleListView.Items.Clear()
             bsTestSampleListView.Scrollable = True
@@ -2083,7 +2087,7 @@ Public Class IQCResultsReview
                 Close()
             Else
                 'Normal button click - Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExitButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -2119,7 +2123,7 @@ Public Class IQCResultsReview
                 myIQCGraph.DecimalAllowed = LocalDecimalAllow
                 myIQCGraph.TestName = bsTestSampleListView.SelectedItems(0).SubItems(0).Text
                 myIQCGraph.SampleType = bsTestSampleListView.SelectedItems(0).SubItems(1).Text
-                myIQCGraph.RejectionCriteria = Me.bsRejectionNumeric.Value.ToString()
+                myIQCGraph.RejectionCriteria = Me.bsRejectionNumeric.Value
 
                 myIQCGraph.ShowDialog()
 
@@ -2359,7 +2363,7 @@ Public Class IQCResultsReview
                 Dim file As String = e.Value.ToString()
 
                 If (System.IO.File.Exists(file)) Then
-                    e.Value = Image.FromFile(file)
+                    e.Value = ImageUtilities.ImageFromFile(file)
                 Else
                     e.Value = Nothing
                 End If

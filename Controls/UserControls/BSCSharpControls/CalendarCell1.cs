@@ -26,29 +26,24 @@ namespace Biosystems.Ax00.Controls.UserControls
             // Set the value of the editing control to the current cell value.
             base.InitializeEditingControl(rowIndex, initialFormattedValue,
                 dataGridViewCellStyle);
-            CalendarEditingControl1 ctl =
-                DataGridView.EditingControl as CalendarEditingControl1;
+            CalendarEditingControl1 ctl = DataGridView.EditingControl as CalendarEditingControl1;
             // Use the default row value when Value property is null.
 
-            if (this.RowIndex >= 0)
+            if (this.RowIndex < 0) 
+                return;
+            if ((object.ReferenceEquals(this.Value, DBNull.Value))) 
+                return;
+            if (this.Value == null) 
+                return;
+            if (Convert.ToString(this.Value) == string.Empty) 
+                return;
+            try
             {
-                                if ((!object.ReferenceEquals(this.Value, DBNull.Value)))
-                {
-                    if (this.Value != null)
-                    {
-                        if (this.Value != string.Empty)
-                        {
-                            try
-                            {
-                                ctl.Value = DateTime.Parse(this.Value.ToString());
-                            }
-                            catch (Exception ex)
-                            {
+                ctl.Value = DateTime.Parse(this.Value.ToString());
+            }
+            catch (Exception)
+            {
 
-                            }
-                        }
-                    }
-                }
             }
 
             //if (this.Value == null)
@@ -175,14 +170,7 @@ namespace Biosystems.Ax00.Controls.UserControls
 
         public bool EditingControlWantsInputKey(Keys key, bool dataGridViewWantsInputKey)
         {
-            if (Keys.KeyCode == Keys.Left || Keys.KeyCode == Keys.Up || Keys.KeyCode == Keys.Down || Keys.KeyCode == Keys.Right || Keys.KeyCode == Keys.Home || Keys.KeyCode == Keys.End || Keys.KeyCode == Keys.PageDown || Keys.KeyCode == Keys.PageUp)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (key == Keys.Left | key == Keys.Up | key == Keys.Down | key == Keys.Right | key == Keys.Home | key == Keys.End | key == Keys.PageDown | key == Keys.PageUp);
         }
 
         public void PrepareEditingControlForEdit(bool selectAll)

@@ -1,4 +1,7 @@
-﻿Imports Biosystems.Ax00.Controls.UserControls
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
@@ -208,18 +211,18 @@ Public Class Historycal
             'FILTER Button
             'auxIconName = GetIconName("FILTER")
             'If (auxIconName <> "") Then
-            '    bsOpenSearchButton.Image = Image.FromFile(iconPath & auxIconName)
+            '    bsOpenSearchButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             'End If
 
             'CLEAR FILTER Button
             auxIconName = GetIconName("DELFILTER")
             If (auxIconName <> "") Then
-                bsClearButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsClearButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -288,8 +291,8 @@ Public Class Historycal
 
     Private Sub Monitor_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
         'Get the current Language from the current Application Session
-        Dim currentLanguageGlobal As New GlobalBase
-        LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+        'Dim currentLanguageGlobal As New GlobalBase
+        LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
         InitializeAlarmsTab()
 

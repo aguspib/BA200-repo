@@ -151,7 +151,7 @@ Partial Class IResults
         GridView1.Name = "GridView1"
         GridView1.OptionsSelection.EnableAppearanceFocusedCell = False
         GridView1.OptionsView.EnableAppearanceEvenRow = True
-        GridView1.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowForFocusedRow
+        GridView1.OptionsView.ShowButtonMode = DevExpress.XtraGrid.Views.Base.ShowButtonModeEnum.ShowForFocusedRow
         '
         'Cycle
         '

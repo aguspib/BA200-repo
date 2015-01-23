@@ -1,14 +1,12 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 'Imports ICSharpCode.SharpZipLib.Zip
 Imports System.IO
 Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
-Imports System.Configuration
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
@@ -59,12 +57,12 @@ Public Class ISATReport
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            currentLanguage = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            currentLanguage = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             PrepareButtons()
             GetScreenLabels(currentLanguage)
@@ -97,7 +95,7 @@ Public Class ISATReport
 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("ISATReport LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("ISATReport LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "ISATReport.SATReportData_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -140,7 +138,7 @@ Public Class ISATReport
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 14/02/2012
@@ -163,13 +161,13 @@ Public Class ISATReport
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
             'TR 14/02/2012 -END.
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("ISATReport Exit Button (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("ISATReport Exit Button (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "ISATReport.ExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -193,7 +191,7 @@ Public Class ISATReport
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 22/12/2011 - Validate if file name exists on the selected folder before starting the ReportSAT creation
@@ -211,7 +209,7 @@ Public Class ISATReport
                     ExitButton.Enabled = False
                     FolderButton.Enabled = False
                     bsSATDirListBox.Enabled = False
-                    IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
 
                     Application.DoEvents()
                     Dim workingThread As New Threading.Thread(AddressOf CreateReportSAT_NEW)
@@ -223,14 +221,14 @@ Public Class ISATReport
                     processing = True
                     ScreenWorkingProcess = True  'AG 08/11/2012 - Inform this flag because the MDI requires it
                     workingThread.Start()
-                    IAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
+                    UiAx00MainMDI.EnableButtonAndMenus(False) 'TR 04/10/2011 -Implement new method.
 
                     While processing
-                        IAx00MainMDI.InitializeMarqueeProgreesBar()
+                        UiAx00MainMDI.InitializeMarqueeProgreesBar()
                         Application.DoEvents()
                         Threading.Thread.Sleep(100)
                     End While
-                    IAx00MainMDI.StopMarqueeProgressBar()
+                    UiAx00MainMDI.StopMarqueeProgressBar()
 
                     'TR 22/12/2011 - Validate if file is created on the current folder.
                     If (File.Exists(FolderPathTextBox.Text & "\" & FileNameTextBox.Text & GlobalBase.ZIPExtension)) Then
@@ -240,7 +238,7 @@ Public Class ISATReport
                         Application.DoEvents()
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        myLogAcciones.CreateLogActivity("Before Email -> ReportSAT Generated (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Before Email -> ReportSAT Generated (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "ISATReport.bsSaveSATRepButton_Click", EventLogEntryType.Information, False)
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -299,8 +297,8 @@ Public Class ISATReport
             ExitButton.Enabled = True
             FolderButton.Enabled = True
             bsSATDirListBox.Enabled = True
-            IAx00MainMDI.SetActionButtonsEnableProperty(True)
-            IAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 - Implement new method
+            UiAx00MainMDI.SetActionButtonsEnableProperty(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 - Implement new method
 
             'TR 09/01/2012 - Indicate Rsat END on Application LOG.'TR 09/01/2012 -Indicate Rsat END on Application LOG.
             CreateLogActivity("RSAT END  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
@@ -314,7 +312,7 @@ Public Class ISATReport
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                     Dim StartTime As DateTime = Now
-                    Dim myLogAcciones As New ApplicationLogManager()
+                    'Dim myLogAcciones As New ApplicationLogManager()
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                     Dim CheckedIndicesCount As Integer = bsSATDirListBox.CheckedIndices.Count
@@ -326,7 +324,7 @@ Public Class ISATReport
                     Next
 
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                    myLogAcciones.CreateLogActivity("ISATReport Delete WS Files (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                    GlobalBase.CreateLogActivity("ISATReport Delete WS Files (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                     "ISATReport.bsDeleteButton_Click", EventLogEntryType.Information, False)
                     '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -416,22 +414,22 @@ Public Class ISATReport
 
             auxIconName = GetIconName("OPEN")
             If auxIconName <> "" Then
-                FolderButton.Image = Image.FromFile(iconPath & auxIconName)
+                FolderButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CREATE_REP_SAT")
             If auxIconName <> "" Then
-                bsSaveSATRepButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsSaveSATRepButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("REMOVE")
             If auxIconName <> "" Then
-                bsDeleteButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsDeleteButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             auxIconName = GetIconName("CANCEL")
             If auxIconName <> "" Then
-                ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception

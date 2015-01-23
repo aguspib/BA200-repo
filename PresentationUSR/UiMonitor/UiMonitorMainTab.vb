@@ -1,10 +1,17 @@
-﻿'Put here your business code for the tab MainTab inside Monitor Form
+﻿Option Explicit On
+Option Strict On
+Option Infer On
+
+
+'Put here your business code for the tab MainTab inside Monitor Form
 
 'Imports System.Text
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.Global
+Imports DevExpress.XtraEditors.Controls
+Imports System.IO
 
-Partial Public Class IMonitor
+Partial Public Class UiMonitor
 
     Dim rnd As Random = New Random(DateTime.Now.Second)
 
@@ -16,7 +23,7 @@ Partial Public Class IMonitor
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("STUS_LOCKED")
             If System.IO.File.Exists(iconPath & auxIconName) Then
-                Dim myImage As Image = Image.FromFile(iconPath & auxIconName)
+                Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
                     Me.BsISELongTermDeactivated.BackgroundImage = myImage
                 End If
@@ -244,7 +251,7 @@ Partial Public Class IMonitor
 
                 If Not pEnable Then
                     'DL 17/05/2012. BEGIN
-                    'MainTab.Appearance.PageClient.Image = Image.FromFile(IconsPath & "Embedded\BackgroundMainMonitor-Start.png")
+                    'MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor-Start.png")
                     'CoverReagentsPicture.Visible = False
                     'CoverReactionsPicture.Visible = False
                     'CoverSamplesPicture.Visible = False
@@ -252,12 +259,12 @@ Partial Public Class IMonitor
                     'CoverOnPicture.Visible = False
 
                     MainTab.Appearance.PageClient.Image = Image.FromFile(IconsPath & "Embedded\BackgroundMainMonitor_DIS.png")
-
-                    CoverReagentsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReagents_DIS.png")
-                    CoverReactionsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReactions_DIS.png")
-                    CoverSamplesPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverSamples_DIS.png")
-                    CoverOffPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOff_DIS.png")
-                    CoverOnPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOn_DIS.png")
+                    'MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor_DIS.png")
+                    CoverReagentsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReagents_DIS.png")
+                    CoverReactionsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReactions_DIS.png")
+                    CoverSamplesPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverSamples_DIS.png")
+                    CoverOffPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOff_DIS.png")
+                    CoverOnPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOn_DIS.png")
 
                     CoverReagentsPicture.Visible = True
                     CoverReactionsPicture.Visible = True
@@ -265,15 +272,17 @@ Partial Public Class IMonitor
                     CoverOffPicture.Visible = True
                     CoverOnPicture.Visible = True
                     'DL 17/05/2012. END
+
                 Else
                     MainTab.Appearance.PageClient.Image = Image.FromFile(IconsPath & "Embedded\BackgroundMainMonitor.png")
+                    'MainTab.Appearance.PageClient.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\BackgroundMainMonitor.png")
 
                     'DL 17/05/2012. BEGIN
-                    CoverReagentsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReagents.png")
-                    CoverReactionsPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverReactions.png")
-                    CoverSamplesPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverSamples.png")
-                    CoverOffPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOff.png")
-                    CoverOnPicture.Image = Image.FromFile(IconsPath & "Embedded\CoverAnalyzerOn.png")
+                    CoverReagentsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReagents.png")
+                    CoverReactionsPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverReactions.png")
+                    CoverSamplesPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverSamples.png")
+                    CoverOffPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOff.png")
+                    CoverOnPicture.Image = ImageUtilities.ImageFromFile(IconsPath & "Embedded\CoverAnalyzerOn.png")
                     'DL 17/05/2012. END
 
                     CoverReagentsPicture.Visible = True
@@ -314,34 +323,34 @@ Partial Public Class IMonitor
         WasteLabel.Text = sensorValue.ToStringWithPercent(0) 'AG 21/12/2011 format 0 decimals BugsTrackings 258 (Elena) 'RH 20/10/2011
 
         'TR 30/09/2011 -Format the values (ask AG the desired format)
-        'Dim myUtil As New Utilities
-        'WashingLabel.Text = myUtil.ToStringWithFormat(chart2.Series("Series1").Points(1).YValues(0), 1) & "%"
-        'WasteLabel.Text = myUtil.ToStringWithFormat(chart2.Series("Series1").Points(2).YValues(0), 1) & "%"
+        ''Dim myUtil As New Utilities.
+        'WashingLabel.Text = Utilities.ToStringWithFormat(chart2.Series("Series1").Points(1).YValues(0), 1) & "%"
+        'WasteLabel.Text = Utilities.ToStringWithFormat(chart2.Series("Series1").Points(2).YValues(0), 1) & "%"
         'TR 30/09/2011 -END.
 
         'RH 20/10/2011
-        'Function myUtil.ToStringWithFormat() does not work properly and has some problems in its definition and use.
+        'Function Utilities.ToStringWithFormat() does not work properly and has some problems in its definition and use.
         'It does not remove comma zeroes (,0...) for every case. The problem it try to solve is not trivial.
         'I replaced it by the extension method ToStringWithPercent().
         'Just run the following lines in debug mode to compare both results. Try different decimal values.
 
-        'Dim myUtil As New Utilities
+        ''Dim myUtil As New Utilities.
         'Dim decimals As Integer = 1 'or 2, or 3...
         'Dim s As Single = 1.1234 'Or Double
         'Dim st As String = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         's = 1.01987
         'st = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         's = 1.001
         'st = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         's = 1.0001
         'st = s.ToStringWithPercent(decimals)
-        'st = myUtil.ToStringWithFormat(s, decimals)
+        'st = Utilities.ToStringWithFormat(s, decimals)
 
         chart2.ResetAutoValues()
 

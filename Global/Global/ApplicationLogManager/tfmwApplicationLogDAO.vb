@@ -1,7 +1,6 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports System.Text
 Imports Biosystems.Ax00.Types
@@ -72,8 +71,8 @@ Namespace Biosystems.Ax00.Global.DAL
                                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                                Dim myLogAcciones As New ApplicationLogManager()
-                                myLogAcciones.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Create", EventLogEntryType.Error, False)
+                                'Dim myLogAcciones As New ApplicationLogManager()
+                                GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Create", EventLogEntryType.Error, False)
                             End If
                         End Try
                         'DL 16/07/2012. End
@@ -251,8 +250,8 @@ Namespace Biosystems.Ax00.Global.DAL
                 myGlobalDataTO.ErrorCode = "SYSTEM_ERROR"
                 myGlobalDataTO.ErrorMessage = ex.Message
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Delete", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.Delete", EventLogEntryType.Error, False)
             Finally
                 'Close the open connection
                 myDBConnection.Close()
@@ -293,8 +292,8 @@ Namespace Biosystems.Ax00.Global.DAL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.DeleteByDate", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message, "tfmwApplicationLogDAO.DeleteByDate", EventLogEntryType.Error, False)
         '    End Try
         '    Return resultData
         'End Function

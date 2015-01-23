@@ -1,12 +1,10 @@
 ﻿Option Strict On
 Option Explicit On
 
-Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.DAL
 Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Namespace Biosystems.Ax00.BL
     Partial Public Class WorkSessionsDelegate
@@ -97,7 +95,7 @@ Namespace Biosystems.Ax00.BL
                             Dim i As Integer = 0
                             Dim newElement As Boolean = True
                             Dim visibleElement As Boolean = True
-                            Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow
+                            Dim wsElementsRow As WSRequiredElementsDS.twksWSRequiredElementsRow = Nothing
 
                             'SGM 29/04/2013
                             'From table twksOrderTestsLISInfo,  get all different SpecimenID sent by LIS for each Patient/Sample Type
@@ -258,8 +256,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForPatientSamples", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForPatientSamples", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -405,8 +403,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForDilutionSolutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForDilutionSolutions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -557,8 +555,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForWashingSolutions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForWashingSolutions", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -683,8 +681,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForISEWashing", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForISEWashing", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -777,8 +775,8 @@ Namespace Biosystems.Ax00.BL
                     dbConnection = DirectCast(dataToReturn.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         'Get the logged User
-                        Dim currentSession As New GlobalBase
-                        Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                        'Dim currentSession As New GlobalBase
+                        Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                         Dim stopProcess As Boolean = False
                         Dim workSessionDataDS As New WorkSessionsDS
@@ -821,8 +819,8 @@ Namespace Biosystems.Ax00.BL
                                     stopProcess = True
 
                                     'Write the Warning in the Application LOG
-                                    Dim myLogAcciones As New ApplicationLogManager()
-                                    myLogAcciones.CreateLogActivity("WARNING: Called to add EMPTY WS when the previous one still exists", "WorkSessionsDelegate.AddWorkSession", EventLogEntryType.Error, False)
+                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                    GlobalBase.CreateLogActivity("WARNING: Called to add EMPTY WS when the previous one still exists", "WorkSessionsDelegate.AddWorkSession", EventLogEntryType.Error, False)
                                 End If
                             End If
                         Else
@@ -1047,8 +1045,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1194,8 +1192,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForReagents", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForReagents", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1354,8 +1352,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForCalibrators", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForCalibrators", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1473,8 +1471,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForControls", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForControls", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1611,8 +1609,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForBlanks", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForBlanks", EventLogEntryType.Error, False)
             Finally
                 'When Database Connection was opened locally, it has to be closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -1648,8 +1646,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetByWorkSession", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetByWorkSession", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1813,8 +1811,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetReagentTubesByElement", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetReagentTubesByElement", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -1915,8 +1913,8 @@ Namespace Biosystems.Ax00.BL
 
                         If (Not myGlobalDataTO.HasError) Then
                             'Get the logged User
-                            Dim currentSession As New GlobalBase
-                            Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                            'Dim currentSession As New GlobalBase
+                            Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                             'Prepare the DataSet needed to add all selected Order Tests to a new or existing Work Session
                             'Add OPEN Blanks and Calibrators....
@@ -2119,8 +2117,8 @@ Namespace Biosystems.Ax00.BL
                                             Dim myWorkSessionsDS As WorkSessionsDS = DirectCast(myGlobalDataTO.SetDatos, WorkSessionsDS)
                                             If (myWorkSessionsDS.twksWorkSessions.Rows.Count = 1) Then
                                                 If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                                                    Dim myLogAcciones As New ApplicationLogManager()
-                                                    myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", _
+                                                    'Dim myLogAcciones As New ApplicationLogManager()
+                                                    GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", _
                                                                                     "WorkSessionsDelegate.PrepareOrderTestsForWS", EventLogEntryType.Error, False)
                                                 End If
                                             End If
@@ -2240,8 +2238,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareOrderTestsForWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareOrderTestsForWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2320,8 +2318,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetOrderTestsForWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetOrderTestsForWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2594,8 +2592,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2701,8 +2699,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ChangeWSStatusFromOpenToEmpty", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ChangeWSStatusFromOpenToEmpty", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2806,8 +2804,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.UpdateInUseFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3070,8 +3068,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.FindElementsInNotInUsePosition", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.FindElementsInNotInUsePosition", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3189,8 +3187,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.FindPatientsInNotInUsePositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.FindPatientsInNotInUsePositions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3256,10 +3254,10 @@ Namespace Biosystems.Ax00.BL
                             Dim imageControl As Byte() = preloadedDataConfig.GetIconImage("CTRL", dbConnection)
 
                             'Get the label for Results in the Current Application Language
-                            Dim currentLanguageGlobal As New GlobalBase
+                            'Dim currentLanguageGlobal As New GlobalBase
                             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
                             Dim myResultsLabel As String = myMultiLangResourcesDelegate.GetResourceText(dbConnection, "LBL_Results", _
-                                                                                                        currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString)
+                                                                                                        GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString)
 
                             'Get value of the SW Parameter for the allowed maximum number of non cumulated QC Results for the Control/Lot and the Test/SampleType
                             Dim myMaxQCResults As Integer = 0
@@ -3385,8 +3383,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ValidateDependenciesOnResetWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ValidateDependenciesOnResetWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3519,8 +3517,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.CalculateTimeRemaining", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.CalculateTimeRemaining", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3595,8 +3593,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionDelegate.StartedWorkSessionFlag", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionDelegate.StartedWorkSessionFlag", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3641,8 +3639,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionDelegate.UpdateStartDateTime", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionDelegate.UpdateStartDateTime", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3865,8 +3863,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetOrderTestsForLISReset", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetOrderTestsForLISReset", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -3969,8 +3967,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.UpdateInUseFlagOnLISCancellation", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.UpdateInUseFlagOnLISCancellation", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4068,8 +4066,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.SaveReagentsRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.SaveReagentsRotorPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4167,8 +4165,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.SaveSamplesRotorPositions", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.SaveSamplesRotorPositions", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4224,8 +4222,8 @@ Namespace Biosystems.Ax00.BL
                             myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "BLANK")
                         Else
                             'Get the logged User
-                            Dim currentSession As New GlobalBase
-                            Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                            'Dim currentSession As New GlobalBase
+                            Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                             'Go through BlankCalibrators Table to process Blanks requested previously that have been not sent to an 
                             'Analyzer Rotor (fields OrderID and OrderTestID are informed)
@@ -4413,8 +4411,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareBlankOrders", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareBlankOrders", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4474,8 +4472,8 @@ Namespace Biosystems.Ax00.BL
                             myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "CALIB")
                         Else
                             'Get the logged User
-                            Dim currentSession As New GlobalBase
-                            Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                            'Dim currentSession As New GlobalBase
+                            Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                             'Go through BlankCalibrators Table to process Calibrators requested previously (having been sent or not to 
                             'the Analyzer; fields OrderID and OrderTestID are informed) - For positioned Calibrator Order Tests, only value
@@ -4740,8 +4738,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareCalibratorOrders", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareCalibratorOrders", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -4799,8 +4797,8 @@ Namespace Biosystems.Ax00.BL
                             myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "CTRL")
                         Else
                             'Get the logged User
-                            Dim currentSession As New GlobalBase
-                            Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                            'Dim currentSession As New GlobalBase
+                            Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                             'Go through Controls Table to process Controls requested previously (having been sent or not to 
                             'the Analyzer; fields OrderID and OrderTestID are informed) - For positioned Control Order Tests, only value
@@ -4990,8 +4988,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareControlOrders", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareControlOrders", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5079,8 +5077,8 @@ Namespace Biosystems.Ax00.BL
                                 myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "PATIENT")
                             Else
                                 'Get the logged User
-                                Dim currentSession As New GlobalBase
-                                Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                                'Dim currentSession As New GlobalBase
+                                Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                                 'Go through Patients Table to process Patient Orders requested previously (field OrderID is informed). These Orders can have
                                 'existing Order Tests (field OrderTestID informed) and non existing Order Tests (they have to be added to the Order) query 
@@ -5570,8 +5568,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PreparePatientOrders", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PreparePatientOrders", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5650,8 +5648,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.UpdateRequiredElementPositionStatusByAddingOrderTests", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.UpdateRequiredElementPositionStatusByAddingOrderTests", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5681,7 +5679,7 @@ Namespace Biosystems.Ax00.BL
                     If (Not dbConnection Is Nothing) Then
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
                         Dim StartTime As DateTime = Now
-                        Dim myLogAcciones As New ApplicationLogManager()
+                        'Dim myLogAcciones As New ApplicationLogManager()
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
                         'For TestTypes/Tests/SampleTypes with Controls requested in the WorkSession, verify if they exceed the maximum
@@ -5695,7 +5693,7 @@ Namespace Biosystems.Ax00.BL
                         End If
 
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                        myLogAcciones.CreateLogActivity("Export QC Results to QC Historic Module " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                        GlobalBase.CreateLogActivity("Export QC Results to QC Historic Module " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                         "WorkSessionsDelegate.ExportQCData", EventLogEntryType.Information, False)
                         StartTime = Now
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -5719,8 +5717,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ExportQCData", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ExportQCData", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5811,8 +5809,8 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -5886,11 +5884,11 @@ Namespace Biosystems.Ax00.BL
                                    Optional pIsUpdateProcess As Boolean = False) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 Dim myResults As New ResultsDelegate
-                Dim myErrorCodes As List(Of String)
+                Dim myErrorCodes As List(Of String) = Nothing
                 Dim myErrorCode As String
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -5911,7 +5909,7 @@ Namespace Biosystems.Ax00.BL
                     If (myErrorCodes Is Nothing) Then myErrorCodes = New List(Of String)
                     myErrorCode = GlobalEnumerates.Messages.RESET_WS_FAILED.ToString
                     myErrorCodes.Add(myErrorCode)
-                    myLogAcciones.CreateLogActivity("Reset WS Failed - FIRST BLOCK: EXPORT QC RESULTS TO QC HISTORIC MODULE", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity("Reset WS Failed - FIRST BLOCK: EXPORT QC RESULTS TO QC HISTORIC MODULE", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
                 End If
 
                 'SECOND BLOCK: EXPORT BLANK; CALIBRATOR AND PATIENT RESULTS TO HISTORIC MODULE
@@ -5920,7 +5918,7 @@ Namespace Biosystems.Ax00.BL
                     If (myErrorCodes Is Nothing) Then myErrorCodes = New List(Of String)
                     myErrorCode = GlobalEnumerates.Messages.RESET_WS_FAILED.ToString
                     myErrorCodes.Add(myErrorCode)
-                    myLogAcciones.CreateLogActivity("Reset WS Failed - SECOND BLOCK: EXPORT BLANK; CALIBRATOR AND PATIENT RESULTS TO HISTORIC MODULE ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
+                    GlobalBase.CreateLogActivity("Reset WS Failed - SECOND BLOCK: EXPORT BLANK; CALIBRATOR AND PATIENT RESULTS TO HISTORIC MODULE ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
                 End If
 
                 'THIRD BLOCK: SAVE ROTORS
@@ -5945,7 +5943,7 @@ Namespace Biosystems.Ax00.BL
                         If (myErrorCodes Is Nothing) Then myErrorCodes = New List(Of String)
                         myErrorCode = GlobalEnumerates.Messages.RESET_WS_FAILED.ToString
                         myErrorCodes.Add(myErrorCode)
-                        myLogAcciones.CreateLogActivity("Reset WS Failed - THIRD BLOCK: SAVE ROTORS ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
+                        GlobalBase.CreateLogActivity("Reset WS Failed - THIRD BLOCK: SAVE ROTORS ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
                     End If
                 End If
 
@@ -5973,7 +5971,7 @@ Namespace Biosystems.Ax00.BL
                             Dim myTests As String
 
                             If (myDiffSampleIDs.Count > 0) Then
-                                myLogAcciones.CreateLogActivity("Deleted LIS Orders on RESET: ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Deleted LIS Orders on RESET: ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Information, False)
                                 For Each myrow As String In myDiffSampleIDs
 
                                     myDiffTests = (From a In myDS.tparSavedWSOrderTests _
@@ -5985,7 +5983,7 @@ Namespace Biosystems.Ax00.BL
                                         myTests = myTests + myRow2 + "; "
                                     Next
 
-                                    myLogAcciones.CreateLogActivity("Specimen: [" & myrow & "] for tests : " & myTests, "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity("Specimen: [" & myrow & "] for tests : " & myTests, "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Information, False)
                                 Next
                             End If
                             ' XB 05/02/2014 - Do not save previous Orders from LIS (Patch 2.1.1c)
@@ -5996,7 +5994,7 @@ Namespace Biosystems.Ax00.BL
                         If myErrorCodes Is Nothing Then myErrorCodes = New List(Of String)
                         myErrorCode = GlobalEnumerates.Messages.RESET_WS_FAILED.ToString
                         myErrorCodes.Add(myErrorCode)
-                        myLogAcciones.CreateLogActivity("Reset WS Failed - FOURTH BLOCK: SAVE LIS NOT PROCESSED ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
+                        GlobalBase.CreateLogActivity("Reset WS Failed - FOURTH BLOCK: SAVE LIS NOT PROCESSED ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
                     End If
                 End If
 
@@ -6197,7 +6195,7 @@ Namespace Biosystems.Ax00.BL
                             If (myErrorCodes Is Nothing) Then myErrorCodes = New List(Of String)
                             myErrorCode = GlobalEnumerates.Messages.RESET_WS_FAILED.ToString
                             myErrorCodes.Add(myErrorCode)
-                            myLogAcciones.CreateLogActivity("Reset WS Failed - FITH BLOCK: DELETE TEMPORARY DATA ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
+                            GlobalBase.CreateLogActivity("Reset WS Failed - FITH BLOCK: DELETE TEMPORARY DATA ", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
                         End If
                     End If
                 End If
@@ -6214,7 +6212,7 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                myLogAcciones.CreateLogActivity("Total time WorkSession reset + export " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                GlobalBase.CreateLogActivity("Total time WorkSession reset + export " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                                 "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Information, False)
                 StartTime = Now
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -6234,7 +6232,7 @@ Namespace Biosystems.Ax00.BL
                 resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.ResetWSNEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -6334,8 +6332,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddControlsForWorkSession", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddControlsForWorkSession", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -6492,8 +6490,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddCalibratorForWorkSession", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddCalibratorForWorkSession", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -6561,8 +6559,8 @@ Namespace Biosystems.Ax00.BL
         '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        resultData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddBlankForWorkSession", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddBlankForWorkSession", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -6665,8 +6663,8 @@ Namespace Biosystems.Ax00.BL
         '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
         '        myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetOrderTestElements", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.GetOrderTestElements", EventLogEntryType.Error, False)
         '    Finally
         '        If (pDBConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
         '    End Try
@@ -6795,8 +6793,8 @@ Namespace Biosystems.Ax00.BL
         '        dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
         '        dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-        '        Dim myLogAcciones As New ApplicationLogManager()
-        '        myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForISEWashing", EventLogEntryType.Error, False)
+        '        'Dim myLogAcciones As New ApplicationLogManager()
+        '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWSElementsForISEWashing", EventLogEntryType.Error, False)
 
         '    Finally
         '        'When Database Connection was opened locally, it has to be closed
@@ -6903,8 +6901,8 @@ Namespace Biosystems.Ax00.BL
                 End If
 
                 'Get the logged User
-                Dim currentSession As New GlobalBase
-                Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                'Dim currentSession As New GlobalBase
+                Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                 Dim stopProcess As Boolean = False
                 Dim workSessionDataDS As New WorkSessionsDS
@@ -6941,8 +6939,8 @@ Namespace Biosystems.Ax00.BL
                             stopProcess = True
 
                             'Write the Warning in the Application LOG
-                            Dim myLogAcciones As New ApplicationLogManager()
-                            myLogAcciones.CreateLogActivity("WARNING: Called to add EMPTY WS when the previous one still exists", "WorkSessionsDelegate.AddWorkSession_NEW", _
+                            'Dim myLogAcciones As New ApplicationLogManager()
+                            GlobalBase.CreateLogActivity("WARNING: Called to add EMPTY WS when the previous one still exists", "WorkSessionsDelegate.AddWorkSession_NEW", _
                                                             EventLogEntryType.Error, False)
                         End If
                     Else
@@ -7121,8 +7119,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWorkSession_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.AddWorkSession_NEW", EventLogEntryType.Error, False)
             Finally
                 'If there is an opened Database Transaction, then it is closed
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
@@ -7247,8 +7245,8 @@ Namespace Biosystems.Ax00.BL
                 dataToReturn.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 dataToReturn.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.CreateEmptyWS", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.CreateEmptyWS", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -7308,8 +7306,8 @@ Namespace Biosystems.Ax00.BL
                 myWSOrderTestDR.TS_DateTime = DateTime.Now
                 pWSOrderTestsDS.twksWSOrderTests.AddtwksWSOrderTestsRow(myWSOrderTestDR)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.BlkCalibWSOrderTestsDSRow", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.BlkCalibWSOrderTestsDSRow", EventLogEntryType.Error, False)
                 Throw
             End Try
         End Sub
@@ -7359,8 +7357,8 @@ Namespace Biosystems.Ax00.BL
                 myWSOrderTestDR.TS_DateTime = DateTime.Now
                 pWSOrderTestsDS.twksWSOrderTests.AddtwksWSOrderTestsRow(myWSOrderTestDR)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.CtrlWSOrderTestsDSRow", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.CtrlWSOrderTestsDSRow", EventLogEntryType.Error, False)
                 Throw
             End Try
         End Sub
@@ -7405,8 +7403,8 @@ Namespace Biosystems.Ax00.BL
                 myWSOrderTestDR.TS_DateTime = DateTime.Now
                 pWSOrderTestsDS.twksWSOrderTests.AddtwksWSOrderTestsRow(myWSOrderTestDR)
             Catch ex As Exception
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PatientWSOrderTestsDSRow", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PatientWSOrderTestsDSRow", EventLogEntryType.Error, False)
                 Throw
             End Try
         End Sub
@@ -7461,8 +7459,8 @@ Namespace Biosystems.Ax00.BL
                             myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "BLANK")
                         Else
                             'Get the logged User
-                            Dim currentSession As New GlobalBase
-                            Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                            'Dim currentSession As New GlobalBase
+                            Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                             'Go through BlankCalibrators Table to process Blanks requested previously (fields OrderID and OrderTestID are informed)
                             'Go through BlankCalibrators Table to process Blanks requested previously (having been sent or not to the Analyzer; fields 
@@ -7657,8 +7655,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareBlankOrders_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareBlankOrders_NEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -7717,8 +7715,8 @@ Namespace Biosystems.Ax00.BL
                             myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "CALIB")
                         Else
                             'Get the logged User
-                            Dim currentSession As New GlobalBase
-                            Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                            'Dim currentSession As New GlobalBase
+                            Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                             'Go through BlankCalibrators Table to process Calibrators requested previously (having been sent or not to 
                             'the Analyzer; fields OrderID and OrderTestID are informed) - For positioned Calibrator Order Tests, only value
@@ -8014,8 +8012,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareCalibratorOrders_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareCalibratorOrders_NEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -8074,8 +8072,8 @@ Namespace Biosystems.Ax00.BL
                             myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "CTRL")
                         Else
                             'Get the logged User
-                            Dim currentSession As New GlobalBase
-                            Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                            'Dim currentSession As New GlobalBase
+                            Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                             'Validate if there are CtrlsSendingGroup
                             Dim myCtrlSendingGroup As Integer = 0
@@ -8273,8 +8271,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareControlOrders_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareControlOrders_NEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -8361,8 +8359,8 @@ Namespace Biosystems.Ax00.BL
                                 myGlobalDataTO = myOrdersDelegate.DeleteOrdersBySampleClass(dbConnection, pWorkSessionID, "PATIENT")
                             Else
                                 'Get the logged User
-                                Dim currentSession As New GlobalBase
-                                Dim loggedUser As String = currentSession.GetSessionInfo.UserName
+                                'Dim currentSession As New GlobalBase
+                                Dim loggedUser As String = GlobalBase.GetSessionInfo.UserName
 
                                 'Go through Patients Table to process Patient Orders requested previously (field OrderID is informed). These Orders can have
                                 'existing Order Tests (field OrderTestID informed) and non existing Order Tests (they have to be added to the Order) query 
@@ -8847,8 +8845,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PreparePatientOrders_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PreparePatientOrders_NEW", EventLogEntryType.Error, False)
             Finally
                 If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -8955,8 +8953,8 @@ Namespace Biosystems.Ax00.BL
                 returnData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 returnData.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.SaveOffSystemOTsResults", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.SaveOffSystemOTsResults", EventLogEntryType.Error, False)
             End Try
             Return returnData
         End Function
@@ -9059,8 +9057,8 @@ Namespace Biosystems.Ax00.BL
                                         Dim myWorkSessionsDS As WorkSessionsDS = DirectCast(myGlobalDataTO.SetDatos, WorkSessionsDS)
                                         If (myWorkSessionsDS.twksWorkSessions.Rows.Count = 1) Then
                                             If (myWorkSessionsDS.twksWorkSessions(0).CreateEmptyWSStopped) Then
-                                                Dim myLogAcciones As New ApplicationLogManager()
-                                                myLogAcciones.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", _
+                                                'Dim myLogAcciones As New ApplicationLogManager()
+                                                GlobalBase.CreateLogActivity("WARNING: Source of call to add EMPTY WS when the previous one still exists", _
                                                                                 "WorkSessionsDelegate.PrepareOrderTestsForWS", EventLogEntryType.Error, False)
                                             End If
                                         End If
@@ -9123,8 +9121,8 @@ Namespace Biosystems.Ax00.BL
                 myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
                 myGlobalDataTO.ErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
 
-                Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareOrderTestsForWS_NEW", EventLogEntryType.Error, False)
+                'Dim myLogAcciones As New ApplicationLogManager()
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", "WorkSessionsDelegate.PrepareOrderTestsForWS_NEW", EventLogEntryType.Error, False)
             End Try
             Return myGlobalDataTO
         End Function

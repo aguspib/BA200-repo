@@ -1,5 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
@@ -12,7 +13,6 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports System.Text
 Imports System.ComponentModel
 Imports LIS.Biosystems.Ax00.LISCommunications
-Imports System.Threading
 
 Public Class IResults
     'RH 13/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)
@@ -162,7 +162,6 @@ Public Class IResults
 
     Private WorkSessionIDField As String = ""
     Private AnalyzerIDField As String = ""
-    Private AnalyzerModelField As String = ""
     Private WSStatusField As String = "" 'AG 19/03/2012
     Private LISWorkingModeRerunsAttr As String = "BOTH" 'SGM 17/04/2013
 
@@ -187,15 +186,6 @@ Public Class IResults
         End Get
         Set(ByVal value As String)
             AnalyzerIDField = value
-        End Set
-    End Property
-
-    Public Property AnalyzerModel() As String
-        Get
-            Return AnalyzerModelField
-        End Get
-        Set(ByVal value As String)
-            AnalyzerModelField = value
         End Set
     End Property
 
@@ -324,20 +314,20 @@ Public Class IResults
             'startTime = Now 'AG 04/06/2012
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'TR 16/05/2012 -Get the current level
-            Dim MyGlobalBase As New GlobalBase
-            CurrentUserLevel = MyGlobalBase.GetSessionInfo.UserLevel
+            'Dim myGlobalbase As New GlobalBase
+            CurrentUserLevel = GlobalBase.GetSessionInfo.UserLevel
             'TR 16/05/2012 -END
 
             'TR 11/07/2012 -Get the current Language from the current Application Session
-            LanguageID = MyGlobalBase.GetSessionInfo().ApplicationLanguage
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
 
-            WorkSessionIDField = IAx00MainMDI.ActiveWorkSession
-            AnalyzerIDField = IAx00MainMDI.ActiveAnalyzer
+            WorkSessionIDField = UiAx00MainMDI.ActiveWorkSession
+            AnalyzerIDField = UiAx00MainMDI.ActiveAnalyzer
             'AnalyzerModelField = IAx00MainMDI.AnalyzerModel 'AG 03/07/2012 - comment because causes AnalyzerModelField = ""
 
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -364,7 +354,7 @@ Public Class IResults
             CollapseAll(bsExperimentalsDataGridView) 'dl 23/07/2013 
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ResultForm_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -581,7 +571,7 @@ Public Class IResults
                                                                                                                            bsCalibratorsDataGridView.CellMouseClick, _
                                                                                                                            bsControlsDataGridView.CellMouseClick
 
-        Dim resultRow As ResultsDS.vwksResultsRow
+        Dim resultRow As ResultsDS.vwksResultsRow = Nothing
         Dim key As String = String.Empty
         Dim executionRow As ExecutionsDS.vwksWSExecutionsResultsRow 'SG 30/08/2010
         Dim ParentControl As System.Windows.Forms.Control
@@ -1039,13 +1029,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowPatientsFinalReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1065,14 +1055,14 @@ Public Class IResults
     Private Sub PrintCompactReportButton_Click(sender As Object, e As EventArgs) Handles PrintCompactReportButton.Click
         Try
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'Stub
             XRManager.PrintCompactPatientsReport(ActiveAnalyzer, ActiveWorkSession, Nothing, False)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Compact Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintCompactReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1092,13 +1082,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowResultsByTestReport(ActiveAnalyzer, ActiveWorkSession)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1117,13 +1107,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'XRManager.ShowResultsByTestReportCompactBySampleType(ActiveAnalyzer, ActiveWorkSession, "BLANK")
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Test Results Blank Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestBlankButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1143,13 +1133,13 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowControlsCompactReport(ActiveAnalyzer, ActiveWorkSession, False) 'IT 01/10/2014 - #BA-1864
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Ctrl Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Ctrl Test Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintTestCtrlButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -1190,12 +1180,12 @@ Public Class IResults
 
             ' XB 26/11/2013 - Inform to MDI that this screen is closing aims to open next screen - Task #1303
             ExitingScreen()
-            IAx00MainMDI.EnableButtonAndMenus(True)
+            UiAx00MainMDI.EnableButtonAndMenus(True)
             Application.DoEvents()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'SGM 17/04/2013
@@ -1229,14 +1219,14 @@ Public Class IResults
                 Close()
             Else
                 'TR 18/05/2012 - indicate to monitor form there was a change on the worsession.
-                IMonitor.WorkSessionChange = ChangeWS
+                UiMonitor.WorkSessionChange = ChangeWS
                 'Normal button click
                 'Open the WS Monitor form and close this one
-                IAx00MainMDI.OpenMonitorForm(Me)
+                UiAx00MainMDI.OpenMonitorForm(Me)
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("IResults CLOSED (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ExitButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1292,7 +1282,7 @@ Public Class IResults
 
             If myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY OrElse myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING OrElse Not myAnalyzerManager.Connected Then
                 bsXlsresults.Enabled = False
-                IAx00MainMDI.SetActionButtonsEnableProperty(False) 'Disable all action button bar
+                UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'Disable all action button bar
 
                 Dim workingThread As New Threading.Thread(AddressOf ExportResults)
                 CreatingXlsResults = True
@@ -1300,13 +1290,13 @@ Public Class IResults
                 workingThread.Start()
 
                 While CreatingXlsResults
-                    IAx00MainMDI.InitializeMarqueeProgreesBar()
+                    UiAx00MainMDI.InitializeMarqueeProgreesBar()
                     Cursor = Cursors.WaitCursor
                     Application.DoEvents()
                 End While
 
                 workingThread = Nothing
-                IAx00MainMDI.StopMarqueeProgressBar()
+                UiAx00MainMDI.StopMarqueeProgressBar()
             End If
 
         Catch ex As Exception
@@ -1317,7 +1307,7 @@ Public Class IResults
             CreatingXlsResults = False
             ScreenWorkingProcess = False 'AG 08/11/2012 - inform this flag because the MDI requires it
             bsXlsresults.Enabled = True
-            IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Activate action button bar depending Ax00 status, alarms, ...
+            UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'Activate action button bar depending Ax00 status, alarms, ...
             Cursor = Cursors.Default
 
             'Enable all screen buttons, and enable also all buttons and menus in the MainMDI
@@ -1345,7 +1335,7 @@ Public Class IResults
 
         ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         'Dim StartTime As DateTime = Now
-        'Dim myLogAcciones As New ApplicationLogManager()
+        ''Dim myLogAcciones As New ApplicationLogManager()
         ''*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         'Try
 
@@ -1493,7 +1483,7 @@ Public Class IResults
         '    'TR 04/08/2011 -END.
 
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        '    myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+        '    GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
         '                                    "IResults.ExportButton_Click", EventLogEntryType.Information, False)
         '    '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1528,7 +1518,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Dim mySendManRepButton As BSButton = TryCast(sender, BSButton)
@@ -1604,7 +1594,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Send Manual Repetition: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.SendmanRepButton_Click", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -1615,7 +1605,7 @@ Public Class IResults
         Finally
             'SGM 17/04/2013
             If (SendManRepButton.Tag Is Nothing) Then
-                IAx00MainMDI.SetActionButtonsEnableProperty(True) 'RH 17/05/2012
+                UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'RH 17/05/2012
                 SendManRepButton.Enabled = True 'RH 17/05/2012
                 Cursor = Cursors.Default 'RH 17/05/2012
             End If
@@ -2480,7 +2470,7 @@ Public Class IResults
     Private Sub PrepareButtons()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Try
             Dim preloadedDataConfig As New PreloadedMasterDataDelegate
@@ -2491,51 +2481,51 @@ Public Class IResults
             'dl 12/05/2011
             'Excel Export Button
             'auxIconName = GetIconName("BTN_EXCELEXPORT")
-            'If Not String.Equals(auxIconName, "") Then bsXlsresults.Image = Image.FromFile(iconPath & auxIconName)
+            'If Not String.Equals(auxIconName, "") Then bsXlsresults.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'TEST()
             'PRINT REPORT Button
             auxIconName = GetIconName("FINALPRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintReportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintReportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'cf 26/09/2013
             'Print compact report button
             auxIconName = GetIconName("COMPACTPRINT")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintCompactReportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintCompactReportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("COMPACTPRINTCTR")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintTestCtrlButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintTestCtrlButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'SUMMARY Button
             auxIconName = GetIconName("GRID")
-            If Not String.Equals(auxIconName, String.Empty) Then SummaryButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then SummaryButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'PRINT Buttons: PrintSampleButton, PrintTestButton
             auxIconName = GetIconName("PRINT")
             If Not String.Equals(auxIconName, String.Empty) Then
-                PrintSampleButton.Image = Image.FromFile(iconPath & auxIconName)
-                '                bsPrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
-                PrintTestButton.Image = Image.FromFile(iconPath & auxIconName)
+                PrintSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                '                bsPrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'SEND MANUAL REPETITION Button
             auxIconName = GetIconName("MANUAL_REP")
-            If Not String.Equals(auxIconName, String.Empty) Then SendManRepButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then SendManRepButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'OFF SYSTEM TESTS RESULTS Button
             auxIconName = GetIconName("OFFSYSTEMBUT")
-            If Not String.Equals(auxIconName, String.Empty) Then OffSystemResultsButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then OffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             ' Export Button
             auxIconName = GetIconName("MANUAL_EXP")
-            If Not String.Equals(auxIconName, String.Empty) Then ExportButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then ExportButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             auxIconName = GetIconName("CANCEL")
-            If Not String.Equals(auxIconName, String.Empty) Then ExitButton.Image = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Icons to be used in Grids
             auxIconName = GetIconName("PRINTL")
-            If Not String.Equals(auxIconName, String.Empty) Then PrintImage = Image.FromFile(iconPath & auxIconName)
+            If Not String.Equals(auxIconName, String.Empty) Then PrintImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             auxIconName = GetIconName("LOGIN")
             If Not String.Equals(auxIconName, String.Empty) Then RepImage = preloadedDataConfig.GetIconImage("LOGIN")
 
@@ -2550,21 +2540,21 @@ Public Class IResults
             End If
 
             '
-            bsXlsresults.Image = Image.FromFile(iconPath & "BTN_EXCELEXPORT.png")
-            PrintReportButton.Image = Image.FromFile(iconPath & "FinalPrint.png")
-            SummaryButton.Image = Image.FromFile(iconPath & "Grid_16.png")
+            bsXlsresults.Image = ImageUtilities.ImageFromFile(iconPath & "BTN_EXCELEXPORT.png")
+            PrintReportButton.Image = ImageUtilities.ImageFromFile(iconPath & "FinalPrint.png")
+            SummaryButton.Image = ImageUtilities.ImageFromFile(iconPath & "Grid_16.png")
             '
-            PrintSampleButton.Image = Image.FromFile(iconPath & "Print.png")
-            '            bsPrintTestButton.Image = Image.FromFile(iconPath & "Print.png")
-            PrintTestButton.Image = Image.FromFile(iconPath & "Print.png")
+            PrintSampleButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
+            '            bsPrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
+            PrintTestButton.Image = ImageUtilities.ImageFromFile(iconPath & "Print.png")
             '
-            SendManRepButton.Image = Image.FromFile(iconPath & "Manual_Repeat.png")
-            OffSystemResultsButton.Image = Image.FromFile(iconPath & "OFFSTestButton.png")
+            SendManRepButton.Image = ImageUtilities.ImageFromFile(iconPath & "Manual_Repeat.png")
+            OffSystemResultsButton.Image = ImageUtilities.ImageFromFile(iconPath & "OFFSTestButton.png")
 
-            ExportButton.Image = Image.FromFile(iconPath & "Export.png")
-            ExitButton.Image = Image.FromFile(iconPath & "Cancel.png")
+            ExportButton.Image = ImageUtilities.ImageFromFile(iconPath & "Export.png")
+            ExitButton.Image = ImageUtilities.ImageFromFile(iconPath & "Cancel.png")
 
-            PrintImage = Image.FromFile(iconPath & "PrintL.png")
+            PrintImage = ImageUtilities.ImageFromFile(iconPath & "PrintL.png")
 
             'RepImage = preloadedDataConfig.GetIconImage("LOGIN")
             auxIconName = GetIconName("LOGIN")
@@ -2665,22 +2655,22 @@ Public Class IResults
 
             'auxIconName = GetIconName("TCALC") 'CALC Tests Icon
             'If (auxIconName <> String.Empty) Then
-            '    TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+            '    TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             'End If
 
             auxIconName = GetIconName("TISE_SYS") 'ISE Tests Icon
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TOFF_SYS") 'OFFS Tests Icon
             If (auxIconName <> String.Empty) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
 
             auxIconName = GetIconName("TCALC") 'CALC Tests Icon
             If (auxIconName <> String.Empty) Then
-                TestTypeIconList.Images.Add(Image.FromFile(iconPath & auxIconName))
+                TestTypeIconList.Images.Add(ImageUtilities.ImageFromFile(iconPath & auxIconName))
             End If
             ' WE 13/01/2015 (BA-2153) - End.
 
@@ -2711,30 +2701,30 @@ Public Class IResults
 
             auxIconName = GetIconName("PRINTHEAD")
             If (String.Compare(auxIconName, String.Empty, False) <> 0) Then
-                'PrintPictureBox.Image = Image.FromFile(iconPath & auxIconName)
-                PrintHeadImage = Image.FromFile(iconPath & auxIconName) 'RH 04/06/2012
+                'PrintPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                PrintHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName) 'RH 04/06/2012
             End If
 
             auxIconName = GetIconName("EXPORTHEAD")
             If (auxIconName <> String.Empty) Then
                 'HISSentImage = preloadedDataConfig.GetIconImage("MANUAL_EXP")
                 'LISHeadImage = preloadedDataConfig.GetIconImage("EXPORTHEAD")
-                'HISPictureBox.Image = Image.FromFile(iconPath & auxIconName)
+                'HISPictureBox.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
                 'RH 19/10/2011
-                LISExperimentalHeadImage = Image.FromFile(iconPath & auxIconName)
-                LISControlHeadImage = Image.FromFile(iconPath & auxIconName)
-                LISSamplesHeadImage = Image.FromFile(iconPath & auxIconName)
+                LISExperimentalHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                LISControlHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
+                LISSamplesHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 LISSubHeaderImage = preloadedDataConfig.GetIconImage("EXPORTHEAD")
                 'END RH 19/10/2011
 
-                LISHeadImage = Image.FromFile(iconPath & auxIconName) 'RH 04/06/2012
+                LISHeadImage = ImageUtilities.ImageFromFile(iconPath & auxIconName) 'RH 04/06/2012
             End If
 
             'IT 21/10/2014: INI BA-2036
             auxIconName = GetIconName("EXPORTHEADCHECK")
             If (auxIconName <> String.Empty) Then
-                LISHeadCheckImage = Image.FromFile(iconPath & GetIconName("EXPORTHEADCHECK"))
+                LISHeadCheckImage = ImageUtilities.ImageFromFile(iconPath & GetIconName("EXPORTHEADCHECK"))
             End If
             'IT 21/10/2014: END BA-2036
 
@@ -2816,7 +2806,7 @@ Public Class IResults
             auxIconName = GetIconName("XTRAVERTICALBAR")
             'auxIconName = "XtraVerticalBar.png"
             If (auxIconName <> String.Empty) Then
-                XtraVerticalBar = Image.FromFile(iconPath & auxIconName)
+                XtraVerticalBar = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -2825,7 +2815,7 @@ Public Class IResults
 
         End Try
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-        myLogAcciones.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+        GlobalBase.CreateLogActivity("IResults PrepareButtons (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                         " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                         "IResults.PrepareButtons", EventLogEntryType.Information, False)
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -2908,8 +2898,8 @@ Public Class IResults
                         If (Not resultData.HasError) Then
                             If myResultsDelegate.LastExportedResults.twksWSExecutions.Rows.Count > 0 Then 'AG 21/02/2014 - #1505 call mdi threat only when needed
                                 CreateLogActivity("Current Results automatic upload (OFFS)", Me.Name & ".OpenOffSystemResultsScreen ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
-                                IAx00MainMDI.AddResultsIntoQueueToUpload(myResultsDelegate.LastExportedResults)
-                                IAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
+                                UiAx00MainMDI.AddResultsIntoQueueToUpload(myResultsDelegate.LastExportedResults)
+                                UiAx00MainMDI.InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
 
                                 'Clear the executions
                                 myResultsDelegate.ClearLastExportedResults()
@@ -3200,93 +3190,6 @@ Public Class IResults
     End Sub
 
     ''' <summary>
-    ''' Creates the structure for the PatientListDataGridView for the Final Report Printing
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by: RH - 28/09/2010
-    ''' </remarks>
-    Private Function GetNewPatientListDataGridView() As DataGridView
-        Dim PatientListDataGridView As DataGridView = Nothing
-
-        Try
-            PatientListDataGridView = New DataGridView()
-
-            Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle
-            'Dim DataGridViewCellStyle2 As DataGridViewCellStyle = New DataGridViewCellStyle
-            Dim DataGridViewCellStyle3 As DataGridViewCellStyle = New DataGridViewCellStyle
-
-            PatientListDataGridView.BackgroundColor = System.Drawing.Color.LightGray
-            PatientListDataGridView.BorderStyle = BorderStyle.Fixed3D
-            PatientListDataGridView.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
-            PatientListDataGridView.ColumnHeadersHeight = 20
-            PatientListDataGridView.EnableHeadersVisualStyles = True
-            PatientListDataGridView.GridColor = System.Drawing.Color.Silver
-            PatientListDataGridView.Name = "PatientListDataGridView"
-            'PatientListDataGridView.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.[Single]
-            PatientListDataGridView.RowHeadersVisible = False
-
-            DataGridViewCellStyle1.BackColor = System.Drawing.Color.DarkGray
-            DataGridViewCellStyle1.Font = New System.Drawing.Font("Verdana", 7.25!)
-            DataGridViewCellStyle1.ForeColor = System.Drawing.Color.Black
-            DataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight
-            DataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText
-            DataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-            PatientListDataGridView.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
-
-            'DataGridViewCellStyle2.BackColor = System.Drawing.Color.DarkGray
-            'DataGridViewCellStyle2.Font = New System.Drawing.Font("Verdana", 7.25!)
-            'DataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black
-            'DataGridViewCellStyle2.SelectionBackColor = System.Drawing.Color.LightSlateGray
-            'DataGridViewCellStyle2.SelectionForeColor = System.Drawing.Color.White
-            'DataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.[False]
-            'PatientListDataGridView.RowHeadersDefaultCellStyle = DataGridViewCellStyle2
-
-            DataGridViewCellStyle3.BackColor = System.Drawing.Color.White
-            DataGridViewCellStyle3.Font = New System.Drawing.Font("Verdana", 7.25!)
-            DataGridViewCellStyle3.ForeColor = System.Drawing.Color.Black
-            DataGridViewCellStyle3.SelectionBackColor = System.Drawing.Color.White
-            DataGridViewCellStyle3.SelectionForeColor = System.Drawing.Color.Black
-            PatientListDataGridView.RowsDefaultCellStyle = DataGridViewCellStyle3
-            PatientListDataGridView.AlternatingRowsDefaultCellStyle = DataGridViewCellStyle3
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("PatientName", "Patient Name")
-            PatientListDataGridView.Columns("PatientName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("TestName", "Test")
-            PatientListDataGridView.Columns("TestName").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Concentration", "Concentration")
-            PatientListDataGridView.Columns("Concentration").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("Concentration").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Unit", "Unit")
-            PatientListDataGridView.Columns("Unit").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("ReferenceRanges", "Ref. Ranges")
-            PatientListDataGridView.Columns("ReferenceRanges").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("ReferenceRanges").DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-
-            'Patient Name Column
-            PatientListDataGridView.Columns.Add("Remarks", "Remarks")
-            PatientListDataGridView.Columns("Remarks").AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
-            PatientListDataGridView.Columns("Remarks").DefaultCellStyle.WrapMode = DataGridViewTriState.True
-
-        Catch ex As Exception
-            PatientListDataGridView = Nothing
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " GetNewPatientListDataGridView ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
-
-        End Try
-
-        Return PatientListDataGridView
-    End Function
-
-    ''' <summary>
     ''' Release elements not handle by the GC.
     ''' </summary>
     ''' <remarks>
@@ -3451,8 +3354,8 @@ Public Class IResults
             'GC.Collect() 
 
         Catch ex As Exception
-            Dim myLogAcciones As New ApplicationLogManager()
-            myLogAcciones.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
+            'Dim myLogAcciones As New ApplicationLogManager()
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElement", EventLogEntryType.Error, False)
         End Try
     End Sub
 #End Region
@@ -3873,7 +3776,7 @@ Public Class IResults
         Try
             Dim ContinuePro As Boolean = True
 
-            Dim ExecutionResultRow As ExecutionsDS.vwksWSExecutionsResultsRow
+            Dim ExecutionResultRow As ExecutionsDS.vwksWSExecutionsResultsRow = Nothing
             If (Not dgv.Rows(RowIndex).Tag Is Nothing) Then
                 ExecutionResultRow = CType(dgv.Rows(RowIndex).Tag, ExecutionsDS.vwksWSExecutionsResultsRow)
             Else
@@ -3891,7 +3794,7 @@ Public Class IResults
                     Dim myGlobal As GlobalDataTO
                     Dim myRecalDelegate As New RecalculateResultsDelegate
 
-                    myRecalDelegate.AnalyzerModel = AnalyzerModelField
+                    myRecalDelegate.AnalyzerModel = AnalyzerModel()
                     'myGlobal = myRecalDelegate.ChangeInUseFlagReplicate(Nothing, AnalyzerIDField, WorkSessionIDField, ExecutionResultRow.ExecutionID, Not ExecutionResultRow.InUse)
                     myGlobal = myRecalDelegate.ChangeInUseFlagReplicateNEW(ExecutionResultRow, Not ExecutionResultRow.InUse)
 
@@ -4018,7 +3921,7 @@ Public Class IResults
                 Dim myGlobal As GlobalDataTO
                 Dim myRecalDelegate As New RecalculateResultsDelegate
 
-                myRecalDelegate.AnalyzerModel = AnalyzerModelField
+                myRecalDelegate.AnalyzerModel = AnalyzerModel()
                 'myGlobal = myRecalDelegate.ChangeInUseFlagReplicate(Nothing, AnalyzerIDField, WorkSessionIDField, ExecutionResultRow.ExecutionID, Not ExecutionResultRow.InUse)
                 myGlobal = myRecalDelegate.ChangeInUseFlagReplicateNEW(ExecutionResultRow, Not ExecutionResultRow.InUse)
 
@@ -4583,9 +4486,9 @@ Public Class IResults
                 myForm.OrderTestID = pOrderTestID
                 myForm.Replicate = pReplicate
 
-                IAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myForm 'Inform the MDI the curve calib results is shown
                 myForm.ShowDialog()
-                IAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myForm 'Inform the MDI the curve calib results is closed
             End Using
 
         Catch ex As Exception
@@ -5169,7 +5072,7 @@ Public Class IResults
                 With myCurveForm
                     .ActiveAnalyzer = AnalyzerIDField
                     .ActiveWorkSession = WorkSessionIDField
-                    .AnalyzerModel = AnalyzerModelField
+                    .AnalyzerModel = AnalyzerModel()
                     .AverageResults = AverageResultsDS
                     .ExecutionResults = ExecutionsResultsDS
                     .SelectedTestName = TestsListViewText
@@ -5184,10 +5087,10 @@ Public Class IResults
                                             Select row.RerunNumber).First
                 End With
 
-                IAx00MainMDI.AddNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is shown
+                UiAx00MainMDI.AddNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is shown
                 myCurveForm.ShowDialog()
                 UpdateScreenGlobalDSWithAffectedResults()
-                IAx00MainMDI.RemoveNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is closed
+                UiAx00MainMDI.RemoveNoMDIChildForm = myCurveForm 'Inform the MDI the curve calib results is closed
 
                 'TR 25/09/2013 #memory
                 TestList = Nothing
@@ -5316,8 +5219,8 @@ Public Class IResults
                     resultData = xlsResults.ExportXLS(WorkSessionIDField, pathname, filename, AnalyzerIDField)
 
                     If resultData.HasError Then
-                        Dim myLogAcciones As New ApplicationLogManager()
-                        myLogAcciones.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
+                        'Dim myLogAcciones As New ApplicationLogManager()
+                        GlobalBase.CreateLogActivity(resultData.ErrorMessage, "ExportCalculations.ExportResults. ExportXLS", EventLogEntryType.Error, False)
 
                         'DL 15/05/2013
                         'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), resultData.ErrorMessage, Me)
@@ -5341,7 +5244,7 @@ Public Class IResults
     End Sub
 
     Public Function ExportResultsWithParameters(ByVal pFileName As String, ByVal pPath As String, ByVal pWorkSessionID As String) As GlobalDataTO
-        Dim resultData As GlobalDataTO
+        Dim resultData As GlobalDataTO = Nothing
 
         Try
 
@@ -5405,7 +5308,7 @@ Public Class IResults
             Dim myGlobal As New GlobalDataTO
             Dim myRecalDelegate As New RecalculateResultsDelegate
 
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
+            myRecalDelegate.AnalyzerModel = AnalyzerModel()
             Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
 
             If String.Equals(RowValues.TestType, "STD") Then
@@ -5490,7 +5393,7 @@ Public Class IResults
             Dim myGlobal As New GlobalDataTO
             Dim myRecalDelegate As New RecalculateResultsDelegate
 
-            myRecalDelegate.AnalyzerModel = AnalyzerModelField
+            myRecalDelegate.AnalyzerModel = AnalyzerModel()
             Dim executionRowToRecalculate As ExecutionsDS.vwksWSExecutionsResultsRow
 
             'Get the maximum MultiItemNumber for the selected OrderTestID/RerunNumber 
@@ -5555,7 +5458,7 @@ Public Class IResults
     Private Sub ActivateDeactivateAllButtons(ByVal pStatusToSet As Boolean)
         Try
             'Disable all screen buttons, and disable also all buttons and menus in the MainMDI
-            IAx00MainMDI.EnableButtonAndMenus(pStatusToSet)
+            UiAx00MainMDI.EnableButtonAndMenus(pStatusToSet)
             PrintReportButton.Enabled = pStatusToSet
             PrintCompactReportButton.Enabled = pStatusToSet
             SummaryButton.Enabled = pStatusToSet
@@ -5594,7 +5497,7 @@ Public Class IResults
     Private Sub ExportResultsToLIS()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
         Dim StartTime As DateTime = Now
-        Dim myLogAcciones As New ApplicationLogManager()
+        'Dim myLogAcciones As New ApplicationLogManager()
         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
         Try
@@ -5658,7 +5561,7 @@ Public Class IResults
                     'AG 17/02/2014 - BT #1505
                     If (exportResults.twksWSExecutions.Rows.Count > 0) Then
                         'Pass the list of Results to be exported to LIS to the MainMDI
-                        IAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
+                        UiAx00MainMDI.AddResultsIntoQueueToUpload(exportResults)
 
                         'AG 17/02/2014 - BT #1505: improvement, copy DS using Merge instead of loops
                         Dim myResultsAlarmsDS As New ResultsDS
@@ -5668,7 +5571,7 @@ Public Class IResults
                         'AG 02/01/2014 - BT #1433 (v211 patch2)
                         CreateLogActivity("Current Results manual upload", Me.Name & ".ExportResultsToLIS ", EventLogEntryType.Information, False)
 
-                        IAx00MainMDI.InvokeUploadResultsLIS(False, False, AverageResultsDS, myResultsAlarmsDS, Nothing) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
+                        UiAx00MainMDI.InvokeUploadResultsLIS(False, False, AverageResultsDS, myResultsAlarmsDS, Nothing) 'AG 30/09/2014 - BA-1440 inform that is a manual exportation
                     End If
                 End If
             End If
@@ -5701,7 +5604,7 @@ Public Class IResults
             ActivateDeactivateAllButtons(True)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Manual Export of Results: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.ExportResultsToLIS", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -5722,7 +5625,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             Select Case (bsTestDetailsTabControl.SelectedTab.Name)
@@ -5774,7 +5677,7 @@ Public Class IResults
             End If
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) & _
                                             " OPEN TAB: " & bsTestDetailsTabControl.SelectedTab.Name, _
                                             "IResults.TestDetailsTabSelectedEvent", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -5796,7 +5699,7 @@ Public Class IResults
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'BA-1927: The ExportButton will be visible if the Selected Tab is Controls or Patients
@@ -5811,7 +5714,7 @@ Public Class IResults
             UpdateCurrentResultsGrid()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
+            GlobalBase.CreateLogActivity("IResults TAB CHANGE (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0) _
                                             & " OPEN TAB: " & bsResultsTabControl.SelectedTab.Name, _
                                             "IResults.ResultsTabControlSelectedEvent", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***

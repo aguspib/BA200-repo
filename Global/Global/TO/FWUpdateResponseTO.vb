@@ -11,7 +11,7 @@ Namespace Biosystems.Ax00.Global
         End Sub
 
         Public Sub New(ByVal pActionType As GlobalEnumerates.FwUpdateActions)
-            MyClass.ActionTypeAttr = pActionType
+            ActionTypeAttr = pActionType
         End Sub
 
 

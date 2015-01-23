@@ -33,7 +33,7 @@ Public Class MasterTemplateLS
 
 
 
-    Private Sub XtraReport1_FilterControlProperties(ByVal sender As Object, ByVal e As DevExpress.XtraReports.UserDesigner.FilterControlPropertiesEventArgs) Handles Me.FilterControlProperties
+    Private Sub XtraReport1_FilterControlProperties(ByVal sender As Object, ByVal e As DevExpress.XtraReports.UserDesigner.FilterComponentPropertiesEventArgs) Handles Me.FilterComponentProperties
         'e.Properties.Remove("Angle")
         Try
 

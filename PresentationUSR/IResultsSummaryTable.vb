@@ -1,10 +1,10 @@
 ﻿Option Explicit On
 Option Strict On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.PresentationCOM.XRManager
@@ -92,13 +92,13 @@ Public Class IResultsSummaryTable
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             InitializeScreen()
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Table Resume LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Table Resume LOAD (Complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResultsSummaryTable.SummaryResultForm_Load", EventLogEntryType.Information, False)
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
@@ -113,13 +113,13 @@ Public Class IResultsSummaryTable
         Try
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             Dim StartTime As DateTime = Now
-            Dim myLogAcciones As New ApplicationLogManager()
+            'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             XRManager.ShowSummaryResultsReport(ActiveAnalyzer, ActiveWorkSession, bsVerticalRadioButton.Checked)
 
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-            myLogAcciones.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+            GlobalBase.CreateLogActivity("Patients Final Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
                                             "IResults.PrintReportButton_Click", EventLogEntryType.Information, False)
             StartTime = Now
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
@@ -163,8 +163,8 @@ Public Class IResultsSummaryTable
             'END DL 28/07/2011
 
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            LanguageID = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage
+            'Dim currentLanguageGlobal As New GlobalBase
+            LanguageID = GlobalBase.GetSessionInfo().ApplicationLanguage
 
             GetScreenLabels()
             PrepareButtons()
@@ -215,13 +215,13 @@ Public Class IResultsSummaryTable
             'PRINT Button
             auxIconName = GetIconName("PRINT")
             If (auxIconName <> "") Then
-                bsPrintButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsPrintButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
             'CANCEL Button
             auxIconName = GetIconName("CANCEL")
             If (auxIconName <> "") Then
-                bsExitButton.Image = Image.FromFile(iconPath & auxIconName)
+                bsExitButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
             End If
 
         Catch ex As Exception
@@ -293,13 +293,14 @@ Public Class IResultsSummaryTable
                 bsPatientListDataGridView("FirstName", i).Value = sample.patient.firstName
                 bsPatientListDataGridView("LastName", i).Value = sample.patient.lastName
 
-                For j As Integer = 0 To TestNames.Count - 1
+                For j = 0 To TestNames.Count - 1
+                    Dim auxJ = j
                     TestsList = (From row In AverageResultsDS.vwksResults _
                                      Where String.Compare(row.PatientID, sample.patientId, False) = 0 _
                                      AndAlso row.SampleType = sample.sampleType _
-                                     AndAlso row.TestID = TestNames.ElementAt(j).TestId _
-                                     AndAlso row.SampleType = TestNames.ElementAt(j).SampleType.Name _
-                                     AndAlso row.TestType = TestNames.ElementAt(j).TestType _
+                                     AndAlso row.TestID = TestNames.ElementAt(auxJ).TestId _
+                                     AndAlso row.SampleType = TestNames.ElementAt(auxJ).SampleType.Name _
+                                     AndAlso row.TestType = TestNames.ElementAt(auxJ).TestType _
                                      AndAlso row.AcceptedResultFlag _
                                      Select row).ToList()
 
@@ -328,7 +329,7 @@ Public Class IResultsSummaryTable
                         concentration = "-"
                     End If
 
-                    columnName = String.Format("{0} ({1})", TestNames.ElementAt(j).TestName, TestNames.ElementAt(j).SampleType.Name)
+                    columnName = String.Format("{0} ({1})", TestNames.ElementAt(auxJ).TestName, TestNames.ElementAt(auxJ).SampleType.Name)
                     bsPatientListDataGridView(columnName, i).Value = concentration
                 Next
             Next

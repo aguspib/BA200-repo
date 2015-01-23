@@ -74,8 +74,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Set(ByVal value As Single)
 
                 'value = CSng(FormatDisplayValue(value).Replace(",", "."))
-                Dim myUtilities As New Utilities
-                value = myUtilities.FormatToSingle(FormatDisplayValue(value).Replace(",", "."))
+                'Dim myUtilities As New Utilities
+                value = Utilities.FormatToSingle(FormatDisplayValue(value).Replace(",", "."))
 
                 'SG 21/01/11
                 If value < Me.MinimumLimit Or value > Me.MaximumLimit Then
@@ -306,8 +306,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
             Set(ByVal value As Single)
 
                 'value = CSng(FormatDisplayValue(value).Replace(",", "."))
-                Dim myUtilities As New Utilities
-                value = myUtilities.FormatToSingle(FormatDisplayValue(value).Replace(",", "."))
+                'Dim myUtilities As New Utilities
+                value = Utilities.FormatToSingle(FormatDisplayValue(value).Replace(",", "."))
 
                 If value <> SetPointValueAttr Then
 
@@ -1057,8 +1057,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
                         'Dim myTextValue As Single = CSng(BSDisplayTextBox.Text.Replace(".", ","))
                         Dim myTextValue As Single
-                        Dim myUtilities As New Utilities
-                        myTextValue = myUtilities.FormatToSingle(BSDisplayTextBox.Text.Replace(".", ","))
+                        'Dim myUtilities As New Utilities
+                        myTextValue = Utilities.FormatToSingle(BSDisplayTextBox.Text.Replace(".", ","))
 
                         Select Case MyClass.IncreaseMode
                             Case IncreaseModes.Direct
@@ -1106,8 +1106,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
                         'Dim myTextValue As Single = CSng(BSDisplayTextBox.Text.Replace(".", ","))
                         Dim myTextValue As Single
-                        Dim myUtilities As New Utilities
-                        myTextValue = myUtilities.FormatToSingle(BSDisplayTextBox.Text.Replace(".", ","))
+                        'Dim myUtilities As New Utilities
+                        myTextValue = Utilities.FormatToSingle(BSDisplayTextBox.Text.Replace(".", ","))
 
                         Select Case MyClass.IncreaseMode
                             Case IncreaseModes.Direct
@@ -1150,8 +1150,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
                     'Dim myTextValue As Single = CSng(BSDisplayTextBox.Text.Replace(".", ","))
                     Dim myTextValue As Single
-                    Dim myUtilities As New Utilities
-                    myTextValue = myUtilities.FormatToSingle(BSDisplayTextBox.Text.Replace(".", ","))
+                    'Dim myUtilities As New Utilities
+                    myTextValue = Utilities.FormatToSingle(BSDisplayTextBox.Text.Replace(".", ","))
 
                     CurrentActionRequested = AdjustActions.Enter
                     UpdateNewSetPoint(myTextValue)
@@ -1546,8 +1546,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
                                         'Dim myTextValue As Single = CSng(BSDisplayTextBox.Text.Replace(".", ","))
                                         Dim myTextValue As Single
-                                        Dim myUtilities As New Utilities
-                                        myTextValue = myUtilities.FormatToSingle(BSDisplayTextBox.Text)
+                                        'Dim myUtilities As New Utilities
+                                        myTextValue = Utilities.FormatToSingle(BSDisplayTextBox.Text)
 
                                         Dim myValue As Single = ValidateLimits(myTextValue, isOver)
                                         If Not isOver Then

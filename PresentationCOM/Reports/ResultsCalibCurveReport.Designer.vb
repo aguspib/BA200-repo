@@ -118,9 +118,9 @@ Partial Public Class ResultsCalibCurveReport
                     Or DevExpress.XtraPrinting.BorderSide.Right) _
                     Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         XyDiagram1.AxisX.GridLines.Visible = True
-        XyDiagram1.AxisX.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisX.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram1.AxisY.Range.SideMarginsEnabled = True
+        XyDiagram1.AxisY.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
         Me.XrChart1.Diagram = XyDiagram1
         Me.XrChart1.FillStyle.FillMode = DevExpress.XtraCharts.FillMode.Gradient
@@ -128,16 +128,16 @@ Partial Public Class ResultsCalibCurveReport
         RectangleGradientFillOptions1.GradientMode = DevExpress.XtraCharts.RectangleGradientMode.TopLeftToBottomRight
         Me.XrChart1.FillStyle.Options = RectangleGradientFillOptions1
         Me.XrChart1.IndicatorsPaletteName = "Default"
-        Me.XrChart1.Legend.Visible = False
+        Me.XrChart1.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.XrChart1.LocationFloat = New DevExpress.Utils.PointFloat(20.0!, 40.0!)
         Me.XrChart1.Name = "XrChart1"
         Me.XrChart1.PaletteBaseColorNumber = 4
         Me.XrChart1.PaletteName = "Black and White"
         Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel1.LineVisible = True
-        PointSeriesLabel1.Visible = False
+        PointSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.True
         Series1.Label = PointSeriesLabel1
-        Series1.LegendPointOptions = PointOptions1
+        Series1.LabelsVisibility = DevExpress.Utils.DefaultBoolean.False
+        Series1.LegendTextPattern = "{V}"
         Series1.Name = "Series 1"
         Series1.ShowInLegend = False
         Series1.SynchronizePointOptions = False
@@ -147,13 +147,13 @@ Partial Public Class ResultsCalibCurveReport
         Series2.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
         PointSeriesLabel2.Angle = 90
         PointSeriesLabel2.BackColor = System.Drawing.Color.Transparent
-        PointSeriesLabel2.Border.Visible = False
+        PointSeriesLabel2.Border.Visibility = DevExpress.Utils.DefaultBoolean.False
         PointSeriesLabel2.Font = New System.Drawing.Font("Verdana", 9.0!, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
-        PointSeriesLabel2.LineVisible = False
+        PointSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.False
         PointSeriesLabel2.ResolveOverlappingMode = DevExpress.XtraCharts.ResolveOverlappingMode.JustifyAroundPoint
         PointSeriesLabel2.TextColor = System.Drawing.Color.Black
         Series2.Label = PointSeriesLabel2
-        Series2.LegendPointOptions = PointOptions2
+        Series2.LegendTextPattern = "{V}"
         Series2.Name = "Series 2"
         Series2.ShowInLegend = False
         Series2.SynchronizePointOptions = False
@@ -162,9 +162,9 @@ Partial Public Class ResultsCalibCurveReport
         PointSeriesView1.PointMarkerOptions.Size = 10
         Series2.View = PointSeriesView1
         Me.XrChart1.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1, Series2}
-        PointSeriesLabel3.LineVisible = True
+        PointSeriesLabel3.LineVisibility = DevExpress.Utils.DefaultBoolean.True
         Me.XrChart1.SeriesTemplate.Label = PointSeriesLabel3
-        Me.XrChart1.SeriesTemplate.LegendPointOptions = PointOptions3
+        Me.XrChart1.SeriesTemplate.LegendTextPattern = PointOptions3.Pattern
         Me.XrChart1.SeriesTemplate.SynchronizePointOptions = False
         Me.XrChart1.SeriesTemplate.View = LineSeriesView2
         Me.XrChart1.SizeF = New System.Drawing.SizeF(610.0!, 410.0!)
@@ -181,7 +181,7 @@ Partial Public Class ResultsCalibCurveReport
         ChartTitle2.Text = "Concentration"
         ChartTitle3.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         ChartTitle3.Text = "Linear"
-        ChartTitle3.Visible = False
+        ChartTitle3.Visibility = DevExpress.Utils.DefaultBoolean.False
         Me.XrChart1.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle1, ChartTitle2, ChartTitle3})
         '
         'XrPanel3

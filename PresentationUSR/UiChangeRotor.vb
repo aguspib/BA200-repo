@@ -1,12 +1,13 @@
 ﻿Option Strict On
 Option Explicit On
+Option Infer On
 
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class IChangeRotor
+Public Class UiChangeRotor
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constructor"
@@ -43,15 +44,15 @@ Public Class IChangeRotor
 
             'CHANGE ROTOR Button
             auxIconName = GetIconName("CHANGEROTORB")
-            If (auxIconName <> String.Empty) Then bsChangeRotortButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsChangeRotortButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'CONTINUE Button
             auxIconName = GetIconName("ADJUSTMENT")
-            If (auxIconName <> String.Empty) Then bsContinueButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsContinueButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'EXIT Button
             auxIconName = GetIconName("CANCEL")
-            If (auxIconName <> String.Empty) Then bsCancelButton.Image = Image.FromFile(iconPath & auxIconName)
+            If (auxIconName <> String.Empty) Then bsCancelButton.Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
 
             'Icons for the final result of the Rotor change process: OK or ERROR
             auxIconName = GetIconName("ACCEPTF")
@@ -74,8 +75,8 @@ Public Class IChangeRotor
     Private Sub GetScreenLabels()
         Try
             'Get the current Language from the current Application Session
-            Dim currentLanguageGlobal As New GlobalBase
-            Dim currentLanguage As String = currentLanguageGlobal.GetSessionInfo().ApplicationLanguage.Trim.ToString
+            'Dim currentLanguageGlobal As New GlobalBase
+            Dim currentLanguage As String = GlobalBase.GetSessionInfo().ApplicationLanguage.Trim.ToString
 
             Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
             bsTitleLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_ChangeRotor", currentLanguage)
@@ -175,7 +176,7 @@ Public Class IChangeRotor
                     bsContinueButton.Enabled = False
                     bsCancelButton.Enabled = True
                 Else
-                    bsChangeRotortButton.Enabled = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
+                    bsChangeRotortButton.Enabled = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
                 End If
             End If
         Catch ex As Exception
@@ -266,9 +267,9 @@ Public Class IChangeRotor
         Try
             If (bsCancelButton.Enabled) Then
                 If (statusMDIChangedFlag) Then
-                    IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
+                    UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY)
                 Else
-                    IAx00MainMDI.ErrorStatusLabel.Text = String.Empty
+                    UiAx00MainMDI.ErrorStatusLabel.Text = String.Empty
                 End If
 
                 'Open the WS Monitor form and close this one
@@ -278,7 +279,7 @@ Public Class IChangeRotor
                 Else
                     'Normal button click
                     'Open the WS Monitor form and close this one
-                    IAx00MainMDI.OpenMonitorForm(Me)
+                    UiAx00MainMDI.OpenMonitorForm(Me)
                 End If
             End If
         Catch ex As Exception
@@ -317,8 +318,8 @@ Public Class IChangeRotor
                 sensorValue = mdiAnalyzerCopy.GetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED)
                 If (sensorValue = 1) Then
                     ScreenWorkingProcess = True
-                    IAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
-                    IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
+                    UiAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 18/10/2011
 
                     'Not necessary because Fw peforms the action although the reaction cover enabled & open
                     bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
@@ -332,7 +333,7 @@ Public Class IChangeRotor
                     'Create a new ReactionsRotor
                     Dim myGlobal As New GlobalDataTO
                     Dim myReactionsRotorDelegate As New ReactionsRotorDelegate
-                    myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, IAx00MainMDI.ActiveAnalyzer, IAx00MainMDI.AnalyzerModel)
+                    myGlobal = myReactionsRotorDelegate.ChangeRotor(Nothing, UiAx00MainMDI.ActiveAnalyzer, UiAx00MainMDI.AnalyzerModel)
 
                     'DL 29/02/2012 - evaluate if the adjust ligth has been successfully or not
                     Dim myAlarms As List(Of GlobalEnumerates.Alarms) = mdiAnalyzerCopy.Alarms
@@ -365,8 +366,8 @@ Public Class IChangeRotor
                     bsContinueButton.Enabled = False
                     bsCancelButton.Enabled = True
 
-                    IAx00MainMDI.EnableButtonAndMenus(True)
-                    IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                    UiAx00MainMDI.EnableButtonAndMenus(True)
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(True)
                     Cursor = Cursors.Default
                 End If
                 'AG 15/03/2012
@@ -393,8 +394,8 @@ Public Class IChangeRotor
                 linQAlarm = Nothing
 
                 'AG 02/04/2012 - Raise WashStation is active once the ISE initialization finished
-                If (bsChangeRotortButton.Enabled AndAlso Not IAx00MainMDI Is Nothing) Then
-                    bsChangeRotortButton.Enabled = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
+                If (bsChangeRotortButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
+                    bsChangeRotortButton.Enabled = UiAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
                 Else
                     bsChangeRotortButton.Enabled = False
                 End If
@@ -402,7 +403,7 @@ Public Class IChangeRotor
 
                 'AG 29/03/2012 - no change rotor is reactions rotor cover enabled and opened (the nothing condition is to avoid create a new MDI instance)
                 'Not necessary because Fw peforms the action although the reaction cover enabled & open
-                If (bsContinueButton.Enabled AndAlso Not IAx00MainMDI Is Nothing) Then
+                If (bsContinueButton.Enabled AndAlso Not UiAx00MainMDI Is Nothing) Then
                     bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
                 Else
                     bsContinueButton.Enabled = False
@@ -469,8 +470,8 @@ Public Class IChangeRotor
 
                 Else
                     ScreenWorkingProcess = True
-                    IAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
-                    IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+                    UiAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
+                    UiAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
                     mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS"
                     mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = ""
                     mdiAnalyzerCopy.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = ""
@@ -505,26 +506,26 @@ Public Class IChangeRotor
                                 dxProgressBar.Visible = True
                                 dxProgressBar.Position = dxProgressBar.Properties.Maximum
 
-                                bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                                bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
                                 bsStatusImage.Visible = True
 
-                                IAx00MainMDI.EnableButtonAndMenus(True)
-                                IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Enable vertical action buttons bar
+                                UiAx00MainMDI.EnableButtonAndMenus(True)
+                                UiAx00MainMDI.SetActionButtonsEnableProperty(True) 'Enable vertical action buttons bar
                                 'DL 28/02/2012
                             End If
                         End If
-                End If
+                    End If
                 End If
             End If
 
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
             Cursor = Cursors.Default        'DL 04/04/2012
 
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotortButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsChangeRotortButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
             Cursor = Cursors.Default        'DL 04/04/2012
         End Try
     End Sub
@@ -554,7 +555,7 @@ Public Class IChangeRotor
                     resultData = mdiAnalyzerCopy.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True, Nothing, Nothing, Nothing)
 
                     If Not resultData.HasError AndAlso mdiAnalyzerCopy.Connected Then
-                        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.LIGHT_ADJUSTMENT)
+                        UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.LIGHT_ADJUSTMENT)
                         statusMDIChangedFlag = True
                         mdiAnalyzerCopy.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
 
@@ -591,10 +592,10 @@ Public Class IChangeRotor
 
                         'dl 26/09/2012
                         If Not mdiAnalyzerCopy.Connected Then
-                            IAx00MainMDI.EnableButtonAndMenus(False)
+                            UiAx00MainMDI.EnableButtonAndMenus(False)
                         Else
-                            IAx00MainMDI.EnableButtonAndMenus(True)
-                            IAx00MainMDI.SetActionButtonsEnableProperty(True)
+                            UiAx00MainMDI.EnableButtonAndMenus(True)
+                            UiAx00MainMDI.SetActionButtonsEnableProperty(True)
                         End If
                         'IAx00MainMDI.EnableButtonAndMenus(True)
                         'IAx00MainMDI.SetActionButtonsEnableProperty(True)
@@ -602,11 +603,11 @@ Public Class IChangeRotor
 
                         If Not ExistBaseLineInitError Then
                             bsStatusImage.Visible = True
-                            bsStatusImage.Image = Image.FromFile(OKIconName)
+                            bsStatusImage.Image = ImageUtilities.ImageFromFile(OKIconName)
 
                         Else
                             bsStatusImage.Visible = True
-                            bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                            bsStatusImage.Image = ImageUtilities.ImageFromFile(WRONGIconName)
                         End If
 
                         'DL 26/09/2012. begin
@@ -630,11 +631,11 @@ Public Class IChangeRotor
 
             End If
 
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
             Cursor = Cursors.Default        'DL 04/04/2012
 
         Catch ex As Exception
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+            UiAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
             Cursor = Cursors.Default        'DL 04/04/2012
 
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsContinueButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
