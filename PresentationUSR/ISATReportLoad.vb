@@ -16,7 +16,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports LIS.Biosystems.Ax00.LISCommunications   ' XB 07/05/2013
 
-Public Class ISATReportLoad
+Public Class UiSATReportLoad
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Properties"

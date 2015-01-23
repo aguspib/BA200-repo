@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports System.Timers
 Imports System.Globalization
 
-Public Class IWSRotorPositions
+Public Class UiWSRotorPositions
     'RH 14/12/2010 Substitute every "And" by "AndAlso" (Only in boolean expressions, not in bitwise expressions!)
     '              Substitute every "Or" by "OrElse"   (Only in boolean expressions, not in bitwise expressions!)
     'To evaluate the boolean expressions in short circuit and speed up mean processing velocity
@@ -3489,7 +3489,7 @@ Public Class IWSRotorPositions
 
             If (myElemFree > 0) Then
                 'RH 19/10/2010 - Introduce the Using statement
-                Using myLoadSaveAuxScreen As New IWSLoadSaveAuxScreen()
+                Using myLoadSaveAuxScreen As New UiWSLoadSaveAuxScreen()
                     myLoadSaveAuxScreen.ScreenUse = "VROTORS"
                     myLoadSaveAuxScreen.SourceButton = "SAVE"
                     myLoadSaveAuxScreen.RotorType = pRotorType
@@ -3550,7 +3550,7 @@ Public Class IWSRotorPositions
     ''' </remarks>
     Private Sub LoadVirtualRotor(ByVal pRotorType As String)
         Try
-            Using myLoadSaveAuxScreen As New IWSLoadSaveAuxScreen()
+            Using myLoadSaveAuxScreen As New UiWSLoadSaveAuxScreen()
                 'Assign the required properties of the auxiliary screen and open it as a DialogForm
                 myLoadSaveAuxScreen.ScreenUse = "VROTORS"
                 myLoadSaveAuxScreen.SourceButton = "LOAD"
@@ -5958,7 +5958,7 @@ Public Class IWSRotorPositions
                     Dim StartTime As DateTime = Now 'AG 18/02/2014 - #1505
 
                     'Shown the Positioning Warnings Screen
-                    Using NotPositionedDialog As New IWSNotPosWarning()
+                    Using NotPositionedDialog As New UiWSNotPosWarning()
                         NotPositionedDialog.OpenMode = pOpenMode
                         NotPositionedDialog.ActiveWorkSession = Me.WorkSessionIDAttribute
                         NotPositionedDialog.ShowDialog()
@@ -8936,7 +8936,7 @@ Public Class IWSRotorPositions
 
                 'Allow manual barcode only in free positions or in positions with patients
                 If (cellStatus = "FREE" OrElse cellTubeContent = "PATIENT") Then
-                    Using BarCodeForm As New IBarCodeEdit()
+                    Using BarCodeForm As New UiBarCodeEdit()
                         BarCodeForm.BarCode = bsSamplesBarcodeTextBox.Text
                         BarCodeForm.RotorType = GlobalEnumerates.Rotors.SAMPLES
 
@@ -9024,7 +9024,7 @@ Public Class IWSRotorPositions
     Private Sub bsReagentsBarCodeTextBox_MouseUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.MouseEventArgs) Handles bsReagentsBarCodeTextBox.MouseUp
         Try
             If (Not mySelectedElementInfo Is Nothing AndAlso mySelectedElementInfo.twksWSRotorContentByPosition.Rows.Count > 0) Then
-                Using BarCodeForm As New IBarCodeEdit()
+                Using BarCodeForm As New UiBarCodeEdit()
                     BarCodeForm.AnalyzerID = AnalyzerIDAttribute
                     BarCodeForm.BarCode = bsReagentsBarCodeTextBox.Text
                     BarCodeForm.RotorType = GlobalEnumerates.Rotors.REAGENTS
@@ -9096,7 +9096,7 @@ Public Class IWSRotorPositions
                 Dim createAutoWS As Boolean = False
                 Dim lisWithFilesMode As Boolean = IsLisWithFilesMode()
                 If (lisWithFilesMode) Then
-                    Using myForm As New IWSIncompleteSamplesAuxScreen()
+                    Using myForm As New UiWSIncompleteSamplesAuxScreen()
                         myForm.AnalyzerID = AnalyzerIDAttribute
                         myForm.WorkSessionID = WorkSessionIDAttribute
                         myForm.WorkSessionStatus = WorkSessionStatusAttribute

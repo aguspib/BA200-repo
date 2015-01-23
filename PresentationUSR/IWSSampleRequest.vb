@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IWSSampleRequest
+Public Class UiWSSampleRequest
 
 #Region "Declarations"
     'Global variable for all Blank, Calibrator, Control and Patient Order Tests shown in the different grids
@@ -4625,7 +4625,7 @@ Public Class IWSSampleRequest
                 Cursor = Cursors.Default
 
                 'Open the auxiliary screen that allow inform a result for each requested OffSystem Test
-                Dim myAuxOFFSResultsScreen As New IResultsOffSystemsTest
+                Dim myAuxOFFSResultsScreen As New UiResultsOffSystemsTest
                 myAuxOFFSResultsScreen.OffSystemTestsList = myOffSystemTestsResultsDS
 
                 myAuxOFFSResultsScreen.ShowDialog()
@@ -5937,7 +5937,7 @@ Public Class IWSSampleRequest
             Dim myGlobalDataTo As New GlobalDataTO
 
             'The same Form used to Save Virtual Rotors is reused to manage the saving of WorkSessions
-            Using myWSSelection As New IWSLoadSaveAuxScreen
+            Using myWSSelection As New UiWSLoadSaveAuxScreen
                 'Assign the required properties of the auxiliary screen and open it as a DialogForm
                 myWSSelection.ScreenUse = "SAVEDWS"
                 myWSSelection.SourceButton = "SAVE"
@@ -6385,7 +6385,7 @@ Public Class IWSSampleRequest
 
                 'Open screen of Patient's Search passing to it the informed PatientID 
                 'RH 19/10/2010 Introduce the Using statement
-                Using myPatientSearchForm As New IProgPatientData()
+                Using myPatientSearchForm As New UiProgPatientData()
                     myPatientSearchForm.EntryMode = "SEARCH"
                     myPatientSearchForm.PatientID = bsPatientIDTextBox.Text
                     myPatientSearchForm.PatientsList = lstPatientExist
@@ -6496,7 +6496,7 @@ Public Class IWSSampleRequest
             lstWSBlanksDS = Nothing
 
             'Inform properties of the auxiliary screen of Tests Selection and open it
-            Using myForm As New IWSTestSelectionAuxScreen()
+            Using myForm As New UiWSTestSelectionAuxScreen()
                 myForm.SampleClass = "BLANK"
                 myForm.SampleType = ""
                 myForm.SampleTypeName = ""
@@ -6576,7 +6576,7 @@ Public Class IWSSampleRequest
             lstWSCalibDS = Nothing
 
             'Inform properties of the auxiliary screen of Tests Selection and open it
-            Using myForm As New IWSTestSelectionAuxScreen()
+            Using myForm As New UiWSTestSelectionAuxScreen()
                 myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                 myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                 myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6692,7 +6692,7 @@ Public Class IWSSampleRequest
             lstWSCtrlDS = Nothing
 
             'Inform properties of the auxiliary screen of Tests Selection and open it
-            Using myForm As New IWSTestSelectionAuxScreen()
+            Using myForm As New UiWSTestSelectionAuxScreen()
                 myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                 myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                 myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6821,7 +6821,7 @@ Public Class IWSSampleRequest
                         FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                         'Inform properties and open the screen of Tests Selection
-                        Using myForm As New IWSTestSelectionAuxScreen()
+                        Using myForm As New UiWSTestSelectionAuxScreen()
                             myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                             myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                             myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6877,7 +6877,7 @@ Public Class IWSSampleRequest
                         FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                         'Inform properties and open the screen of Tests Selection
-                        Using myForm As New IWSTestSelectionAuxScreen()
+                        Using myForm As New UiWSTestSelectionAuxScreen()
                             myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                             myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                             myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -6946,7 +6946,7 @@ Public Class IWSSampleRequest
                         FillMaxOrderTestValues(myMaxOrderTestsDS)
 
                         'Inform properties and open the screen of Tests Selection
-                        Using myForm As New IWSTestSelectionAuxScreen()
+                        Using myForm As New UiWSTestSelectionAuxScreen()
                             myForm.SampleClass = bsSampleClassComboBox.SelectedValue.ToString()
                             myForm.SampleType = bsSampleTypeComboBox.SelectedValue.ToString()
                             myForm.SampleTypeName = bsSampleTypeComboBox.Text
@@ -7139,7 +7139,7 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub ShowLIMSImportErrors()
         Try
-            Using LIMSImportErrorsDialog As New IWSImportLIMSErrors()
+            Using LIMSImportErrorsDialog As New UiWSImportLIMSErrors()
                 LIMSImportErrorsDialog.ListOfImportErrors = myImportErrorsLogDS
                 LIMSImportErrorsDialog.ShowDialog()
             End Using
@@ -8243,7 +8243,7 @@ Public Class IWSSampleRequest
     ''' </remarks>
     Private Sub bsLoadWSButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsLoadWSButton.Click
         Try
-            Using myWSSelection As New IWSLoadSaveAuxScreen
+            Using myWSSelection As New UiWSLoadSaveAuxScreen
                 'Assign the required properties of the auxiliary screen and open it as a DialogForm
                 myWSSelection.ScreenUse = "SAVEDWS"
                 myWSSelection.SourceButton = "LOAD"
@@ -8363,7 +8363,7 @@ Public Class IWSSampleRequest
                                                                                           myWorkSessionResultDS, False)
                 If (Not resultData.HasError) Then
                     'Open the auxiliary screen for Incomplete Patient Samples
-                    Using myForm As New IWSIncompleteSamplesAuxScreen()
+                    Using myForm As New UiWSIncompleteSamplesAuxScreen()
                         myForm.AnalyzerID = AnalyzerIDAttribute
                         myForm.WorkSessionID = WorkSessionIDAttribute
                         myForm.WorkSessionStatus = WSStatusAttribute

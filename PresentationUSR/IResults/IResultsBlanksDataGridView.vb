@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 'AG 26/07/2010
 
 
-Partial Class IResults
+Partial Class UiResults
 
     Dim CollapseColumnBlanks As New bsDataGridViewCollapseColumn
 

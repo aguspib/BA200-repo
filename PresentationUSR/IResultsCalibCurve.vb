@@ -16,7 +16,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports DevExpress.XtraCharts
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class IResultsCalibCurve
+Public Class UiResultsCalibCurve
 
 #Region "Declarations"
 
@@ -2056,7 +2056,7 @@ Public Class IResultsCalibCurve
 
         Try
 
-            Using myForm As New IResultsAbsCurve
+            Using myForm As New UiResultsAbsCurve
                 myForm.AnalyzerID = AnalyzerIDField
                 myForm.WorkSessionID = WorkSessionIDField
                 myForm.MultiItemNumber = pMultiItemNumber

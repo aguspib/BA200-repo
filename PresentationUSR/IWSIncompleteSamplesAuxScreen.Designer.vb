@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSIncompleteSamplesAuxScreen
+Partial Class UiWSIncompleteSamplesAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -27,7 +27,7 @@ Partial Class IWSIncompleteSamplesAuxScreen
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSIncompleteSamplesAuxScreen))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSIncompleteSamplesAuxScreen))
         Me.bsOrderDetailsGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.bsSaveButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsSamplesDetailsLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()

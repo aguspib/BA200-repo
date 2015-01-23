@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
 
 
-Public Class IProgTestContaminations
+Public Class UiProgTestContaminations
 
 #Region "Declarations"
     Private EditionMode As Boolean                    'To control when the screen is in Edition Mode
@@ -1704,7 +1704,7 @@ Public Class IProgTestContaminations
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ReleaseElements ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReleaseElements ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
-        
+
     End Sub
 
 #End Region
@@ -1933,7 +1933,7 @@ Public Class IProgTestContaminations
     End Sub
 
     Private Sub bsSummaryByTestButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSummaryByTestButton.Click
-        Using myProgAuxTestContaminations As New IProgAuxTestContaminations
+        Using myProgAuxTestContaminations As New UiProgAuxTestContaminations
             'myProgAuxTestContaminations.FormBorderStyle = Windows.Forms.FormBorderStyle.FixedToolWindow
 
             'RH 20/06/2012 This is the right value

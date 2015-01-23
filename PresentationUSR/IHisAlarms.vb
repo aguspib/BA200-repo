@@ -10,7 +10,7 @@ Imports System.Windows.Forms
 Imports System.Drawing
 Imports System.Globalization
 
-Public Class IHisAlarms
+Public Class UiHisAlarms
 
 #Region "Events definitions"
 

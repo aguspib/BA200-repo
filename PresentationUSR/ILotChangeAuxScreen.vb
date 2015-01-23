@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 
-Public Class ILotChangeAuxScreen
+Public Class UiLotChangeAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declarations"

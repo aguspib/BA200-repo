@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IQCResultsReview
+Public Class UiQCResultsReview
 
 #Region "Declaration"
     Private currentLanguage As String = ""
@@ -103,7 +103,7 @@ Public Class IQCResultsReview
                 Next
 
                 'Open the auxiliary screen to add new results
-                Using myManualQCResultForm As New IQCAddManualResultsAux
+                Using myManualQCResultForm As New UiQCAddManualResultsAux
                     myManualQCResultForm.LanguageID = currentLanguage
                     myManualQCResultForm.MaxRunNumber = myRunNumber + 1
                     myManualQCResultForm.DecimalAllowed = LocalDecimalAllow
@@ -709,7 +709,7 @@ Public Class IQCResultsReview
     Private Sub EditResultValues()
         Try
             If (bsResultsDetailsGridView.SelectedRows.Count = 1) Then
-                Using myQCResultEdition As New IQCResultsEditionAux()
+                Using myQCResultEdition As New UiQCResultsEditionAux()
                     Dim myResultInformationDS As New ResultInformationDS
                     Dim myResultInformationRow As ResultInformationDS.tResultInformationRow
 
@@ -2066,7 +2066,7 @@ Public Class IQCResultsReview
 
     Private Sub CumulateButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsCumulateButton.Click
         Try
-            Dim myCumulateForm As New IQCCumulateControlResults
+            Dim myCumulateForm As New UiQCCumulateControlResults
             myCumulateForm.MdiParent = Me.MdiParent
             myCumulateForm.AnalyzerID = AnalyzerIDAttribute
             myCumulateForm.IQCResultReviewGone = True
@@ -2114,7 +2114,7 @@ Public Class IQCResultsReview
 
     Private Sub GraphsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsGraphsButton.Click
         Try
-            Using myIQCGraph As New IQCGraphs
+            Using myIQCGraph As New UiQCGraphs
                 myIQCGraph.DateTo = bsDateToDateTimePick.Value
                 myIQCGraph.DateFrom = bsDateFromDateTimePick.Value
                 myIQCGraph.TestSampleID = CInt(bsTestSampleListView.SelectedItems(0).SubItems(2).Text)

@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ISATReport
+Partial Class UiSATReport
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -25,7 +25,7 @@ Partial Class ISATReport
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ISATReport))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiSATReport))
         Me.BsTitleCreation = New Biosystems.Ax00.Controls.UserControls.BSLabel
         Me.bsSATReportTitle = New Biosystems.Ax00.Controls.UserControls.BSLabel
         Me.bsSaveSATRepButton = New Biosystems.Ax00.Controls.UserControls.BSButton

@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IProgCalibrator
+Public Class UiProgCalibrator
 
 #Region "Attributes"
     Private AnalyzerIDAttribute As String
@@ -1137,7 +1137,7 @@ Public Class IProgCalibrator
             If (Not myResultGlobalTO.HasError) Then
                 'Show the screen of Affected Elements
                 If (myDependenciesElementsDS.DependenciesElements.Count > 0) Then
-                    Using myAffectedElementsWarning As New IWarningAfectedElements()
+                    Using myAffectedElementsWarning As New UiWarningAfectedElements()
                         myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                         myAffectedElementsWarning.AdditionalElements = True
                         myAffectedElementsWarning.ElementsAffectedMessageDetail = "MSG_UPDATE_CONCENTRATION"
@@ -2080,7 +2080,7 @@ Public Class IProgCalibrator
             Next
 
             If myDependenciesElementsDS.DependenciesElements.Count > 0 Then
-                Using myAffectedElementsWarning As New IWarningAfectedElements()
+                Using myAffectedElementsWarning As New UiWarningAfectedElements()
                     myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                     myAffectedElementsWarning.AdditionalElements = True
                     'TODO: change message to a new one.
@@ -2177,7 +2177,7 @@ Public Class IProgCalibrator
 
                     Next
 
-                    Using myAffectedElementsWarning As New IWarningAfectedElements()
+                    Using myAffectedElementsWarning As New UiWarningAfectedElements()
                         myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                         myAffectedElementsWarning.AdditionalElements = True
 

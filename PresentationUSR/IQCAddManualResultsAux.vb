@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 
-Public Class IQCAddManualResultsAux
+Public Class UiQCAddManualResultsAux
 
 #Region "Declarations"
     Private myNewLocation As Point              'To avoid the screen movement
@@ -690,6 +690,6 @@ Public Class IQCAddManualResultsAux
     End Sub
 #End Region
 
-    
-   
+
+
 End Class

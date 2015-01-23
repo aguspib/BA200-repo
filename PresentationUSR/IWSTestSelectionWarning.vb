@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 
-Public Class IWSTestSelectionWarning
+Public Class UiWSTestSelectionWarning
 
 #Region "Declarations"
 

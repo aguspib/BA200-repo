@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 
-Public Class IBarCodeEdit
+Public Class UiBarCodeEdit
 
 #Region "Attributes"
     Dim BarCodeAttribute As String

@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class IConfigLISMapping
+Public Class UiConfigLISMapping
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declarations"

@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports LIS.Biosystems.Ax00.LISCommunications
 Imports Biosystems.Ax00.CommunicationsSwFw
 
-Public Class ILISUtilities
+Public Class UiLISUtilities
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declaration"

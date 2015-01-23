@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Public Class IProgOffSystemTest
+Public Class UiProgOffSystemTest
 
 #Region "Declarations"
     Private EditionMode As Boolean = False                 'To control when the selected Calculated Test is in Edition Mode
@@ -276,7 +276,7 @@ Public Class IProgOffSystemTest
                         myDependeciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
                                 AffectedElement.ShowDialog()
 
@@ -1546,7 +1546,7 @@ Public Class IProgOffSystemTest
                         myDependeciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
                                 AffectedElement.ShowDialog()
 
@@ -1613,7 +1613,7 @@ Public Class IProgOffSystemTest
                         myDependeciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
                                 AffectedElement.ShowDialog()
 
@@ -2521,7 +2521,7 @@ Public Class IProgOffSystemTest
     Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
         Try
             'Shown the Positioning Warnings Screen
-            Using AuxMe As New ISortingTestsAux()
+            Using AuxMe As New UiSortingTestsAux()
                 AuxMe.openMode = "TESTSELECTION"
                 AuxMe.screenID = "OFFS"
                 AuxMe.ShowDialog()

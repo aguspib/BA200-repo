@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class ISortingTestsAux
+Public Class UiSortingTestsAux
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
     Implements IPermissionLevel
 

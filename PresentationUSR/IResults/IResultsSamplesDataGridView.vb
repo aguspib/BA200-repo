@@ -19,7 +19,7 @@ Imports DevExpress.XtraEditors.Controls
 Imports DevExpress.Utils
 
 
-Partial Class IResults
+Partial Class UiResults
 
 #Region "SamplesXtraGrid Methods"
     ''' <summary>

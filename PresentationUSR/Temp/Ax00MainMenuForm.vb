@@ -12,7 +12,7 @@ Public Class Ax00MainMenuForm
     Dim LocalAnalizerDS As New AnalyzersDS
 
     Private Sub PosititioningToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PosititioningToolStripMenuItem.Click
-        Dim myReagSampPosForm As New IWSRotorPositions
+        Dim myReagSampPosForm As New UiWSRotorPositions
         myReagSampPosForm.ActiveWorkSession = Me.TextBox1.Text
         If Not GetFormFromList(myReagSampPosForm.Name) Then
             myReagSampPosForm.MdiParent = Me
@@ -21,7 +21,7 @@ Public Class Ax00MainMenuForm
     End Sub
 
     Private Sub PositioningBCNToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
-        Dim myReagSampPosForm As New IWSRotorPositions
+        Dim myReagSampPosForm As New UiWSRotorPositions
         myReagSampPosForm.ActiveWorkSession = Me.TextBox1.Text
         If Not GetFormFromList(myReagSampPosForm.Name) Then
             myReagSampPosForm.MdiParent = Me
@@ -30,7 +30,7 @@ Public Class Ax00MainMenuForm
     End Sub
 
     Private Sub TestProgrammingToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TestProgrammingToolStripMenuItem.Click
-        Dim myTestProgrammingForm As New IProgTest
+        Dim myTestProgrammingForm As New UiProgTest
         If LocalAnalizerDS.tcfgAnalyzers.Rows.Count > 0 Then
             myTestProgrammingForm.AnalyzerModel = LocalAnalizerDS.tcfgAnalyzers(0).AnalyzerModel
             myTestProgrammingForm.AnalyzerID = LocalAnalizerDS.tcfgAnalyzers(0).AnalyzerID
@@ -43,7 +43,7 @@ Public Class Ax00MainMenuForm
     End Sub
 
     Private Sub WSPreparationToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles WSPreparationToolStripMenuItem.Click
-        Dim myWSPreparationForm As New IWSSampleRequest
+        Dim myWSPreparationForm As New UiWSSampleRequest
         myWSPreparationForm.ActiveAnalyzer = "SN0000099999_Ax400"
         myWSPreparationForm.ActiveWorkSession = Me.TextBox1.Text
 
@@ -116,14 +116,14 @@ Public Class Ax00MainMenuForm
     End Sub
 
     Private Sub PatientDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PatientDataToolStripMenuItem.Click
-        If Not GetFormFromList(IProgPatientData.Name) Then
-            IProgPatientData.MdiParent = Me
-            IProgPatientData.Show()
+        If Not GetFormFromList(UiProgPatientData.Name) Then
+            UiProgPatientData.MdiParent = Me
+            UiProgPatientData.Show()
         End If
     End Sub
 
     Private Sub PatientDataSearchToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles PatientDataSearchToolStripMenuItem.Click
-        Dim myPatientSearchForm As New IProgPatientData
+        Dim myPatientSearchForm As New UiProgPatientData
 
         myPatientSearchForm.EntryMode = "SEARCH"
         myPatientSearchForm.PatientID = "PAT00007"

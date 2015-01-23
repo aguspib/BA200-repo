@@ -2035,11 +2035,11 @@ Partial Public Class UiMonitor
             'Application.DoEvents()
             'Close()
 
-            IResults.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
-            IResults.AnalyzerModel = UiAx00MainMDI.ActiveAnalyzerModel
-            IResults.SampleClass = SampleClass
-            IResults.SampleOrTestName = SampleOrTestName
-            UiAx00MainMDI.OpenMDIChildForm(IResults)
+            UiResults.ActiveWSStatus = UiAx00MainMDI.ActiveStatus
+            UiResults.AnalyzerModel = UiAx00MainMDI.ActiveAnalyzerModel
+            UiResults.SampleClass = SampleClass
+            UiResults.SampleOrTestName = SampleOrTestName
+            UiAx00MainMDI.OpenMDIChildForm(UiResults)
             ' XB 26/02/2014 - task #1529
 
         Catch ex As Exception
@@ -2068,7 +2068,7 @@ Partial Public Class UiMonitor
 
         Try
 
-            Using myForm As New IResultsAbsCurve
+            Using myForm As New UiResultsAbsCurve
                 myForm.AnalyzerID = AnalyzerIDField
                 myForm.WorkSessionID = WorkSessionIDField
                 myForm.MultiItemNumber = pMultiItemNumber

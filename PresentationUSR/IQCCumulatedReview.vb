@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 Imports Biosystems.Ax00.PresentationCOM
 Imports DevExpress.XtraCharts
 
-Public Class IQCCumulatedReview
+Public Class UiQCCumulatedReview
 
 #Region "Declarations"
     Private currentLanguage As String = ""

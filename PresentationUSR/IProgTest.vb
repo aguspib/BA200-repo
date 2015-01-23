@@ -11,7 +11,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Controls.UserControls
 'Imports System.Threading
 
-Public Class IProgTest
+Public Class UiProgTest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Internal structures Test Programming"
@@ -1168,7 +1168,7 @@ Public Class IProgTest
                             End If
                             'TR 24/05/2011
                             If myDependenciesElementsDS.DependenciesElements.Count > 0 Then
-                                Using myAffectedElementsWarning As New IWarningAfectedElements()
+                                Using myAffectedElementsWarning As New UiWarningAfectedElements()
                                     myAffectedElementsWarning.AffectedElements = myDependenciesElementsDS
                                     myAffectedElementsWarning.ShowDialog()
 
@@ -1361,7 +1361,7 @@ Public Class IProgTest
                     myDependeciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
                     If Not myDependeciesElementsDS Is Nothing AndAlso myDependeciesElementsDS.DependenciesElements.Count > 0 Then
                         'Filter the affected elemente for not showing duplicate elements.
-                        Using AffectedElement As New IWarningAfectedElements()
+                        Using AffectedElement As New UiWarningAfectedElements()
                             AffectedElement.AffectedElements = myDependeciesElementsDS
                             AffectedElement.ShowDialog()
                             myResult = AffectedElement.DialogResult
@@ -10738,7 +10738,7 @@ Public Class IProgTest
             End If
 
             'RH 19/10/2010 Introduce the Using statement
-            Using myMultiCalibProgrammingForm As New IProgCalibrator()
+            Using myMultiCalibProgrammingForm As New UiProgCalibrator()
 
                 If SelectedTestDS.tparTests.Rows.Count > 0 Then
                     myMultiCalibProgrammingForm.StartPosition = FormStartPosition.CenterParent
@@ -13430,7 +13430,7 @@ Public Class IProgTest
     Private Sub AddControls_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AddControls.Click
         Try
             'Open controls Programming
-            Using myProgControls As New IProgControls
+            Using myProgControls As New UiProgControls
                 myProgControls.AnalyzerID = AnalyzerIDAttribute
                 myProgControls.WorkSessionID = WorkSessionIDAttribute
                 myProgControls.SourceScreen = GlbSourceScreen.TEST_QCTAB.ToString
@@ -13774,7 +13774,7 @@ Public Class IProgTest
     Private Sub BsCustomOrderButton_Click(sender As Object, e As EventArgs) Handles BsCustomOrderButton.Click
         Try
             'Shown the Positioning Warnings Screen
-            Using AuxMe As New ISortingTestsAux()
+            Using AuxMe As New UiSortingTestsAux()
                 AuxMe.openMode = "TESTSELECTION"
                 AuxMe.screenID = "STD"
                 AuxMe.ShowDialog()

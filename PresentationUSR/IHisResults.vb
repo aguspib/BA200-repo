@@ -13,7 +13,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports LIS.Biosystems.Ax00.LISCommunications
 
-Public Class IHisResults
+Public Class UiHisResults
 
 #Region "Attributes"
     'SA 01/09/2014
@@ -1857,14 +1857,14 @@ Public Class IHisResults
                 myHisWSResultsSorted = Nothing
             End If
 
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
-                GlobalBase.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
-                                                "IHisResults.PrintReport", EventLogEntryType.Information, False)
-                StartTime = Now
-                '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
+            GlobalBase.CreateLogActivity("Historic Patient Results Report: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), _
+                                            "IHisResults.PrintReport", EventLogEntryType.Information, False)
+            StartTime = Now
+            '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-                myHisWSResults = Nothing
-                myInitialHisWSResults = Nothing
+            myHisWSResults = Nothing
+            myInitialHisWSResults = Nothing
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrintReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrintReport ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")

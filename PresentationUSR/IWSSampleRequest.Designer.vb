@@ -1,7 +1,7 @@
 ﻿Imports Biosystems.Ax00.Controls.UserControls
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSSampleRequest
+Partial Class UiWSSampleRequest
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -43,7 +43,7 @@ Partial Class IWSSampleRequest
         Dim DataGridViewCellStyle13 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle14 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle15 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSSampleRequest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSSampleRequest))
         Me.bsLoadWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsSaveWSButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsOpenRotorButton = New Biosystems.Ax00.Controls.UserControls.BSButton()

@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IResults
+Partial Class UiResults
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -27,7 +27,7 @@ Partial Class IResults
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim GridView1 As DevExpress.XtraGrid.Views.Grid.GridView
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IResults))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiResults))
         Dim DataGridViewCellStyle21 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle22 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle23 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()

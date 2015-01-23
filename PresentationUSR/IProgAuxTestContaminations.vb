@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
-Public Class IProgAuxTestContaminations
+Public Class UiProgAuxTestContaminations
 
 #Region "Declarations"
     Dim myNewLocation As Point    'Used to avoid the screen movement

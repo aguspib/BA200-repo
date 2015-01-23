@@ -16,7 +16,7 @@ Imports Biosystems.Ax00.InfoAnalyzer
 'PENDING:
 'Add Information XPS Docs for each Action
 'The Reagents Pack Dallas Information MUST BE HIDE!!!!!!!!!! (DisplayISEInfo)
-Public Class IISEResultsHistory
+Public Class UiISEResultsHistory
 
 #Region "Events definitions"
 
@@ -1525,7 +1525,7 @@ Public Class IISEResultsHistory
         Try
             If mLastElectrodeDataTable.Rows.Count = 0 Then Exit Sub
 
-            Using myISEGraph As New IISEResultsHistoryGraph()
+            Using myISEGraph As New UiISEResultsHistoryGraph()
                 myISEGraph.SetData(mLastElectrodesFilter.Value, mLastElectrodeDataTable)
                 myISEGraph.ShowDialog()
 

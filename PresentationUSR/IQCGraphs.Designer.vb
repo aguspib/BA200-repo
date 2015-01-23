@@ -1,7 +1,7 @@
 ﻿Imports DevExpress.Utils
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IQCGraphs
+Partial Class UiQCGraphs
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -32,7 +32,7 @@ Partial Class IQCGraphs
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IQCGraphs))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiQCGraphs))
         Me.bsToolTipController = New DevExpress.Utils.ToolTipController(Me.components)
         Me.bsWarningLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()
         Me.bsGraphicalResultLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()

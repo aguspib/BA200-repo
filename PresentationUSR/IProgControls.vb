@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.BL.Framework
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class IProgControls
+Public Class UiProgControls
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Attributes"
@@ -330,7 +330,7 @@ Public Class IProgControls
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 Dim myPreviousControlLotDS As ControlsDS = DirectCast(resultData.SetDatos, ControlsDS)
 
-                Using myForm As New ILotChangeAuxScreen
+                Using myForm As New UiLotChangeAuxScreen
                     myForm.CurrentLot = bsLotNumberTextBox.Text.Trim
                     myForm.OriginalLot = bsControlsListView.SelectedItems(0).SubItems(4).Text
                     myForm.PreviusLotDataDS = myPreviousControlLotDS
@@ -1831,7 +1831,7 @@ Public Class IProgControls
             Next
 
             'Inform Properties and open the auxiliary screen of Tests selection
-            Using myForm As New IWSTestSelectionAuxScreen
+            Using myForm As New UiWSTestSelectionAuxScreen
                 myForm.WorkingModel = GlbSourceScreen.MODEL2.ToString()
                 myForm.ControlID = selectedControlID
                 myForm.ListOfSelectedTests = myTests
@@ -2059,7 +2059,7 @@ Public Class IProgControls
                 Dim myDependeciesElementsDS As DependenciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                 If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                    Using AffectedElement As New IWarningAfectedElements
+                    Using AffectedElement As New UiWarningAfectedElements
                         AffectedElement.AffectedElements = myDependeciesElementsDS
 
                         AffectedElement.ShowDialog()
@@ -2101,7 +2101,7 @@ Public Class IProgControls
                 Dim myDependeciesElementsDS As DependenciesElementsDS = DirectCast(myGlobalDataTO.SetDatos, DependenciesElementsDS)
 
                 If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                    Using AffectedElement As New IWarningAfectedElements
+                    Using AffectedElement As New UiWarningAfectedElements
                         AffectedElement.AffectedElements = myDependeciesElementsDS
                         AffectedElement.ShowDialog()
 
@@ -2154,7 +2154,7 @@ Public Class IProgControls
                         Dim myDependeciesElementsDS As DependenciesElementsDS = DirectCast(resultData.SetDatos, DependenciesElementsDS)
 
                         If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
-                            Using AffectedElement As New IWarningAfectedElements
+                            Using AffectedElement As New UiWarningAfectedElements
                                 AffectedElement.AffectedElements = myDependeciesElementsDS
 
                                 AffectedElement.ShowDialog()

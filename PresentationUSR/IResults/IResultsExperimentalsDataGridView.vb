@@ -22,7 +22,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 'Imports DevExpress.Utils
 
 
-Partial Class IResults
+Partial Class UiResults
 
     Dim CollapseColumnExperimentals As New bsDataGridViewCollapseColumn
 

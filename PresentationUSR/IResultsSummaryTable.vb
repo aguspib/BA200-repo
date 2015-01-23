@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.PresentationCOM
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.PresentationCOM.XRManager
 
-Public Class IResultsSummaryTable
+Public Class UiResultsSummaryTable
 
 #Region "Declarations"
 

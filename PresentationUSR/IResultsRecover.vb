@@ -5,7 +5,7 @@ Option Infer On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 
-Public Class IResultsRecover
+Public Class UiResultsRecover
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constructor"
@@ -15,7 +15,7 @@ Public Class IResultsRecover
 #End Region
 
 #Region "Declarations"
-    
+
 #End Region
 
 #Region "Private Methods"
