@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
 Imports DevExpress.XtraGrid.Views.Grid 'DL 24/07/2012
 Imports System.Timers 'AG 31/01/2014 - BT #1486
-
+Imports Biosystems.Ax00.PresentationCOM
 
 ' Remarks
 ' -------
