@@ -7,6 +7,8 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports System.Globalization
+Imports Biosystems.Ax00.PresentationCOM
+Imports PesentationLayer.RotorUtils
 
 'Put here your common business code for the Rotors tabs inside Monitor Form
 Partial Public Class UiMonitor
@@ -2049,7 +2051,7 @@ Partial Public Class UiMonitor
                                     ' WE 07/10/2014 BA-1965 - Only get Exp.date for Reagents, not for Special Solutions (they don´t have Exp.date in Barcodes).
                                     If Not myCellPosInfoDS.PositionInformation(0).BarcodeInfo = "" AndAlso myCellPosInfoDS.PositionInformation(0).BarcodeStatus = "OK" _
                                             AndAlso myCellPosInfoDS.PositionInformation(0).Content = "REAGENT" Then
-                                        myCellPosInfoDS.Reagents(0).ExpirationDate = GetReagentExpDateFromBarCode(myCellPosInfoDS.PositionInformation(0).BarcodeInfo)
+                                        myCellPosInfoDS.Reagents(0).ExpirationDate = GetReagentExpDateFromBarCode(myCellPosInfoDS.PositionInformation(0).BarcodeInfo, Me)
                                     End If
                                     'TR 28/03/2014 -END.
                                 End If
@@ -2138,46 +2140,6 @@ Partial Public Class UiMonitor
     End Sub
 
 
-    ''' <summary>
-    ''' Get the Expiration date from the reagent barcode information.
-    ''' </summary>
-    ''' <param name="pReagentBarcode"></param>
-    ''' <returns>Valid datepart in pReagentBarcode ==> Expiration Date.
-    '''          Datepart in pReagentBarcode represents invalid date ==> Date.MinValue</returns>
-    ''' <remarks>
-    ''' Created by:  TR 28/03/2014
-    ''' Modified by: TR 10/04/2014 bt #1583-Initialize the ExpirationDate variable to min Date value.
-    '''              XB 10/07/2014 - DateTime to Invariant Format (MM dd yyyy) - Bug #1673
-    '''              WE 07/10/2014 - Extend code with check on Month field to prevent String to Date Conversion Error shown on screen (BA-1965).
-    ''' </remarks>
-    Private Function GetReagentExpDateFromBarCode(pReagentBarcode As String) As Date
-        Dim ExpirationDate As Date = Date.MinValue
-        Try
-            Dim myMonth As String = ""
-            Dim myYear As String = ""
-            If pReagentBarcode <> "" Then
-                'The month start on position 6 to 7 (2pos)
-                myMonth = pReagentBarcode.Substring(5, 2)
-                'The year start on position 8 to 9 (2pos)
-                myYear = pReagentBarcode.Substring(7, 2)
-                'Add to year expiration the 2000 to avoid error of 1900
-                myYear = "20" & myYear
-
-                'Set the result value.
-                'If myMonth <> "" OrElse myYear <> "" Then
-                If myMonth <> "" AndAlso myYear <> "" AndAlso CInt(myMonth) >= 1 AndAlso CInt(myMonth) <= 12 Then
-                    ' XB 10/07/2014 - DateTime to Invariant Format - Bug #1673
-                    'Date.TryParse("01" & "-" & myMonth & "-" & myYear, ExpirationDate)
-                    'ExpirationDate = CDate(myMonth & "-" & "01" & "-" & myYear).ToString(CultureInfo.InvariantCulture)
-                    ExpirationDate = New DateTime(CInt(myYear), CInt(myMonth), 1)
-                End If
-            End If
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentExpDateFromBarCode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".GetReagentExpDateFromBarCode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-        Return ExpirationDate
-    End Function
 
 
     ''' <summary>

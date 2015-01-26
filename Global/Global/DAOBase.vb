@@ -115,18 +115,7 @@ Namespace Biosystems.Ax00.Global
             'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
-                'Dim cmdText As String = ""
-                'cmdText = " SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED "
 
-                'Dim dbCmd As New SqlClient.SqlCommand
-                'dbCmd.Connection = pDBConnection
-
-                'dbCmd.CommandText = cmdText
-                'dbCmd.ExecuteNonQuery()
-
-                'cmdText = " BEGIN TRANSACTION "
-                'dbCmd.CommandText = cmdText
-                'dbCmd.ExecuteNonQuery()
 
                 GlobalBase.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
 
@@ -137,12 +126,15 @@ Namespace Biosystems.Ax00.Global
 
                     dbCmd.CommandText = " BEGIN TRANSACTION "
                     dbCmd.ExecuteNonQuery()
+                    Debug.WriteLine("MANEL: --> " & dbCmd.Transaction.ToString())
                 End Using
 
             Catch ex As Exception
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
+
+
 
         ''' <summary>
         ''' Commit the Database Transaction that is opened over the specified Database Connection
