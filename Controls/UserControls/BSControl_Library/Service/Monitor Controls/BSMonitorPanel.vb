@@ -222,7 +222,7 @@ Public Class BSMonitorPanel
                             Next
                             If isAdded Then
                                 Dim myControlStruct As New ControlStruct(pControl, pSensorId, pColIndex, pRowIndex, pMin, pMax)
-                                MyClass.ControlList.Add(myControlStruct)
+                                ControlList.Add(myControlStruct)
                                 pControl.RefreshControl()
                                 pControl.Focus()
                                 Exit For
@@ -266,7 +266,7 @@ Public Class BSMonitorPanel
         Dim myGlobal As New GlobalDataTO
 
         Try
-            For Each C As ControlStruct In MyClass.ControlList
+            For Each C As ControlStruct In ControlList
                 'If C.SensorId.ToUpper.Trim = pSensorId.ToUpper.Trim Then
                 If C.SensorId.Trim = pSensorId.Trim Then
                     If TypeOf (C.MonitorControl) Is BSMonitorLED Then
@@ -348,7 +348,7 @@ Public Class BSMonitorPanel
         Dim myGlobal As New GlobalDataTO
 
         Try
-            For Each C As ControlStruct In MyClass.ControlList
+            For Each C As ControlStruct In ControlList
                 'If C.SensorId.ToUpper.Trim = pSensorId.ToUpper.Trim Then
                 If C.SensorId.Trim = pSensorId.Trim Then
                     C.MonitorControl.TitleText = pText

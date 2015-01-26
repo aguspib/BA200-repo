@@ -35,15 +35,15 @@ Namespace Biosystems.Ax00.Controls.UserControls
             InitializeComponent()
 
             ' Add any initialization after the InitializeComponent() call.
-            MyBase.InstrumentationControl = MyClass.IndicatorWidget1
-            MyBase.InstrumentationControl.HideFocusRectangle = True
+            InstrumentationControl = IndicatorWidget1
+            InstrumentationControl.HideFocusRectangle = True
 
-            MyBase.TextValueElementName = "LabelValue"
+            TextValueElementName = "LabelValue"
 
             InitializeColors()
 
-            MyClass.SetRealValue(RealValueAttr)
-            MyClass.SetTextValue(CInt(PercentValueAttr).ToString + "%")
+            SetRealValue(RealValueAttr)
+            SetTextValue(CInt(PercentValueAttr).ToString + "%")
 
         End Sub
 
@@ -75,16 +75,16 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 If value <> CurrentStatusAttr Then
                     Select Case value
                         Case Status.DISABLED
-                            MyClass.SetTextForeColor(Color.DimGray)
+                            SetTextForeColor(Color.DimGray)
 
                         Case Status._ON
-                            MyClass.TextForeColor = TextForeColorAttr
+                            TextForeColor = TextForeColorAttr
 
                         Case Status._OFF
-                            MyClass.SetTextForeColor(Color.Red)
+                            SetTextForeColor(Color.Red)
 
                         Case Status.TIMEOUT
-                            MyClass.TextForeColor = TextForeColorAttr
+                            TextForeColor = TextForeColorAttr
 
                     End Select
 

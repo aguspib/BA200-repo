@@ -27,9 +27,9 @@ Namespace Biosystems.Ax00.Controls.UserControls
             InitializeComponent()
 
             ' Add any initialization after the InitializeComponent() call.
-            'MyBase.InstrumentPanel = MyClass.InstrumentPanel
-            MyBase.InstrumentationControl = MyClass.IndicatorWidget1
-            MyBase.InstrumentationControl.HideFocusRectangle = True
+            'InstrumentPanel = InstrumentPanel
+            InstrumentationControl = IndicatorWidget1
+            InstrumentationControl.HideFocusRectangle = True
 
         End Sub
 
@@ -53,44 +53,34 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     Select Case value
                         Case Status.DISABLED
                             Dim myColors As New List(Of Color)
-                            'If CurrentStatusAttr = Status._ON Then
-                            '    myColors.Add(Color.LightGreen)
-                            '    myColors.Add(Color.Honeydew)
-                            'ElseIf CurrentStatusAttr = Status._OFF Then
-                            '    myColors.Add(Color.LightCoral)
-                            '    myColors.Add(Color.LightPink)
-                            'Else
-                            '    myColors.Add(Color.Gray)
-                            '    myColors.Add(Color.White)
-                            'End If
-                            'MyClass.LightColor = myColors
 
                             myColors.Add(Color.Gray)
                             myColors.Add(Color.White)
-                            MyClass.LightColor = myColors
+                            LightColor = myColors
 
                         Case Status._ON
                             Dim myColors As New List(Of Color)
                             myColors.Add(Color.Green)
                             myColors.Add(Color.LightGreen)
-                            MyClass.LightColor = myColors
+                            LightColor = myColors
 
                         Case Status._OFF
                             Dim myColors As New List(Of Color)
                             myColors.Add(Color.Red)
                             myColors.Add(Color.Pink)
-                            MyClass.LightColor = myColors
+                            LightColor = myColors
 
                         Case Status.TIMEOUT
                             Dim myColors As New List(Of Color)
                             myColors.Add(Color.LightGray)
                             myColors.Add(Color.White)
-                            MyClass.LightColor = myColors
+                            LightColor = myColors
 
                         Case Status.EXCEPTION
 
                     End Select
 
+                    'correct usage of MyBase here: (no shadowing) MIC
                     MyBase.CurrentStatus = value
 
                     CurrentStatusAttr = value
@@ -119,7 +109,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                     LightColorAttr.Clear()
                     LightColorAttr.Add(value(0))
                     LightColorAttr.Add(value(1))
-                    MyClass.SetLightColor(LightColorAttr)
+                    SetLightColor(LightColorAttr)
                 End If
             End Set
         End Property
@@ -157,7 +147,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
         Private Sub SetLightColor(ByVal pColors As List(Of Color))
             'Try
             If pColors.Count = 2 Then
-                MyClass.SetElementSphericalColor(MyClass.InstrumentationControl, MyClass.MainCircleElementName, pColors(0), pColors(1), 225)
+                SetElementSphericalColor(InstrumentationControl, MainCircleElementName, pColors(0), pColors(1), 225)
             End If
             'Catch ex As Exception
             '    Throw ex
