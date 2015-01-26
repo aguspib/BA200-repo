@@ -38,7 +38,7 @@ Partial Public Class UiMonitor
             bsOpticalPictureBox.ImageLocation = MyBase.IconsPath & LEGREACTIONOPTICAL_IconName
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReagentLegendArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReagentLegendArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareReagentLegendArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -84,7 +84,7 @@ Partial Public Class UiMonitor
             bsReactionsPositionInfoLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "TITLE_RotorPos_InfoPos", LanguageID)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentTabLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentTabLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetReagentTabLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -100,8 +100,8 @@ Partial Public Class UiMonitor
     ''' </remarks>
     Private Sub RefreshReactionsRotor(ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
-            CreateLogActivity("RefreshReactionsRotor (Init): " + IsDisposed.ToString(), Name & ".RefreshReactionsRotor ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
-            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshReactionsRotor ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity("RefreshReactionsRotor (Init): " + IsDisposed.ToString(), Name & ".RefreshReactionsRotor ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            'GlobalBase.CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshReactionsRotor ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             If (IsDisposed) Then Exit Sub 'IT 03/06/2014 - #1644 No refresh if screen is disposed
 
@@ -166,7 +166,7 @@ Partial Public Class UiMonitor
             GlobalBase.CreateLogActivity("Refresh reactions rotor: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshReactionsRotor", EventLogEntryType.Information, False) 'AG 04/07/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshReactionsRotor ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshReactionsRotor ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshReactionsRotor", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try

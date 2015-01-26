@@ -236,10 +236,10 @@ Public Class BSBaseForm
     ''' <remarks>
     ''' Created by:  TR
     ''' </remarks>
+    <Obsolete("Use GlobalBase.CreateLogActivity instead. there's no need to have duplicate implementations of this!")>
     Public Sub CreateLogActivity(ByVal Message As String, ByVal LogModule As String, ByVal LogType As EventLogEntryType, _
                                  ByVal InformSystem As Boolean)
         Try
-            'Dim myGlobalbase As New GlobalBase
             GlobalBase.CreateLogActivity(Message, LogModule, LogType, InformSystem)
         Catch ex As Exception
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
@@ -398,9 +398,9 @@ Public Class BSBaseForm
                                             WarningMsgDisplayed += 1
 
                                             If ExceptionIDHResult = GlobalConstants.HResult_OutOfMemoryException Then
-                                                CreateLogActivity("Display a message instead of a catched 'Out Of Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+                                                GlobalBase.CreateLogActivity("Display a message instead of a catched 'Out Of Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
                                             Else
-                                                CreateLogActivity("Display a message instead of a catched 'Insufficient Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+                                                GlobalBase.CreateLogActivity("Display a message instead of a catched 'Insufficient Memory Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
                                             End If
                                         Else
                                             Exit Try
@@ -414,7 +414,7 @@ Public Class BSBaseForm
                                         '    msgText = GlobalConstants.MAX_APP_MEMORY_USAGE
                                         '    myMessageType = "Information"
                                         '    WarningMsgDisplayed += 1
-                                        '    CreateLogActivity("Display a message instead of a catched 'Timeout Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
+                                        '    GlobalBase.CreateLogActivity("Display a message instead of a catched 'Timeout Exception'", "BSBaseForm.ShowMessage", EventLogEntryType.Error, False)
                                         'Else
                                         '    Exit Try
                                         'End If
@@ -437,7 +437,7 @@ Public Class BSBaseForm
                         'If (myMessagesDS.tfmwMessages(0).MessageType = "Error") Then
                         If (myMessageType = "Error") Then
                             ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
-                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
 
                             'Error Message 
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -460,7 +460,7 @@ Public Class BSBaseForm
                             'ElseIf (myMessagesDS.tfmwMessages(0).MessageType = "FailureAudit") Then
                         ElseIf (myMessageType = "FailureAudit") Then
                             ' XB 29/05/2014 - Write into the Log what error messages are displayed on screen
-                            CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
+                            GlobalBase.CreateLogActivity("This message is shown to the user: '" & msgText & "'", "BSBaseForm.ShowMessage", EventLogEntryType.Information, False)
 
                             'System Error Message - FailureAudit
                             result = MessageBox.Show(pOwnerWindow, msgText, windowTitleText, MessageBoxButtons.OK, MessageBoxIcon.Stop)
@@ -509,7 +509,7 @@ Public Class BSBaseForm
             End If 'AG 15/03/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ShowMessage", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowMessage", EventLogEntryType.Error, False)
 
         End Try
 
@@ -715,7 +715,7 @@ Public Class BSBaseForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.ShowMultipleMessage", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.ShowMultipleMessage", EventLogEntryType.Error, False)
 
         End Try
 
@@ -750,7 +750,7 @@ Public Class BSBaseForm
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.GetMessageText ", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.GetMessageText ", EventLogEntryType.Error, False)
         End Try
         Return textMessage
     End Function
@@ -770,7 +770,7 @@ Public Class BSBaseForm
             Dim myApplicationSessionManager As New ApplicationSessionManager
             myApplicationInfoSession = GlobalBase.GetSessionInfo()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.GetApplicationInfoSession", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.GetApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
         Return myApplicationInfoSession
     End Function
@@ -793,7 +793,7 @@ Public Class BSBaseForm
             Dim myApplicationSessionManager As New ApplicationSessionManager
             result = myApplicationSessionManager.InitializeSession(pUserName, pUserLevel, IconsPath, pLanguageID)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.InitializeApplicationInfoSession", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.InitializeApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
         Return result
     End Function
@@ -812,7 +812,7 @@ Public Class BSBaseForm
             Dim myApplicationSessionManager As New ApplicationSessionManager
             result = myApplicationSessionManager.ResetSession()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, "BSBaseForm.ResetApplicationInfoSession", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.ResetApplicationInfoSession", EventLogEntryType.Error, False)
         End Try
         Return result
     End Function
@@ -840,7 +840,7 @@ Public Class BSBaseForm
                 result = isNumber.Match(pValueToValidate).Success
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ValidateNumericValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateNumericValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return result
@@ -871,7 +871,7 @@ Public Class BSBaseForm
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetIconPath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetIconPath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myIconName
@@ -912,7 +912,7 @@ Public Class BSBaseForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".AddIconToImageList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AddIconToImageList", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -937,7 +937,7 @@ Public Class BSBaseForm
                 myResult = True
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ValidateSpecialCharacters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateSpecialCharacters ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myResult
@@ -1006,7 +1006,7 @@ Public Class BSBaseForm
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetHelpFilePath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetHelpFilePath ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myHelpPath
@@ -1035,7 +1035,7 @@ Public Class BSBaseForm
                 ShowMessage("", myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetScreenChapter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenChapter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return mySceenHelpChapter
@@ -1077,7 +1077,7 @@ Public Class BSBaseForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
                                                     GetApplicationInfoSession().ActivateSystemLog)
             'Show error message
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
@@ -1094,7 +1094,7 @@ Public Class BSBaseForm
                 ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), myGlobalDataTO.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetSATReportDirectory ", EventLogEntryType.Error, _
                                                     GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
@@ -1252,7 +1252,7 @@ Public Class BSBaseForm
 
     'SGM 05/01/2012
     Private Sub FormBack_Exception(ByVal ex As Exception) Handles FormBack.ExceptionHappened
-        CreateLogActivity(ex.Message, Me.Name & ".FormBack", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormBack", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         ShowMessage(Me.Name & ".FormBack", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     End Sub
 
@@ -1578,7 +1578,7 @@ Public Class BSBaseForm
     '            End Select
     '        Next
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, "BSBaseForm.GetScreenTexts ", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.GetScreenTexts ", EventLogEntryType.Error, False)
     '        ShowMessage("BSBaseForm.GetScreenTexts ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -1633,7 +1633,7 @@ Public Class BSBaseForm
 
     '        myDataSet.Tables.Add(myTable)
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, "BSBaseForm.CreateTempDataSet ", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.CreateTempDataSet ", EventLogEntryType.Error, False)
     '        ShowMessage("BSBaseForm.CreateTempDataSet ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     '    Return myDataSet
@@ -1694,7 +1694,7 @@ Public Class BSBaseForm
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, "BSBaseForm.InsertScreenTexts ", EventLogEntryType.Error, False)
+    '        GlobalBase.CreateLogActivity(ex.Message, "BSBaseForm.InsertScreenTexts ", EventLogEntryType.Error, False)
     '        ShowMessage("BSBaseForm.InsertScreenTexts ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -1736,7 +1736,7 @@ Public Class BSBaseForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BSBaseForm_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BSBaseForm_FormClosed", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BSBaseForm_FormClosed", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1802,7 +1802,7 @@ Public Class BSBaseForm
             Next
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " EnableDisableControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " EnableDisableControls ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
         End Try
 

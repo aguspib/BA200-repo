@@ -96,7 +96,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             MyClass.SimulatedResponse = ""
@@ -129,7 +129,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StartReadingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartReadingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -152,7 +152,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -177,7 +177,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StartUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -195,7 +195,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StopUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StopUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -215,7 +215,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnUTILTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnUTILTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -240,7 +240,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StartANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -258,7 +258,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StopANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StopANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -279,7 +279,7 @@ Public Class FormXavi
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnANSINFOTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnANSINFOTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -1450,7 +1450,7 @@ Public Class FormXavi
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsCommTestings_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         Finally
@@ -1465,7 +1465,7 @@ Public Class FormXavi
             BsReceivedTextBox.Clear()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsClearReception_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         End Try
@@ -1481,7 +1481,7 @@ Public Class FormXavi
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsRestore_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsRestore_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsRestore_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub

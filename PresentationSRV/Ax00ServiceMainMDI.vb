@@ -521,7 +521,7 @@ Public Class Ax00ServiceMainMDI
             AddHandler myDriveDetector.DeviceRemoved, AddressOf OnDeviceRemoved
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " New ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " New ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'RH: At this point the Ax00ServiceMainMDI new object does not exist yet.
             'As the ShowMessage() method references Ax00ServiceMainMDI object as the parent window,
             'we can't call it here, so we call MessageBox.Show() instead.
@@ -1088,7 +1088,7 @@ Public Class Ax00ServiceMainMDI
                                                 End If
 
                                                 Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
-                                                CreateLogActivity("Read Adjustments (3)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
+                                                GlobalBase.CreateLogActivity("Read Adjustments (3)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
 
                                             End If
                                             'Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
@@ -1540,7 +1540,7 @@ Public Class Ax00ServiceMainMDI
                                         Me.MDIAnalyzerManager.ClearQueueToSend()
                                         If Not myGlobal.HasError AndAlso Me.MDIAnalyzerManager.Connected Then
                                             Me.SEND_STANDBY()
-                                            CreateLogActivity("Send Standby ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Error, False)
+                                            GlobalBase.CreateLogActivity("Send Standby ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Error, False)
                                         End If
 
                                     ElseIf Me.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
@@ -1557,7 +1557,7 @@ Public Class Ax00ServiceMainMDI
                                                 End If
                                             End If
                                             Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
-                                            CreateLogActivity("Read Adjustments (1)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
+                                            GlobalBase.CreateLogActivity("Read Adjustments (1)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
                                         End If
                                     End If
 
@@ -2043,7 +2043,7 @@ Public Class Ax00ServiceMainMDI
                             If Not Me.MDIAnalyzerManager.IsStressing AndAlso Me.MDIAnalyzerManager.IsUserConnectRequested Then
                                 Me.CheckAnalyzerInfo = True
                                 Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
-                                CreateLogActivity("Read Adjustments (2)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Read Adjustments (2)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
                                 Exit Try
                             ElseIf Not Me.MDIAnalyzerManager.IsStressing AndAlso Not Me.CheckAnalyzerInfo Then
                                 Me.CheckAnalyzerInfo = True
@@ -2180,7 +2180,7 @@ Public Class Ax00ServiceMainMDI
                 ShowMessage(Name & ".SetWSActiveDataFromDB ", dataToReturn.ErrorCode, dataToReturn.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".SetWSActiveDataFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".SetWSActiveDataFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetWSActiveDataFromDB ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2230,7 +2230,7 @@ Public Class Ax00ServiceMainMDI
             If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = ApplicationLogManager.DeleteAll()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".CleanApplicationLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".CleanApplicationLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CleanApplicationLog ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2306,13 +2306,13 @@ Public Class Ax00ServiceMainMDI
 
                 Me.bsAnalyzerStatus.Text = "NOT CONNECTED"
 
-                CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".ShowTimeoutMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".ShowTimeoutMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode, myAdtionalText)
             End If
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowTimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowTimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowTimeoutMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2355,7 +2355,7 @@ Public Class Ax00ServiceMainMDI
             ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowISETimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowISETimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowISETimeoutMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2482,7 +2482,7 @@ Public Class Ax00ServiceMainMDI
     '        '        Next
     '        '        ' XBC 15/11/2011 - Add more info to solve communications problems with adjustments screens
 
-    '        '        CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".MDIAnalyzerManager.SendEvent", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        '        GlobalBase.CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".MDIAnalyzerManager.SendEvent", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        '        ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode, myAdtionalText)
     '        '    End If
     '        'End If
@@ -2597,7 +2597,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".OnDeviceRemoved ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".OnDeviceRemoved ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OnDeviceRemoved ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2640,7 +2640,7 @@ Public Class Ax00ServiceMainMDI
             ' XBC 09/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSConnectButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSConnectButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTSConnectButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -2663,7 +2663,7 @@ Public Class Ax00ServiceMainMDI
             Me.ShutDownAnalyzer()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSShutdownButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSShutdownButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTSShutdownButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2705,7 +2705,7 @@ Public Class Ax00ServiceMainMDI
 
                     ' XBC 07/11/2012
                 Else
-                    CreateLogActivity("Error when remove Error Codes List", Me.Name & ".bsTSRecoverButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                    GlobalBase.CreateLogActivity("Error when remove Error Codes List", Me.Name & ".bsTSRecoverButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                     ShowMessage(Me.Name & ".bsTSRecoverButton_Click ", Messages.SYSTEM_ERROR.ToString, "Error when remove Error Codes List", Me)
                 End If
                 ' XBC 07/11/2012
@@ -2713,7 +2713,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsTSRecover_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsTSRecover_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSRecover_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -2733,7 +2733,7 @@ Public Class Ax00ServiceMainMDI
             myErrCodesForm.ShowDialog()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsTSWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsTSWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSWarningButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2757,7 +2757,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ActivateScreenEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ActivateScreenEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ActivateScreenEvent ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3010,7 +3010,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " InitializeMonitor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " InitializeMonitor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3121,7 +3121,7 @@ Public Class Ax00ServiceMainMDI
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".GetMonitorLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetMonitorLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetMonitorLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobalDataTO
@@ -3194,7 +3194,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " BsInfoTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " BsInfoTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3205,7 +3205,7 @@ Public Class Ax00ServiceMainMDI
             BsInfoTimer.Enabled = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_On ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_On ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3230,7 +3230,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_Off ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_Off ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3458,7 +3458,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_WASH ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_WASH ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_WASH", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3489,7 +3489,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_SLEEP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_SLEEP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_SLEEP", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3521,7 +3521,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_STANDBY ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_STANDBY ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_STANDBY ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3549,7 +3549,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_RESET ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_RESET ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_RESET ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3578,7 +3578,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_READ_ADJUSTMENTS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_READ_ADJUSTMENTS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_READ_ADJUSTMENTS ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3614,7 +3614,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_ISE_COMMAND ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_ISE_COMMAND ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_ISE_COMMAND ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3664,7 +3664,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_START( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_START( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_INFO_START ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3712,7 +3712,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_STOP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_STOP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_INFO_STOP ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3751,7 +3751,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_POLLFW( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_POLLFW( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_POLLFW ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3798,7 +3798,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_BARCODE_CONFIG ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_BARCODE_CONFIG ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_BARCODE_CONFIG ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3831,7 +3831,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_SDPOLL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_SDPOLL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_SDPOLL ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3862,7 +3862,7 @@ Public Class Ax00ServiceMainMDI
             Dim myInstrumUpdateForm As New UiInstrumentUpdateUtil(pForceToFirmwareUpdate)
             OpenMDIChildForm(myInstrumUpdateForm)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".OpenInstrumentUpdateToolScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenInstrumentUpdateToolScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -4157,7 +4157,7 @@ Public Class Ax00ServiceMainMDI
             ' XBC 24/10/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -4322,7 +4322,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message, Me.Name & ".ActivateActionButtonBar ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ActivateActionButtonBar ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & " ActivateActionButtonBar, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4336,7 +4336,7 @@ Public Class Ax00ServiceMainMDI
             End If
 #End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WriteDebugConsoleTraceLine ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WriteDebugConsoleTraceLine ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & " WriteDebugConsoleTraceLine, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4390,7 +4390,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".ReadSensorAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSensorAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadSensorAdjustmentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4432,7 +4432,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write Error in the Application Log and show the message
-            CreateLogActivity(ex.Message, Me.Name & ".ReadAllFwAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadAllFwAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadAllFwAdjustments ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4473,7 +4473,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write Error in the Application Log and show the message
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4504,7 +4504,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write Error in the Application Log and show the message
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareMenuOptions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4523,7 +4523,7 @@ Public Class Ax00ServiceMainMDI
             Me.BorrameToolStripMenuItem.Visible = (myCurrentUser >= USER_LEVEL.lBIOSYSTEMS)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareMenuOptions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -4538,7 +4538,7 @@ Public Class Ax00ServiceMainMDI
             Dim myDummyInfoTextControl As New BsXPSViewer
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " PrepareInformation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " PrepareInformation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4696,7 +4696,7 @@ Public Class Ax00ServiceMainMDI
             End If
         Catch ex As Exception
             screenOpened = False
-            CreateLogActivity(ex.Message, Me.Name & ".OpenMDIChildForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenMDIChildForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".OpenMDIChildForm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -4895,7 +4895,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".CloseApplication ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CloseApplication ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CloseApplication ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -5105,7 +5105,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".ShutDownAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShutDownAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ShutDownAnalyzer ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -5150,7 +5150,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetAnalyzerInfo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5182,7 +5182,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".GetAnalyzerInfo2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -5214,7 +5214,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdatePreliminaryHomesMasterData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5244,7 +5244,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".UpdatePreliminaryHomesMasterData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -5427,7 +5427,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             Me.MDIAnalyzerManager.IsUserConnectRequested = False
-            CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Connect ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         Finally
@@ -5527,7 +5527,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".Connect ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
     '    Finally
@@ -5591,7 +5591,7 @@ Public Class Ax00ServiceMainMDI
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WaitControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WaitControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
 
     End Sub
@@ -5627,7 +5627,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareWaitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWaitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareWaitingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5725,7 +5725,7 @@ Public Class Ax00ServiceMainMDI
             Me.NotConnectedText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NOT_CONNECTED", CurrentLanguageAttribute)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5748,7 +5748,7 @@ Public Class Ax00ServiceMainMDI
             OpenMDIChildForm(AnalyzerInfo)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".OpenAnalyzerInfoScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenAnalyzerInfoScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -5777,7 +5777,7 @@ Public Class Ax00ServiceMainMDI
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".DeactivateANSINFRefreshingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DeactivateANSINFRefreshingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".DeactivateANSINFRefreshingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -5837,7 +5837,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".MaintenanceLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MaintenanceLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -5871,7 +5871,7 @@ Public Class Ax00ServiceMainMDI
             Me.Connect()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAutoConnect_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5895,7 +5895,7 @@ Public Class Ax00ServiceMainMDI
             AutoConnectProcess = False
 
             If String.Compare(AutoConnectFailsTitle, "", False) <> 0 Then
-                CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".BsAutoConnect_DoWork", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".BsAutoConnect_DoWork", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ' XBC 25/10/2011 - message is shown in method OnManageSentEvent
                 'Me.ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode)
                 Me.isWaitingForConnected = False 'SGM 16/11/2011
@@ -6043,7 +6043,7 @@ Public Class Ax00ServiceMainMDI
         Catch ex As Exception
             Me.ReconnectRequested = False
             Me.isWaitingForConnected = False
-            CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAutoConnect_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6089,7 +6089,7 @@ Public Class Ax00ServiceMainMDI
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsWaitStandBy_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6130,7 +6130,7 @@ Public Class Ax00ServiceMainMDI
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsWaitStandBy_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6149,7 +6149,7 @@ Public Class Ax00ServiceMainMDI
             'Me.A400ServiceHelpProvider.SetHelpNavigator(Me, HelpNavigator.TableOfContents)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".SetHelpProvider ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".SetHelpProvider ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6201,7 +6201,7 @@ Public Class Ax00ServiceMainMDI
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".Ax00MainMDI_MdiChildActivate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Ax00MainMDI_MdiChildActivate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".Ax00MainMDI_MdiChildActivate ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -6242,7 +6242,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Ax00ServiceMainMDI_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6357,7 +6357,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal = Me.MDIAnalyzerManager.LoadAppFwScriptsData()
             If myGlobal.HasError Or myGlobal Is Nothing Then
                 ' Loading Data Scripts failed !!! PDT !!! localització text !!!
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name, GlobalEnumerates.Messages.SRV_FWSCRIPTS_NOT_LOADED.ToString)
                 Me.ErrorStatusLabel.Text = GetMessageText(myGlobal.ErrorCode)
                 'Application.Exit()
@@ -6371,7 +6371,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal = Me.MDIAnalyzerManager.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
             If myGlobal.HasError Or myGlobal.SetDatos Is Nothing Then
                 ' Loading Adjustments failed 
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name, GlobalEnumerates.Messages.SRV_FWADJ_MASTER_NOK.ToString)
                 Me.ErrorStatusLabel.Text = GetMessageText(myGlobal.ErrorCode)
                 'Application.Exit()
@@ -6419,7 +6419,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             Me.Cursor = Cursors.Default
-            CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Ax00ServiceMainMDI_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6435,7 +6435,7 @@ Public Class Ax00ServiceMainMDI
         Try
             Me.bsTSDateLabel.Text = String.Format("{0} {1}", Today.ToShortDateString(), Now.ToShortTimeString())
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".TestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".TestsToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6456,7 +6456,7 @@ Public Class Ax00ServiceMainMDI
             'Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UsersManagementToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UsersManagementToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UsersManagementToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -6520,7 +6520,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " ApplicationClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " ApplicationClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6540,7 +6540,7 @@ Public Class Ax00ServiceMainMDI
     '        OpenMDIChildForm(myConfigAnalyzers)
     '        'Cursor = Cursors.Default
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Name & ".AnalyzerToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Name & ".AnalyzerToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".AnalyzerToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    Finally
     '        Cursor = Cursors.Default
@@ -6564,7 +6564,7 @@ Public Class Ax00ServiceMainMDI
             OpenMDIChildForm(myConfigAnalyzers)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSAnalysersButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSAnalysersButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTSAnalysersButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6587,7 +6587,7 @@ Public Class Ax00ServiceMainMDI
 
             OpenMDIChildForm(FwScriptsEdition)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".HeadPToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".HeadPToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6634,7 +6634,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & PositionsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PositionsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PositionsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6659,7 +6659,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & PhotometryToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PhotometryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PhotometryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6699,7 +6699,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & TankLevelsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".TankLevelsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TankLevelsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6726,7 +6726,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & StressTestToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StressTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StressTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6745,7 +6745,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & DemoModeToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DemoModeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DemoModeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6772,7 +6772,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & MotorsTestToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6786,7 +6786,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & AnalyzerInfoToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".AnalyzerInfoToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AnalyzerInfoToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6815,7 +6815,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsMonitorSensorsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsMonitorSensorsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6862,7 +6862,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & ThermosTestToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6889,7 +6889,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & CycleCountsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".CycleCountsToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CycleCountsToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6909,7 +6909,7 @@ Public Class Ax00ServiceMainMDI
             MessageBox.Show("Pending to define")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSEmergencyButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSEmergencyButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("bsTSEmergencyButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6939,7 +6939,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WithOutShutDownToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WithOutShutDownToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("WithOutShutDownToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6964,7 +6964,7 @@ Public Class Ax00ServiceMainMDI
                 Me.Text = My.Application.Info.ProductName & " - " & InstrumentUpdateToolStripMenuItem.Text
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".AdjustmentsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AdjustmentsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6981,7 +6981,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & HistoryToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".HistoryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".HistoryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7011,7 +7011,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WithShutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WithShutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7070,16 +7070,16 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            'CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            'GlobalBase.CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
             If DirectCast(ex, System.ComponentModel.Win32Exception).ErrorCode = -2147467259 Then
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("OperationGuideToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_ERROR_READER", CurrentLanguageAttribute))
             Else
-                CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("OperationGuideToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             End If
 
@@ -7098,7 +7098,7 @@ Public Class Ax00ServiceMainMDI
         Try
             'Pending
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".MaintenancePlanToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".MaintenancePlanToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7116,7 +7116,7 @@ Public Class Ax00ServiceMainMDI
         Try
             'Pending
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".TroubleshooterToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".TroubleshooterToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7135,7 +7135,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & LevelDetectionToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".LevelDetectionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LevelDetectionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7154,7 +7154,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & BarCodeToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BarCodeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BarCodeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7181,7 +7181,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & ISEModuleToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ISEModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ISEModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7203,7 +7203,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & SettingsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SettingsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SettingsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7225,7 +7225,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & ChangeRotorToolStripMenuItem.Text
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ChangeRotorToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ChangeRotorToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7245,7 +7245,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & BarcodesConfigToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BarcodesConfigToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BarcodesConfigToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7270,7 +7270,7 @@ Public Class Ax00ServiceMainMDI
             OpenMDIChildForm(myConfigAnalyzers)
             'Cursor = Cursors.Default
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GeneralToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GeneralToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GeneralToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7287,7 +7287,7 @@ Public Class Ax00ServiceMainMDI
             'Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UserToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7299,7 +7299,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UtilitiesToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7320,7 +7320,7 @@ Public Class Ax00ServiceMainMDI
             OpenMDIChildForm(myLogin)
             'Cursor = Cursors.Default
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UserToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7337,7 +7337,7 @@ Public Class Ax00ServiceMainMDI
             'Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".LanguageToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".LanguageToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7360,7 +7360,7 @@ Public Class Ax00ServiceMainMDI
             OpenMDIChildForm(myAbout)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".AboutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".AboutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -7382,7 +7382,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".AdjustmentsTestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".AdjustmentsTestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AdjustmentsTestsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7402,7 +7402,7 @@ Public Class Ax00ServiceMainMDI
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7419,7 +7419,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".CommonForms_Closed2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".CommonForms_Closed2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7441,7 +7441,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7470,7 +7470,7 @@ Public Class Ax00ServiceMainMDI
             '' XBC 20/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".CommonForms_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".CommonForms_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7484,7 +7484,7 @@ Public Class Ax00ServiceMainMDI
             MDIAnalyzerManager.IsConfigGeneralProcess = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GeneralConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GeneralConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7505,7 +7505,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ErrCodesForm_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ErrCodesForm_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7689,7 +7689,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ManageAlarmStep1", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ManageAlarmStep1", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ManageAlarmStep1", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7727,7 +7727,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ManageAlarmStep2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ManageAlarmStep2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ManageAlarmStep2", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7789,7 +7789,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowAlarmOrSensorsWarningMessages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowAlarmOrSensorsWarningMessages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowAlarmOrSensorsWarningMessages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7891,7 +7891,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".AlarmFinalTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".AlarmFinalTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AlarmFinalTreatment", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7946,7 +7946,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".RecoverInstrument", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".RecoverInstrument", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RecoverInstrument", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             ScreenWorkingProcess = False
             Me.RecoverRequested = False
@@ -7965,7 +7965,7 @@ Public Class Ax00ServiceMainMDI
             'TODO
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -7986,7 +7986,7 @@ Public Class Ax00ServiceMainMDI
             MyClass.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -8006,7 +8006,7 @@ Public Class Ax00ServiceMainMDI
             MyClass.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".On_CommonScreenStopOperationFinished ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".On_CommonScreenStopOperationFinished ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".On_CommonScreenStopOperationFinished ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8019,7 +8019,7 @@ Public Class Ax00ServiceMainMDI
             MyClass.ActivateActionButtonBar(True, False, isSleeping)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".On_ConfigGeneralIsClosed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".On_ConfigGeneralIsClosed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".On_ConfigGeneralIsClosed ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8057,7 +8057,7 @@ Public Class Ax00ServiceMainMDI
 
             'end SGM 25/10/2012
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -8102,10 +8102,10 @@ Public Class Ax00ServiceMainMDI
             If DirectCast(ex, System.ComponentModel.Win32Exception).ErrorCode = -2147467259 Then
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("UserManualToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_ERROR_READER", CurrentLanguageAttribute))
             Else
-                CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("UserManualToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             End If
 
@@ -8127,7 +8127,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default

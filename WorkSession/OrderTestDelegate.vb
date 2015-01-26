@@ -8301,7 +8301,7 @@ Namespace Biosystems.Ax00.BL
 		''' <remarks>
 		''' Created by:  SA 13/05/2010
 		''' Modified by: SA 31/01/2012 - Set to Nothing all declared Lists; do not declare variables inside loops
-		'''              RH 12/04/2012 - If the collection is empty then do nothing. Update method name in CreateLogActivity()
+		'''              RH 12/04/2012 - If the collection is empty then do nothing. Update method name in GlobalBase.CreateLogActivity()
 		'''              SA 13/04/2012 - After get the list of Calculated Tests in which the Test in process is included, use TRIM to compare
 		'''                              calcIDs(i) with parameter pCalcTestID (the split adds empty spaces on the rigth)
 		''' </remarks>

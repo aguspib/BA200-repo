@@ -51,7 +51,7 @@ Public Class UiMsgBox
         Try
             'from images to ImageList
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadIconImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadIconImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -71,7 +71,7 @@ Public Class UiMsgBox
             Me.BsMessageLabel.Height = CType(StringSize.Height, Integer)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetMessageText", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SetMessageText", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -128,7 +128,7 @@ Public Class UiMsgBox
             Me.ButtonsLayoutPanel.Refresh()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SetButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -162,7 +162,7 @@ Public Class UiMsgBox
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SetIconImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SetIconImage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 
@@ -182,7 +182,7 @@ Public Class UiMsgBox
             Me.Close()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".On_Button_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".On_Button_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
 
     End Sub
@@ -191,7 +191,7 @@ Public Class UiMsgBox
         Try
             Me.Height = Me.BsMessageLabel.Height + 100
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsMessageLabel_Resize", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsMessageLabel_Resize", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
     End Sub
 End Class

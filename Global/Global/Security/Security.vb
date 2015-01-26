@@ -67,7 +67,7 @@ Namespace Biosystems.Ax00.Global.Security
                 Return encryptedText
 
             Catch ex As Exception
-                CreateLogActivity(ex.Message, "Security.Encryption", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, "Security.Encryption", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
             End Try
             Return encryptedText
         End Function
@@ -90,7 +90,7 @@ Namespace Biosystems.Ax00.Global.Security
                 Return plainText
 
             Catch ex As Exception
-                CreateLogActivity(ex.Message, "Security.Decryption", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, "Security.Decryption", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
             End Try
             Return plainText
 
@@ -140,7 +140,7 @@ Namespace Biosystems.Ax00.Global.Security
                 memStream.Close()
 
             Catch ex As CryptographicException
-                CreateLogActivity(ex.Message, "Security.EncryptTextToMemory", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, "Security.EncryptTextToMemory", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
             End Try
             Return encryptedTest
         End Function
@@ -189,7 +189,7 @@ Namespace Biosystems.Ax00.Global.Security
                 plainText = New ASCIIEncoding().GetString(plainTextBytes)
 
             Catch ex As CryptographicException
-                CreateLogActivity(ex.Message, "Security.DecryptTextFromMemory", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, "Security.DecryptTextFromMemory", EventLogEntryType.Error, GetSessionInfo.ActivateSystemLog)
             End Try
             Return plainText
         End Function

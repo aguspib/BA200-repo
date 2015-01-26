@@ -251,7 +251,7 @@ Public Class FormSergio
             myGlobal.HasError = True
             myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ImportAdjustmentsRestoreFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ImportAdjustmentsRestoreFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ImportAdjustmentsRestoreFile", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1073,7 +1073,7 @@ Public Class FormSergio
 
            
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".RefreshScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".RefreshScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RefreshScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1147,7 +1147,7 @@ Public Class FormSergio
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ManageAlarmTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ManageAlarmTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ManageAlarmTreatment", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1174,7 +1174,7 @@ Public Class FormSergio
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowAlarmMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowAlarmMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowAlarmMessage", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1201,7 +1201,7 @@ Public Class FormSergio
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".StopCurrentOperation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".StopCurrentOperation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".StopCurrentOperation", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1211,7 +1211,7 @@ Public Class FormSergio
         Try
             'each screen must set its elements disabled unless Exit button
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".PrepareErrorMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".PrepareErrorMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareErrorMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

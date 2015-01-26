@@ -675,7 +675,7 @@ Namespace Biosystems.Ax00.Global
                 End If
 
             Catch ex As Exception
-                CreateLogActivity(ex.Message, "ApplicationSessionManager.GetSessionInfo", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.GetSessionInfo", EventLogEntryType.Error, False)
             End Try
 
             Return MyApplicationInfoSession
@@ -706,7 +706,7 @@ Namespace Biosystems.Ax00.Global
             End If
 
             'Write error in the Application Log
-            CreateLogActivity(errMsg & " " & errDoc & " " & errMethod & ": " & errLine, _
+            GlobalBase.CreateLogActivity(errMsg & " " & errDoc & " " & errMethod & ": " & errLine, _
                               errDoc & "." & errMethod & ": " & errLine, _
                               EventLogEntryType.Error, False)
             'Catch ex As Exception
