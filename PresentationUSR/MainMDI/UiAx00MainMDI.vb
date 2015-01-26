@@ -1929,7 +1929,7 @@ Partial Public Class UiAx00MainMDI
 
                     'TR 10/07/2013 - Shrink the Database before close the application
                     Dim myDataBaseUpdateManagerDelegate As New DataBaseUpdateManagerDelegate
-                    myDataBaseUpdateManagerDelegate.ShrinkDatabase(Biosystems.Ax00.DAL.DAOBase.CurrentDB, Nothing)
+                    myDataBaseUpdateManagerDelegate.ShrinkDatabase(Biosystems.Ax00.Global.DAOBase.CurrentDB, Nothing)
 
                     'BT #1588 - SQL Services are not stopped
                     '#If (Not Debug) Then

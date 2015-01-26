@@ -375,10 +375,10 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
 
                 If pServer Is Nothing Then
                     'Create a new server control
-                    pServer = New Server(DAL.DAOBase.DBServer)
+                    pServer = New Server(DAOBase.DBServer)
                     pServer.ConnectionContext.LoginSecure = False
-                    pServer.ConnectionContext.Login = DAL.DAOBase.DBLogin
-                    pServer.ConnectionContext.Password = DAL.DAOBase.DBPassword
+                    pServer.ConnectionContext.Login = DAOBase.DBLogin
+                    pServer.ConnectionContext.Password = DAOBase.DBPassword
                 End If
 
                 myGlobalDataTO.SetDatos = myDataBaseMangDelegate.RunDatabaseScript(pServer, pDataBaseName, myShrinkScript)

@@ -7,10 +7,10 @@ Imports Biosystems.Ax00.Global
 
 
 
-Namespace Biosystems.Ax00.DAL
-    Public Class DAOBase
-        Inherits [Global].DAL.DAOBase
+'Namespace Biosystems.Ax00.DAL
+'    Public Class DAOBase
+'        Inherits [Global].DAL.DAOBase
 
-    End Class
+'    End Class
 
-End Namespace
+'End Namespace

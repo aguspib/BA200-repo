@@ -4,7 +4,7 @@ Option Strict On
 
 
 
-Namespace Biosystems.Ax00.Global.DAL
+Namespace Biosystems.Ax00.Global
 
     Public Class DAOBase
 

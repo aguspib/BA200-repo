@@ -127,7 +127,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationLogManager\ApplicationLog.vb" />
-    <Compile Include="ApplicationLogManager\DAOBase.vb" />
+    <Compile Include="DAOBase.vb" />
     <Compile Include="ApplicationLogManager\tfmwApplicationLogDAO.vb" />
     <Compile Include="Extensions.vb" />
     <Compile Include="FwAdjustments\ArmTO.vb" />
