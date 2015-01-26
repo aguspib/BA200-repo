@@ -11793,5 +11793,4 @@ Partial Public Class UiAx00MainMDI
 
 #End Region
 
-  
 End Class

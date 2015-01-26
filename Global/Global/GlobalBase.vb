@@ -628,9 +628,9 @@ Namespace Biosystems.Ax00.Global
                     End While
 
                     '2.- We append the call stack information, with delimiters (to make it a bit easier to read)
-                    exceptionDesc.Append(vbCr & vbCr & "<CallStack>")
+                    exceptionDesc.Append(vbCr & vbCr & "CallStack:" & vbCr)
                     exceptionDesc.Append(ex.StackTrace)
-                    exceptionDesc.Append("</CallStack>" & vbCr & vbCr)
+                    exceptionDesc.Append(vbCr & "end of CallStack" & vbCr & vbCr)
 
                     '2.- We inspect the exception origin by inspecing the target of main exception 
                     Dim sourceOfException = ex.Source &
