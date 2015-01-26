@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class CalibratorUpdateDAO
-        Inherits DAOBase
+          
 
 #Region "FUNCTIONS FOR NEW UPDATE VERSION PROCESS (NEW AND UPDATED FUNCTIONS)"
         ''' <summary>

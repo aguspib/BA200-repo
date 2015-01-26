@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class BarCodesDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
 

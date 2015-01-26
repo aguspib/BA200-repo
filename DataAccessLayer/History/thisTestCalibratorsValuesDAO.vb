@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisTestCalibratorsValuesDAO
-        Inherits DAOBase
+
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -41,7 +41,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                              " CalibratorNum, TheoreticalConcentration, KitConcentrationRelation) " & vbCrLf & _
                                       " VALUES (" & pHistTestID.ToString & ", '" & pSampleType & "', " & pTestVersionNum.ToString & ", " & vbCrLf & _
                                                     pHistCalibratorID.ToString & ", " & row.CalibratorNum.ToString & ", " & vbCrLf & _
-                                                    ReplaceNumericString(row.TheoricalConcentration) & ", " & ReplaceNumericString(row.KitConcentrationRelation) & ") " & vbCrLf
+                                                    DAOBase.ReplaceNumericString(row.TheoricalConcentration) & ", " & DAOBase.ReplaceNumericString(row.KitConcentrationRelation) & ") " & vbCrLf
 
                             dbCmd.CommandText = cmdText.ToString()
                             resultData.AffectedRecords += dbCmd.ExecuteNonQuery()

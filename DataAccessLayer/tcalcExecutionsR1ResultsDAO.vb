@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tcalcExecutionsR1ResultsDAO
-        Inherits DAOBase
+
 
         Public Function InsertResult(ByVal pDBConnection As SqlClient.SqlConnection, _
                                      ByVal ptcalcExecutionsR1Results As ExecutionsR1ResultsDS.tcalcExecutionsR1ResultsRow) As GlobalDataTO
@@ -39,7 +39,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         'cmdText += ", " & ptcalcExecutionsR1Results.ABS_Value.ToString.Replace(",", ".") & vbCrLf
                         ' Modified by : DL 12/03/2010
-                        cmdText += ", " & ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
+                        cmdText += ", " & DAOBase.ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
                     End If
 
                     If ptcalcExecutionsR1Results.IsReadingNumberNull Then
@@ -104,7 +104,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         'cmdText += "  ABS_Value = " & ptcalcExecutionsR1Results.ABS_Value.ToString.Replace(",", ".") & vbCrLf
                         ' Modified by : DL 12/03/2010
-                        cmdText += "  ABS_Value = " & ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
+                        cmdText += "  ABS_Value = " & DAOBase.ReplaceNumericString(ptcalcExecutionsR1Results.ABS_Value) & vbCrLf
                     End If
 
                     If ptcalcExecutionsR1Results.IsReadingNumberNull Then

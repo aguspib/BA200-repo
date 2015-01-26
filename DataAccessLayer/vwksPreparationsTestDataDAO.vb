@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class vwksPreparationsTestDataDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Get all data contained in view vwksPreparationsTestData for the specified OrderTest Identifier

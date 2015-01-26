@@ -11,7 +11,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
     Partial Public Class tcfgAnalyzerLedPositionsDAO
-        Inherits DAOBase
+          
 
 
 

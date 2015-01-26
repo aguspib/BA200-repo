@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class thisCalibISEDAO
 
-        Inherits DAOBase
+          
 
 
 #Region "CRUD Methods"

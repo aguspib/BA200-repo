@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 #Region "Partial twksWSExecutionsDAO Class"
     Partial Public Class TemporalDAO
-        Inherits DAOBase
+          
 
         Public Function Create(ByVal pDBConnection As SqlClient.SqlConnection, _
                               ByVal pTemporalTableDS As TemporalTableDS) As GlobalDataTO

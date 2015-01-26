@@ -13,7 +13,7 @@ namespace Biosystems.Ax00.DAL.DAO
   
 
     Partial Public Class TparTestControlsGeneratedDAO
-        Inherits DAOBase
+          
 
 #Region "AUTOMATICALLY GENERATED CODE"
 

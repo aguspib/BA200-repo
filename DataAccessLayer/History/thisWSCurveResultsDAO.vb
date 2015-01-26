@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Types
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisWSCurveResultsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>

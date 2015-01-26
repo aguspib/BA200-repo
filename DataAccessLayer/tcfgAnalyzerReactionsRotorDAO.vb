@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tcfgAnalyzerReactionsRotorDAO
-        Inherits DAOBase
+          
 
 
 #Region "C+R+U+D"

@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tcfgCustomDemographicsDAO
-        Inherits DAOBase
+
 
 #Region "Other Methods"
 

@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Partial Public Class twksImportErrorsLogDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>

@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Types
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class vparAllTestByTypeDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Read by the TestType and TestID and get the LIS Value

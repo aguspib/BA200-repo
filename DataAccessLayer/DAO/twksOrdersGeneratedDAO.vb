@@ -12,7 +12,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
     Partial Public Class TwksOrdersDAO
-        Inherits DAOBase
+          
 
 #Region "AUTOMATICALLY GENERATED CODE"
 

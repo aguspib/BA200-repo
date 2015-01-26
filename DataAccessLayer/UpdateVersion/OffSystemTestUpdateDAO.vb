@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class OffSystemTestUpdateDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Search in FACTORY DB all preloaded OffSystem Tests that do not exists in CUSTOMER DB

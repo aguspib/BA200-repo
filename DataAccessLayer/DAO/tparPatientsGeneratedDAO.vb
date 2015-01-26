@@ -13,7 +13,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
     Partial Public Class TparPatientsDAO
-        Inherits DAOBase
+          
 
 #Region "AUTOMATICALLY GENERATED CODE"
 

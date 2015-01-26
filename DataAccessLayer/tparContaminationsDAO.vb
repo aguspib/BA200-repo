@@ -8,7 +8,7 @@ Imports System.Data.SqlClient
 Imports System.Text
 
 Partial Public Class tparContaminationsDAO
-    Inherits DAOBase
+      
 
 #Region "CRUD Methods"
     ''' <summary>

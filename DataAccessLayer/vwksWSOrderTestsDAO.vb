@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Types
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class vwksWSOrderTestsDAO
-        Inherits DAOBase
+          
 
 #Region "Public Methods"
         ''' <summary>

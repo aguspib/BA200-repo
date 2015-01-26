@@ -8,7 +8,7 @@ Imports System.Data.SqlClient
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tqcResultAlarmsDAO
-        Inherits DAOBase
+          
 
 #Region "TO DELETE - OLD FUNCTIONS"
         '''' <summary>

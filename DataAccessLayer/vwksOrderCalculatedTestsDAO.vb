@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class vwksOrderCalculatedTestsDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Get data (ViewOrderCalculatedTestsDS) with all the OrderTestID (CALC) that used the entry parameter OrderTestID (STD)

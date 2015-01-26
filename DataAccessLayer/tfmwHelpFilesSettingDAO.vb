@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tfmwHelpFilesSettingDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Read the table tfmwHelpFilesSetting by the ID and the Language.

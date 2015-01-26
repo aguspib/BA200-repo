@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Imports System.Data.SqlClient
 
 Partial Public Class tparReagentsDAO
-    Inherits DAOBase
+      
 
     ''' <summary>
     ''' Add new Reagents

@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
     Partial Public Class twksWSReactionsRotorDAO
-        Inherits DAOBase
+          
 
 
 

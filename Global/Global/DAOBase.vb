@@ -6,24 +6,25 @@ Option Strict On
 
 Namespace Biosystems.Ax00.Global
 
-    Public Class DAOBase
+    Public Module DAOBase
 
-        Private Shared DBServerField As String = String.Empty
-        Private Shared CurrentDBField As String = String.Empty
-        Private Shared ConnectionString As String = String.Empty
+
+        Private DBServerField As String = String.Empty
+        Private CurrentDBField As String = String.Empty
+        Private ConnectionString As String = String.Empty
 
         'RH 17/05/2011
-        Private Shared DBLoginField As String = String.Empty
-        Private Shared DBPasswordField As String = String.Empty
+        Private DBLoginField As String = String.Empty
+        Private DBPasswordField As String = String.Empty
 
-        Public Shared ReadOnly Property DBServer() As String
+        Public ReadOnly Property DBServer() As String
             Get
                 If String.IsNullOrEmpty(DBServerField) Then GetConnectionString()
                 Return DBServerField
             End Get
         End Property
 
-        Public Shared ReadOnly Property CurrentDB() As String
+        Public ReadOnly Property CurrentDB() As String
             Get
                 If String.IsNullOrEmpty(CurrentDBField) Then GetConnectionString()
                 Return CurrentDBField
@@ -31,7 +32,7 @@ Namespace Biosystems.Ax00.Global
         End Property
 
         'RH 17/05/2011
-        Public Shared ReadOnly Property DBLogin() As String
+        Public ReadOnly Property DBLogin() As String
             Get
                 If String.IsNullOrEmpty(DBLoginField) Then GetConnectionString()
                 Return DBLoginField
@@ -39,7 +40,7 @@ Namespace Biosystems.Ax00.Global
         End Property
 
         'RH 17/05/2011
-        Public Shared ReadOnly Property DBPassword() As String
+        Public ReadOnly Property DBPassword() As String
             Get
                 If String.IsNullOrEmpty(DBPasswordField) Then GetConnectionString()
                 Return DBPasswordField
@@ -56,7 +57,7 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by: RH 16/11/2010
         ''' Modified by: RH 17/05/2011 Add DB Login and Password.
         ''' </remarks>
-        Public Shared Function GetConnectionString(Optional ByVal pUpdateConnection As Boolean = False) As String
+        Public Function GetConnectionString(Optional ByVal pUpdateConnection As Boolean = False) As String
             Try
                 'Dim mySecurity As New Security.Security
                 'myConnectionString = mySecurity.Decryption(ConfigurationManager.ConnectionStrings("BiosystemsConn").ConnectionString)
@@ -109,7 +110,7 @@ Namespace Biosystems.Ax00.Global
         ''' Created by:  SA
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
-        Public Shared Sub BeginTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+        Public Sub BeginTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
 
             'Dim myLogAcciones As New ApplicationLogManager()
 
@@ -151,7 +152,7 @@ Namespace Biosystems.Ax00.Global
         ''' Created by:  SA
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
-        Public Shared Sub CommitTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+        Public Sub CommitTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
 
             'Dim myLogAcciones As New ApplicationLogManager()
 
@@ -181,7 +182,7 @@ Namespace Biosystems.Ax00.Global
         ''' Created by:  SA
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
-        Public Shared Sub RollbackTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+        Public Sub RollbackTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
             'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
@@ -213,7 +214,7 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by RH 23/05/2011 Remove unneeded SqlConnection object creation,
         '''             so now there is less presure over the Garbage Collector.
         ''' </remarks>
-        Public Shared Function GetOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function GetOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim openConnection As New GlobalDataTO
             'Dim dbConnection As New SqlClient.SqlConnection
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -245,7 +246,7 @@ Namespace Biosystems.Ax00.Global
             Return openConnection
         End Function
 
-        Public Shared Function GetGenericOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As GenericGlobalDataTo(Of SqlClient.SqlConnection)
+        Public Function GetGenericOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As GenericGlobalDataTo(Of SqlClient.SqlConnection)
 
             Dim openConnection As New GenericGlobalDataTo(Of SqlClient.SqlConnection)
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -290,7 +291,7 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by RH 23/05/2011 Remove unneeded SqlConnection object creation,
         '''             so now there is less presure over the Garbage Collector.
         ''' </remarks>
-        Public Shared Function GetOpenDBTransaction(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function GetOpenDBTransaction(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim openTransaction As New GlobalDataTO
             'Dim dbConnection As New SqlClient.SqlConnection
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -364,6 +365,6 @@ Namespace Biosystems.Ax00.Global
             Return resultData
         End Function
 
-    End Class
+    End Module
 
 End Namespace

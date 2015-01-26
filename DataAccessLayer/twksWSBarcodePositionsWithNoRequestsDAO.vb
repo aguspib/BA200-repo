@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Partial Public Class twksWSBarcodePositionsWithNoRequestsDAO
-        Inherits DAOBase
+          
 
 #Region "Declarations"
         'Comparisons by field BarcodeInfo have to be done in a CASE SENSITIVE way. So this SQL Sentence has to

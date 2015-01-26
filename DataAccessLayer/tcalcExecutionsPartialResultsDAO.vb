@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tcalcExecutionsPartialResultsDAO
-        Inherits DAOBase
+          
 
         'Public Function InsertResult(ByVal pDBConnection As SqlClient.SqlConnection, _
         '                             ByVal ptcalcExecutionsPartialResults As ExecutionsPartialResultsDS.tcalcExecutionsPartialResultsRow) As GlobalDataTO
