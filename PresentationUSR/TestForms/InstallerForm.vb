@@ -17,7 +17,7 @@ Public Class InstallerForm
 
     'Public WithEvents MDIAnalyzerManager As AnalyzerManager
 
-    Protected wfPrecarga As Biosystems.Ax00.PresentationCOM.IAx00StartUp
+    Protected wfPrecarga As Biosystems.Ax00.PresentationCOM.UiAx00StartUp
 
 
     Private Sub InstallerForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load

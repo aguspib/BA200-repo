@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.IO
 Imports System.Runtime.InteropServices 'WIN32
 
-Public Class IISEUtilities
+Public Class UiISEUtilities
 
 #Region "Declarations"
     Private WithEvents mdiAnalyzerCopy As AnalyzerManager
@@ -193,12 +193,12 @@ Public Class IISEUtilities
                         End If
 
                     Else
-                            If MyClass.mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
-                                bsScreenErrorProvider.ShowError(MSG_EndProcess)
-                            Else
-                                bsScreenErrorProvider.ShowError(MSG_StartInstrument)
-                            End If
-                            isAvailable = False
+                        If MyClass.mdiAnalyzerCopy.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
+                            bsScreenErrorProvider.ShowError(MSG_EndProcess)
+                        Else
+                            bsScreenErrorProvider.ShowError(MSG_StartInstrument)
+                        End If
+                        isAvailable = False
                     End If
 
                 ElseIf MyClass.myISEManager.IsAnalyzerDisconnected Then
@@ -1176,7 +1176,7 @@ Public Class IISEUtilities
                     'verify if there is any Li+ Test in use
                     Dim InUse As Boolean = MyClass.LithiumTestInUse()
 
-                    Using myForm As New IISEDateElementSelection(myISEManager.IsLiEnabledByUser, InUse)
+                    Using myForm As New UiISEDateElementSelection(myISEManager.IsLiEnabledByUser, InUse)
                         myForm.TitleLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallElectrodes", currentLanguage)
 
                         myForm.Element1Name = "Ref:"    ' myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RefElectrode", currentLanguage)
@@ -1289,7 +1289,7 @@ Public Class IISEUtilities
 
                 Case "ACT_PUMP_TUB"
 
-                    Using myForm As New IISEDateElementSelection()
+                    Using myForm As New UiISEDateElementSelection()
                         myForm.TitleLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallTubing", currentLanguage)
 
                         myForm.Element1Name = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallPumpTubing", currentLanguage)
@@ -1323,7 +1323,7 @@ Public Class IISEUtilities
 
                 Case "ACT_FLUID_TUB"
 
-                    Using myForm As New IISEDateElementSelection()
+                    Using myForm As New UiISEDateElementSelection()
                         myForm.TitleLabel = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallTubing", currentLanguage)
 
                         myForm.Element1Name = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_InstallFluidTubing", currentLanguage)

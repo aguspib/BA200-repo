@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.BL
 Imports System.Globalization
 
 
-Public Class IHistoricalReports
+Public Class UiHistoricalReports
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"

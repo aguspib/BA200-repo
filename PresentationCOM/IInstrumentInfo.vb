@@ -5,7 +5,7 @@ Imports Biosystems.Ax00.BL
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.CommunicationsSwFw  ' XBC 05/06/2012
 
-Public NotInheritable Class IInstrumentInfo
+Public NotInheritable Class UiInstrumentInfo
     Inherits BSBaseForm
 
 #Region "Declarations"

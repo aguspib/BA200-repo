@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.CommunicationsSwFw
 
 
-Public Class ICycleCountScreen
+Public Class UiCycleCountScreen
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'PENDING
@@ -279,7 +279,7 @@ Public Class ICycleCountScreen
         End Try
     End Sub
 
-   
+
 
     ''' <summary>
     ''' Loads the icons and tooltips used for painting the buttons
@@ -460,7 +460,7 @@ Public Class ICycleCountScreen
 
             MyClass.CurrentScreenMode = ScreenModes.INITIATED
 
-            
+
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -632,7 +632,7 @@ Public Class ICycleCountScreen
 
 #Region "UI Prepare Methods"
 
-   
+
 
     ''' <summary>
     ''' Prepares User Interface according to the screen's status
@@ -1984,7 +1984,7 @@ Public Class ICycleCountScreen
     Public Overrides Sub PrepareErrorMode(Optional ByVal pAlarmType As ManagementAlarmTypes = ManagementAlarmTypes.NONE)
         Try
 
-           
+
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

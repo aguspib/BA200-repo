@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
 'Imports System.Runtime.InteropServices 'WIN32
 
-Public Class ITankLevelsAdjustments
+Public Class UiTankLevelsAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 
@@ -55,7 +55,7 @@ Public Class ITankLevelsAdjustments
     '    OK = 1
     '    NOK = 2
     'End Enum
-   
+
 #End Region
 
 #Region "Declarations"
@@ -63,7 +63,7 @@ Public Class ITankLevelsAdjustments
     'Screen's business delegate
     Private WithEvents myScreenDelegate As TankLevelsAdjustmentDelegate
 
-    Private SelectedPage As ITankLevelsAdjustments.ADJUSTMENT_PAGES = ADJUSTMENT_PAGES.SCALES
+    Private SelectedPage As UiTankLevelsAdjustments.ADJUSTMENT_PAGES = ADJUSTMENT_PAGES.SCALES
 
     Private SelectedAdjustmentsDS As New SRVAdjustmentsDS
     Private TemporalAdjustmentsDS As New SRVAdjustmentsDS
@@ -1849,7 +1849,7 @@ Public Class ITankLevelsAdjustments
         End Try
     End Sub
 
-    
+
 
 #Region "History Methods"
 
@@ -5183,5 +5183,5 @@ Public Class ITankLevelsAdjustments
 
 #End Region
 
-    
+
 End Class

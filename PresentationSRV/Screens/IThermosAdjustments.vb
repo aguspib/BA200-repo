@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.BL
 'Imports DevExpress.XtraCharts
 'Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class IThermosAdjustments
+Public Class UiThermosAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Enumerations"

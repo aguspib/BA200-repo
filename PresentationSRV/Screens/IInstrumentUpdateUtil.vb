@@ -25,7 +25,7 @@ Imports System.Xml.Serialization
 'FWUTIL
 
 
-Public Class IInstrumentUpdateUtil
+Public Class UiInstrumentUpdateUtil
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 
@@ -2708,7 +2708,7 @@ Public Class IInstrumentUpdateUtil
         'End Try
     End Sub
 
-  
+
 
 #End Region
 
@@ -3987,10 +3987,10 @@ Public Class IInstrumentUpdateUtil
                                 MyClass.PrepareArea()
                                 myCPUUpdateResponseData = Nothing
                             End If
-                            Else
-                                'In case of second time received ignore it
-                                Exit Sub
-                            End If
+                        Else
+                            'In case of second time received ignore it
+                            Exit Sub
+                        End If
                     Else
 
                         MyBase.CurrentMode = ADJUSTMENT_MODES.FW_UTIL_RECEIVED

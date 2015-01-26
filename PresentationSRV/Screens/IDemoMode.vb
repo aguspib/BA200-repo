@@ -6,7 +6,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 
-Public Class IDemoMode
+Public Class UiDemoMode
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"
@@ -133,7 +133,7 @@ Public Class IDemoMode
         Return True
     End Function
 
-    
+
 
 #End Region
 
@@ -896,5 +896,5 @@ Public Class IDemoMode
     End Sub
 
 #End Region
-    
+
 End Class

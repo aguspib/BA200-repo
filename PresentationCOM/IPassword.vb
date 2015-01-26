@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.BL
 Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
 
-Public Class IPassword
+Public Class UiPassword
 
 #Region "Definitions"
     'Private changesMade As Boolean = False

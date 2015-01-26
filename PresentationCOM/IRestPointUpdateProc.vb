@@ -14,7 +14,7 @@ Imports System.Drawing
 Imports System.Windows.Forms
 
 
-Public Class IRestPointUpdateProc
+Public Class UiRestPointUpdateProc
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Properties"

@@ -11,7 +11,7 @@ Imports System.Drawing
 Imports System.Windows.Forms
 
 
-Public Class ISettings
+Public Class UiSettings
 
 
 #Region "Constructor"

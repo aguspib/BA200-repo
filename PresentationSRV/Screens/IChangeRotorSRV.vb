@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 
 
 
-Public Class IChangeRotorSRV
+Public Class UiChangeRotorSRV
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Constructor"
@@ -109,7 +109,7 @@ Public Class IChangeRotorSRV
         End Try
     End Sub
 
-   
+
 
     ''' <summary>
     ''' 
@@ -622,7 +622,7 @@ Public Class IChangeRotorSRV
             Exit Sub
 
 
-           
+
 
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".bsContinueButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)

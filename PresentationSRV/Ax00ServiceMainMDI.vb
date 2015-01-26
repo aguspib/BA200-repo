@@ -57,7 +57,7 @@ Public Class Ax00ServiceMainMDI
 
     'DL 20/04/2012
     'Protected wfWaitScreen As Biosystems.Ax00.PresentationCOM.IAx00StartUp
-    Protected wfWaitScreen As Biosystems.Ax00.PresentationCOM.WaitScreen
+    Protected wfWaitScreen As Biosystems.Ax00.PresentationCOM.UiWaitScreen
     'DL 20/04/2012
 
 
@@ -535,21 +535,21 @@ Public Class Ax00ServiceMainMDI
 
 #Region "Common Forms"
 
-    Private WithEvents myLanguageConfig As IConfigLanguage
-    Private WithEvents myConfigAnalyzers As IConfigGeneral
+    Private WithEvents myLanguageConfig As UiConfigLanguage
+    Private WithEvents myConfigAnalyzers As UiConfigGeneral
     'Private WithEvents myChangePassword As IPassword
-    Private WithEvents myLogin As IAx00Login
-    Private WithEvents myConfigUsers As IConfigUsers
-    Private WithEvents mySettings As ISettings
-    Private WithEvents myISEUtilities As IISEUtilities ' XBC 05/02/2012 ISE Utilities placed into PresetationCOM layer
-    Private WithEvents myConfigBarCode As IBarCodesConfig ' XBC 14/02/2012 Barcodes Configuration placed into PresetationCOM layer
-    Private WithEvents myAbout As IAboutBox 'RH 28/03/2012
-    Private WithEvents myInstrumentInfo As IInstrumentInfo
-    Private WithEvents myChangeRotor As IChangeRotorSRV
+    Private WithEvents myLogin As UiAx00Login
+    Private WithEvents myConfigUsers As UiConfigUsers
+    Private WithEvents mySettings As UiSettings
+    Private WithEvents myISEUtilities As UiISEUtilities ' XBC 05/02/2012 ISE Utilities placed into PresetationCOM layer
+    Private WithEvents myConfigBarCode As UiBarCodesConfig ' XBC 14/02/2012 Barcodes Configuration placed into PresetationCOM layer
+    Private WithEvents myAbout As UiAboutBox 'RH 28/03/2012
+    Private WithEvents myInstrumentInfo As UiInstrumentInfo
+    Private WithEvents myChangeRotor As UiChangeRotorSRV
 #End Region
 
 #Region "Another Forms"
-    Private WithEvents myErrCodesForm As IErrorCodes    ' XBC 07/11/2012
+    Private WithEvents myErrCodesForm As UiErrorCodes    ' XBC 07/11/2012
 #End Region
 
 #Region "Communications Events"
@@ -631,8 +631,8 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             'SGM 18/09/2012 - Refresh ISE Utilities
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
@@ -733,8 +733,8 @@ Public Class Ax00ServiceMainMDI
 
                         ' Refresh Instrument Update Utility screen
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As IInstrumentUpdateUtil = CType(ActiveMdiChild, IInstrumentUpdateUtil)
+                            If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
+                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.STANDBY_START
@@ -754,8 +754,8 @@ Public Class Ax00ServiceMainMDI
 
                         ' Refresh Thermos Adjustment screen
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IThermosAdjustments) Then
-                                Dim CurrentMdiChild As IThermosAdjustments = CType(ActiveMdiChild, IThermosAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
+                                Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -784,8 +784,8 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Positions Adjustment screen
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IPositionsAdjustments) Then
-                                Dim CurrentMdiChild As IPositionsAdjustments = CType(ActiveMdiChild, IPositionsAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
+                                Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -813,8 +813,8 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Motors Test screen
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                            If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -846,8 +846,8 @@ Public Class Ax00ServiceMainMDI
                         ' XBC 20/02/2012 
                         ' Refresh Photometry Adjustment screen 
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IPhotometryAdjustments) Then
-                                Dim CurrentMdiChild As IPhotometryAdjustments = CType(ActiveMdiChild, IPhotometryAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiPhotometryAdjustments) Then
+                                Dim CurrentMdiChild As UiPhotometryAdjustments = CType(ActiveMdiChild, UiPhotometryAdjustments)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -875,8 +875,8 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Change Rotor screen
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IChangeRotorSRV) Then
-                                Dim CurrentMdiChild As IChangeRotorSRV = CType(ActiveMdiChild, IChangeRotorSRV)
+                            If (TypeOf ActiveMdiChild Is UiChangeRotorSRV) Then
+                                Dim CurrentMdiChild As UiChangeRotorSRV = CType(ActiveMdiChild, UiChangeRotorSRV)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -900,8 +900,8 @@ Public Class Ax00ServiceMainMDI
 
                         'SGM 18/09/2012 - Refresh ISE Utilities 
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
                         End If
@@ -1082,7 +1082,7 @@ Public Class Ax00ServiceMainMDI
                                             ElseIf Not Me.MDIAnalyzerManager.IsStressing Then
 
                                                 If Not ActiveMdiChild Is Nothing Then
-                                                    If (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                                                    If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                                         Exit Try
                                                     End If
                                                 End If
@@ -1183,8 +1183,8 @@ Public Class Ax00ServiceMainMDI
                             ' XBC 16/05/2012
                             ' Refresh Stress Mode screen
                             If Not ActiveMdiChild Is Nothing Then
-                                If (TypeOf ActiveMdiChild Is IStressModeTest) Then
-                                    Dim CurrentMdiChild As IStressModeTest = CType(ActiveMdiChild, IStressModeTest)
+                                If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
+                                    Dim CurrentMdiChild As UiStressModeTest = CType(ActiveMdiChild, UiStressModeTest)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                             End If
@@ -1233,8 +1233,8 @@ Public Class Ax00ServiceMainMDI
                             If Not ActiveMdiChild Is Nothing Then
 
                                 'SGM 25/10/2012 - reset Collision Detected Sensor
-                                If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                    Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                    Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                                 'end SGM 25/10/2012
@@ -1329,8 +1329,8 @@ Public Class Ax00ServiceMainMDI
 
                                 If Not ActiveMdiChild Is Nothing Then
                                     ' Refresh Tank Levels screen
-                                    If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
-                                        Dim CurrentMdiChild As ITankLevelsAdjustments = CType(ActiveMdiChild, ITankLevelsAdjustments)
+                                    If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
+                                        Dim CurrentMdiChild As UiTankLevelsAdjustments = CType(ActiveMdiChild, UiTankLevelsAdjustments)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1341,8 +1341,8 @@ Public Class Ax00ServiceMainMDI
                                     'End If
 
                                     ' Refresh Thermos screen
-                                    If (TypeOf ActiveMdiChild Is IThermosAdjustments) Then
-                                        Dim CurrentMdiChild As IThermosAdjustments = CType(ActiveMdiChild, IThermosAdjustments)
+                                    If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
+                                        Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1357,8 +1357,8 @@ Public Class Ax00ServiceMainMDI
 
                                     'SGM 17/04/2012
                                     ' Refresh Motors screen (for the moment no POLHW values can be obtained from Fw so some values will be obtained by means of ANSINF)
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1552,7 +1552,7 @@ Public Class Ax00ServiceMainMDI
                                             Exit Try
                                         ElseIf Not Me.MDIAnalyzerManager.IsStressing Then
                                             If Not ActiveMdiChild Is Nothing Then
-                                                If (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                                                If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                                     Exit Try
                                                 End If
                                             End If
@@ -1587,8 +1587,8 @@ Public Class Ax00ServiceMainMDI
 
                         ' Instrument Update Utility screen
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As IInstrumentUpdateUtil = CType(ActiveMdiChild, IInstrumentUpdateUtil)
+                            If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
+                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
                         End If
@@ -1623,8 +1623,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1639,8 +1639,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1658,8 +1658,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1674,8 +1674,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1694,10 +1694,10 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IPhotometryAdjustments) Or _
-                                    (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
+                                    If (TypeOf ActiveMdiChild Is UiPhotometryAdjustments) Or _
+                                    (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
 
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1712,8 +1712,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1740,8 +1740,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1768,8 +1768,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Level Detection screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ILevelDetectionTest) Then
-                                        Dim CurrentMdiChild As ILevelDetectionTest = CType(ActiveMdiChild, ILevelDetectionTest)
+                                    If (TypeOf ActiveMdiChild Is UiLevelDetectionTest) Then
+                                        Dim CurrentMdiChild As UiLevelDetectionTest = CType(ActiveMdiChild, UiLevelDetectionTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1796,8 +1796,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1821,8 +1821,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1857,8 +1857,8 @@ Public Class Ax00ServiceMainMDI
 
                             ' Refresh BarCode Info screen
                             If Not ActiveMdiChild Is Nothing Then
-                                If (TypeOf ActiveMdiChild Is IBarCodeAdjustments) Then
-                                    Dim CurrentMdiChild As IBarCodeAdjustments = CType(ActiveMdiChild, IBarCodeAdjustments)
+                                If (TypeOf ActiveMdiChild Is UiBarCodeAdjustments) Then
+                                    Dim CurrentMdiChild As UiBarCodeAdjustments = CType(ActiveMdiChild, UiBarCodeAdjustments)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                             End If
@@ -1879,13 +1879,13 @@ Public Class Ax00ServiceMainMDI
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
-                            If (TypeOf ActiveMdiChild Is IStressModeTest) Then
-                                Dim CurrentMdiChild As IStressModeTest = CType(ActiveMdiChild, IStressModeTest)
+                            If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
+                                Dim CurrentMdiChild As UiStressModeTest = CType(ActiveMdiChild, UiStressModeTest)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
@@ -1983,8 +1983,8 @@ Public Class Ax00ServiceMainMDI
                         '
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As IInstrumentUpdateUtil = CType(ActiveMdiChild, IInstrumentUpdateUtil)
+                            If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
+                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 Return True 'not to refresh sensors
 
@@ -2012,8 +2012,8 @@ Public Class Ax00ServiceMainMDI
                             If MyResultsStressTest.Status = STRESS_STATUS.UNFINISHED Then
 
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If Not (TypeOf ActiveMdiChild Is IStressModeTest) And _
-                                        Not (TypeOf ActiveMdiChild Is IDemoMode) Then
+                                    If Not (TypeOf ActiveMdiChild Is UiStressModeTest) And _
+                                        Not (TypeOf ActiveMdiChild Is UiDemoMode) Then
                                         'Dim CurrentMdiChild As IStressModeTest = CType(ActiveMdiChild, IStressModeTest)
                                         'CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                         openStressScreen = True
@@ -2035,7 +2035,7 @@ Public Class Ax00ServiceMainMDI
                         Else
 
                             If Not ActiveMdiChild Is Nothing Then
-                                If (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                                If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                     Exit Try
                                 End If
                             End If
@@ -2258,15 +2258,15 @@ Public Class Ax00ServiceMainMDI
                 Dim myAdtionalText As String = ""
                 For Each oForm As Form In Me.MdiChildren
                     If oForm Is AnalyzerInfo Or _
-                       oForm Is IPositionsAdjustments Or _
-                       oForm Is IPhotometryAdjustments Or _
-                       oForm Is ITankLevelsAdjustments Or _
-                       oForm Is IMotorsPumpsValvesTest Or _
-                       oForm Is IThermosAdjustments Or _
-                       oForm Is IStressModeTest Or _
-                       oForm Is IDemoMode Or _
-                       oForm Is IInstrumentUpdateUtil Or _
-                       oForm Is IChangeRotorSRV Or _
+                       oForm Is UiPositionsAdjustments Or _
+                       oForm Is UiPhotometryAdjustments Or _
+                       oForm Is UiTankLevelsAdjustments Or _
+                       oForm Is UiMotorsPumpsValvesTest Or _
+                       oForm Is UiThermosAdjustments Or _
+                       oForm Is UiStressModeTest Or _
+                       oForm Is UiDemoMode Or _
+                       oForm Is UiInstrumentUpdateUtil Or _
+                       oForm Is UiChangeRotorSRV Or _
                        oForm Is FwScriptsEdition Then
 
                         myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_ERR_COMM2", CurrentLanguageAttribute)
@@ -2412,8 +2412,8 @@ Public Class Ax00ServiceMainMDI
 
                     If Not ActiveMdiChild Is Nothing Then
 
-                        If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                            Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                            Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                             CurrentMdiChild.PrepareErrorMode()
                         End If
 
@@ -2584,8 +2584,8 @@ Public Class Ax00ServiceMainMDI
                     If Not ActiveMdiChild Is Nothing Then
                         '- Configuration screen (close screen without save changes)
                         ' The 1st idea was update the ports combo but it was CANCELED due a system error was triggered and it was difficult to solve
-                        If (TypeOf ActiveMdiChild Is IConfigGeneral) Then
-                            Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                        If (TypeOf ActiveMdiChild Is UiConfigGeneral) Then
+                            Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                             Dim emptyRefreshDS As UIRefreshDS = Nothing
                             Dim emptyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
                             CurrentMdiChild.RefreshScreen(emptyRefreshEventList, emptyRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
@@ -2728,7 +2728,7 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>Created by XBC 07/11/2012</remarks>
     Private Sub bsTSWarningButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSWarningButton.Click
         Try
-            myErrCodesForm = New IErrorCodes
+            myErrCodesForm = New UiErrorCodes
 
             myErrCodesForm.ShowDialog()
 
@@ -3138,7 +3138,7 @@ Public Class Ax00ServiceMainMDI
 
             If Me.SimulationMode Then
                 If Not ActiveMdiChild Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
+                    If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
                         Me.SimulateINFO_Off()
                         continousSimulation = False
                     End If
@@ -3163,18 +3163,18 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             ' Refresh Tank Levels screen
-                            If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
-                                Dim CurrentMdiChild As ITankLevelsAdjustments = CType(ActiveMdiChild, ITankLevelsAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
+                                Dim CurrentMdiChild As UiTankLevelsAdjustments = CType(ActiveMdiChild, UiTankLevelsAdjustments)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                             ' Refresh Motors, Pumps Valves screen
-                            If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                            If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                             ' Refresh Thermos screen
-                            If (TypeOf ActiveMdiChild Is IThermosAdjustments) Then
-                                Dim CurrentMdiChild As IThermosAdjustments = CType(ActiveMdiChild, IThermosAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
+                                Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                         End If
@@ -3859,7 +3859,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            Dim myInstrumUpdateForm As New IInstrumentUpdateUtil(pForceToFirmwareUpdate)
+            Dim myInstrumUpdateForm As New UiInstrumentUpdateUtil(pForceToFirmwareUpdate)
             OpenMDIChildForm(myInstrumUpdateForm)
         Catch ex As Exception
             CreateLogActivity(ex.Message, Me.Name & ".OpenInstrumentUpdateToolScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -3911,8 +3911,8 @@ Public Class Ax00ServiceMainMDI
 
             ' XBC 22/05/2012
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IPositionsAdjustments) Then
-                    Dim CurrentMdiChild As IPositionsAdjustments = CType(ActiveMdiChild, IPositionsAdjustments)
+                If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
+                    Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
                     If CurrentMdiChild.IsCenteringOptic Then
                         pEnable = False
                     End If
@@ -4180,8 +4180,8 @@ Public Class Ax00ServiceMainMDI
 
             ' XBC 22/05/2012
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IPositionsAdjustments) Then
-                    Dim CurrentMdiChild As IPositionsAdjustments = CType(ActiveMdiChild, IPositionsAdjustments)
+                If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
+                    Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
                     If CurrentMdiChild.IsCenteringOptic Then
                         pEnabled = False
                     End If
@@ -4623,8 +4623,8 @@ Public Class Ax00ServiceMainMDI
                                 screenOpened = False
 
                                 'SGM 10/05/2012
-                                If TypeOf ActiveMdiChild Is IISEUtilities Then
-                                    Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                                If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                                    Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                     myISEUtilities.myScreenPendingToOpenWhileISEUtilClosing = pScreenToOpen
                                 Else
                                     ' XBC 20/04/2012
@@ -4725,33 +4725,33 @@ Public Class Ax00ServiceMainMDI
                     If Me.ActiveMdiChild.AcceptButton IsNot Nothing Then
                         'SGM 28/03/2012
                         If TypeOf ActiveMdiChild Is BSAdjustmentBaseForm Then
-                            If Not (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                            If Not (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                 Dim myBaseAdjForm As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                                 myBaseAdjForm.CloseWithoutShutDownRequestedByMDI = True
                                 myBaseAdjForm.CloseRequestedByMDI = True
-                                If TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest Then
-                                    Dim myMotorsForm As IMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, IMotorsPumpsValvesTest)
+                                If TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest Then
+                                    Dim myMotorsForm As UiMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     If Not myMotorsForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is IPositionsAdjustments Then
-                                    Dim myPosForm As IPositionsAdjustments = CType(Me.ActiveMdiChild, IPositionsAdjustments)
+                                If TypeOf ActiveMdiChild Is UiPositionsAdjustments Then
+                                    Dim myPosForm As UiPositionsAdjustments = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
                                     If Not myPosForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is ITankLevelsAdjustments Then
-                                    Dim myTankForm As ITankLevelsAdjustments = CType(Me.ActiveMdiChild, ITankLevelsAdjustments)
+                                If TypeOf ActiveMdiChild Is UiTankLevelsAdjustments Then
+                                    Dim myTankForm As UiTankLevelsAdjustments = CType(Me.ActiveMdiChild, UiTankLevelsAdjustments)
                                     If Not myTankForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is IBarCodeAdjustments Then
-                                    Dim myBarcodeForm As IBarCodeAdjustments = CType(Me.ActiveMdiChild, IBarCodeAdjustments)
+                                If TypeOf ActiveMdiChild Is UiBarCodeAdjustments Then
+                                    Dim myBarcodeForm As UiBarCodeAdjustments = CType(Me.ActiveMdiChild, UiBarCodeAdjustments)
                                     If Not myBarcodeForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
@@ -4765,8 +4765,8 @@ Public Class Ax00ServiceMainMDI
                                 '    End If
                                 'End If
                             End If
-                        ElseIf TypeOf ActiveMdiChild Is IISEUtilities Then
-                            Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        ElseIf TypeOf ActiveMdiChild Is UiISEUtilities Then
+                            Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
 
                             'SGM 19/09/2012
                             If Not myISEUtilities.IsCompletelyClosed Then
@@ -4826,7 +4826,7 @@ Public Class Ax00ServiceMainMDI
                 'RH 03/11/2010 Wait until Ax00MDBackGround.RunWorkerAsync() is completed
                 'DL 20/04/2012
                 'Using wfPreload As New Biosystems.Ax00.PresentationCOM.IAx00StartUp(Me)
-                Using wfPreload As New Biosystems.Ax00.PresentationCOM.WaitScreen(Me)
+                Using wfPreload As New Biosystems.Ax00.PresentationCOM.UiWaitScreen(Me)
                     'dl 20/04/2012
                     wfPreload.Title = "Waiting ongoing processes completion..." 'AG - Not multilanguage text
                     wfPreload.WaitText = "Please wait..." 'AG - Not multilanguage text
@@ -4931,19 +4931,19 @@ Public Class Ax00ServiceMainMDI
                     If Me.ActiveMdiChild.AcceptButton IsNot Nothing Then
                         'SGM 28/03/2012
                         If TypeOf ActiveMdiChild Is BSAdjustmentBaseForm Then
-                            If Not (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                            If Not (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                 Dim myBaseAdjForm As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                                 myBaseAdjForm.CloseWithShutDownRequestedByMDI = True
                                 myBaseAdjForm.CloseRequestedByMDI = True
-                                If TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest Then
-                                    Dim myMotorsForm As IMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, IMotorsPumpsValvesTest)
+                                If TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest Then
+                                    Dim myMotorsForm As UiMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     If Not myMotorsForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is IPositionsAdjustments Then
-                                    Dim myPosForm As IPositionsAdjustments = CType(Me.ActiveMdiChild, IPositionsAdjustments)
+                                If TypeOf ActiveMdiChild Is UiPositionsAdjustments Then
+                                    Dim myPosForm As UiPositionsAdjustments = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
                                     If Not myPosForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
@@ -5579,7 +5579,7 @@ Public Class Ax00ServiceMainMDI
 
             'DL 20/04/2012
             'Me.wfWaitScreen = New IAx00StartUp(Nothing) With {.Title = pTitleText, .WaitText = pWaitText}
-            Me.wfWaitScreen = New WaitScreen(Nothing) With {.Title = pTitleText, .WaitText = pWaitText}
+            Me.wfWaitScreen = New UiWaitScreen(Nothing) With {.Title = pTitleText, .WaitText = pWaitText}
             'DL 20/04/2012            
             Me.wfWaitScreen.Show()
 
@@ -6451,7 +6451,7 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myConfigUsers = New IConfigUsers(Me)
-            myConfigUsers = New IConfigUsers()
+            myConfigUsers = New UiConfigUsers()
             OpenMDIChildForm(myConfigUsers)
             'Cursor = Cursors.Default
 
@@ -6485,9 +6485,9 @@ Public Class Ax00ServiceMainMDI
                 End If
 
                 'SGM 19/09/2012 - special case for ISE utilities screen
-                Dim myISEUtilities As IISEUtilities = Nothing
-                If TypeOf ActiveMdiChild Is IISEUtilities Then
-                    myISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                Dim myISEUtilities As UiISEUtilities = Nothing
+                If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                    myISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                     If myISEUtilities.IsCompletelyClosed Then
                         Me.isWaitingForCloseApp = True
                     End If
@@ -6559,7 +6559,7 @@ Public Class Ax00ServiceMainMDI
         Try
             Application.DoEvents()
             'myConfigAnalyzers = New IConfigGeneral(Me) 'SG 03/12/10
-            myConfigAnalyzers = New IConfigGeneral() 'RH 12/04/2012
+            myConfigAnalyzers = New UiConfigGeneral() 'RH 12/04/2012
             myConfigAnalyzers.ActiveAnalyzer = AnalyzerIDAttribute
             OpenMDIChildForm(myConfigAnalyzers)
 
@@ -6628,7 +6628,7 @@ Public Class Ax00ServiceMainMDI
 
 
 
-            OpenMDIChildForm(IPositionsAdjustments)
+            OpenMDIChildForm(UiPositionsAdjustments)
 
 
             Me.Text = My.Application.Info.ProductName & " - " & PositionsToolStripMenuItem.Text 'SGM 22/02/2012
@@ -6654,7 +6654,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IPhotometryAdjustments)
+            OpenMDIChildForm(UiPhotometryAdjustments)
 
             Me.Text = My.Application.Info.ProductName & " - " & PhotometryToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -6690,7 +6690,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Me.Cursor = Cursors.WaitCursor
 
-            OpenMDIChildForm(ITankLevelsAdjustments)
+            OpenMDIChildForm(UiTankLevelsAdjustments)
 
             ''DELETE
             'Me.StartPosition = FormStartPosition.Manual
@@ -6721,7 +6721,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IStressModeTest)
+            OpenMDIChildForm(UiStressModeTest)
 
             Me.Text = My.Application.Info.ProductName & " - " & StressTestToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -6740,7 +6740,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IDemoMode)
+            OpenMDIChildForm(UiDemoMode)
 
             Me.Text = My.Application.Info.ProductName & " - " & DemoModeToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -6767,7 +6767,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IMotorsPumpsValvesTest)
+            OpenMDIChildForm(UiMotorsPumpsValvesTest)
 
             Me.Text = My.Application.Info.ProductName & " - " & MotorsTestToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -6796,7 +6796,7 @@ Public Class Ax00ServiceMainMDI
             Dim continousSimulation As Boolean = True
             Application.DoEvents()
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
+                If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
                     continousSimulation = False
                 End If
             End If
@@ -6857,7 +6857,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IThermosAdjustments)
+            OpenMDIChildForm(UiThermosAdjustments)
 
             Me.Text = My.Application.Info.ProductName & " - " & ThermosTestToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -6884,7 +6884,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(ICycleCountScreen)
+            OpenMDIChildForm(UiCycleCountScreen)
 
             Me.Text = My.Application.Info.ProductName & " - " & CycleCountsToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -6976,7 +6976,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IHistoricalReports)
+            OpenMDIChildForm(UiHistoricalReports)
 
             Me.Text = My.Application.Info.ProductName & " - " & HistoryToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -7130,7 +7130,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(ILevelDetectionTest)
+            OpenMDIChildForm(UiLevelDetectionTest)
 
             Me.Text = My.Application.Info.ProductName & " - " & LevelDetectionToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -7149,7 +7149,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IBarCodeAdjustments)
+            OpenMDIChildForm(UiBarCodeAdjustments)
 
             Me.Text = My.Application.Info.ProductName & " - " & BarCodeToolStripMenuItem.Text 'SGM 22/02/2012
 
@@ -7173,7 +7173,7 @@ Public Class Ax00ServiceMainMDI
             'OpenMDIChildForm(IIseAdjustments)
 
             'myISEUtilities = New IISEUtilities(Me, Me.SimulationMode)
-            myISEUtilities = New IISEUtilities(Me, Me.SimulationMode)
+            myISEUtilities = New UiISEUtilities(Me, Me.SimulationMode)
             OpenMDIChildForm(myISEUtilities)
             'Cursor = Cursors.Default
             ' XBC 05/02/2012 ISE Utilities placed into PresetationCOM layer
@@ -7196,7 +7196,7 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'mySettings = New ISettings(Me)
-            mySettings = New ISettings()
+            mySettings = New UiSettings()
             OpenMDIChildForm(mySettings)
             'Cursor = Cursors.Default
 
@@ -7219,7 +7219,7 @@ Public Class Ax00ServiceMainMDI
     Private Sub ChangeRotorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ChangeRotorToolStripMenuItem.Click
         Try
 
-            myChangeRotor = New IChangeRotorSRV()
+            myChangeRotor = New UiChangeRotorSRV()
             OpenMDIChildForm(myChangeRotor)
 
             Me.Text = My.Application.Info.ProductName & " - " & ChangeRotorToolStripMenuItem.Text
@@ -7238,7 +7238,7 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myConfigBarCode = New IBarCodesConfig(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigBarCode = New IBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
+            myConfigBarCode = New UiBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
             OpenMDIChildForm(myConfigBarCode)
             'Cursor = Cursors.Default
 
@@ -7266,7 +7266,7 @@ Public Class Ax00ServiceMainMDI
             Application.DoEvents()
             'myConfigAnalyzers = New IConfigGeneral(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
             'myConfigAnalyzers = New IConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigAnalyzers = New IConfigGeneral(MyClass.AdjustmentsReaded) With {.ActiveAnalyzer = AnalyzerIDAttribute} 'SGM 21/11/2012
+            myConfigAnalyzers = New UiConfigGeneral(MyClass.AdjustmentsReaded) With {.ActiveAnalyzer = AnalyzerIDAttribute} 'SGM 21/11/2012
             OpenMDIChildForm(myConfigAnalyzers)
             'Cursor = Cursors.Default
         Catch ex As Exception
@@ -7282,7 +7282,7 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myConfigUsers = New IConfigUsers(Me)
-            myConfigUsers = New IConfigUsers()
+            myConfigUsers = New UiConfigUsers()
             OpenMDIChildForm(myConfigUsers)
             'Cursor = Cursors.Default
 
@@ -7316,7 +7316,7 @@ Public Class Ax00ServiceMainMDI
         Try
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
-            myLogin = New IAx00Login(True)
+            myLogin = New UiAx00Login(True)
             OpenMDIChildForm(myLogin)
             'Cursor = Cursors.Default
         Catch ex As Exception
@@ -7332,7 +7332,7 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myLanguageConfig = New IConfigLanguage(Me)
-            myLanguageConfig = New IConfigLanguage()
+            myLanguageConfig = New UiConfigLanguage()
             OpenMDIChildForm(myLanguageConfig)
             'Cursor = Cursors.Default
 
@@ -7352,7 +7352,7 @@ Public Class Ax00ServiceMainMDI
     ''' </remarks>
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
         Try
-            myAbout = New IAboutBox()
+            myAbout = New UiAboutBox()
 
             'Inform the required screen properties and open the screen
             myAbout.IsUser = False
@@ -7665,16 +7665,16 @@ Public Class Ax00ServiceMainMDI
                         Dim CurrentMdiChild As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
-                    ElseIf (TypeOf ActiveMdiChild Is IConfigGeneral) Then 'General screen
-                        Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                    ElseIf (TypeOf ActiveMdiChild Is UiConfigGeneral) Then 'General screen
+                        Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
-                    ElseIf (TypeOf ActiveMdiChild Is IBarCodesConfig) Then 'Barcode config screen
-                        Dim CurrentMdiChild As IBarCodesConfig = CType(ActiveMdiChild, IBarCodesConfig)
+                    ElseIf (TypeOf ActiveMdiChild Is UiBarCodesConfig) Then 'Barcode config screen
+                        Dim CurrentMdiChild As UiBarCodesConfig = CType(ActiveMdiChild, UiBarCodesConfig)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
-                    ElseIf (TypeOf ActiveMdiChild Is IISEUtilities) Then 'ISE Utilities screen
-                        Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    ElseIf (TypeOf ActiveMdiChild Is UiISEUtilities) Then 'ISE Utilities screen
+                        Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
                     Else
@@ -8040,16 +8040,16 @@ Public Class Ax00ServiceMainMDI
                     Dim CurrentMdiChild As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                     CurrentMdiChild.StopCurrentOperation()
 
-                ElseIf TypeOf (ActiveMdiChild) Is IConfigGeneral Then
-                    Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                ElseIf TypeOf (ActiveMdiChild) Is UiConfigGeneral Then
+                    Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                     CurrentMdiChild.StopCurrentOperation()
 
-                ElseIf TypeOf (ActiveMdiChild) Is IBarCodesConfig Then
-                    Dim CurrentMdiChild As IBarCodesConfig = CType(ActiveMdiChild, IBarCodesConfig)
+                ElseIf TypeOf (ActiveMdiChild) Is UiBarCodesConfig Then
+                    Dim CurrentMdiChild As UiBarCodesConfig = CType(ActiveMdiChild, UiBarCodesConfig)
                     CurrentMdiChild.StopCurrentOperation()
 
-                ElseIf TypeOf (ActiveMdiChild) Is IISEUtilities Then
-                    Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                ElseIf TypeOf (ActiveMdiChild) Is UiISEUtilities Then
+                    Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                     CurrentMdiChild.StopCurrentOperation()
 
                 End If
@@ -8120,7 +8120,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            Dim mySATReport As ISATReportSRV = New ISATReportSRV '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
+            Dim mySATReport As UiSATReportSRV = New UiSATReportSRV '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
             OpenMDIChildForm(mySATReport)
 
             Me.Text = My.Application.Info.ProductName & " - " & SATReportsToolStripMenuItem.Text 'SGM 22/02/2012

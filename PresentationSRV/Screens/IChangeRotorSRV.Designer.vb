@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IChangeRotorSRV
+Partial Class UiChangeRotorSRV
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -24,7 +24,7 @@ Partial Class IChangeRotorSRV
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IChangeRotorSRV))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiChangeRotorSRV))
         Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsWSUpDownButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel()

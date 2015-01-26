@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 
-Public Class IStressModeTest
+Public Class UiStressModeTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"

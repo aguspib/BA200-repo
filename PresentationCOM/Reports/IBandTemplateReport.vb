@@ -12,7 +12,7 @@ Imports DevExpress.XtraPrinting
 Imports System.Drawing.Design
 Imports System.Drawing.Imaging
 
-Public Class IBandTemplateReport
+Public Class UiBandTemplateReport
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declarations"

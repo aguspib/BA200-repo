@@ -33,7 +33,7 @@ Public Class UiConfigLIS
     Private mdiAnalyzerCopy As AnalyzerManager
     Private mdiESWrapperCopy As ESWrapper
     Private ValidationError As Boolean = False
-    Protected wfPreload As Biosystems.Ax00.PresentationCOM.WaitScreen
+    Protected wfPreload As Biosystems.Ax00.PresentationCOM.UiWaitScreen
     Private MaxReceptionInitialValue As Integer
     Private MaxTransmissionInitialValue As Integer
 

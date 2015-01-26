@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class IBarCodeAdjustments
+Public Class UiBarCodeAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"

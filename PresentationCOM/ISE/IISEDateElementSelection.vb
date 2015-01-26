@@ -7,7 +7,7 @@ Imports System.Drawing
 Imports Biosystems.Ax00.Global
 Imports System.Windows.Forms
 
-Public Class IISEDateElementSelection
+Public Class UiISEDateElementSelection
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constructor"

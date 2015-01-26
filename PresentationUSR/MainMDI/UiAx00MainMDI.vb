@@ -550,18 +550,18 @@ Partial Public Class UiAx00MainMDI
 
 #Region "Common Forms" 'SG 03/12/10
 
-    Private WithEvents myLanguageConfig As IConfigLanguage
-    Private WithEvents myConfigAnalyzers As IConfigGeneral
-    Private WithEvents myConfigUsers As IConfigUsers
-    Private WithEvents myConfigBarCode As IBarCodesConfig   ' DL 22/07/2011
+    Private WithEvents myLanguageConfig As UiConfigLanguage
+    Private WithEvents myConfigAnalyzers As UiConfigGeneral
+    Private WithEvents myConfigUsers As UiConfigUsers
+    Private WithEvents myConfigBarCode As UiBarCodesConfig   ' DL 22/07/2011
     Private WithEvents mySortingTest As UiSortingTestsAux
-    Private WithEvents myLogin As IAx00Login
-    Private WithEvents myReport As IBandTemplateReport 'RH 15/12/2011
-    Private WithEvents mySettings As ISettings    ' XBC 18/01/2012
+    Private WithEvents myLogin As UiAx00Login
+    Private WithEvents myReport As UiBandTemplateReport 'RH 15/12/2011
+    Private WithEvents mySettings As UiSettings    ' XBC 18/01/2012
     'Private WithEvents myISEUtilities As Biosystems.Ax00.PresentationCOM.IISEUtilities ' XBC 08/02/2012 ISE Utilities placed into PresetationCOM layer
-    Private WithEvents myISEUtilities As IISEUtilities 'RH 26/03/2012
-    Private WithEvents myAbout As IAboutBox 'RH 28/03/2012
-    Private WithEvents myInstrumentInfo As IInstrumentInfo
+    Private WithEvents myISEUtilities As UiISEUtilities 'RH 26/03/2012
+    Private WithEvents myAbout As UiAboutBox 'RH 28/03/2012
+    Private WithEvents myInstrumentInfo As UiInstrumentInfo
 
 #End Region
 
@@ -1152,7 +1152,7 @@ Partial Public Class UiAx00MainMDI
 
             'SG 03/12/10
             'myConfigUsers = New IConfigUsers(Me)
-            myConfigUsers = New IConfigUsers()
+            myConfigUsers = New UiConfigUsers()
             OpenMDIChildForm(myConfigUsers)
             'END SG 03/12/10
 
@@ -1869,7 +1869,7 @@ Partial Public Class UiAx00MainMDI
                     'RH 30/03/2012 - Don't execute these lines when background work has been finished
                     If (RunningAx00MDBackGround Or ProcessingLISManagerObject Or ProcessingLISManagerUploadResults Or processingLISOrderDownload) Then
                         'RH 03/11/2010 Wait until Ax00MDBackGround.RunWorkerAsync() is completed
-                        Using wfPreload As New IAx00StartUp(Me)
+                        Using wfPreload As New UiAx00StartUp(Me)
                             wfPreload.Title = "Waiting ongoing processes completion..."
                             wfPreload.WaitText = "Please wait..."
                             wfPreload.Show()
@@ -2011,7 +2011,7 @@ Partial Public Class UiAx00MainMDI
 
             'SG 03/12/10
             'myConfigAnalyzers = New IConfigGeneral(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigAnalyzers = New IConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
+            myConfigAnalyzers = New UiConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
             OpenMDIChildForm(myConfigAnalyzers)
             'END 03/12/10
 
@@ -2028,7 +2028,7 @@ Partial Public Class UiAx00MainMDI
     Private Sub LanguageToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LanguageToolStripMenuItem.Click
         Try
             'myLanguageConfig = New IConfigLanguage(Me)
-            myLanguageConfig = New IConfigLanguage()
+            myLanguageConfig = New UiConfigLanguage()
             OpenMDIChildForm(myLanguageConfig)
 
         Catch ex As Exception
@@ -2067,7 +2067,7 @@ Partial Public Class UiAx00MainMDI
             'OpenMDIChildForm(ConfigAnalyzers)
             'SG 03/12/10
             'myConfigAnalyzers = New IConfigGeneral(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigAnalyzers = New IConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
+            myConfigAnalyzers = New UiConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
             OpenMDIChildForm(myConfigAnalyzers)
             'END 03/12/10
 
@@ -2400,7 +2400,7 @@ Partial Public Class UiAx00MainMDI
             'DL 22/07/2011
             'OpenMDIChildForm(IBarCodesConfig)
             'myConfigBarCode = New IBarCodesConfig(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigBarCode = New IBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
+            myConfigBarCode = New UiBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
             OpenMDIChildForm(myConfigBarCode)
             'END DL 22/07/2011
 
@@ -2665,7 +2665,7 @@ Partial Public Class UiAx00MainMDI
             'OpenMDIChildForm(myISettings)
 
             'mySettings = New ISettings(Me)
-            mySettings = New ISettings()
+            mySettings = New UiSettings()
             OpenMDIChildForm(mySettings)
             ' XBC 18/01/2012
 
@@ -2708,7 +2708,7 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
         Try
-            myAbout = New IAboutBox()
+            myAbout = New UiAboutBox()
 
             'Inform the required screen properties and open the screen
             myAbout.IsUser = True
@@ -2729,7 +2729,7 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub InstrumentInfoToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InstrumentInfoToolStripMenuItem.Click
         Try
-            myInstrumentInfo = New IInstrumentInfo()
+            myInstrumentInfo = New UiInstrumentInfo()
             OpenMDIChildForm(myInstrumentInfo)
 
         Catch ex As Exception
@@ -2805,7 +2805,7 @@ Partial Public Class UiAx00MainMDI
         'End If
 
         'RH 30/03/2012
-        myLogin = New IAx00Login(True)
+        myLogin = New UiAx00Login(True)
         OpenMDIChildForm(myLogin)
     End Sub
 
@@ -2817,7 +2817,7 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub HeadPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HeadPToolStripMenuItem.Click
         Try
-            myReport = New IBandTemplateReport()
+            myReport = New UiBandTemplateReport()
             OpenMDIChildForm(myReport)
 
         Catch ex As Exception
@@ -2909,7 +2909,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
             'myISEUtilities = New IISEUtilities(Me)
-            myISEUtilities = New IISEUtilities(Me)
+            myISEUtilities = New UiISEUtilities(Me)
 
             ' XBC 03/08/2012 - initialize to protect
             Me.ShutDownisPending = False
@@ -7306,8 +7306,8 @@ Partial Public Class UiAx00MainMDI
                         Dim auxScreen As UiWSSampleRequest = CType(myCurrentMDIForm, UiWSSampleRequest)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
-                        Dim auxScreen As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiISEUtilities) Then
+                        Dim auxScreen As UiISEUtilities = CType(myCurrentMDIForm, UiISEUtilities)
                         returnValue = auxScreen.ScreenWorkingProcess
 
                     ElseIf (TypeOf myCurrentMDIForm Is UiSATReport) Then
@@ -7943,8 +7943,8 @@ Partial Public Class UiAx00MainMDI
                                 'IsFormClosed = False
 
                                 'SGM 10/05/2012
-                                If TypeOf ActiveMdiChild Is IISEUtilities Then
-                                    Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                                If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                                    Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                     myISEUtilities.myScreenPendingToOpenWhileISEUtilClosing = pFormToOpen
                                     myISEUtilities.IsMDICloseRequested = False
                                     MyClass.IsISEUtilClosing = True
@@ -7968,7 +7968,7 @@ Partial Public Class UiAx00MainMDI
 
                 If (IsFormClosed) Then
                     ' XBC 11/07/2102
-                    If TypeOf pFormToOpen Is IISEUtilities Then
+                    If TypeOf pFormToOpen Is UiISEUtilities Then
                         ISELoadingPending = True
                     End If
                     ' XBC 11/07/2102
@@ -8030,8 +8030,8 @@ Partial Public Class UiAx00MainMDI
 
                         IsFormClosed = False
 
-                        If TypeOf ActiveMdiChild Is IISEUtilities Then
-                            Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                            Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                             myISEUtilities.myScreenPendingToOpenWhileISEUtilClosing = Nothing
                             If Not MyClass.IsISEUtilClosing Then
                                 myISEUtilities.IsMDICloseRequested = True
@@ -8063,8 +8063,8 @@ Partial Public Class UiAx00MainMDI
             ' XBC 11/07/2102
             If ISELoadingPending Then
                 If (Not ActiveMdiChild Is Nothing) Then
-                    If TypeOf ActiveMdiChild Is IISEUtilities Then
-                        Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                        Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         myISEUtilities.PrepareLoadingMode()
                     End If
                 End If
@@ -9201,7 +9201,7 @@ Partial Public Class UiAx00MainMDI
                     mydisableButtons = True
                 End If
 
-                If (TypeOf ActiveMdiChild Is IISEUtilities) Then
+                If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
                     mydisableButtons = True
                 End If
 
@@ -9658,7 +9658,7 @@ Partial Public Class UiAx00MainMDI
             Dim bf As BSBaseForm = CType(sender, BSBaseForm)
             ReleaseUnManageControls(bf.Controls)
 
-            If TypeOf sender Is IISEUtilities Then
+            If TypeOf sender Is UiISEUtilities Then
                 MyClass.SetActionButtonsEnableProperty(True)
             End If
 

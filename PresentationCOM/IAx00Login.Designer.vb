@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IAx00Login
+Partial Class UiAx00Login
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -19,7 +19,7 @@ Partial Class IAx00Login
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IAx00Login))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiAx00Login))
         Me.bsLoginTimer = New Biosystems.Ax00.Controls.UserControls.BSTimer
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip
         Me.bwPreload = New Biosystems.Ax00.Controls.UserControls.BSBackgroundWorker

@@ -10,7 +10,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports System.Windows.Forms
 Imports System.Drawing
 
-Public Class IBarCodesConfig
+Public Class UiBarCodesConfig
 
 #Region "Attributes"
     Private AnalyzerIDAttribute As String = ""
@@ -1581,5 +1581,5 @@ Public Class IBarCodesConfig
 
     End Sub
 
-   
+
 End Class

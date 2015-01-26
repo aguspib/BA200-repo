@@ -1,7 +1,7 @@
 ﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IConfigGeneral
+Partial Class UiConfigGeneral
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -25,7 +25,7 @@ Partial Class IConfigGeneral
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IConfigGeneral))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiConfigGeneral))
         Me.bsScreenToolTips = New Biosystems.Ax00.Controls.UserControls.BSToolTip()
         Me.bsCancelButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsAnalyzerConfigGroupBox = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()

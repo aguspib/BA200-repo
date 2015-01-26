@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Global.TO
 Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
 
-Public Class IConfigUsers
+Public Class UiConfigUsers
 
 #Region "Declarations"
 

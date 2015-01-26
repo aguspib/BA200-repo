@@ -207,7 +207,7 @@ Partial Public Class UiAx00MainMDI
                             ShowStatus(Messages.STARTING_INSTRUMENT)
                         Else
                             'SGM 10/04/2012 not to show Standby in case of ISE utilities open
-                            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is IISEUtilities Then
+                            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is UiISEUtilities Then
                             Else
                                 If Not ProcessingBusinessInCourse() AndAlso Not Me.ShutDownisPending AndAlso Not Me.StartSessionisPending Then ' AG 08/11/2012 - PENDING Validate - Execute only when the working process progress bar is activate
                                     'If Not Me.ShutDownisPending And Not Me.StartSessionisPending Then ' XBC 23/07/2012
@@ -345,8 +345,8 @@ Partial Public Class UiAx00MainMDI
                     ' Refresh BarCode Info screen
                     If Not ActiveMdiChild Is Nothing Then
 
-                        If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                            Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                            Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                             CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         ElseIf (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not monitorTreated) Then
                             Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
@@ -1003,8 +1003,8 @@ Partial Public Class UiAx00MainMDI
                     myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
                     MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
 
-                    If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                        Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                        Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         CurrentMdiChild.PrepareErrorMode()
                     End If
 
@@ -1021,8 +1021,8 @@ Partial Public Class UiAx00MainMDI
                 ' The 1st idea was update the ports combo but it was CANCELED due a system error was triggered and it was difficult to solve
                 Dim myRefreshDS As UIRefreshDS = Nothing
                 Dim myRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
-                If (TypeOf ActiveMdiChild Is IConfigGeneral) Then
-                    Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                If (TypeOf ActiveMdiChild Is UiConfigGeneral) Then
+                    Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                     CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS)
 
                 ElseIf (TypeOf ActiveMdiChild Is UiMonitor) Then
@@ -1071,8 +1071,8 @@ Partial Public Class UiAx00MainMDI
 
                 If Not ActiveMdiChild Is Nothing Then
 
-                    If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                        Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                        Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         CurrentMdiChild.PrepareErrorMode()
                     End If
 
@@ -1273,8 +1273,8 @@ Partial Public Class UiAx00MainMDI
                             myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
                             MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
 
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.PrepareErrorMode()
                             End If
 
@@ -1291,8 +1291,8 @@ Partial Public Class UiAx00MainMDI
                         ' The 1st idea was update the ports combo but it was CANCELED due a system error was triggered and it was difficult to solve
                         Dim myRefreshDS As UIRefreshDS = Nothing
                         Dim myRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
-                        If (TypeOf ActiveMdiChild Is IConfigGeneral) Then
-                            Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                        If (TypeOf ActiveMdiChild Is UiConfigGeneral) Then
+                            Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                             CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
 
                             'AG 13/02/2012 - Refresh monitor (new alarm)
@@ -1822,8 +1822,8 @@ Partial Public Class UiAx00MainMDI
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                     End If
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables ISE command button. Else enable it
-                ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
-                    Dim CurrentMdiChild As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
+                ElseIf (TypeOf myCurrentMDIForm Is UiISEUtilities) Then
+                    Dim CurrentMdiChild As UiISEUtilities = CType(myCurrentMDIForm, UiISEUtilities)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
@@ -1984,8 +1984,8 @@ Partial Public Class UiAx00MainMDI
 
                         'DL 05/06/2012 ISE Utilities placed into PresetationCOM layer
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
-                        Dim CurrentMdiChild As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiISEUtilities) Then
+                        Dim CurrentMdiChild As UiISEUtilities = CType(myCurrentMDIForm, UiISEUtilities)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                         'ElseIf (TypeOf myCurrentMDIForm Is Biosystems.Ax00.PresentationCOM.IISEUtilities) Then

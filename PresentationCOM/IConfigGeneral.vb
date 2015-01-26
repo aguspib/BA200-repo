@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw  ' XBC 06/09/2011
 
 Imports Biosystems.Ax00.FwScriptsManagement 'SGM 28/10/2011
 
-Public Class IConfigGeneral
+Public Class UiConfigGeneral
 
 #Region "Attributes"
     Private AnalyzerIDAttribute As String = ""
@@ -2287,7 +2287,7 @@ Public Class IConfigGeneral
 
 #End Region
 
-    
+
     Private Sub bsFreqComboBox_SelectionChangeCommitted(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsFreqComboBox.SelectionChangeCommitted
         If EditionMode Then
             ChangesMade = True

@@ -4,7 +4,7 @@ Imports Biosystems.Ax00.BL
 'Imports Biosystems.Ax00.PresentationCOM
 Imports System.Windows.Forms
 
-Public NotInheritable Class IAboutBox
+Public NotInheritable Class UiAboutBox
     Inherits BSBaseForm
 
 #Region "Declarations"

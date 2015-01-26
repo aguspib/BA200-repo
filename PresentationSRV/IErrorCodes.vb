@@ -5,7 +5,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.BL
 
-Public Class IErrorCodes
+Public Class UiErrorCodes
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"

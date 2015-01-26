@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IThermosAdjustments
+Partial Class UiThermosAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.

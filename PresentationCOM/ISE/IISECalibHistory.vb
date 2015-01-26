@@ -13,7 +13,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 'PENDING:
 'Add Information XPS Docs for each Action
 'The Reagents Pack Dallas Information MUST BE HIDE!!!!!!!!!! (DisplayISEInfo)
-Public Class IISECalibHistory
+Public Class UiISECalibHistory
 
 #Region "Declarations"
     Private WithEvents mdiAnalyzerCopy As AnalyzerManager
@@ -43,7 +43,7 @@ Public Class IISECalibHistory
 #End Region
 
 #Region "Attributes"
-   
+
 #End Region
 
 #Region "Properties"
@@ -58,7 +58,7 @@ Public Class IISECalibHistory
 #End Region
 
 #Region "Enumerations"
-    
+
 #End Region
 
 #Region "Public Methods"

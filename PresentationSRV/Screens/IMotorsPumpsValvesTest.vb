@@ -156,7 +156,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 '''elements are displayed.
 ''' </summary>
 ''' <remarks>Created by SGM 03/05/2011</remarks>
-Public Class IMotorsPumpsValvesTest
+Public Class UiMotorsPumpsValvesTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Constructor"

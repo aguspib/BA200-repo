@@ -11,12 +11,12 @@ Imports System.Drawing 'SG 03/12/10
 Imports System.Windows.Forms 'SG 03/12/10
 Imports Biosystems.Ax00.Types
 
-Public Class IAx00Login
+Public Class UiAx00Login
 
 #Region "Declarations"
     'Private CountDownValue As Long = 0
     Private CurrentAppLanguage As String = "ENG"
-    Protected Ax00StartUp As IAx00StartUp
+    Protected Ax00StartUp As UiAx00StartUp
     Private RunningPreload As Boolean = False
     Private DBServerError As Boolean
     Private IsService As Boolean = False
@@ -291,7 +291,7 @@ Public Class IAx00Login
     Private Function CallRestorePointScreen() As DialogResult
         Dim myResult As DialogResult
         Try
-            Dim myIRestPointUpdateProc As New IRestPointUpdateProc
+            Dim myIRestPointUpdateProc As New UiRestPointUpdateProc
             myIRestPointUpdateProc.AllowDrop = False 'TR 08/07/2013 -Set the allow Drop to false to avoid exception (bugTracking 1232)
             myIRestPointUpdateProc.RestorePointMode = True
             myResult = myIRestPointUpdateProc.ShowDialog()
@@ -468,7 +468,7 @@ Public Class IAx00Login
                         'Informed User/Pwd is correct
                         SetApplicationSessionInfo(bsUserIDTextBox.Text.Trim, returnData.SetUserLevel.ToString)
 
-                        Using objChangePwd As New IPassword() ' dl 08/06/2011
+                        Using objChangePwd As New UiPassword() ' dl 08/06/2011
                             objChangePwd.IsUserChange = IsUserChange 'TR 28/11/2011
                             objChangePwd.ShowDialog()
                             If (objChangePwd.DialogResult = DialogResult.OK) Then
@@ -594,9 +594,9 @@ Public Class IAx00Login
                     '                .WaitText = "Please wait...", _
                     '                .Background = myBackground}
 
-                    Dim myStartUp As WaitScreen
+                    Dim myStartUp As UiWaitScreen
                     Me.Enabled = False
-                    myStartUp = New WaitScreen(Me) With { _
+                    myStartUp = New UiWaitScreen(Me) With { _
                                     .Title = "Waiting ongoing processes completion...", _
                                     .WaitText = "Please wait..."}
 
@@ -838,7 +838,7 @@ Public Class IAx00Login
                     myBackground &= "Embedded\UserSplash.png"
                 End If
 
-                Ax00StartUp = New IAx00StartUp(Me) With { _
+                Ax00StartUp = New UiAx00StartUp(Me) With { _
                                 .Title = "Starting system required services...", _
                                 .WaitText = "Please wait...", _
                                 .Background = myBackground}

@@ -3,9 +3,10 @@ Option Strict On
 
 Imports System.Windows.Forms
 Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.PresentationCOM
 
-Public Class IMsgBox
-    Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
+Public Class UiMsgBox
+    Inherits BSBaseForm
 
     Private MessageAttr As String
     Private TitleAttr As String
@@ -28,16 +29,16 @@ Public Class IMsgBox
 
     Public Function ShowMsg(ByVal pMessage As String, ByVal pTitle As String, Optional ByVal pButtons As MessageBoxButtons = MessageBoxButtons.OK, Optional ByVal pIcon As MessageBoxIcon = MessageBoxIcon.None) As DialogResult
 
-        Dim res As DialogResult = Windows.Forms.DialogResult.None
+        Dim res As DialogResult = DialogResult.None
 
         Try
 
-            Me.Text = pTitle
-            MyClass.SetMessageText(pMessage)
-            MyClass.SetButtons(pButtons)
-            MyClass.SetIconImage(pIcon)
+            Text = pTitle
+            SetMessageText(pMessage)
+            SetButtons(pButtons)
+            SetIconImage(pIcon)
 
-            res = Me.ShowDialog()
+            res = ShowDialog()
 
         Catch ex As Exception
             Throw ex
@@ -165,17 +166,17 @@ Public Class IMsgBox
         End Try
     End Sub
 
-    Private Sub On_Button_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles myOKButton.Click, myYESButton.Click, myNOButton.Click, myCancelButton.Click
+    Private Sub On_Button_Click(ByVal sender As Object, ByVal e As EventArgs) Handles myOKButton.Click, myYESButton.Click, myNOButton.Click, myCancelButton.Click
         Try
 
             If sender Is Me.myOKButton Then
-                Me.DialogResult = Windows.Forms.DialogResult.OK
+                Me.DialogResult = DialogResult.OK
             ElseIf sender Is Me.myCancelButton Then
-                Me.DialogResult = Windows.Forms.DialogResult.Cancel
+                Me.DialogResult = DialogResult.Cancel
             ElseIf sender Is Me.myYESButton Then
-                Me.DialogResult = Windows.Forms.DialogResult.Yes
+                Me.DialogResult = DialogResult.Yes
             ElseIf sender Is Me.myNOButton Then
-                Me.DialogResult = Windows.Forms.DialogResult.No
+                Me.DialogResult = DialogResult.No
             End If
 
             Me.Close()
@@ -186,7 +187,7 @@ Public Class IMsgBox
 
     End Sub
 
-    Private Sub BsMessageLabel_Resize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsMessageLabel.Resize
+    Private Sub BsMessageLabel_Resize(ByVal sender As Object, ByVal e As EventArgs) Handles BsMessageLabel.Resize
         Try
             Me.Height = Me.BsMessageLabel.Height + 100
         Catch ex As Exception

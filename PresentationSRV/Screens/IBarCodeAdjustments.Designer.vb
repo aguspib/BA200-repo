@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IBarCodeAdjustments
+Partial Class UiBarCodeAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -27,7 +27,7 @@ Partial Class IBarCodeAdjustments
         Dim DataGridViewCellStyle2 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IBarCodeAdjustments))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiBarCodeAdjustments))
         Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
         Me.ProgressBar1 = New Biosystems.Ax00.Controls.UserControls.BSProgressBar
         Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox

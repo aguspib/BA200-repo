@@ -39,7 +39,7 @@ Public Class AnalyzerInfo
 
     ' Waiting process functionality
     Private myWaitingTime As Boolean
-    Protected wfPreload As Biosystems.Ax00.PresentationCOM.WaitScreen ' .IAx00StartUp 'DL 18/04/2012
+    Protected wfPreload As Biosystems.Ax00.PresentationCOM.UiWaitScreen ' .IAx00StartUp 'DL 18/04/2012
 
     ' Print variables
     Private myTextToPrint As String
@@ -704,9 +704,9 @@ Public Class AnalyzerInfo
                 End If
 
 
-                    If myResultData.HasError Then
-                        Me.PrepareErrorMode()
-                    End If
+                If myResultData.HasError Then
+                    Me.PrepareErrorMode()
+                End If
             End If
 
         Catch ex As Exception
@@ -1142,7 +1142,7 @@ Public Class AnalyzerInfo
             '        .Background = myBackground & "Embedded\ServiceSplash.png" _
             '    }
 
-            wfPreload = New WaitScreen(Nothing) _
+            wfPreload = New UiWaitScreen(Nothing) _
                 With { _
                     .Title = pText1, _
                     .WaitText = pText2 _

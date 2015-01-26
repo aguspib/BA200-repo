@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 
-Public Class ILevelDetectionTest
+Public Class UiLevelDetectionTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"
@@ -47,7 +47,7 @@ Public Class ILevelDetectionTest
         End Set
     End Property
 
-    
+
 #End Region
 
 #Region "Constructor"
@@ -245,7 +245,7 @@ Public Class ILevelDetectionTest
                     End If
                 Next
 
-                
+
             End If
 
         Catch ex As Exception
@@ -977,7 +977,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-   
+
     Private Sub PrepareDetectedMode()
 
         Try
@@ -1021,7 +1021,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-   
+
 #End Region
 
 
@@ -1251,7 +1251,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-   
+
 
     Private Sub BsDetectionArmComboBox_SelectedIndexChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsDetectionArmComboBox.SelectedIndexChanged
 
@@ -1280,7 +1280,7 @@ Public Class ILevelDetectionTest
 
             End Select
 
-            
+
 
         Catch ex As Exception
             MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsDetectionArmComboBox_SelectedIndexChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1362,7 +1362,7 @@ Public Class ILevelDetectionTest
         End Try
     End Sub
 
-    
+
     ''' <summary>
     ''' When the  ESC key is pressed, the screen is closed 
     ''' </summary>
@@ -1388,8 +1388,8 @@ Public Class ILevelDetectionTest
 
 #End Region
 
-   
-   
-    
-    
+
+
+
+
 End Class

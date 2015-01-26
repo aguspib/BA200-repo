@@ -48,7 +48,7 @@ Public Class BSBaseForm
     Protected Const WM_WINDOWPOSCHANGING As Int32 = &H46
 
     'SGM 22/12/2012
-    Public WithEvents FormBack As IBackground
+    Public WithEvents FormBack As UiBackground
 
     Protected MsgParent As Form = Nothing
     Protected isClosingFlag As Boolean = False  'AG + RH 03/04/2012 - True when the screen is closing and the refreshscreen method has to be ignored

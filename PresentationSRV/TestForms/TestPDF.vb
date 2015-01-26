@@ -1,14 +1,15 @@
-﻿Imports Biosystems.Ax00.Global
+﻿Imports System.IO
+Imports Biosystems.Ax00.Global
 
 Public NotInheritable Class TestPDF
 
-    Private Sub TestPDF_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub TestPDF_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
 
     End Sub
 
 
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Button1.Click
 
         Try
 
@@ -19,12 +20,12 @@ Public NotInheritable Class TestPDF
 
             'Dim myUtil As New Utilities.
 
-            Utilities.ExtractFromZip("C:\Prueba3.zip", "C:\tmp", "AX00")
+            ExtractFromZip("C:\Prueba3.zip", "C:\tmp", "AX00")
 
             Application.DoEvents()
 
-            If System.IO.Directory.Exists("C:\tmp") Then
-                Dim myFiles As String() = System.IO.Directory.GetFiles("C:\tmp", "*.rtf")
+            If Directory.Exists("C:\tmp") Then
+                Dim myFiles As String() = Directory.GetFiles("C:\tmp", "*.rtf")
                 If myFiles.Length > 0 Then
                     Me.BsRichTextBox1.Enabled = False
                     Me.BsRichTextBox1.ScrollBars = RichTextBoxScrollBars.Horizontal
@@ -32,11 +33,11 @@ Public NotInheritable Class TestPDF
 
                     Application.DoEvents()
 
-                    If System.IO.File.Exists(myFiles(0)) Then
-                        System.IO.File.Delete(myFiles(0))
+                    If File.Exists(myFiles(0)) Then
+                        File.Delete(myFiles(0))
                     End If
-                    If System.IO.Directory.Exists("C:\tmp") Then
-                        System.IO.Directory.Delete("C:\tmp")
+                    If Directory.Exists("C:\tmp") Then
+                        Directory.Delete("C:\tmp")
                     End If
                 End If
             End If

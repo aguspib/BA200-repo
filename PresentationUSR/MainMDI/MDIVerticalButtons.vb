@@ -226,7 +226,7 @@ Partial Public Class UiAx00MainMDI
 
             'AG 14/05/2012 - When ISE utilities screen is active the only vertical buttons that can be enabled are: ChangeBottle confirm, Recover & Sound Off
             Dim iSEUtilitiesActiveFlag As Boolean = False
-            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is IISEUtilities Then
+            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is UiISEUtilities Then
                 iSEUtilitiesActiveFlag = True
             End If
             'AG 14/05/2012

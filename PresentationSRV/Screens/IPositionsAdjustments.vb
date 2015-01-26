@@ -11,7 +11,7 @@ Imports Biosystems.Ax00.Controls.UserControls
 'Imports System.Runtime.InteropServices 'WIN32
 Imports DevExpress.XtraCharts
 
-Public Class IPositionsAdjustments
+Public Class UiPositionsAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 
@@ -8471,9 +8471,9 @@ Public Class IPositionsAdjustments
                 InitializeEditedValue()
                 With EditedValue
 
-                    Dim myPolar As New IPositionsAdjustments.AdjustmentRowData
-                    Dim myZ As New IPositionsAdjustments.AdjustmentRowData
-                    Dim myRotor As New IPositionsAdjustments.AdjustmentRowData
+                    Dim myPolar As New UiPositionsAdjustments.AdjustmentRowData
+                    Dim myZ As New UiPositionsAdjustments.AdjustmentRowData
+                    Dim myRotor As New UiPositionsAdjustments.AdjustmentRowData
 
                     Select Case SelectedArmTab
                         Case ADJUSTMENT_ARMS.SAMPLE
@@ -9127,7 +9127,7 @@ Public Class IPositionsAdjustments
                             .AdjustmentID = ADJUSTMENT_GROUPS.WASHING_STATION
                             .AxisID = GlobalEnumerates.AXIS.Z
 
-                            Dim myZ As New IPositionsAdjustments.AdjustmentRowData
+                            Dim myZ As New UiPositionsAdjustments.AdjustmentRowData
                             myZ = ReadGlobalAdjustmentData(.AdjustmentID.ToString, GlobalEnumerates.AXIS.Z, True)
                             If myZ.CanSave And myZ.Value.Length = 0 Then
                                 myGlobal.HasError = True

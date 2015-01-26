@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.BL.UpdateVersion
 Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Controls.UserControls
 
-Public Class ISATReportSRV
+Public Class UiSATReportSRV
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Declaration"
@@ -160,7 +160,7 @@ Public Class ISATReportSRV
     ''' </remarks>
     Private Sub bsSaveSATRepButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsSaveSATRepButton.Click
         Try
-             'TR 22/12/2011 - Validate if file name exists on the selected folder before starting the ReportSAT creation
+            'TR 22/12/2011 - Validate if file name exists on the selected folder before starting the ReportSAT creation
             If (FileNameExist(FileNameTextBox.Text)) Then
                 ShowMessage("Warning", GlobalEnumerates.Messages.FILE_EXIST.ToString())
                 FileNameTextBox.Focus()
@@ -248,7 +248,7 @@ Public Class ISATReportSRV
             ExitButton.Enabled = True
             FolderButton.Enabled = True
             bsSATDirListBox.Enabled = True
-            
+
             'TR 09/01/2012 - Indicate RSAT END on Application LOG.
             CreateLogActivity("RSAT END  Time: " & Now.ToLongTimeString, Name & ".bsSaveSATRepButton_Click", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
         End Try

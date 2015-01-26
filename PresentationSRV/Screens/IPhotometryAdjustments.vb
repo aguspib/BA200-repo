@@ -12,7 +12,7 @@ Imports Biosystems.Ax00.FwScriptsManagement
 Imports Biosystems.Ax00.BL
 Imports System.IO
 
-Public Class IPhotometryAdjustments
+Public Class UiPhotometryAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
 #Region "Declarations"
@@ -4637,5 +4637,5 @@ Public Class IPhotometryAdjustments
 
 #End Region
 
-    
+
 End Class
