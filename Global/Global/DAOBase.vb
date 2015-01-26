@@ -126,11 +126,11 @@ Namespace Biosystems.Ax00.Global
 
                     dbCmd.CommandText = " BEGIN TRANSACTION "
                     dbCmd.ExecuteNonQuery()
-                    Debug.WriteLine("MANEL: --> " & dbCmd.Transaction.ToString())
                 End Using
 
             Catch ex As Exception
-                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
