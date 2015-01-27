@@ -7808,7 +7808,7 @@ Public Class UiWSRotorPositions
             If isTreeDragDropAllowed = True Then
                 sourceNode = CType(e.Item, TreeNode)
                 isDragging = True
-                DoDragDrop(e.Item.ToString(), DragDropEffects.Move And DragDropEffects.Copy)
+                DoDragDrop(e.Item.ToString(), DragDropEffects.Move Or DragDropEffects.Copy)
             Else
                 isDragging = False
             End If
