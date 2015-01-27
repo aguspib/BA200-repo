@@ -206,11 +206,18 @@ Namespace Biosystems.Ax00.Global
         ''' Modified by RH 23/05/2011 Remove unneeded SqlConnection object creation,
         '''             so now there is less presure over the Garbage Collector.
         '''             MI: Removed ByRef as it was not required by function logic, and it's less efficient on .NET
+        '''             MI: Replaced to internally use typed GlobalDataTo with the idea of removing GlobalDataTo completely in a future iteration.
         ''' </remarks>
         ''' 
         Public Function GetOpenDBConnection(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
 
-            Return GetSafeOpenDBConnection(pDBConnection).GetCompatibleGlobalDataTo
+            'Better implementation:
+            Dim connectionSafeDataTo = GetSafeOpenDBConnection(pDBConnection)   'It handles its own exeptions
+            Return connectionSafeDataTo.CloneUntyped()
+
+            'Return GetSafeOpenDBConnection(pDBConnection).GetCompatibleGlobalDataTo
+
+            'Old one:
             'Dim openConnection As New GlobalDataTO
             ''Dim dbConnection As New SqlClient.SqlConnection
             'Dim dbConnection As SqlClient.SqlConnection = Nothing

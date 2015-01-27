@@ -4,9 +4,7 @@ Option Explicit On
 Namespace Biosystems.Ax00.Global
     'Definition of the global TO used for Data Access 
 
-
     Public Class TypedGlobalDataTo(Of T)
-
 
 #Region "Properties"
         'Get/Set the number of records affected for an SQL command
@@ -34,20 +32,28 @@ Namespace Biosystems.Ax00.Global
 #End Region
 
 #Region "Methods"
-        Function GetCompatibleGlobalDataTo() As GlobalDataTO
-            Dim GDT As New GlobalDataTO()
-            GDT.AffectedRecords = AffectedRecords
-            GDT.ErrorCode = ErrorCode
-            GDT.ErrorMessage = ErrorMessage
-            GDT.HasError = HasError
-            GDT.SetDatos = TryCast(SetDatos, Object)
-            GDT.SetUserLevel = SetUserLevel
-            Return GDT
+        ''' <summary>
+        ''' This function creates a clone of this TypedGlobalDataTo as an older untyped GlobalDataTo. Use this for compatibility with older code.
+        ''' </summary>
+        ''' <returns>A GlobalDataTo.</returns>
+        ''' <remarks></remarks>
+        Overridable Function CloneUntyped() As GlobalDataTO
+            Dim globalDataTo As New GlobalDataTO()
+            globalDataTo.AffectedRecords = AffectedRecords
+            globalDataTo.ErrorCode = ErrorCode
+            globalDataTo.ErrorMessage = ErrorMessage
+            globalDataTo.HasError = HasError
+            globalDataTo.SetDatos = TryCast(SetDatos, Object)
+            globalDataTo.SetUserLevel = SetUserLevel
+            Return globalDataTo
         End Function
+
 #End Region
+
     End Class
 
-    Public Class GlobalDataTO
+    Public NotInheritable Class GlobalDataTO
         Inherits TypedGlobalDataTo(Of Object)
     End Class
+
 End Namespace
