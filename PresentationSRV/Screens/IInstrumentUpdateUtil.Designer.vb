@@ -1,7 +1,7 @@
 ﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IInstrumentUpdateUtil
+Partial Class UiInstrumentUpdateUtil
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.

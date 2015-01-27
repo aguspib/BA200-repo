@@ -151,7 +151,7 @@
     <Reference Include="DevExpress.XtraRichEdit.v14.2, Version=14.2.3.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.SqlServer.Smo, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Visual Studio 2012\Projects\UpdateModuleTest\UpdateModuleTest\SqlServer2008R2\Microsoft.SqlServer.Smo.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft SQL Server\100\SDK\Assemblies\Microsoft.SqlServer.Smo.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -192,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="RotorUtils\ReagentExpirationParsing.vb" />
     <Compile Include="UiConfigLIS.Designer.vb">
       <DependentUpon>UiConfigLIS.vb</DependentUpon>
     </Compile>

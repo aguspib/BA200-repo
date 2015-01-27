@@ -108,7 +108,7 @@ Public Class Ax00MainForm
                 LocalAnalizerDS = CType(myGlobalDataTO.SetDatos, AnalyzersDS)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010 "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -293,7 +293,7 @@ Public Class Ax00MainForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
             Me.UIThread(Function() ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message))

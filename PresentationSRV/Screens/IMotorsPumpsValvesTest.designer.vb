@@ -1,7 +1,7 @@
 ﻿
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IMotorsPumpsValvesTest
+Partial Class UiMotorsPumpsValvesTest
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -27,7 +27,7 @@ Partial Class IMotorsPumpsValvesTest
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IMotorsPumpsValvesTest))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiMotorsPumpsValvesTest))
         Me.BsMessagesPanel = New Biosystems.Ax00.Controls.UserControls.BSPanel
         Me.ProgressBar1 = New System.Windows.Forms.ProgressBar
         Me.BsMessageImage = New Biosystems.Ax00.Controls.UserControls.BSPictureBox

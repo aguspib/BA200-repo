@@ -57,7 +57,7 @@ Public Class Ax00ServiceMainMDI
 
     'DL 20/04/2012
     'Protected wfWaitScreen As Biosystems.Ax00.PresentationCOM.IAx00StartUp
-    Protected wfWaitScreen As Biosystems.Ax00.PresentationCOM.WaitScreen
+    Protected wfWaitScreen As Biosystems.Ax00.PresentationCOM.UiWaitScreen
     'DL 20/04/2012
 
 
@@ -521,7 +521,7 @@ Public Class Ax00ServiceMainMDI
             AddHandler myDriveDetector.DeviceRemoved, AddressOf OnDeviceRemoved
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " New ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " New ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'RH: At this point the Ax00ServiceMainMDI new object does not exist yet.
             'As the ShowMessage() method references Ax00ServiceMainMDI object as the parent window,
             'we can't call it here, so we call MessageBox.Show() instead.
@@ -535,21 +535,21 @@ Public Class Ax00ServiceMainMDI
 
 #Region "Common Forms"
 
-    Private WithEvents myLanguageConfig As IConfigLanguage
-    Private WithEvents myConfigAnalyzers As IConfigGeneral
+    Private WithEvents myLanguageConfig As UiConfigLanguage
+    Private WithEvents myConfigAnalyzers As UiConfigGeneral
     'Private WithEvents myChangePassword As IPassword
-    Private WithEvents myLogin As IAx00Login
-    Private WithEvents myConfigUsers As IConfigUsers
-    Private WithEvents mySettings As ISettings
-    Private WithEvents myISEUtilities As IISEUtilities ' XBC 05/02/2012 ISE Utilities placed into PresetationCOM layer
-    Private WithEvents myConfigBarCode As IBarCodesConfig ' XBC 14/02/2012 Barcodes Configuration placed into PresetationCOM layer
-    Private WithEvents myAbout As IAboutBox 'RH 28/03/2012
-    Private WithEvents myInstrumentInfo As IInstrumentInfo
-    Private WithEvents myChangeRotor As IChangeRotorSRV
+    Private WithEvents myLogin As UiAx00Login
+    Private WithEvents myConfigUsers As UiConfigUsers
+    Private WithEvents mySettings As UiSettings
+    Private WithEvents myISEUtilities As UiISEUtilities ' XBC 05/02/2012 ISE Utilities placed into PresetationCOM layer
+    Private WithEvents myConfigBarCode As UiBarCodesConfig ' XBC 14/02/2012 Barcodes Configuration placed into PresetationCOM layer
+    Private WithEvents myAbout As UiAboutBox 'RH 28/03/2012
+    Private WithEvents myInstrumentInfo As UiInstrumentInfo
+    Private WithEvents myChangeRotor As UiChangeRotorSRV
 #End Region
 
 #Region "Another Forms"
-    Private WithEvents myErrCodesForm As IErrorCodes    ' XBC 07/11/2012
+    Private WithEvents myErrCodesForm As UiErrorCodes    ' XBC 07/11/2012
 #End Region
 
 #Region "Communications Events"
@@ -631,8 +631,8 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             'SGM 18/09/2012 - Refresh ISE Utilities
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
@@ -733,8 +733,8 @@ Public Class Ax00ServiceMainMDI
 
                         ' Refresh Instrument Update Utility screen
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As IInstrumentUpdateUtil = CType(ActiveMdiChild, IInstrumentUpdateUtil)
+                            If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
+                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.STANDBY_START
@@ -754,8 +754,8 @@ Public Class Ax00ServiceMainMDI
 
                         ' Refresh Thermos Adjustment screen
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IThermosAdjustments) Then
-                                Dim CurrentMdiChild As IThermosAdjustments = CType(ActiveMdiChild, IThermosAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
+                                Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -784,8 +784,8 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Positions Adjustment screen
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IPositionsAdjustments) Then
-                                Dim CurrentMdiChild As IPositionsAdjustments = CType(ActiveMdiChild, IPositionsAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
+                                Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -813,8 +813,8 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Motors Test screen
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                            If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -846,8 +846,8 @@ Public Class Ax00ServiceMainMDI
                         ' XBC 20/02/2012 
                         ' Refresh Photometry Adjustment screen 
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IPhotometryAdjustments) Then
-                                Dim CurrentMdiChild As IPhotometryAdjustments = CType(ActiveMdiChild, IPhotometryAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiPhotometryAdjustments) Then
+                                Dim CurrentMdiChild As UiPhotometryAdjustments = CType(ActiveMdiChild, UiPhotometryAdjustments)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -875,8 +875,8 @@ Public Class Ax00ServiceMainMDI
                         ' Refresh Change Rotor screen
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IChangeRotorSRV) Then
-                                Dim CurrentMdiChild As IChangeRotorSRV = CType(ActiveMdiChild, IChangeRotorSRV)
+                            If (TypeOf ActiveMdiChild Is UiChangeRotorSRV) Then
+                                Dim CurrentMdiChild As UiChangeRotorSRV = CType(ActiveMdiChild, UiChangeRotorSRV)
 
                                 Select Case MDIAnalyzerManager.AnalyzerCurrentAction
                                     Case AnalyzerManagerAx00Actions.WASHSTATION_CTRL_START
@@ -900,8 +900,8 @@ Public Class Ax00ServiceMainMDI
 
                         'SGM 18/09/2012 - Refresh ISE Utilities 
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
                         End If
@@ -1082,13 +1082,13 @@ Public Class Ax00ServiceMainMDI
                                             ElseIf Not Me.MDIAnalyzerManager.IsStressing Then
 
                                                 If Not ActiveMdiChild Is Nothing Then
-                                                    If (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                                                    If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                                         Exit Try
                                                     End If
                                                 End If
 
                                                 Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
-                                                CreateLogActivity("Read Adjustments (3)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
+                                                GlobalBase.CreateLogActivity("Read Adjustments (3)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
 
                                             End If
                                             'Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
@@ -1183,8 +1183,8 @@ Public Class Ax00ServiceMainMDI
                             ' XBC 16/05/2012
                             ' Refresh Stress Mode screen
                             If Not ActiveMdiChild Is Nothing Then
-                                If (TypeOf ActiveMdiChild Is IStressModeTest) Then
-                                    Dim CurrentMdiChild As IStressModeTest = CType(ActiveMdiChild, IStressModeTest)
+                                If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
+                                    Dim CurrentMdiChild As UiStressModeTest = CType(ActiveMdiChild, UiStressModeTest)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                             End If
@@ -1233,8 +1233,8 @@ Public Class Ax00ServiceMainMDI
                             If Not ActiveMdiChild Is Nothing Then
 
                                 'SGM 25/10/2012 - reset Collision Detected Sensor
-                                If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                    Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                    Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                                 'end SGM 25/10/2012
@@ -1329,8 +1329,8 @@ Public Class Ax00ServiceMainMDI
 
                                 If Not ActiveMdiChild Is Nothing Then
                                     ' Refresh Tank Levels screen
-                                    If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
-                                        Dim CurrentMdiChild As ITankLevelsAdjustments = CType(ActiveMdiChild, ITankLevelsAdjustments)
+                                    If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
+                                        Dim CurrentMdiChild As UiTankLevelsAdjustments = CType(ActiveMdiChild, UiTankLevelsAdjustments)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1341,8 +1341,8 @@ Public Class Ax00ServiceMainMDI
                                     'End If
 
                                     ' Refresh Thermos screen
-                                    If (TypeOf ActiveMdiChild Is IThermosAdjustments) Then
-                                        Dim CurrentMdiChild As IThermosAdjustments = CType(ActiveMdiChild, IThermosAdjustments)
+                                    If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
+                                        Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1357,8 +1357,8 @@ Public Class Ax00ServiceMainMDI
 
                                     'SGM 17/04/2012
                                     ' Refresh Motors screen (for the moment no POLHW values can be obtained from Fw so some values will be obtained by means of ANSINF)
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
 
@@ -1540,7 +1540,7 @@ Public Class Ax00ServiceMainMDI
                                         Me.MDIAnalyzerManager.ClearQueueToSend()
                                         If Not myGlobal.HasError AndAlso Me.MDIAnalyzerManager.Connected Then
                                             Me.SEND_STANDBY()
-                                            CreateLogActivity("Send Standby ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Error, False)
+                                            GlobalBase.CreateLogActivity("Send Standby ", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Error, False)
                                         End If
 
                                     ElseIf Me.MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
@@ -1552,12 +1552,12 @@ Public Class Ax00ServiceMainMDI
                                             Exit Try
                                         ElseIf Not Me.MDIAnalyzerManager.IsStressing Then
                                             If Not ActiveMdiChild Is Nothing Then
-                                                If (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                                                If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                                     Exit Try
                                                 End If
                                             End If
                                             Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
-                                            CreateLogActivity("Read Adjustments (1)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
+                                            GlobalBase.CreateLogActivity("Read Adjustments (1)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
                                         End If
                                     End If
 
@@ -1587,8 +1587,8 @@ Public Class Ax00ServiceMainMDI
 
                         ' Instrument Update Utility screen
                         If Not ActiveMdiChild Is Nothing Then
-                            If (TypeOf ActiveMdiChild Is IInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As IInstrumentUpdateUtil = CType(ActiveMdiChild, IInstrumentUpdateUtil)
+                            If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
+                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
                         End If
@@ -1623,8 +1623,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1639,8 +1639,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1658,8 +1658,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1674,8 +1674,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1694,10 +1694,10 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors Pumps screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IPhotometryAdjustments) Or _
-                                    (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
+                                    If (TypeOf ActiveMdiChild Is UiPhotometryAdjustments) Or _
+                                    (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
 
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1712,8 +1712,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1740,8 +1740,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1768,8 +1768,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Level Detection screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ILevelDetectionTest) Then
-                                        Dim CurrentMdiChild As ILevelDetectionTest = CType(ActiveMdiChild, ILevelDetectionTest)
+                                    If (TypeOf ActiveMdiChild Is UiLevelDetectionTest) Then
+                                        Dim CurrentMdiChild As UiLevelDetectionTest = CType(ActiveMdiChild, UiLevelDetectionTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1796,8 +1796,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Cycles Count screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is ICycleCountScreen) Then
-                                        Dim CurrentMdiChild As ICycleCountScreen = CType(ActiveMdiChild, ICycleCountScreen)
+                                    If (TypeOf ActiveMdiChild Is UiCycleCountScreen) Then
+                                        Dim CurrentMdiChild As UiCycleCountScreen = CType(ActiveMdiChild, UiCycleCountScreen)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1821,8 +1821,8 @@ Public Class Ax00ServiceMainMDI
 
                                 ' Refresh Motors screen
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                        Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                                    If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                        Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                     End If
                                 End If
@@ -1857,8 +1857,8 @@ Public Class Ax00ServiceMainMDI
 
                             ' Refresh BarCode Info screen
                             If Not ActiveMdiChild Is Nothing Then
-                                If (TypeOf ActiveMdiChild Is IBarCodeAdjustments) Then
-                                    Dim CurrentMdiChild As IBarCodeAdjustments = CType(ActiveMdiChild, IBarCodeAdjustments)
+                                If (TypeOf ActiveMdiChild Is UiBarCodeAdjustments) Then
+                                    Dim CurrentMdiChild As UiBarCodeAdjustments = CType(ActiveMdiChild, UiBarCodeAdjustments)
                                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 End If
                             End If
@@ -1879,13 +1879,13 @@ Public Class Ax00ServiceMainMDI
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
-                            If (TypeOf ActiveMdiChild Is IStressModeTest) Then
-                                Dim CurrentMdiChild As IStressModeTest = CType(ActiveMdiChild, IStressModeTest)
+                            If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
+                                Dim CurrentMdiChild As UiStressModeTest = CType(ActiveMdiChild, UiStressModeTest)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                             End If
 
@@ -1983,8 +1983,8 @@ Public Class Ax00ServiceMainMDI
                         '
                         If Not ActiveMdiChild Is Nothing Then
 
-                            If (TypeOf ActiveMdiChild Is IInstrumentUpdateUtil) Then
-                                Dim CurrentMdiChild As IInstrumentUpdateUtil = CType(ActiveMdiChild, IInstrumentUpdateUtil)
+                            If (TypeOf ActiveMdiChild Is UiInstrumentUpdateUtil) Then
+                                Dim CurrentMdiChild As UiInstrumentUpdateUtil = CType(ActiveMdiChild, UiInstrumentUpdateUtil)
                                 CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                 Return True 'not to refresh sensors
 
@@ -2012,8 +2012,8 @@ Public Class Ax00ServiceMainMDI
                             If MyResultsStressTest.Status = STRESS_STATUS.UNFINISHED Then
 
                                 If Not ActiveMdiChild Is Nothing Then
-                                    If Not (TypeOf ActiveMdiChild Is IStressModeTest) And _
-                                        Not (TypeOf ActiveMdiChild Is IDemoMode) Then
+                                    If Not (TypeOf ActiveMdiChild Is UiStressModeTest) And _
+                                        Not (TypeOf ActiveMdiChild Is UiDemoMode) Then
                                         'Dim CurrentMdiChild As IStressModeTest = CType(ActiveMdiChild, IStressModeTest)
                                         'CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                                         openStressScreen = True
@@ -2035,7 +2035,7 @@ Public Class Ax00ServiceMainMDI
                         Else
 
                             If Not ActiveMdiChild Is Nothing Then
-                                If (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                                If (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                     Exit Try
                                 End If
                             End If
@@ -2043,7 +2043,7 @@ Public Class Ax00ServiceMainMDI
                             If Not Me.MDIAnalyzerManager.IsStressing AndAlso Me.MDIAnalyzerManager.IsUserConnectRequested Then
                                 Me.CheckAnalyzerInfo = True
                                 Me.SEND_READ_ADJUSTMENTS(Ax00Adjustsments.ALL)
-                                CreateLogActivity("Read Adjustments (2)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("Read Adjustments (2)", Me.Name & ".OnManageReceptionEvent ", EventLogEntryType.Information, False)
                                 Exit Try
                             ElseIf Not Me.MDIAnalyzerManager.IsStressing AndAlso Not Me.CheckAnalyzerInfo Then
                                 Me.CheckAnalyzerInfo = True
@@ -2180,7 +2180,7 @@ Public Class Ax00ServiceMainMDI
                 ShowMessage(Name & ".SetWSActiveDataFromDB ", dataToReturn.ErrorCode, dataToReturn.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".SetWSActiveDataFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".SetWSActiveDataFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetWSActiveDataFromDB ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2230,7 +2230,7 @@ Public Class Ax00ServiceMainMDI
             If (Not myGlobalDataTO.HasError) Then myGlobalDataTO = ApplicationLogManager.DeleteAll()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".CleanApplicationLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".CleanApplicationLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CleanApplicationLog ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2258,15 +2258,15 @@ Public Class Ax00ServiceMainMDI
                 Dim myAdtionalText As String = ""
                 For Each oForm As Form In Me.MdiChildren
                     If oForm Is AnalyzerInfo Or _
-                       oForm Is IPositionsAdjustments Or _
-                       oForm Is IPhotometryAdjustments Or _
-                       oForm Is ITankLevelsAdjustments Or _
-                       oForm Is IMotorsPumpsValvesTest Or _
-                       oForm Is IThermosAdjustments Or _
-                       oForm Is IStressModeTest Or _
-                       oForm Is IDemoMode Or _
-                       oForm Is IInstrumentUpdateUtil Or _
-                       oForm Is IChangeRotorSRV Or _
+                       oForm Is UiPositionsAdjustments Or _
+                       oForm Is UiPhotometryAdjustments Or _
+                       oForm Is UiTankLevelsAdjustments Or _
+                       oForm Is UiMotorsPumpsValvesTest Or _
+                       oForm Is UiThermosAdjustments Or _
+                       oForm Is UiStressModeTest Or _
+                       oForm Is UiDemoMode Or _
+                       oForm Is UiInstrumentUpdateUtil Or _
+                       oForm Is UiChangeRotorSRV Or _
                        oForm Is FwScriptsEdition Then
 
                         myAdtionalText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_SRV_ERR_COMM2", CurrentLanguageAttribute)
@@ -2306,13 +2306,13 @@ Public Class Ax00ServiceMainMDI
 
                 Me.bsAnalyzerStatus.Text = "NOT CONNECTED"
 
-                CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".ShowTimeoutMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".ShowTimeoutMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode, myAdtionalText)
             End If
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowTimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowTimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowTimeoutMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2355,7 +2355,7 @@ Public Class Ax00ServiceMainMDI
             ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowISETimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowISETimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowISETimeoutMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2412,8 +2412,8 @@ Public Class Ax00ServiceMainMDI
 
                     If Not ActiveMdiChild Is Nothing Then
 
-                        If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                            Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                            Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                             CurrentMdiChild.PrepareErrorMode()
                         End If
 
@@ -2482,7 +2482,7 @@ Public Class Ax00ServiceMainMDI
     '        '        Next
     '        '        ' XBC 15/11/2011 - Add more info to solve communications problems with adjustments screens
 
-    '        '        CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".MDIAnalyzerManager.SendEvent", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        '        GlobalBase.CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".MDIAnalyzerManager.SendEvent", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        '        ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode, myAdtionalText)
     '        '    End If
     '        'End If
@@ -2584,8 +2584,8 @@ Public Class Ax00ServiceMainMDI
                     If Not ActiveMdiChild Is Nothing Then
                         '- Configuration screen (close screen without save changes)
                         ' The 1st idea was update the ports combo but it was CANCELED due a system error was triggered and it was difficult to solve
-                        If (TypeOf ActiveMdiChild Is IConfigGeneral) Then
-                            Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                        If (TypeOf ActiveMdiChild Is UiConfigGeneral) Then
+                            Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                             Dim emptyRefreshDS As UIRefreshDS = Nothing
                             Dim emptyRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
                             CurrentMdiChild.RefreshScreen(emptyRefreshEventList, emptyRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
@@ -2597,7 +2597,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".OnDeviceRemoved ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".OnDeviceRemoved ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OnDeviceRemoved ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2640,7 +2640,7 @@ Public Class Ax00ServiceMainMDI
             ' XBC 09/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSConnectButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSConnectButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTSConnectButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -2663,7 +2663,7 @@ Public Class Ax00ServiceMainMDI
             Me.ShutDownAnalyzer()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSShutdownButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSShutdownButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTSShutdownButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2705,7 +2705,7 @@ Public Class Ax00ServiceMainMDI
 
                     ' XBC 07/11/2012
                 Else
-                    CreateLogActivity("Error when remove Error Codes List", Me.Name & ".bsTSRecoverButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                    GlobalBase.CreateLogActivity("Error when remove Error Codes List", Me.Name & ".bsTSRecoverButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                     ShowMessage(Me.Name & ".bsTSRecoverButton_Click ", Messages.SYSTEM_ERROR.ToString, "Error when remove Error Codes List", Me)
                 End If
                 ' XBC 07/11/2012
@@ -2713,7 +2713,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsTSRecover_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsTSRecover_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSRecover_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -2728,12 +2728,12 @@ Public Class Ax00ServiceMainMDI
     ''' <remarks>Created by XBC 07/11/2012</remarks>
     Private Sub bsTSWarningButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSWarningButton.Click
         Try
-            myErrCodesForm = New IErrorCodes
+            myErrCodesForm = New UiErrorCodes
 
             myErrCodesForm.ShowDialog()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsTSWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsTSWarningButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSWarningButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -2757,7 +2757,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ActivateScreenEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ActivateScreenEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ActivateScreenEvent ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3010,7 +3010,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " InitializeMonitor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " InitializeMonitor ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3121,7 +3121,7 @@ Public Class Ax00ServiceMainMDI
             myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobalDataTO.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".GetMonitorLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetMonitorLimitValues ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetMonitorLimitValues ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobalDataTO
@@ -3138,7 +3138,7 @@ Public Class Ax00ServiceMainMDI
 
             If Me.SimulationMode Then
                 If Not ActiveMdiChild Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
+                    If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
                         Me.SimulateINFO_Off()
                         continousSimulation = False
                     End If
@@ -3163,18 +3163,18 @@ Public Class Ax00ServiceMainMDI
                         If Not ActiveMdiChild Is Nothing Then
 
                             ' Refresh Tank Levels screen
-                            If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
-                                Dim CurrentMdiChild As ITankLevelsAdjustments = CType(ActiveMdiChild, ITankLevelsAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
+                                Dim CurrentMdiChild As UiTankLevelsAdjustments = CType(ActiveMdiChild, UiTankLevelsAdjustments)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                             ' Refresh Motors, Pumps Valves screen
-                            If (TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest) Then
-                                Dim CurrentMdiChild As IMotorsPumpsValvesTest = CType(ActiveMdiChild, IMotorsPumpsValvesTest)
+                            If (TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest) Then
+                                Dim CurrentMdiChild As UiMotorsPumpsValvesTest = CType(ActiveMdiChild, UiMotorsPumpsValvesTest)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                             ' Refresh Thermos screen
-                            If (TypeOf ActiveMdiChild Is IThermosAdjustments) Then
-                                Dim CurrentMdiChild As IThermosAdjustments = CType(ActiveMdiChild, IThermosAdjustments)
+                            If (TypeOf ActiveMdiChild Is UiThermosAdjustments) Then
+                                Dim CurrentMdiChild As UiThermosAdjustments = CType(ActiveMdiChild, UiThermosAdjustments)
                                 CurrentMdiChild.RefreshScreen(myRefreshEvent, mySimRefreshDS)
                             End If
                         End If
@@ -3194,7 +3194,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " BsInfoTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " BsInfoTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3205,7 +3205,7 @@ Public Class Ax00ServiceMainMDI
             BsInfoTimer.Enabled = True
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_On ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_On ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3230,7 +3230,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_Off ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SimulateINFO_Off ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -3458,7 +3458,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_WASH ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_WASH ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_WASH", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3489,7 +3489,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_SLEEP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_SLEEP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_SLEEP", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3521,7 +3521,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_STANDBY ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_STANDBY ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_STANDBY ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3549,7 +3549,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_RESET ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_RESET ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_RESET ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3578,7 +3578,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_READ_ADJUSTMENTS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_READ_ADJUSTMENTS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_READ_ADJUSTMENTS ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3614,7 +3614,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_ISE_COMMAND ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_ISE_COMMAND ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_ISE_COMMAND ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3664,7 +3664,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_START( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_START( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_INFO_START ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3712,7 +3712,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_STOP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_INFO_STOP ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_INFO_STOP ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3751,7 +3751,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_POLLFW( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_POLLFW( ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_POLLFW ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3798,7 +3798,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_BARCODE_CONFIG ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_BARCODE_CONFIG ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_BARCODE_CONFIG ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3831,7 +3831,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message, Me.Name & ".SEND_SDPOLL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SEND_SDPOLL ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SEND_SDPOLL ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
@@ -3859,10 +3859,10 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            Dim myInstrumUpdateForm As New IInstrumentUpdateUtil(pForceToFirmwareUpdate)
+            Dim myInstrumUpdateForm As New UiInstrumentUpdateUtil(pForceToFirmwareUpdate)
             OpenMDIChildForm(myInstrumUpdateForm)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".OpenInstrumentUpdateToolScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenInstrumentUpdateToolScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -3911,8 +3911,8 @@ Public Class Ax00ServiceMainMDI
 
             ' XBC 22/05/2012
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IPositionsAdjustments) Then
-                    Dim CurrentMdiChild As IPositionsAdjustments = CType(ActiveMdiChild, IPositionsAdjustments)
+                If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
+                    Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
                     If CurrentMdiChild.IsCenteringOptic Then
                         pEnable = False
                     End If
@@ -4157,7 +4157,7 @@ Public Class Ax00ServiceMainMDI
             ' XBC 24/10/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisableAll ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -4180,8 +4180,8 @@ Public Class Ax00ServiceMainMDI
 
             ' XBC 22/05/2012
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is IPositionsAdjustments) Then
-                    Dim CurrentMdiChild As IPositionsAdjustments = CType(ActiveMdiChild, IPositionsAdjustments)
+                If (TypeOf ActiveMdiChild Is UiPositionsAdjustments) Then
+                    Dim CurrentMdiChild As UiPositionsAdjustments = CType(ActiveMdiChild, UiPositionsAdjustments)
                     If CurrentMdiChild.IsCenteringOptic Then
                         pEnabled = False
                     End If
@@ -4322,7 +4322,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log
-            CreateLogActivity(ex.Message, Me.Name & ".ActivateActionButtonBar ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ActivateActionButtonBar ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & " ActivateActionButtonBar, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4336,7 +4336,7 @@ Public Class Ax00ServiceMainMDI
             End If
 #End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WriteDebugConsoleTraceLine ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WriteDebugConsoleTraceLine ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & " WriteDebugConsoleTraceLine, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4390,7 +4390,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".ReadSensorAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadSensorAdjustmentValue ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadSensorAdjustmentValue ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -4432,7 +4432,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write Error in the Application Log and show the message
-            CreateLogActivity(ex.Message, Me.Name & ".ReadAllFwAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ReadAllFwAdjustments ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ReadAllFwAdjustments ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4473,7 +4473,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write Error in the Application Log and show the message
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4504,7 +4504,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             'Write Error in the Application Log and show the message
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareMenuOptions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4523,7 +4523,7 @@ Public Class Ax00ServiceMainMDI
             Me.BorrameToolStripMenuItem.Visible = (myCurrentUser >= USER_LEVEL.lBIOSYSTEMS)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareMenuOptions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -4538,7 +4538,7 @@ Public Class Ax00ServiceMainMDI
             Dim myDummyInfoTextControl As New BsXPSViewer
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " PrepareInformation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " PrepareInformation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -4623,8 +4623,8 @@ Public Class Ax00ServiceMainMDI
                                 screenOpened = False
 
                                 'SGM 10/05/2012
-                                If TypeOf ActiveMdiChild Is IISEUtilities Then
-                                    Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                                If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                                    Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                     myISEUtilities.myScreenPendingToOpenWhileISEUtilClosing = pScreenToOpen
                                 Else
                                     ' XBC 20/04/2012
@@ -4696,7 +4696,7 @@ Public Class Ax00ServiceMainMDI
             End If
         Catch ex As Exception
             screenOpened = False
-            CreateLogActivity(ex.Message, Me.Name & ".OpenMDIChildForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenMDIChildForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".OpenMDIChildForm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -4725,33 +4725,33 @@ Public Class Ax00ServiceMainMDI
                     If Me.ActiveMdiChild.AcceptButton IsNot Nothing Then
                         'SGM 28/03/2012
                         If TypeOf ActiveMdiChild Is BSAdjustmentBaseForm Then
-                            If Not (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                            If Not (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                 Dim myBaseAdjForm As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                                 myBaseAdjForm.CloseWithoutShutDownRequestedByMDI = True
                                 myBaseAdjForm.CloseRequestedByMDI = True
-                                If TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest Then
-                                    Dim myMotorsForm As IMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, IMotorsPumpsValvesTest)
+                                If TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest Then
+                                    Dim myMotorsForm As UiMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     If Not myMotorsForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is IPositionsAdjustments Then
-                                    Dim myPosForm As IPositionsAdjustments = CType(Me.ActiveMdiChild, IPositionsAdjustments)
+                                If TypeOf ActiveMdiChild Is UiPositionsAdjustments Then
+                                    Dim myPosForm As UiPositionsAdjustments = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
                                     If Not myPosForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is ITankLevelsAdjustments Then
-                                    Dim myTankForm As ITankLevelsAdjustments = CType(Me.ActiveMdiChild, ITankLevelsAdjustments)
+                                If TypeOf ActiveMdiChild Is UiTankLevelsAdjustments Then
+                                    Dim myTankForm As UiTankLevelsAdjustments = CType(Me.ActiveMdiChild, UiTankLevelsAdjustments)
                                     If Not myTankForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is IBarCodeAdjustments Then
-                                    Dim myBarcodeForm As IBarCodeAdjustments = CType(Me.ActiveMdiChild, IBarCodeAdjustments)
+                                If TypeOf ActiveMdiChild Is UiBarCodeAdjustments Then
+                                    Dim myBarcodeForm As UiBarCodeAdjustments = CType(Me.ActiveMdiChild, UiBarCodeAdjustments)
                                     If Not myBarcodeForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
@@ -4765,8 +4765,8 @@ Public Class Ax00ServiceMainMDI
                                 '    End If
                                 'End If
                             End If
-                        ElseIf TypeOf ActiveMdiChild Is IISEUtilities Then
-                            Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        ElseIf TypeOf ActiveMdiChild Is UiISEUtilities Then
+                            Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
 
                             'SGM 19/09/2012
                             If Not myISEUtilities.IsCompletelyClosed Then
@@ -4826,7 +4826,7 @@ Public Class Ax00ServiceMainMDI
                 'RH 03/11/2010 Wait until Ax00MDBackGround.RunWorkerAsync() is completed
                 'DL 20/04/2012
                 'Using wfPreload As New Biosystems.Ax00.PresentationCOM.IAx00StartUp(Me)
-                Using wfPreload As New Biosystems.Ax00.PresentationCOM.WaitScreen(Me)
+                Using wfPreload As New Biosystems.Ax00.PresentationCOM.UiWaitScreen(Me)
                     'dl 20/04/2012
                     wfPreload.Title = "Waiting ongoing processes completion..." 'AG - Not multilanguage text
                     wfPreload.WaitText = "Please wait..." 'AG - Not multilanguage text
@@ -4895,7 +4895,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".CloseApplication ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CloseApplication ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".CloseApplication ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -4931,19 +4931,19 @@ Public Class Ax00ServiceMainMDI
                     If Me.ActiveMdiChild.AcceptButton IsNot Nothing Then
                         'SGM 28/03/2012
                         If TypeOf ActiveMdiChild Is BSAdjustmentBaseForm Then
-                            If Not (TypeOf ActiveMdiChild Is IStressModeTest) Then
+                            If Not (TypeOf ActiveMdiChild Is UiStressModeTest) Then
                                 Dim myBaseAdjForm As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                                 myBaseAdjForm.CloseWithShutDownRequestedByMDI = True
                                 myBaseAdjForm.CloseRequestedByMDI = True
-                                If TypeOf ActiveMdiChild Is IMotorsPumpsValvesTest Then
-                                    Dim myMotorsForm As IMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, IMotorsPumpsValvesTest)
+                                If TypeOf ActiveMdiChild Is UiMotorsPumpsValvesTest Then
+                                    Dim myMotorsForm As UiMotorsPumpsValvesTest = CType(Me.ActiveMdiChild, UiMotorsPumpsValvesTest)
                                     If Not myMotorsForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
                                     End If
                                 End If
-                                If TypeOf ActiveMdiChild Is IPositionsAdjustments Then
-                                    Dim myPosForm As IPositionsAdjustments = CType(Me.ActiveMdiChild, IPositionsAdjustments)
+                                If TypeOf ActiveMdiChild Is UiPositionsAdjustments Then
+                                    Dim myPosForm As UiPositionsAdjustments = CType(Me.ActiveMdiChild, UiPositionsAdjustments)
                                     If Not myPosForm.IsReadyToClose Then
                                         Me.isWaitingForCloseApp = True
                                         Return myGlobal
@@ -5105,7 +5105,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & ".ShutDownAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShutDownAnalyzer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ShutDownAnalyzer ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -5150,7 +5150,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetAnalyzerInfo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5182,7 +5182,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetAnalyzerInfo2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".GetAnalyzerInfo2", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -5214,7 +5214,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdatePreliminaryHomesMasterData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5244,7 +5244,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UpdatePreliminaryHomesMasterData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".UpdatePreliminaryHomesMasterData", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -5427,7 +5427,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             Me.MDIAnalyzerManager.IsUserConnectRequested = False
-            CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Connect ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         Finally
@@ -5527,7 +5527,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".Connect ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
     '    Finally
@@ -5579,7 +5579,7 @@ Public Class Ax00ServiceMainMDI
 
             'DL 20/04/2012
             'Me.wfWaitScreen = New IAx00StartUp(Nothing) With {.Title = pTitleText, .WaitText = pWaitText}
-            Me.wfWaitScreen = New WaitScreen(Nothing) With {.Title = pTitleText, .WaitText = pWaitText}
+            Me.wfWaitScreen = New UiWaitScreen(Nothing) With {.Title = pTitleText, .WaitText = pWaitText}
             'DL 20/04/2012            
             Me.wfWaitScreen.Show()
 
@@ -5591,7 +5591,7 @@ Public Class Ax00ServiceMainMDI
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WaitControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WaitControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
 
     End Sub
@@ -5627,7 +5627,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareWaitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareWaitingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareWaitingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -5725,7 +5725,7 @@ Public Class Ax00ServiceMainMDI
             Me.NotConnectedText = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_SRV_NOT_CONNECTED", CurrentLanguageAttribute)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5748,7 +5748,7 @@ Public Class Ax00ServiceMainMDI
             OpenMDIChildForm(AnalyzerInfo)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".OpenAnalyzerInfoScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OpenAnalyzerInfoScreen ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -5777,7 +5777,7 @@ Public Class Ax00ServiceMainMDI
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".DeactivateANSINFRefreshingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DeactivateANSINFRefreshingMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".DeactivateANSINFRefreshingMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
     'End Sub
@@ -5837,7 +5837,7 @@ Public Class Ax00ServiceMainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".MaintenanceLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MaintenanceLog ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -5871,7 +5871,7 @@ Public Class Ax00ServiceMainMDI
             Me.Connect()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAutoConnect_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -5895,7 +5895,7 @@ Public Class Ax00ServiceMainMDI
             AutoConnectProcess = False
 
             If String.Compare(AutoConnectFailsTitle, "", False) <> 0 Then
-                CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".BsAutoConnect_DoWork", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(AutoConnectFailsTitle & " - ErrorCode: " & AutoConnectFailsErrorCode, Me.Name & ".BsAutoConnect_DoWork", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ' XBC 25/10/2011 - message is shown in method OnManageSentEvent
                 'Me.ShowMessage(AutoConnectFailsTitle, AutoConnectFailsErrorCode)
                 Me.isWaitingForConnected = False 'SGM 16/11/2011
@@ -6043,7 +6043,7 @@ Public Class Ax00ServiceMainMDI
         Catch ex As Exception
             Me.ReconnectRequested = False
             Me.isWaitingForConnected = False
-            CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAutoConnect_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsAutoConnect_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6089,7 +6089,7 @@ Public Class Ax00ServiceMainMDI
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsWaitStandBy_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6130,7 +6130,7 @@ Public Class Ax00ServiceMainMDI
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".bsWaitStandBy_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsWaitStandBy_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6149,7 +6149,7 @@ Public Class Ax00ServiceMainMDI
             'Me.A400ServiceHelpProvider.SetHelpNavigator(Me, HelpNavigator.TableOfContents)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".SetHelpProvider ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".SetHelpProvider ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6201,7 +6201,7 @@ Public Class Ax00ServiceMainMDI
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Me.Name & ".Ax00MainMDI_MdiChildActivate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Ax00MainMDI_MdiChildActivate ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".Ax00MainMDI_MdiChildActivate ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    End Try
     'End Sub
@@ -6242,7 +6242,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Ax00ServiceMainMDI_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6357,7 +6357,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal = Me.MDIAnalyzerManager.LoadAppFwScriptsData()
             If myGlobal.HasError Or myGlobal Is Nothing Then
                 ' Loading Data Scripts failed !!! PDT !!! localització text !!!
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name, GlobalEnumerates.Messages.SRV_FWSCRIPTS_NOT_LOADED.ToString)
                 Me.ErrorStatusLabel.Text = GetMessageText(myGlobal.ErrorCode)
                 'Application.Exit()
@@ -6371,7 +6371,7 @@ Public Class Ax00ServiceMainMDI
             myGlobal = Me.MDIAnalyzerManager.LoadFwAdjustmentsMasterData(MyClass.SimulationMode)
             If myGlobal.HasError Or myGlobal.SetDatos Is Nothing Then
                 ' Loading Adjustments failed 
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name, GlobalEnumerates.Messages.SRV_FWADJ_MASTER_NOK.ToString)
                 Me.ErrorStatusLabel.Text = GetMessageText(myGlobal.ErrorCode)
                 'Application.Exit()
@@ -6419,7 +6419,7 @@ Public Class Ax00ServiceMainMDI
 
         Catch ex As Exception
             Me.Cursor = Cursors.Default
-            CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Ax00ServiceMainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".Ax00ServiceMainMDI_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6435,7 +6435,7 @@ Public Class Ax00ServiceMainMDI
         Try
             Me.bsTSDateLabel.Text = String.Format("{0} {1}", Today.ToShortDateString(), Now.ToShortTimeString())
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".TestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".TestsToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6451,12 +6451,12 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myConfigUsers = New IConfigUsers(Me)
-            myConfigUsers = New IConfigUsers()
+            myConfigUsers = New UiConfigUsers()
             OpenMDIChildForm(myConfigUsers)
             'Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UsersManagementToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UsersManagementToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UsersManagementToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -6485,9 +6485,9 @@ Public Class Ax00ServiceMainMDI
                 End If
 
                 'SGM 19/09/2012 - special case for ISE utilities screen
-                Dim myISEUtilities As IISEUtilities = Nothing
-                If TypeOf ActiveMdiChild Is IISEUtilities Then
-                    myISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                Dim myISEUtilities As UiISEUtilities = Nothing
+                If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                    myISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                     If myISEUtilities.IsCompletelyClosed Then
                         Me.isWaitingForCloseApp = True
                     End If
@@ -6520,7 +6520,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " ApplicationClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " ApplicationClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6540,7 +6540,7 @@ Public Class Ax00ServiceMainMDI
     '        OpenMDIChildForm(myConfigAnalyzers)
     '        'Cursor = Cursors.Default
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message, Name & ".AnalyzerToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Name & ".AnalyzerToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".AnalyzerToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
     '    Finally
     '        Cursor = Cursors.Default
@@ -6559,12 +6559,12 @@ Public Class Ax00ServiceMainMDI
         Try
             Application.DoEvents()
             'myConfigAnalyzers = New IConfigGeneral(Me) 'SG 03/12/10
-            myConfigAnalyzers = New IConfigGeneral() 'RH 12/04/2012
+            myConfigAnalyzers = New UiConfigGeneral() 'RH 12/04/2012
             myConfigAnalyzers.ActiveAnalyzer = AnalyzerIDAttribute
             OpenMDIChildForm(myConfigAnalyzers)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSAnalysersButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSAnalysersButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsTSAnalysersButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6587,7 +6587,7 @@ Public Class Ax00ServiceMainMDI
 
             OpenMDIChildForm(FwScriptsEdition)
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".HeadPToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".HeadPToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6628,13 +6628,13 @@ Public Class Ax00ServiceMainMDI
 
 
 
-            OpenMDIChildForm(IPositionsAdjustments)
+            OpenMDIChildForm(UiPositionsAdjustments)
 
 
             Me.Text = My.Application.Info.ProductName & " - " & PositionsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PositionsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PositionsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6654,12 +6654,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IPhotometryAdjustments)
+            OpenMDIChildForm(UiPhotometryAdjustments)
 
             Me.Text = My.Application.Info.ProductName & " - " & PhotometryToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PhotometryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PhotometryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6690,7 +6690,7 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Me.Cursor = Cursors.WaitCursor
 
-            OpenMDIChildForm(ITankLevelsAdjustments)
+            OpenMDIChildForm(UiTankLevelsAdjustments)
 
             ''DELETE
             'Me.StartPosition = FormStartPosition.Manual
@@ -6699,7 +6699,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & TankLevelsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".TankLevelsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TankLevelsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6721,12 +6721,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IStressModeTest)
+            OpenMDIChildForm(UiStressModeTest)
 
             Me.Text = My.Application.Info.ProductName & " - " & StressTestToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StressTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StressTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6740,12 +6740,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IDemoMode)
+            OpenMDIChildForm(UiDemoMode)
 
             Me.Text = My.Application.Info.ProductName & " - " & DemoModeToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".DemoModeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DemoModeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6767,12 +6767,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IMotorsPumpsValvesTest)
+            OpenMDIChildForm(UiMotorsPumpsValvesTest)
 
             Me.Text = My.Application.Info.ProductName & " - " & MotorsTestToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6786,7 +6786,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & AnalyzerInfoToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".AnalyzerInfoToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AnalyzerInfoToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6796,7 +6796,7 @@ Public Class Ax00ServiceMainMDI
             Dim continousSimulation As Boolean = True
             Application.DoEvents()
             If Not ActiveMdiChild Is Nothing Then
-                If (TypeOf ActiveMdiChild Is ITankLevelsAdjustments) Then
+                If (TypeOf ActiveMdiChild Is UiTankLevelsAdjustments) Then
                     continousSimulation = False
                 End If
             End If
@@ -6815,7 +6815,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsMonitorSensorsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsMonitorSensorsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6857,12 +6857,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IThermosAdjustments)
+            OpenMDIChildForm(UiThermosAdjustments)
 
             Me.Text = My.Application.Info.ProductName & " - " & ThermosTestToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MotorsTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -6884,12 +6884,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(ICycleCountScreen)
+            OpenMDIChildForm(UiCycleCountScreen)
 
             Me.Text = My.Application.Info.ProductName & " - " & CycleCountsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".CycleCountsToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CycleCountsToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6909,7 +6909,7 @@ Public Class Ax00ServiceMainMDI
             MessageBox.Show("Pending to define")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".bsTSEmergencyButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsTSEmergencyButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("bsTSEmergencyButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6939,7 +6939,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WithOutShutDownToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WithOutShutDownToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("WithOutShutDownToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6964,7 +6964,7 @@ Public Class Ax00ServiceMainMDI
                 Me.Text = My.Application.Info.ProductName & " - " & InstrumentUpdateToolStripMenuItem.Text
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".AdjustmentsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".AdjustmentsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -6976,12 +6976,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IHistoricalReports)
+            OpenMDIChildForm(UiHistoricalReports)
 
             Me.Text = My.Application.Info.ProductName & " - " & HistoryToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".HistoryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".HistoryToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7011,7 +7011,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".WithShutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".WithShutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7070,16 +7070,16 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            'CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            'GlobalBase.CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
             If DirectCast(ex, System.ComponentModel.Win32Exception).ErrorCode = -2147467259 Then
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("OperationGuideToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_ERROR_READER", CurrentLanguageAttribute))
             Else
-                CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".OperationGuideToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("OperationGuideToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             End If
 
@@ -7098,7 +7098,7 @@ Public Class Ax00ServiceMainMDI
         Try
             'Pending
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".MaintenancePlanToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".MaintenancePlanToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7116,7 +7116,7 @@ Public Class Ax00ServiceMainMDI
         Try
             'Pending
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".TroubleshooterToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".TroubleshooterToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7130,12 +7130,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(ILevelDetectionTest)
+            OpenMDIChildForm(UiLevelDetectionTest)
 
             Me.Text = My.Application.Info.ProductName & " - " & LevelDetectionToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".LevelDetectionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LevelDetectionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7149,12 +7149,12 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            OpenMDIChildForm(IBarCodeAdjustments)
+            OpenMDIChildForm(UiBarCodeAdjustments)
 
             Me.Text = My.Application.Info.ProductName & " - " & BarCodeToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BarCodeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BarCodeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7173,7 +7173,7 @@ Public Class Ax00ServiceMainMDI
             'OpenMDIChildForm(IIseAdjustments)
 
             'myISEUtilities = New IISEUtilities(Me, Me.SimulationMode)
-            myISEUtilities = New IISEUtilities(Me, Me.SimulationMode)
+            myISEUtilities = New UiISEUtilities(Me, Me.SimulationMode)
             OpenMDIChildForm(myISEUtilities)
             'Cursor = Cursors.Default
             ' XBC 05/02/2012 ISE Utilities placed into PresetationCOM layer
@@ -7181,7 +7181,7 @@ Public Class Ax00ServiceMainMDI
             Me.Text = My.Application.Info.ProductName & " - " & ISEModuleToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ISEModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ISEModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7196,14 +7196,14 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'mySettings = New ISettings(Me)
-            mySettings = New ISettings()
+            mySettings = New UiSettings()
             OpenMDIChildForm(mySettings)
             'Cursor = Cursors.Default
 
             Me.Text = My.Application.Info.ProductName & " - " & SettingsToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SettingsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SettingsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7219,13 +7219,13 @@ Public Class Ax00ServiceMainMDI
     Private Sub ChangeRotorToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ChangeRotorToolStripMenuItem.Click
         Try
 
-            myChangeRotor = New IChangeRotorSRV()
+            myChangeRotor = New UiChangeRotorSRV()
             OpenMDIChildForm(myChangeRotor)
 
             Me.Text = My.Application.Info.ProductName & " - " & ChangeRotorToolStripMenuItem.Text
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ChangeRotorToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ChangeRotorToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7238,14 +7238,14 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myConfigBarCode = New IBarCodesConfig(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigBarCode = New IBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
+            myConfigBarCode = New UiBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
             OpenMDIChildForm(myConfigBarCode)
             'Cursor = Cursors.Default
 
             Me.Text = My.Application.Info.ProductName & " - " & BarcodesConfigToolStripMenuItem.Text 'SGM 22/02/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BarcodesConfigToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BarcodesConfigToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default
@@ -7266,11 +7266,11 @@ Public Class Ax00ServiceMainMDI
             Application.DoEvents()
             'myConfigAnalyzers = New IConfigGeneral(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
             'myConfigAnalyzers = New IConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigAnalyzers = New IConfigGeneral(MyClass.AdjustmentsReaded) With {.ActiveAnalyzer = AnalyzerIDAttribute} 'SGM 21/11/2012
+            myConfigAnalyzers = New UiConfigGeneral(MyClass.AdjustmentsReaded) With {.ActiveAnalyzer = AnalyzerIDAttribute} 'SGM 21/11/2012
             OpenMDIChildForm(myConfigAnalyzers)
             'Cursor = Cursors.Default
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GeneralToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GeneralToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GeneralToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7282,12 +7282,12 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myConfigUsers = New IConfigUsers(Me)
-            myConfigUsers = New IConfigUsers()
+            myConfigUsers = New UiConfigUsers()
             OpenMDIChildForm(myConfigUsers)
             'Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UserToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7299,7 +7299,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UtilitiesToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7316,11 +7316,11 @@ Public Class Ax00ServiceMainMDI
         Try
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
-            myLogin = New IAx00Login(True)
+            myLogin = New UiAx00Login(True)
             OpenMDIChildForm(myLogin)
             'Cursor = Cursors.Default
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".UserToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UserToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7332,12 +7332,12 @@ Public Class Ax00ServiceMainMDI
             Cursor = Cursors.WaitCursor
             Application.DoEvents()
             'myLanguageConfig = New IConfigLanguage(Me)
-            myLanguageConfig = New IConfigLanguage()
+            myLanguageConfig = New UiConfigLanguage()
             OpenMDIChildForm(myLanguageConfig)
             'Cursor = Cursors.Default
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".LanguageToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".LanguageToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Cursor = Cursors.Default
@@ -7352,7 +7352,7 @@ Public Class Ax00ServiceMainMDI
     ''' </remarks>
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
         Try
-            myAbout = New IAboutBox()
+            myAbout = New UiAboutBox()
 
             'Inform the required screen properties and open the screen
             myAbout.IsUser = False
@@ -7360,7 +7360,7 @@ Public Class Ax00ServiceMainMDI
             OpenMDIChildForm(myAbout)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".AboutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".AboutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
         End Try
     End Sub
@@ -7382,7 +7382,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".AdjustmentsTestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".AdjustmentsTestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AdjustmentsTestsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7402,7 +7402,7 @@ Public Class Ax00ServiceMainMDI
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7419,7 +7419,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".CommonForms_Closed2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".CommonForms_Closed2 ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7441,7 +7441,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7470,7 +7470,7 @@ Public Class Ax00ServiceMainMDI
             '' XBC 20/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".CommonForms_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".CommonForms_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7484,7 +7484,7 @@ Public Class Ax00ServiceMainMDI
             MDIAnalyzerManager.IsConfigGeneralProcess = False
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".GeneralConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GeneralConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7505,7 +7505,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ErrCodesForm_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ErrCodesForm_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -7665,16 +7665,16 @@ Public Class Ax00ServiceMainMDI
                         Dim CurrentMdiChild As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
-                    ElseIf (TypeOf ActiveMdiChild Is IConfigGeneral) Then 'General screen
-                        Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                    ElseIf (TypeOf ActiveMdiChild Is UiConfigGeneral) Then 'General screen
+                        Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
-                    ElseIf (TypeOf ActiveMdiChild Is IBarCodesConfig) Then 'Barcode config screen
-                        Dim CurrentMdiChild As IBarCodesConfig = CType(ActiveMdiChild, IBarCodesConfig)
+                    ElseIf (TypeOf ActiveMdiChild Is UiBarCodesConfig) Then 'Barcode config screen
+                        Dim CurrentMdiChild As UiBarCodesConfig = CType(ActiveMdiChild, UiBarCodesConfig)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
-                    ElseIf (TypeOf ActiveMdiChild Is IISEUtilities) Then 'ISE Utilities screen
-                        Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    ElseIf (TypeOf ActiveMdiChild Is UiISEUtilities) Then 'ISE Utilities screen
+                        Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         CurrentMdiChild.StopCurrentOperation(pAlarmType)
 
                     Else
@@ -7689,7 +7689,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ManageAlarmStep1", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ManageAlarmStep1", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ManageAlarmStep1", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7727,7 +7727,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ManageAlarmStep2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ManageAlarmStep2", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ManageAlarmStep2", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -7789,7 +7789,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowAlarmOrSensorsWarningMessages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowAlarmOrSensorsWarningMessages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowAlarmOrSensorsWarningMessages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7891,7 +7891,7 @@ Public Class Ax00ServiceMainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".AlarmFinalTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".AlarmFinalTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AlarmFinalTreatment", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -7946,7 +7946,7 @@ Public Class Ax00ServiceMainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".RecoverInstrument", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".RecoverInstrument", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RecoverInstrument", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             ScreenWorkingProcess = False
             Me.RecoverRequested = False
@@ -7965,7 +7965,7 @@ Public Class Ax00ServiceMainMDI
             'TODO
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -7986,7 +7986,7 @@ Public Class Ax00ServiceMainMDI
             MyClass.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -8006,7 +8006,7 @@ Public Class Ax00ServiceMainMDI
             MyClass.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".On_CommonScreenStopOperationFinished ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".On_CommonScreenStopOperationFinished ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".On_CommonScreenStopOperationFinished ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8019,7 +8019,7 @@ Public Class Ax00ServiceMainMDI
             MyClass.ActivateActionButtonBar(True, False, isSleeping)
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".On_ConfigGeneralIsClosed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".On_ConfigGeneralIsClosed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".On_ConfigGeneralIsClosed ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -8040,16 +8040,16 @@ Public Class Ax00ServiceMainMDI
                     Dim CurrentMdiChild As BSAdjustmentBaseForm = CType(ActiveMdiChild, BSAdjustmentBaseForm)
                     CurrentMdiChild.StopCurrentOperation()
 
-                ElseIf TypeOf (ActiveMdiChild) Is IConfigGeneral Then
-                    Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                ElseIf TypeOf (ActiveMdiChild) Is UiConfigGeneral Then
+                    Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                     CurrentMdiChild.StopCurrentOperation()
 
-                ElseIf TypeOf (ActiveMdiChild) Is IBarCodesConfig Then
-                    Dim CurrentMdiChild As IBarCodesConfig = CType(ActiveMdiChild, IBarCodesConfig)
+                ElseIf TypeOf (ActiveMdiChild) Is UiBarCodesConfig Then
+                    Dim CurrentMdiChild As UiBarCodesConfig = CType(ActiveMdiChild, UiBarCodesConfig)
                     CurrentMdiChild.StopCurrentOperation()
 
-                ElseIf TypeOf (ActiveMdiChild) Is IISEUtilities Then
-                    Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                ElseIf TypeOf (ActiveMdiChild) Is UiISEUtilities Then
+                    Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                     CurrentMdiChild.StopCurrentOperation()
 
                 End If
@@ -8057,7 +8057,7 @@ Public Class Ax00ServiceMainMDI
 
             'end SGM 25/10/2012
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             Me.Cursor = Cursors.Default
@@ -8102,10 +8102,10 @@ Public Class Ax00ServiceMainMDI
             If DirectCast(ex, System.ComponentModel.Win32Exception).ErrorCode = -2147467259 Then
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("UserManualToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_ERROR_READER", CurrentLanguageAttribute))
             Else
-                CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message, Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("UserManualToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
             End If
 
@@ -8120,14 +8120,14 @@ Public Class Ax00ServiceMainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             Application.DoEvents()
             Me.Cursor = Cursors.WaitCursor
-            Dim mySATReport As ISATReportSRV = New ISATReportSRV '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
+            Dim mySATReport As UiSATReportSRV = New UiSATReportSRV '(MyClass.MDIAnalyzerManager) 'SGM 25/11/2011
             OpenMDIChildForm(mySATReport)
 
             Me.Text = My.Application.Info.ProductName & " - " & SATReportsToolStripMenuItem.Text 'SGM 22/02/2012
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             Me.Cursor = Cursors.Default

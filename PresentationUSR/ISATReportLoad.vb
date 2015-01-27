@@ -108,7 +108,7 @@ Public Class UiSATReportLoad
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -142,7 +142,7 @@ Public Class UiSATReportLoad
             bsScreenToolTips.SetToolTip(bsBrowseButton, myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_LoadSAT_Select", pLanguageID))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -225,7 +225,7 @@ Public Class UiSATReportLoad
                                 'RH 07/02/2012 Return from the Function.
                                 'Avoid the execution of the next code lines.
                                 'Log the error
-                                CreateLogActivity(GlobalEnumerates.Messages.SAT_SAVE_RESTORE_POINT_ERROR.ToString(), _
+                                GlobalBase.CreateLogActivity(GlobalEnumerates.Messages.SAT_SAVE_RESTORE_POINT_ERROR.ToString(), _
                                                   Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, _
                                                   GetApplicationInfoSession().ActivateSystemLog)
 
@@ -335,7 +335,7 @@ Public Class UiSATReportLoad
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ManageVersionComparison", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ManageVersionComparison", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
         Finally
@@ -397,7 +397,7 @@ Public Class UiSATReportLoad
             Else
                 myErrorMessage = ex.Message + " ((" + ex.HResult.ToString + "))"
             End If
-            CreateLogActivity(myErrorMessage, Me.Name & " RestoreDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(myErrorMessage, Me.Name & " RestoreDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = myErrorMessage
 
         Finally
@@ -459,7 +459,7 @@ Public Class UiSATReportLoad
 
         Catch ex As Exception
             Dim myErrorMessage As String = ex.Message + " ((" + ex.HResult.ToString + "))" & " - " & ex.InnerException.InnerException.Message
-            CreateLogActivity(myErrorMessage, Me.Name & " UpdateDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(myErrorMessage, Me.Name & " UpdateDataBase ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = myErrorMessage
 
         Finally
@@ -492,7 +492,7 @@ Public Class UiSATReportLoad
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateRestorePoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " CreateRestorePoint ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = ex.Message
 
         Finally
@@ -563,7 +563,7 @@ Public Class UiSATReportLoad
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " LoadSATReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " LoadSATReport ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ErrorMessage = ex.Message
 
         End Try
@@ -630,7 +630,7 @@ Public Class UiSATReportLoad
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSATReportData_KeyDown", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -752,7 +752,7 @@ Public Class UiSATReportLoad
             'AG 25/10/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadSATReportData_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".LoadSATReportData_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -833,7 +833,7 @@ Public Class UiSATReportLoad
             bsScreenToolTips.SetToolTip(bsSelectedTextBox, bsSelectedTextBox.Text)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BrowseButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".BrowseButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BrowseButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -970,7 +970,7 @@ Public Class UiSATReportLoad
                         'Save the registry value on the DB.
                         myGlobal = myUserSettingsDelegate.Update(Nothing, UserSettingsEnum.LIS_TRACE_LEVEL.ToString(), RegistryLISTraceValue)
                         'Inform on the application log the change and the previous value.
-                        CreateLogActivity("RSAT LIS Trace value change From -->" & DBLISTraceValue & " To --> " & RegistryLISTraceValue, "LOAD RSAT", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("RSAT LIS Trace value change From -->" & DBLISTraceValue & " To --> " & RegistryLISTraceValue, "LOAD RSAT", EventLogEntryType.Information, False)
                     End If
                 End If
                 'TR 24/05/2013 -END.
@@ -1026,7 +1026,7 @@ Public Class UiSATReportLoad
             'IAx00MainMDI.Connect()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOKButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsOKButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Me.Name & ".bsOKButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
 
@@ -1037,7 +1037,7 @@ Public Class UiSATReportLoad
             UiAx00MainMDI.EnableButtonAndMenus(True) 'TR 04/10/2011 -Implement new method.
 
             ' XBC 04/07/2012 - Indicate Load Rsat END on Application LOG.
-            CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
+            GlobalBase.CreateLogActivity("LOAD RSAT END - Start Time: " & StartTime.ToLongTimeString, Name & ".bsOKButton_Click", _
                                        EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
         End Try
@@ -1091,7 +1091,7 @@ Public Class UiSATReportLoad
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRSATConfig", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".LoadRSATConfig", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Me.Name & ".LoadRSATConfig", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
@@ -1122,7 +1122,7 @@ Public Class UiSATReportLoad
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -1142,7 +1142,7 @@ Public Class UiSATReportLoad
             'AG 25/10/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSATDirListBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsSATDirListBox_SelectedIndexChanged", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsSATDirListBox_SelectedIndexChanged", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub

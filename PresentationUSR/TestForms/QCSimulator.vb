@@ -758,7 +758,7 @@ Public Class QCSimulator
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".QCSimulator_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".QCSimulator_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QCSimulator_KeyDown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub

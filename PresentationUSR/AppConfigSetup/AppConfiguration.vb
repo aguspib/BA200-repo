@@ -128,11 +128,11 @@ Public Class AppConfiguration
                 Next
             Else
                 'validate if connection string is empty to send an error
-                'CreateLogActivity("Error Reading the Connection String .", "DAOBase", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity("Error Reading the Connection String .", "DAOBase", EventLogEntryType.Error, False)
             End If
 
         Catch ex As Exception
-            'CreateLogActivity(ex.Message, "AppConfiguration.GetConnectionStringInfo", EventLogEntryType.Error, False)
+            'GlobalBase.CreateLogActivity(ex.Message, "AppConfiguration.GetConnectionStringInfo", EventLogEntryType.Error, False)
         End Try
     End Sub
 
@@ -146,7 +146,7 @@ Public Class AppConfiguration
         Try
             newConnectionString = DataSource & ";" & InitialCaltalog & ";Integrated Security=" & IntegratedSecurity & ";" & UserID & ";" & Password
         Catch ex As Exception
-            'CreateLogActivity(ex.Message, "AppConfiguration.CreateConectionString", EventLogEntryType.Error, False)
+            'GlobalBase.CreateLogActivity(ex.Message, "AppConfiguration.CreateConectionString", EventLogEntryType.Error, False)
         End Try
         Return newConnectionString
     End Function
@@ -168,7 +168,7 @@ Public Class AppConfiguration
             MessageBox.Show(restartAppMessage, "Information", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
         Catch ex As Exception
-            'CreateLogActivity(ex.Message, "AppConfiguration.UpdateAppConfigFile", EventLogEntryType.Error, False)
+            'GlobalBase.CreateLogActivity(ex.Message, "AppConfiguration.UpdateAppConfigFile", EventLogEntryType.Error, False)
         End Try
     End Sub
 

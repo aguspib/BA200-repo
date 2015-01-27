@@ -89,6 +89,7 @@ Namespace Biosystems.Ax00.BL.UpdateVersion
                                 SystemInfoManager.IsUpdateProcess = True
 
                                 'Create 'Previous' folder if not exists
+                                'TODO: Do not use ProgramFiles folder for this stuff, as it violates UAC policy.
                                 If (Not Directory.Exists(Application.StartupPath & GlobalBase.PreviousFolder)) Then
                                     Directory.CreateDirectory(Application.StartupPath & GlobalBase.PreviousFolder)
                                 End If

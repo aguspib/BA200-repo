@@ -1,6 +1,6 @@
 Imports Biosystems.Ax00.Global
 
-Public Class WaitScreen
+Public Class UiWaitScreen
     Inherits Windows.Forms.Form
 
 #Region "Declaration"
@@ -65,7 +65,7 @@ Public Class WaitScreen
 #Region "Inicializadores de Componentes"
 
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(WaitScreen))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWaitScreen))
         Me.lbTextoPreload = New System.Windows.Forms.Label
         Me.lbTitle = New System.Windows.Forms.Label
         Me.BsTimer1 = New Biosystems.Ax00.Controls.UserControls.BSTimer

@@ -256,7 +256,7 @@ Public Class FwScriptsEdition
             'MyClass.CurrentScreenMode = MyClass.PreviousScreenModeBeforeTesting
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".OnManageReceptionFwScriptEvent ", _
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".OnManageReceptionFwScriptEvent ", _
                                      EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
         End Try
 
@@ -292,7 +292,7 @@ Public Class FwScriptsEdition
             myResultData.SetDatos = dataSessionTO.UserName
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetCurrentAuthorID", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetCurrentAuthorID", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetCurrentAuthorID", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myResultData
@@ -334,7 +334,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertGridToScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ConvertGridToScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ConvertGridToScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -374,7 +374,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -403,7 +403,7 @@ Public Class FwScriptsEdition
             Me.BsScreenActionsTreeView.ImageList = BStreeScreenIcons
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTreeViewImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareTreeViewImages", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareTreeViewImages", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -495,7 +495,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareButtons", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareButtons", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -541,7 +541,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -654,7 +654,7 @@ Public Class FwScriptsEdition
             bsInstructionsListDataGridView.EditMode = DataGridViewEditMode.EditOnEnter
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInstructionsGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".InitializeInstructionsGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".InitializeInstructionsGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -692,7 +692,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FillAnalyzersCombo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FillAnalyzersCombo", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FillAnalyzersCombo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -782,7 +782,7 @@ Public Class FwScriptsEdition
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreensTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".LoadScreensTreeView", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".LoadScreensTreeView", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -826,7 +826,7 @@ Public Class FwScriptsEdition
             Next
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetFwScriptRelatedNodes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myNodes
@@ -861,7 +861,7 @@ Public Class FwScriptsEdition
             Next
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedScreenNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetFwScriptRelatedScreenNodes", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetFwScriptRelatedScreenNodes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myNodes
@@ -893,7 +893,7 @@ Public Class FwScriptsEdition
                 End If
             Next
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileEditing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileEditing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TreeviewWhileEditing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -922,7 +922,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileReading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TreeviewWhileReading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TreeviewWhileReading", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -986,7 +986,7 @@ Public Class FwScriptsEdition
 
             End Select
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIPrepareScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIPrepareScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIPrepareScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1030,7 +1030,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiating", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIInitiating", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1076,7 +1076,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIInitiated", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIInitiated", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1121,7 +1121,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoading", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILoading", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1192,7 +1192,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoaded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILoaded", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILoaded", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1280,7 +1280,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModifying", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModifying", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIModifying", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1354,7 +1354,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModified", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIModified", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIModified", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1408,7 +1408,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGridChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGridChanging", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIGridChanging", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1453,7 +1453,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILocalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUILocalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUILocalSaving", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1498,7 +1498,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIAllImporting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1544,7 +1544,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptChecking", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptChecking", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptChecking", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1589,7 +1589,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptTesting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptTesting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptTesting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1634,7 +1634,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptImporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptImporting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1679,7 +1679,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptExporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIScriptExporting", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIScriptExporting", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1724,7 +1724,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGlobalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIGlobalSaving", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & "UIGlobalSaving", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1769,7 +1769,7 @@ Public Class FwScriptsEdition
             Me.BsUnTestButton.Enabled = False
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllRestoring", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIAllRestoring", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIAllRestoring", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1818,7 +1818,7 @@ Public Class FwScriptsEdition
             Me.Cursor = Cursors.Default
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIOnError", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareUIOnError", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".PrepareUIOnError", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -1872,7 +1872,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ShowActionFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowActionFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ShowActionFwScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1907,7 +1907,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ShowFwScriptInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowFwScriptInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ShowFwScriptInstructions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -1969,7 +1969,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ShowInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ShowInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ShowInstructions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         Finally
             If Not myGlobal.HasError Then
@@ -2031,7 +2031,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ExportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExportCurrentFwScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2110,7 +2110,7 @@ Public Class FwScriptsEdition
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ImportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ImportCurrentFwScript", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ImportCurrentFwScript", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2200,7 +2200,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGrid", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckGrid", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
 
 
@@ -2275,7 +2275,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSyntax", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSyntax", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckGridSyntax", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2320,7 +2320,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSequence", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".CheckGridSequence", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".CheckGridSequence", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2384,7 +2384,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = "SYSTEM_ERROR"
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".DisplayGridResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".DisplayGridResults", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".DisplayGridResults", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
         Return myGlobal
@@ -2521,7 +2521,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateGridCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             Return myGlobal
         End Try
@@ -2569,7 +2569,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateGridCell", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateGridCell", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2606,7 +2606,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateCellsEditionChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ValidateCellsEditionChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ValidateCellsEditionChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2731,7 +2731,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".TestInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".TestInstructions", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".TestInstructions", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -2779,7 +2779,7 @@ Public Class FwScriptsEdition
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
             dialogResultToReturn = Windows.Forms.DialogResult.No
         End Try
@@ -2815,7 +2815,7 @@ Public Class FwScriptsEdition
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingGlobalWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " SavePendingGlobalWarningMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
             dialogResultToReturn = Windows.Forms.DialogResult.No
         End Try
@@ -2929,7 +2929,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveScriptChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveScriptChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveScriptChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -2992,7 +2992,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAllChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SaveAllChanges", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SaveAllChanges", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3018,7 +3018,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".GetCellColumnName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".GetCellColumnName", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".GetCellColumnName", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3131,7 +3131,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".MoveRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".MoveRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".MoveRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3188,7 +3188,7 @@ Public Class FwScriptsEdition
             myGlobal.HasError = True
             myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreFactoryScripts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".RestoreFactoryScripts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".RestoreFactoryScripts ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3223,7 +3223,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_FormClosing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_FormClosing", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FormScriptsManager_FormClosing", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3252,7 +3252,7 @@ Public Class FwScriptsEdition
             ResetBorderSRV()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".FormScriptsManager_Load", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".FormScriptsManager_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3287,7 +3287,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsExportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsExportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExportButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3340,7 +3340,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsImportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsImportButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsImportButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
@@ -3378,7 +3378,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsCheckButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCheckButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsCheckButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -3412,7 +3412,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsTestButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3431,7 +3431,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsUnTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsUnTestButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsUnTestButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3453,7 +3453,7 @@ Public Class FwScriptsEdition
                 End If
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsEditButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsEditButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3504,7 +3504,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsAddButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsAddButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsAddButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3541,7 +3541,7 @@ Public Class FwScriptsEdition
             'Me.SaveAllChanges()
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSaveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsSaveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3577,7 +3577,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCancelButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsCancelButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3592,7 +3592,7 @@ Public Class FwScriptsEdition
             Me.MoveRow(RowMovement.UP)
             'Me.Sort("UP")
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveUpButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveUpButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsMoveUpButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3607,7 +3607,7 @@ Public Class FwScriptsEdition
             Me.MoveRow(RowMovement.DOWN)
             'Me.Sort("DOWN")
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveDownButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsMoveDownButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsMoveDownButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3627,7 +3627,7 @@ Public Class FwScriptsEdition
             MyClass.CurrentScreenMode = ScreenModes.MODIFIED
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsRemoveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsRemoveButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRemoveButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3660,7 +3660,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "ExitButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "ExitButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ExitButton_Click", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -3692,7 +3692,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsSaveAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsSaveAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsSaveAllButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3728,7 +3728,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsExportAllToFileButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsExportAllToFileButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsExportAllToFileButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3749,7 +3749,7 @@ Public Class FwScriptsEdition
 
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_CellValueChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_CellValueChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsInstructionsListDataGridView_CellValueChanged", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -3780,7 +3780,7 @@ Public Class FwScriptsEdition
 
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsRestoreButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsRestoreButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsRestoreButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3858,7 +3858,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BsImportAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BsImportAllButton_Click " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsImportAllButton_Click", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
         End Try
@@ -3921,7 +3921,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsScreenActionsTreeView_NodeMouseClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3980,7 +3980,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsScreenActionsTreeView_NodeMouseDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BsScreenActionsTreeView_NodeMouseDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -3995,7 +3995,7 @@ Public Class FwScriptsEdition
                 MyClass.CurrentScreenMode = ScreenModes.MODIFYING
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".bsInstructionsListDataGridView_CellDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".bsInstructionsListDataGridView_CellDoubleClick", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsInstructionsListDataGridView_CellDoubleClick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4010,7 +4010,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_SelectionChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "bsInstructionsListDataGridView_SelectionChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".bsInstructionsListDataGridView_SelectionChanged", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -4027,7 +4027,7 @@ Public Class FwScriptsEdition
             End If
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_EditingControlShowing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -4067,7 +4067,7 @@ Public Class FwScriptsEdition
             MyClass.CurrentScreenMode = ScreenModes.MODIFIED
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " dgvTextBox_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " dgvTextBox_KeyDown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenModeAttr = ScreenModes.ON_ERROR
         End Try
@@ -4100,7 +4100,7 @@ Public Class FwScriptsEdition
             If myglobal.HasError Then MyClass.CurrentScreenMode = ScreenModes.ON_ERROR
 
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " bsInstructionsListDataGridView_RowEnter ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage("Error", "SYSTEM_ERROR", ex.Message)
             MyClass.CurrentScreenModeAttr = ScreenModes.ON_ERROR
         End Try
@@ -4135,7 +4135,7 @@ Public Class FwScriptsEdition
                 MyClass.LoadScreensTreeView()
             End If
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, "BSAnalyzerCombo_SelectedIndexChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, "BSAnalyzerCombo_SelectedIndexChanged " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".BSAnalyzerCombo_SelectedIndexChanged", "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -4151,7 +4151,7 @@ Public Class FwScriptsEdition
         Try
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".PrepareErrorMode ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareErrorMode ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4169,7 +4169,7 @@ Public Class FwScriptsEdition
             MyBase.myServiceMDI.ManageAlarmStep2(pAlarmType)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".StopCurrentOperation ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".StopCurrentOperation ", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -4377,7 +4377,7 @@ Public Class FwScriptsEdition
     '        myGlobal.HasError = True
     '        myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
     '        myGlobal.ErrorMessage = ex.Message
-    '        MyBase.CreateLogActivity(ex.Message, Me.Name & ".Sort", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".Sort", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        MyBase.ShowMessage(Me.Name & ".Sort", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
     '    End Try
 
@@ -4411,7 +4411,7 @@ Public Class FwScriptsEdition
 
             Return returnValue
         Catch ex As Exception
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".SelectionRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".SelectionRow", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".SelectionRow", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Function

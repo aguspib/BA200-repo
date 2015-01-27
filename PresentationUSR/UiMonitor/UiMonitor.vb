@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.BL
 Imports DevExpress.XtraGrid.Views.Grid 'DL 24/07/2012
 Imports System.Timers 'AG 31/01/2014 - BT #1486
-
+Imports Biosystems.Ax00.PresentationCOM
 
 ' Remarks
 ' -------
@@ -412,7 +412,7 @@ Public Class UiMonitor
                 ShowMessage(Me.Name, resultData.ErrorCode, resultData.ErrorMessage, MsgParent)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTimes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".UpdateTimes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".UpdateTimes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -439,7 +439,7 @@ Public Class UiMonitor
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetWaitingCycle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetWaitingCycle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetWaitingCycle", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
         Return waitingMachineTime
@@ -453,7 +453,7 @@ Public Class UiMonitor
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConvertSecondsInHHmmss ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConvertSecondsInHHmmss ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ConvertSecondsInHHmmss", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
         Return formattedRemTime
@@ -468,7 +468,7 @@ Public Class UiMonitor
 
             timeInSeconds = (remHours * 3600) + (remMinutes * 60) + remSeconds
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConvertHHmmssInSeconds ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ConvertHHmmssInSeconds ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ConvertHHmmssInSeconds", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
         Return timeInSeconds
@@ -556,7 +556,7 @@ Public Class UiMonitor
             'Console.Text &= String.Format("RefreshCommonArea: {0}{1}", ElapsedTime.ToStringWithDecimals(0), vbCrLf)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshCommonArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshCommonArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshCommonArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -775,7 +775,7 @@ Public Class UiMonitor
             myInProcessCellsList = Nothing
             tmpInProcessList = Nothing
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshRotors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshRotors ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshRotors", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -850,7 +850,7 @@ Public Class UiMonitor
             ''PENDING TO DECIDE
             ''SGM 01/10/2012 - In case of Closing NOT TO TREAT GLOBES
             'If MyBase.isClosingFlag Then
-            '    CreateLogActivity("Globes while Is Closing", Me.Name & ".RefreshAlarmsGlobes ", EventLogEntryType.FailureAudit, False)
+            '    GlobalBase.CreateLogActivity("Globes while Is Closing", Me.Name & ".RefreshAlarmsGlobes ", EventLogEntryType.FailureAudit, False)
             '    Exit Sub
             'End If
 
@@ -883,7 +883,7 @@ Public Class UiMonitor
 
             Application.DoEvents()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshAlarmsGlobes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshAlarmsGlobes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshAlarmsGlobes", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -907,7 +907,7 @@ Public Class UiMonitor
             Dim StartTime As DateTime = Now 'AG 04/07/2012 - time estimation
 
             GlobalBase.CreateLogActivity("Refresh monitor screen (init) ", "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
-            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            'GlobalBase.CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.EXECUTION_STATUS) OrElse _
                 pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED) Then
@@ -1010,7 +1010,7 @@ Public Class UiMonitor
             End If
 
             GlobalBase.CreateLogActivity("Refresh monitor screen (complete): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "iMonitor.RefreshScreen", EventLogEntryType.Information, False) 'AG 04/07/2012
-            'CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+            'GlobalBase.CreateLogActivity("IAx00MainMDI.ActiveMdiChild.Name : " + IAx00MainMDI.ActiveMdiChild.Name, Name & ".RefreshScreen ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
             ''AG 12/04/2012 - If WS aborted then show message in the app status bar
             'If WorkSessionStatusField = "ABORTED" Then
@@ -1019,7 +1019,7 @@ Public Class UiMonitor
             ''AG 12/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".RefreshScreen ", EventLogEntryType.Error, _
                                                                     GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
@@ -1851,7 +1851,7 @@ Public Class UiMonitor
             bsEndWarmUp.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "BTN_TERMINATE", LanguageID) 'TR 28/03/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetMonitorLabels ", EventLogEntryType.Error, _
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetMonitorLabels ", EventLogEntryType.Error, _
                                                                           GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetMonitorLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
@@ -1901,7 +1901,7 @@ Public Class UiMonitor
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusDescOnCurrentLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetStatusDescOnCurrentLanguage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetStatusDescOnCurrentLanguage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return myResult
@@ -1953,7 +1953,7 @@ Public Class UiMonitor
             If Not myEnableButtonsAlreadyLaunch Then UiAx00MainMDI.EnableButtonAndMenus(True, True)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".ExecuteAutoCreateWSLastStep ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.StackTrace + " - " + ex.HResult.ToString + "))", Me.Name & ".ExecuteAutoCreateWSLastStep ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".ExecuteAutoCreateWSLastStep ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -2087,7 +2087,7 @@ Public Class UiMonitor
             End If
         Next
 
-        CreateLogActivity("IMonitor CLOSED (Complete)", "IMonitor.Monitor_FormClosed", EventLogEntryType.Information, False) 'AG 28/05/2014 - New trace
+        GlobalBase.CreateLogActivity("IMonitor CLOSED (Complete)", "IMonitor.Monitor_FormClosed", EventLogEntryType.Information, False) 'AG 28/05/2014 - New trace
 
         'Application.DoEvents() 'AG 21/02/2014 - #1516 Comment because sometimes cause internal exceptions
     End Sub
@@ -2162,7 +2162,7 @@ Public Class UiMonitor
     '            End If
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OverallTimeTextEdit_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OverallTimeTextEdit_TextChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Me.Name & ".OverallTimeTextEdit_TextChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
     '    End Try
     'End Sub
@@ -2275,7 +2275,7 @@ Public Class UiMonitor
 
     Public Sub New()
 
-        CreateLogActivity("New Instance", "IMonitor.New ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+        GlobalBase.CreateLogActivity("New Instance", "IMonitor.New ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
 
         ' XB 25/11/2013 - Inform to MDI that this screen is building - Task #1303
         LoadingScreen()

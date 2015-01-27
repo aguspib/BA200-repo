@@ -628,9 +628,9 @@ Namespace Biosystems.Ax00.Global
                     End While
 
                     '2.- We append the call stack information, with delimiters (to make it a bit easier to read)
-                    exceptionDesc.Append(vbCr & vbCr & "<CallStack>")
+                    exceptionDesc.Append(vbCr & vbCr & "CallStack:" & vbCr)
                     exceptionDesc.Append(ex.StackTrace)
-                    exceptionDesc.Append("</CallStack>" & vbCr & vbCr)
+                    exceptionDesc.Append(vbCr & "end of CallStack" & vbCr & vbCr)
 
                     '2.- We inspect the exception origin by inspecing the target of main exception 
                     Dim sourceOfException = ex.Source &
@@ -675,7 +675,7 @@ Namespace Biosystems.Ax00.Global
                 End If
 
             Catch ex As Exception
-                CreateLogActivity(ex.Message, "ApplicationSessionManager.GetSessionInfo", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex.Message, "ApplicationSessionManager.GetSessionInfo", EventLogEntryType.Error, False)
             End Try
 
             Return MyApplicationInfoSession
@@ -706,7 +706,7 @@ Namespace Biosystems.Ax00.Global
             End If
 
             'Write error in the Application Log
-            CreateLogActivity(errMsg & " " & errDoc & " " & errMethod & ": " & errLine, _
+            GlobalBase.CreateLogActivity(errMsg & " " & errDoc & " " & errMethod & ": " & errLine, _
                               errDoc & "." & errMethod & ": " & errLine, _
                               EventLogEntryType.Error, False)
             'Catch ex As Exception
