@@ -2432,6 +2432,8 @@ Public Class UiProgCalibrator
     ''' <remarks>
     ''' Created by:  TR 18/02/2011
     ''' Modified by: TR 09/10/2011 - Changed all convert to INT by convert to DOUBLE
+    '''              WE 26/01/2015 - BA-2047: Solved bug in which the program flow could enter the save process when the
+    '''                              Theoretical Concentration entered by the user was rounded to 0 (zero).
     ''' </remarks>
     Private Function ValidateErrorConcValuesDescOrderGrid() As Boolean
         Dim myResult As Boolean = False
@@ -2444,7 +2446,8 @@ Public Class UiProgCalibrator
                     'Validate the Theorical Concentration is informed for the row and also that it is numeric
                     If (Not ConcentrationRow.Cells("TheoricalConcentration").Value Is DBNull.Value AndAlso _
                         IsNumeric(ConcentrationRow.Cells("TheoricalConcentration").Value.ToString())) Then
-                        If (CDbl(ConcentrationRow.Cells("TheoricalConcentration").Value) <= 0) Then
+                        ' WE 26/01/2015 (BA-2047) - added check to prevent entering the save process when the Theoretical Conc. value is rounded to 0 (zero).
+                        If (CDbl(ConcentrationRow.Cells("TheoricalConcentration").Value) <= 0) OrElse CDbl(ConcentrationRow.Cells("TheoricalConcentration").FormattedValue) = 0 Then
                             myResult = True
                             Exit For
                         End If
