@@ -5,7 +5,7 @@ Namespace Biosystems.Ax00.Global
     'Definition of the global TO used for Data Access 
 
 
-    Public Class GenericGlobalDataTo(Of T)
+    Public Class TypedGlobalDataTo(Of T)
 
 
 #Region "Properties"
@@ -29,12 +29,25 @@ Namespace Biosystems.Ax00.Global
         Public Overridable Property SetDatos As T
 
         'Get/Set the value of the UserLevel
-        Public Property SetUserLevel As Object
+        Public Property SetUserLevel As String
 
+#End Region
+
+#Region "Methods"
+        Function GetCompatibleGlobalDataTo() As GlobalDataTO
+            Dim GDT As New GlobalDataTO()
+            GDT.AffectedRecords = AffectedRecords
+            GDT.ErrorCode = ErrorCode
+            GDT.ErrorMessage = ErrorMessage
+            GDT.HasError = HasError
+            GDT.SetDatos = TryCast(SetDatos, Object)
+            GDT.SetUserLevel = SetUserLevel
+            Return GDT
+        End Function
 #End Region
     End Class
 
     Public Class GlobalDataTO
-        Inherits GenericGlobalDataTo(Of Object)
+        Inherits TypedGlobalDataTo(Of Object)
     End Class
 End Namespace
