@@ -17,6 +17,8 @@ Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.InfoAnalyzer
 
 Imports System.Runtime.CompilerServices
+Imports System.Text
+Imports System.Xml.Serialization
 
 Public Class FormSergio
     Inherits BSAdjustmentBaseForm
@@ -36,10 +38,10 @@ Public Class FormSergio
 
     Private myMDI As Ax00ServiceMainMDI
 
-    Private Sub FormSergio_FormClosing(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles Me.FormClosing
+    Private Sub FormSergio_FormClosing(ByVal sender As Object, ByVal e As FormClosingEventArgs) Handles Me.FormClosing
         Try
             'Dim myUtil As New Utilities.
-            Utilities.TaskBarState = InitialTaskBarState
+            TaskBarState = InitialTaskBarState
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -47,23 +49,23 @@ Public Class FormSergio
 
    
 
-    Private Sub FormSergio_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+    Private Sub FormSergio_Load(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Load
         Dim myGlobal As New GlobalDataTO
         Try
             Dim myProdName As String = My.Application.Info.ProductName
 
             'Dim myUtil As New Utilities.
-            InitialTaskBarState = Utilities.TaskBarState
+            InitialTaskBarState = TaskBarState
 
             RefreshTaskbarState()
 
 
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("ADJUSTMENT")
-            If System.IO.File.Exists(iconPath & auxIconName) Then
+            If File.Exists(iconPath & auxIconName) Then
                 Dim myImage As Image = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
-                    myGlobal = Utilities.ResizeImage(myImage, New Size(16, 16))
+                    myGlobal = ResizeImage(myImage, New Size(16, 16))
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myImage = CType(myGlobal.SetDatos, Image)
                         BsButton14.Image = myImage
@@ -85,7 +87,7 @@ Public Class FormSergio
 
    
 
-    Private Sub BsExceptionsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExceptionsButton.Click
+    Private Sub BsExceptionsButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsExceptionsButton.Click
         Try
             Throw New Exception
         Catch ex As Exception
@@ -93,7 +95,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsCloseButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsCloseButton.Click
+    Private Sub BsCloseButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsCloseButton.Click
         Try
             Me.Close()
         Catch ex As Exception
@@ -101,7 +103,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton1.Click
+    Private Sub BsButton1_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton1.Click
         ChangeScripts()
     End Sub
 
@@ -122,9 +124,9 @@ Public Class FormSergio
 
 
             Dim myData As String = ""
-            Dim objReader As System.IO.StreamReader
+            Dim objReader As StreamReader
             Dim path As String = "C:\FWScripts1.xml"
-            objReader = New System.IO.StreamReader(path)
+            objReader = New StreamReader(path)
             myData = objReader.ReadToEnd()
             objReader.Close()
 
@@ -247,9 +249,9 @@ Public Class FormSergio
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            MyBase.CreateLogActivity(ex.Message, Me.Name & ".ImportAdjustmentsRestoreFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ImportAdjustmentsRestoreFile ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             MyBase.ShowMessage(Me.Name & ".ImportAdjustmentsRestoreFile", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 
@@ -257,7 +259,7 @@ Public Class FormSergio
 
     End Function
 
-    Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton2.Click
+    Private Sub BsButton2_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton2.Click
         Try
             Dim a As String = Environment.GetFolderPath(Environment.SpecialFolder.System)
 
@@ -344,7 +346,7 @@ Public Class FormSergio
             For Each P As PropertyData In n
                 pp &= P.Name & vbCrLf
             Next
-            Dim o As Object = CType(oWMI_Object.GetPropertyValue("RecordNumber"), System.Int64)
+            Dim o As Object = CType(oWMI_Object.GetPropertyValue("RecordNumber"), Int64)
         Next oWMI_Object
 
         ' Clean up
@@ -377,7 +379,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton3.Click
+    Private Sub BsButton3_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton3.Click
         Try
 
             Dim myISECommand As New ISECommandTO()
@@ -401,18 +403,18 @@ Public Class FormSergio
     End Sub
 
 
-    Private InitialTaskBarState As Utilities.TaskBarStates
+    Private InitialTaskBarState As TaskBarStates
 
-    Private Sub BsButton4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton4.Click
+    Private Sub BsButton4_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton4.Click
         Try
             'Dim myUtil As New Utilities.
 
-            Select Case Utilities.TaskBarState
-                Case Utilities.TaskBarStates.AUTOHIDE, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP, Utilities.TaskBarStates.AUTOHIDE_CLOCK, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
-                    Utilities.TaskBarAutoHide = False
+            Select Case TaskBarState
+                Case TaskBarStates.AUTOHIDE, TaskBarStates.AUTOHIDE_ALWAYSONTOP, TaskBarStates.AUTOHIDE_CLOCK, TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
+                    TaskBarAutoHide = False
                    
                 Case Else
-                    Utilities.TaskBarAutoHide = True
+                    TaskBarAutoHide = True
 
             End Select
 
@@ -423,15 +425,15 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton5.Click
+    Private Sub BsButton5_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton5.Click
         Try
             'Dim myUtil As New Utilities.
 
-            Select Case Utilities.TaskBarState
-                Case Utilities.TaskBarStates.ALWAYSONTOP, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP, Utilities.TaskBarStates.ALWAYSONTOP_CLOCK, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
-                    Utilities.TaskBarAlwaysOnTop = False
+            Select Case TaskBarState
+                Case TaskBarStates.ALWAYSONTOP, TaskBarStates.AUTOHIDE_ALWAYSONTOP, TaskBarStates.ALWAYSONTOP_CLOCK, TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
+                    TaskBarAlwaysOnTop = False
                 Case Else
-                    Utilities.TaskBarAlwaysOnTop = True
+                    TaskBarAlwaysOnTop = True
             End Select
 
             RefreshTaskbarState()
@@ -445,16 +447,16 @@ Public Class FormSergio
     Private Sub RefreshTaskbarState()
         Try
             'Dim myUtil As New Utilities.
-            Select Case Utilities.TaskBarState
-                Case Utilities.TaskBarStates.AUTOHIDE, Utilities.TaskBarStates.AUTOHIDE_CLOCK
+            Select Case TaskBarState
+                Case TaskBarStates.AUTOHIDE, TaskBarStates.AUTOHIDE_CLOCK
                     BsButton4.Text = "Not Auto Hide"
                     BsButton5.Text = "Always On Top"
 
-                Case Utilities.TaskBarStates.ALWAYSONTOP, Utilities.TaskBarStates.ALWAYSONTOP_CLOCK
+                Case TaskBarStates.ALWAYSONTOP, TaskBarStates.ALWAYSONTOP_CLOCK
                     BsButton4.Text = "Auto Hide"
                     BsButton5.Text = "Not Always On Top"
 
-                Case Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP, Utilities.TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
+                Case TaskBarStates.AUTOHIDE_ALWAYSONTOP, TaskBarStates.AUTOHIDE_ALWAYSONTOP_CLOCK
                     BsButton4.Text = "Not Auto Hide"
                     BsButton5.Text = "Not Always On Top"
             End Select
@@ -467,7 +469,7 @@ Public Class FormSergio
 
    
 
-    Private Sub BsButton9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton9.Click
+    Private Sub BsButton9_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton9.Click
         Dim myGlobal As New GlobalDataTO
         Try
             '<SER Li 0.93 Na - 0.1 K 2.82 Cl 104.4 0030500b>
@@ -528,7 +530,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton10_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton10.Click
+    Private Sub BsButton10_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton10.Click
         Dim myGlobal As New GlobalDataTO
         Try
 
@@ -621,7 +623,7 @@ Public Class FormSergio
             Dim myISEResultData As New ISEResultsDataTO
             Dim myISEResult As ISEResultTO = myAnalyzer.ISE_Manager.LastISEResult
             If myISEResult IsNot Nothing Then
-                Dim str As New System.Text.StringBuilder
+                Dim str As New StringBuilder
                 With myISEResult
                     str.Append(.ReceivedResults & vbCrLf & vbCrLf)
                     If .ConcentrationValues.HasData Then
@@ -708,9 +710,9 @@ Public Class FormSergio
 
             'SERIALIZE TEST
             If myISEResultData.ISEResultsData.Count > 0 Then
-                Dim FS As System.IO.FileStream
-                FS = System.IO.File.OpenWrite("C:\ISEResults.xml")
-                Dim serializer As New System.Xml.Serialization.XmlSerializer(myISEResultData.GetType)
+                Dim FS As FileStream
+                FS = File.OpenWrite("C:\ISEResults.xml")
+                Dim serializer As New XmlSerializer(myISEResultData.GetType)
                 serializer.Serialize(FS, myISEResultData)
                 FS.Close()
                 FS.Dispose()
@@ -722,7 +724,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton6.Click
+    Private Sub BsButton6_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton6.Click
 
         Dim myGlobal As New GlobalDataTO
 
@@ -731,7 +733,7 @@ Public Class FormSergio
             myGlobal = myISEInfoDelegate.ReadAllInfo(Nothing, "SN0000099999_Ax400")
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 Dim myISEInfoDS As ISEInformationDS = CType(myGlobal.SetDatos, ISEInformationDS)
-                Dim str As New System.Text.StringBuilder
+                Dim str As New StringBuilder
                 For Each I As ISEInformationDS.tinfoISERow In myISEInfoDS.tinfoISE.Rows
                     str.Append(I.ISESettingID & vbTab & I.Value & vbCrLf)
                 Next
@@ -743,7 +745,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton7_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton7.Click
+    Private Sub BsButton7_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton7.Click
 
         Dim myGlobal As New GlobalDataTO
 
@@ -784,7 +786,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton11.Click
+    Private Sub BsButton11_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton11.Click
 
         Dim myGlobal As New GlobalDataTO
 
@@ -793,7 +795,7 @@ Public Class FormSergio
             myGlobal = myISECalibHisDelegate.ReadAll(Nothing, "SN0000099999_Ax400")
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 Dim myISECalibHisDS As HistoryISECalibrationsDS = CType(myGlobal.SetDatos, HistoryISECalibrationsDS)
-                Dim str As New System.Text.StringBuilder
+                Dim str As New StringBuilder
                 For Each C As HistoryISECalibrationsDS.thisCalibISERow In myISECalibHisDS.thisCalibISE.Rows
                     'JB 25/07/2012 - Deleted column ActionType
                     'str.Append(C.CalibrationID.ToString & vbTab & C.CalibrationDate.ToString & vbTab & C.ConditioningType & vbTab & C.ResultsString & vbTab & C.ActionType & vbCrLf)
@@ -807,7 +809,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton12.Click
+    Private Sub BsButton12_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton12.Click
 
         Dim myGlobal As New GlobalDataTO
 
@@ -858,28 +860,28 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton13_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton13.Click
+    Private Sub BsButton13_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton13.Click
         Dim myISE As New TestISEMonitor
         myISE.Show()
     End Sub
 
 
-    Private Sub BsButton14_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton14.Click
+    Private Sub BsButton14_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton14.Click
         Dim ActionButtonCol As New DataGridViewDisableButtonColumn
         ActionButtonCol.ValueType = (New Button).GetType
     End Sub
 
-    Private Sub BsDataGridView1_CellPainting(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DataGridViewCellPaintingEventArgs) Handles BsDataGridView1.CellPainting
+    Private Sub BsDataGridView1_CellPainting(ByVal sender As Object, ByVal e As DataGridViewCellPaintingEventArgs) Handles BsDataGridView1.CellPainting
         Dim myGlobal As New GlobalDataTO
         Try
             'Dim myUtil As New Utilities.
             Dim myImage As Image = Nothing
             Dim iconPath As String = MyBase.IconsPath
             Dim auxIconName As String = GetIconName("ADJUSTMENT")
-            If System.IO.File.Exists(iconPath & auxIconName) Then
+            If File.Exists(iconPath & auxIconName) Then
                 myImage = ImageUtilities.ImageFromFile(iconPath & auxIconName)
                 If myImage IsNot Nothing Then
-                    myGlobal = Utilities.ResizeImage(myImage, New Size(16, 16))
+                    myGlobal = ResizeImage(myImage, New Size(16, 16))
                     If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                         myImage = CType(myGlobal.SetDatos, Image)
                         BsButton14.Image = myImage
@@ -900,9 +902,9 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton15_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton15.Click
+    Private Sub BsButton15_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton15.Click
         Try
-            Dim msg As New IMsgBox
+            Dim msg As New UiMsgBox
             Dim res As DialogResult = msg.ShowMsg("La expresidenta del Consell de Mallorca y de Unió Mallorquina (UM) benefició a una empresa audiovisual. El exvicepresidente, Miquel Nadal, condenado a dos años y siete meses de prisión", "BA400 Service", MessageBoxButtons.OKCancel, MessageBoxIcon.Error)
 
         Catch ex As Exception
@@ -910,7 +912,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton16_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton16.Click
+    Private Sub BsButton16_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton16.Click
         Try
             myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True)
 
@@ -935,7 +937,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton17_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton17.Click
+    Private Sub BsButton17_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton17.Click
         Dim myGlobal As New GlobalDataTO
         Try
             Dim myScreenDelegate As MotorsPumpsValvesTestDelegate
@@ -956,7 +958,7 @@ Public Class FormSergio
         End Try
     End Sub
 
-    Private Sub BsButton18_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton18.Click
+    Private Sub BsButton18_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton18.Click
         Dim myGlobal As New GlobalDataTO
         Try
 
@@ -1034,18 +1036,18 @@ Public Class FormSergio
 
 
 
-    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
+    Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS)
         Try
 
-            If pRefreshEventType.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
+            If pRefreshEventType.Contains(UI_RefreshEvents.SENSORVALUE_CHANGED) Then
                 Dim sensorValue As Single = 0
 
                 'TODO - implementar en el managereception del MDI
                 'ALARM RECEIVED
-                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE)
+                sensorValue = Me.myServiceMDI.MDIAnalyzerManager.GetSensorValue(AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE)
                 If sensorValue > 0 Then
-                    Dim myManageAlarmType As GlobalEnumerates.ManagementAlarmTypes = ManagementAlarmTypes.NONE
-                    myManageAlarmType = CType(sensorValue, GlobalEnumerates.ManagementAlarmTypes)
+                    Dim myManageAlarmType As ManagementAlarmTypes = ManagementAlarmTypes.NONE
+                    myManageAlarmType = CType(sensorValue, ManagementAlarmTypes)
 
                     MyClass.ManageAlarmGUITreatment(myManageAlarmType)
 
@@ -1063,7 +1065,7 @@ Public Class FormSergio
 
                     
                     ScreenWorkingProcess = False
-                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE) = 0 'Once updated UI clear sensor
+                    Me.myServiceMDI.MDIAnalyzerManager.SetSensorValue(AnalyzerSensors.SRV_MANAGEMENT_ALARM_TYPE) = 0 'Once updated UI clear sensor
                 End If
 
 
@@ -1071,7 +1073,7 @@ Public Class FormSergio
 
            
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".RefreshScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".RefreshScreen", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RefreshScreen", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1080,7 +1082,7 @@ Public Class FormSergio
     Public IsStoppingActionByAlarm As Boolean
 
     'MDI called from child
-    Public WriteOnly Property IsStopByAlarmFinished(ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes) As Boolean
+    Public WriteOnly Property IsStopByAlarmFinished(ByVal pAlarmType As ManagementAlarmTypes) As Boolean
         Set(ByVal value As Boolean)
             If value Then
                 MyClass.ManageAlarmGUITreatment(pAlarmType)
@@ -1089,7 +1091,7 @@ Public Class FormSergio
     End Property
 
     'MDI
-    Public Sub ManageAlarmGUITreatment(ByVal pManageAlarmType As GlobalEnumerates.ManagementAlarmTypes)
+    Public Sub ManageAlarmGUITreatment(ByVal pManageAlarmType As ManagementAlarmTypes)
         Try
             If pManageAlarmType = ManagementAlarmTypes.NONE Then Exit Sub
 
@@ -1145,13 +1147,13 @@ Public Class FormSergio
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ManageAlarmTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ManageAlarmTreatment", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ManageAlarmTreatment", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
     'MDI ShowAlarmOrSensorsWarningMessages
-    Public Sub ShowAlarmOrSensorsWarningMessages(ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes)
+    Public Sub ShowAlarmOrSensorsWarningMessages(ByVal pAlarmType As ManagementAlarmTypes)
         Try
             Dim myMessage As String = ""
             Select Case pAlarmType
@@ -1172,14 +1174,14 @@ Public Class FormSergio
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowAlarmMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowAlarmMessage", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowAlarmMessage", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
 
     'Child
-    Public Overrides Sub StopCurrentOperation(Optional ByVal pAlarmType As GlobalEnumerates.ManagementAlarmTypes = ManagementAlarmTypes.NONE)
+    Public Overrides Sub StopCurrentOperation(Optional ByVal pAlarmType As ManagementAlarmTypes = ManagementAlarmTypes.NONE)
         Try
 
             If pAlarmType = ManagementAlarmTypes.UPDATE_FW Or _
@@ -1199,7 +1201,7 @@ Public Class FormSergio
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".StopCurrentOperation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".StopCurrentOperation", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".StopCurrentOperation", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -1209,14 +1211,14 @@ Public Class FormSergio
         Try
             'each screen must set its elements disabled unless Exit button
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".PrepareErrorMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".PrepareErrorMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareErrorMode", Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
 
 #End Region
 
-    Private Sub BsButton19_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton19.Click
+    Private Sub BsButton19_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton19.Click
        
         ShowAlarmOrSensorsWarningMessages(ManagementAlarmTypes.SIMPLE_ERROR)
     End Sub

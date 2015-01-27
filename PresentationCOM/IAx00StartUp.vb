@@ -1,6 +1,6 @@
 Imports Biosystems.Ax00.Global
 
-Public Class IAx00StartUp
+Public Class UiAx00StartUp
     Inherits Windows.Forms.Form
 
 #Region "Declaration"
@@ -66,7 +66,7 @@ Public Class IAx00StartUp
 #Region "Inicializadores de Componentes"
 
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IAx00StartUp))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiAx00StartUp))
         Me.lbTextoPreload = New System.Windows.Forms.Label
         Me.lbTitle = New System.Windows.Forms.Label
         Me.BsTimer1 = New Biosystems.Ax00.Controls.UserControls.BSTimer

@@ -556,18 +556,18 @@ Partial Public Class UiAx00MainMDI
 
 #Region "Common Forms" 'SG 03/12/10
 
-    Private WithEvents myLanguageConfig As IConfigLanguage
-    Private WithEvents myConfigAnalyzers As IConfigGeneral
-    Private WithEvents myConfigUsers As IConfigUsers
-    Private WithEvents myConfigBarCode As IBarCodesConfig   ' DL 22/07/2011
-    Private WithEvents mySortingTest As ISortingTestsAux
-    Private WithEvents myLogin As IAx00Login
-    Private WithEvents myReport As IBandTemplateReport 'RH 15/12/2011
-    Private WithEvents mySettings As ISettings    ' XBC 18/01/2012
+    Private WithEvents myLanguageConfig As UiConfigLanguage
+    Private WithEvents myConfigAnalyzers As UiConfigGeneral
+    Private WithEvents myConfigUsers As UiConfigUsers
+    Private WithEvents myConfigBarCode As UiBarCodesConfig   ' DL 22/07/2011
+    Private WithEvents mySortingTest As UiSortingTestsAux
+    Private WithEvents myLogin As UiAx00Login
+    Private WithEvents myReport As UiBandTemplateReport 'RH 15/12/2011
+    Private WithEvents mySettings As UiSettings    ' XBC 18/01/2012
     'Private WithEvents myISEUtilities As Biosystems.Ax00.PresentationCOM.IISEUtilities ' XBC 08/02/2012 ISE Utilities placed into PresetationCOM layer
-    Private WithEvents myISEUtilities As IISEUtilities 'RH 26/03/2012
-    Private WithEvents myAbout As IAboutBox 'RH 28/03/2012
-    Private WithEvents myInstrumentInfo As IInstrumentInfo
+    Private WithEvents myISEUtilities As UiISEUtilities 'RH 26/03/2012
+    Private WithEvents myAbout As UiAboutBox 'RH 28/03/2012
+    Private WithEvents myInstrumentInfo As UiInstrumentInfo
 
 #End Region
 
@@ -632,7 +632,7 @@ Partial Public Class UiAx00MainMDI
             AutoConnectProcess = True
             Connect()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsAutoConnect_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsAutoConnect_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsAutoConnect_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -654,7 +654,7 @@ Partial Public Class UiAx00MainMDI
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsAutoConnect_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsAutoConnect_RunWorkerCompleted ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsAutoConnect_RunWorkerCompleted ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         Finally
             'SA 07/09/2012
@@ -724,7 +724,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsLoadDefaultReportTemplates_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsLoadDefaultReportTemplates_DoWork ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsLoadDefaultReportTemplates_DoWork ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
 
         End Try
@@ -793,7 +793,7 @@ Partial Public Class UiAx00MainMDI
             End Select
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HideMenuOptionsByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HideMenuOptionsByUserLevel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".HideMenuOptionsByUserLevel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -900,7 +900,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Cursor = Cursors.Default
             ShowMessage(Name & ".Ax00MainMDI_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
@@ -964,7 +964,7 @@ Partial Public Class UiAx00MainMDI
             'StopMarqueeProgressBar()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Ax00MainMDI_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1008,7 +1008,7 @@ Partial Public Class UiAx00MainMDI
 
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Ax00MainMDI_Shown ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".Ax00MainMDI_Shown ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
     '    End Try
@@ -1020,7 +1020,7 @@ Partial Public Class UiAx00MainMDI
                                                Now.ToString(SystemInfoManager.OSShortTimeFormat))
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDateTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsDateTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsDateTimer_Tick", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1034,9 +1034,9 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub TestsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TestsToolStripMenuItem.Click, BsTSTestButton.Click
         Try
-            IProgTest.AnalyzerModel = AnalyzerModelAttribute
-            IProgTest.AnalyzerID = AnalyzerIDAttribute
-            IProgTest.WorkSessionID = WorkSessionIDAttribute
+            UiProgTest.AnalyzerModel = AnalyzerModelAttribute
+            UiProgTest.AnalyzerID = AnalyzerIDAttribute
+            UiProgTest.WorkSessionID = WorkSessionIDAttribute
 
             'TR 12/04/2010 
             'Dim myTestProgrammingForm As New TestProgramingParammeters
@@ -1049,9 +1049,9 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgTest)
+            OpenMDIChildForm(UiProgTest)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TestsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".TestsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1064,9 +1064,9 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgCalculatedTest)
+            OpenMDIChildForm(UiProgCalculatedTest)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculatedTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalculatedTestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CalculatedTestToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1087,16 +1087,16 @@ Partial Public Class UiAx00MainMDI
             ''The form to be opened should be assigned its AcceptButton property to its default exit button
             'OpenMDIChildForm(ProgContaminations)
 
-            IProgTestContaminations.ActiveWorkSession = WorkSessionIDAttribute
-            IProgTestContaminations.ActiveWSStatus = WSStatusAttribute
+            UiProgTestContaminations.ActiveWorkSession = WorkSessionIDAttribute
+            UiProgTestContaminations.ActiveWSStatus = WSStatusAttribute
 
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgTestContaminations)
+            OpenMDIChildForm(UiProgTestContaminations)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ContaminationsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ContaminationsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ContaminationsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1110,12 +1110,12 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>AG 21/10/2010</remarks>
     Private Sub ISEModuleToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ISEModuleToolStripMenuItem.Click
         Try
-            IProgISETest.AnalyzerID = AnalyzerIDAttribute
-            IProgISETest.WorkSessionID = WorkSessionIDAttribute
-            OpenMDIChildForm(IProgISETest)
+            UiProgISETest.AnalyzerID = AnalyzerIDAttribute
+            UiProgISETest.WorkSessionID = WorkSessionIDAttribute
+            OpenMDIChildForm(UiProgISETest)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ISEModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ISEModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ISEModuleToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1134,13 +1134,13 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub RotorPositionsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RotorPositionsToolStripMenuItem.Click
         Try
-            If (IWSSampleRequest.Visible) Then
-                IWSSampleRequest.SaveWSWithPositioning()
+            If (UiWSSampleRequest.Visible) Then
+                UiWSSampleRequest.SaveWSWithPositioning()
             Else
                 OpenRotorPositionsForm(Nothing)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RotorPositionsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RotorPositionsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RotorPositionsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1158,12 +1158,12 @@ Partial Public Class UiAx00MainMDI
 
             'SG 03/12/10
             'myConfigUsers = New IConfigUsers(Me)
-            myConfigUsers = New IConfigUsers()
+            myConfigUsers = New UiConfigUsers()
             OpenMDIChildForm(myConfigUsers)
             'END SG 03/12/10
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UsersManagementToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UsersManagementToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UsersManagementToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1177,9 +1177,9 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgTestProfiles)
+            OpenMDIChildForm(UiProgTestProfiles)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProfilesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProfilesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProfilesToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1197,17 +1197,17 @@ Partial Public Class UiAx00MainMDI
             bsTSResetSessionButton.Enabled = True
 
             'Inform screen properties
-            IWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
-            IWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
-            IWSSampleRequest.ActiveWSStatus = WSStatusAttribute
+            UiWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
+            UiWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
+            UiWSSampleRequest.ActiveWSStatus = WSStatusAttribute
 
             'RH 05/21/2010 
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IWSSampleRequest)
+            OpenMDIChildForm(UiWSSampleRequest)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SampleRequestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SampleRequestToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SampleRequestToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1221,13 +1221,13 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub ManualAssignationOfSamplePosToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSPositionButton.Click
         Try
-            If (IWSSampleRequest.Visible) Then
-                IWSSampleRequest.SaveWSWithPositioning()
+            If (UiWSSampleRequest.Visible) Then
+                UiWSSampleRequest.SaveWSWithPositioning()
             Else
                 OpenRotorPositionsForm(Nothing)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ManualAssignationOfSamplePosToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " ManualAssignationOfSamplePosToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & " ManualAssignationOfSamplePosToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1242,9 +1242,9 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IProgPatientData)
+            OpenMDIChildForm(UiProgPatientData)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PatientSearchToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PatientSearchToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PatientSearchToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1258,9 +1258,9 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(ISATReport)
+            OpenMDIChildForm(UiSATReport)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SATReportsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SATReportsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1301,7 +1301,7 @@ Partial Public Class UiAx00MainMDI
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
             'BT #1360 - Write in Application Log the start of this function
-            CreateLogActivity("Btn Reset", Me.Name & ".ResetSessionButton_Click", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("Btn Reset", Me.Name & ".ResetSessionButton_Click", EventLogEntryType.Information, False)
 
             Dim openMonitorScreen As Boolean = False
 
@@ -1335,8 +1335,8 @@ Partial Public Class UiAx00MainMDI
 
                     'AG 30/05/2013 - Inform this flag before messagebox asking the user (Fix bug #1102)
                     Dim setIsResetToFalse As Boolean = False
-                    If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, IWSSampleRequest.Name, False) = 0)) Then
-                        Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                    If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, UiWSSampleRequest.Name, False) = 0)) Then
+                        Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                         CurrentMdiChild.isWSReset = True
                     End If
                     'AG 30/05/2013
@@ -1364,7 +1364,7 @@ Partial Public Class UiAx00MainMDI
 
                             If (myDependeciesElementsDS.DependenciesElements.Count > 0) Then
                                 'Show the auxiliary screen of affected Elements
-                                Using AffectedElement As New IWarningAfectedElements
+                                Using AffectedElement As New UiWarningAfectedElements
                                     AffectedElement.AffectedElements = myDependeciesElementsDS
 
                                     AffectedElement.ShowDialog()
@@ -1413,7 +1413,7 @@ Partial Public Class UiAx00MainMDI
 
                                         'AG 17/02/2014 - BT #1505 Export in reset only if there is something pending to export
                                         If (exportResults.twksWSExecutions.Rows.Count > 0) Then
-                                            CreateLogActivity("Current Results upload in RESET WS", Me.Name & ".ResetSessionButton_Click ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
+                                            GlobalBase.CreateLogActivity("Current Results upload in RESET WS", Me.Name & ".ResetSessionButton_Click ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
                                             'Inform the new results to be updated into MDI property
                                             AddResultsIntoQueueToUpload(exportResults)
@@ -1531,8 +1531,8 @@ Partial Public Class UiAx00MainMDI
 
                     If (setIsResetToFalse) Then
                         'AG 30/05/2013 - Inform this flag before messagebox asking the user (Fix bug #1102)
-                        If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, IWSSampleRequest.Name, False) = 0)) Then
-                            Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                        If (Not ActiveMdiChild Is Nothing AndAlso (String.Compare(ActiveMdiChild.Name, UiWSSampleRequest.Name, False) = 0)) Then
+                            Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                             CurrentMdiChild.isWSReset = False
                         End If
                     End If
@@ -1585,7 +1585,7 @@ Partial Public Class UiAx00MainMDI
 
         Catch ex As Exception
             Me.Enabled = True 'RH 30/03/2012
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResetSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ResetSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ResetSessionButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             'RH 30/03/2012 - Move code here because we want it to be executed always at the end of the method
@@ -1620,19 +1620,19 @@ Partial Public Class UiAx00MainMDI
     Private Sub LIMSImportToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LIMSImportToolStripMenuItem.Click
         Try
             LIMSImportToolStripMenuItem.Enabled = False
-            If (IWSSampleRequest.Visible) Then
-                IWSSampleRequest.ExecuteImportFromLIMSProcess()
+            If (UiWSSampleRequest.Visible) Then
+                UiWSSampleRequest.ExecuteImportFromLIMSProcess()
             Else
                 'Inform the required screen properties and open the screen
-                IWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
-                IWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
-                IWSSampleRequest.ActiveWSStatus = WSStatusAttribute
-                IWSSampleRequest.OpenForLIMSImport = True
+                UiWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
+                UiWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
+                UiWSSampleRequest.ActiveWSStatus = WSStatusAttribute
+                UiWSSampleRequest.OpenForLIMSImport = True
 
-                OpenMDIChildForm(IWSSampleRequest)
+                OpenMDIChildForm(UiWSSampleRequest)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMonitorButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMonitorButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSMonitorButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1658,13 +1658,13 @@ Partial Public Class UiAx00MainMDI
 
                 'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
                 'without the compiler be aware of it. Instead compare Types or Properties
-                If (String.Compare(ActiveMdiChild.Name, IWSLoadSaveAuxScreen.Name, False) = 0) Then
-                    If (String.Compare(IWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(IWSLoadSaveAuxScreen.SourceButton, "LOAD", False) = 0) Then
+                If (String.Compare(ActiveMdiChild.Name, UiWSLoadSaveAuxScreen.Name, False) = 0) Then
+                    If (String.Compare(UiWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(UiWSLoadSaveAuxScreen.SourceButton, "LOAD", False) = 0) Then
                         cancelOpening = True
                     Else
                         'Execute the closing code of the screen currently open
-                        IWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                        IWSLoadSaveAuxScreen.AcceptButton.PerformClick()
+                        UiWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                        UiWSLoadSaveAuxScreen.AcceptButton.PerformClick()
                     End If
 
                 ElseIf Not ExistSavedWorkSession() Then 'TR 01/08/2011 -Validate if there're any saved WorkSession.
@@ -1674,14 +1674,14 @@ Partial Public Class UiAx00MainMDI
 
             If (Not cancelOpening) Then
                 'Inform screen properties needed for initial configuration and open the screen as MDIChild
-                IWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
-                IWSLoadSaveAuxScreen.SourceButton = "LOAD"
+                UiWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
+                UiWSLoadSaveAuxScreen.SourceButton = "LOAD"
 
-                OpenMDIChildForm(IWSLoadSaveAuxScreen)
+                OpenMDIChildForm(UiWSLoadSaveAuxScreen)
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSessionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSessionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSessionToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1703,37 +1703,37 @@ Partial Public Class UiAx00MainMDI
 
             'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
             'without the compiler be aware of it. Instead compare Types or Properties
-            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, IWSLoadSaveAuxScreen.Name, False) = 0) Then
-                If (String.Compare(IWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(IWSLoadSaveAuxScreen.SourceButton, "SAVE", False) = 0) Then
+            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, UiWSLoadSaveAuxScreen.Name, False) = 0) Then
+                If (String.Compare(UiWSLoadSaveAuxScreen.ScreenUse, "SAVEDWS", False) = 0 AndAlso String.Compare(UiWSLoadSaveAuxScreen.SourceButton, "SAVE", False) = 0) Then
                     cancelOpening = True
                 Else
                     'Execute the closing code of the screen currently open
-                    IWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                    IWSLoadSaveAuxScreen.AcceptButton.PerformClick()
+                    UiWSLoadSaveAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                    UiWSLoadSaveAuxScreen.AcceptButton.PerformClick()
                 End If
             End If
 
             If (Not cancelOpening) Then
                 ' XB 29/08/2014 - BT #1868
-                If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, IWSSampleRequest.Name, False) = 0) Then
+                If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, UiWSSampleRequest.Name, False) = 0) Then
                     ' code when ISampleRequest is active
-                    If IWSSampleRequest.bsSaveWSButton.Enabled Then
-                        IWSSampleRequest.SaveWorkSession()
+                    If UiWSSampleRequest.bsSaveWSButton.Enabled Then
+                        UiWSSampleRequest.SaveWorkSession()
                     End If
                 Else
                     ' old code
                     'Inform screen properties needed for initial configuration and open the screen as MDIChild
-                    IWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
-                    IWSLoadSaveAuxScreen.SourceButton = "SAVE"
-                    IWSLoadSaveAuxScreen.ActiveWorkSession = WorkSessionIDAttribute
-                    IWSLoadSaveAuxScreen.ActiveAnalyzer = AnalyzerIDAttribute
+                    UiWSLoadSaveAuxScreen.ScreenUse = "SAVEDWS"
+                    UiWSLoadSaveAuxScreen.SourceButton = "SAVE"
+                    UiWSLoadSaveAuxScreen.ActiveWorkSession = WorkSessionIDAttribute
+                    UiWSLoadSaveAuxScreen.ActiveAnalyzer = AnalyzerIDAttribute
 
-                    OpenMDIChildForm(IWSLoadSaveAuxScreen)
+                    OpenMDIChildForm(UiWSLoadSaveAuxScreen)
                 End If
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveSessionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SaveSessionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SaveSessionToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1754,13 +1754,13 @@ Partial Public Class UiAx00MainMDI
 
             'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
             'without the compiler be aware of it. Instead compare Types or Properties
-            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, IWSDeleteAuxScreen.Name, False) = 0) Then
-                If (String.Compare(IWSDeleteAuxScreen.ScreenUse, "SAVEDWS", False) = 0) Then
+            If (Not ActiveMdiChild Is Nothing) AndAlso (String.Compare(ActiveMdiChild.Name, UiWSDeleteAuxScreen.Name, False) = 0) Then
+                If (String.Compare(UiWSDeleteAuxScreen.ScreenUse, "SAVEDWS", False) = 0) Then
                     cancelOpening = True
                 Else
                     'Execute the closing code of the screen currently open
-                    IWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                    IWSDeleteAuxScreen.AcceptButton.PerformClick()
+                    UiWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                    UiWSDeleteAuxScreen.AcceptButton.PerformClick()
                 End If
 
             ElseIf Not ExistSavedWorkSession() Then 'TR 01/08/2011 -Validate if there're any saved WorkSession.
@@ -1771,13 +1771,13 @@ Partial Public Class UiAx00MainMDI
             End If
 
             If (Not cancelOpening) Then
-                IWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
-                IWSDeleteAuxScreen.ScreenUse = "SAVEDWS"
+                UiWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
+                UiWSDeleteAuxScreen.ScreenUse = "SAVEDWS"
 
-                OpenMDIChildForm(IWSDeleteAuxScreen)
+                OpenMDIChildForm(UiWSDeleteAuxScreen)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSessionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteSessionToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteSessionToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1789,12 +1789,12 @@ Partial Public Class UiAx00MainMDI
     Private Sub CalibratorsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CalibratorsToolStripMenuItem.Click
         Try
 
-            IProgCalibrator.AnalyzerID = AnalyzerIDAttribute
-            IProgCalibrator.WorkSessionID = WorkSessionIDAttribute
-            OpenMDIChildForm(IProgCalibrator)
+            UiProgCalibrator.AnalyzerID = AnalyzerIDAttribute
+            UiProgCalibrator.WorkSessionID = WorkSessionIDAttribute
+            OpenMDIChildForm(UiProgCalibrator)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalibratorsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CalibratorsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CalibratorsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1875,7 +1875,7 @@ Partial Public Class UiAx00MainMDI
                     'RH 30/03/2012 - Don't execute these lines when background work has been finished
                     If (RunningAx00MDBackGround Or ProcessingLISManagerObject Or ProcessingLISManagerUploadResults Or processingLISOrderDownload) Then
                         'RH 03/11/2010 Wait until Ax00MDBackGround.RunWorkerAsync() is completed
-                        Using wfPreload As New IAx00StartUp(Me)
+                        Using wfPreload As New UiAx00StartUp(Me)
                             wfPreload.Title = "Waiting ongoing processes completion..."
                             wfPreload.WaitText = "Please wait..."
                             wfPreload.Show()
@@ -1935,7 +1935,7 @@ Partial Public Class UiAx00MainMDI
 
                     'TR 10/07/2013 - Shrink the Database before close the application
                     Dim myDataBaseUpdateManagerDelegate As New DataBaseUpdateManagerDelegate
-                    myDataBaseUpdateManagerDelegate.ShrinkDatabase(Biosystems.Ax00.DAL.DAOBase.CurrentDB, Nothing)
+                    myDataBaseUpdateManagerDelegate.ShrinkDatabase(Biosystems.Ax00.Global.DAOBase.CurrentDB, Nothing)
 
                     'BT #1588 - SQL Services are not stopped
                     '#If (Not Debug) Then
@@ -1983,12 +1983,12 @@ Partial Public Class UiAx00MainMDI
             'Next
 
             'If (writeInLog) Then
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplicationClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ApplicationClosing ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
 
             'XB 17/03/2014 - Kill Application when try to close but cannot do it - Task #1544
             Select Case ex.HResult.ToString
                 Case GlobalConstants.CloseCannotBeCalledException
-                    CreateLogActivity("Application is forced to terminate", Name & ".ApplicationClosing ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
+                    GlobalBase.CreateLogActivity("Application is forced to terminate", Name & ".ApplicationClosing ", EventLogEntryType.Information, GetApplicationInfoSession().ActivateSystemLog)
                     System.Environment.Exit(-1)
 
                 Case Else
@@ -2017,12 +2017,12 @@ Partial Public Class UiAx00MainMDI
 
             'SG 03/12/10
             'myConfigAnalyzers = New IConfigGeneral(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigAnalyzers = New IConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
+            myConfigAnalyzers = New UiConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
             OpenMDIChildForm(myConfigAnalyzers)
             'END 03/12/10
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AnalyzerToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AnalyzerToolStripMenuItem_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AnalyzerToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2034,11 +2034,11 @@ Partial Public Class UiAx00MainMDI
     Private Sub LanguageToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LanguageToolStripMenuItem.Click
         Try
             'myLanguageConfig = New IConfigLanguage(Me)
-            myLanguageConfig = New IConfigLanguage()
+            myLanguageConfig = New UiConfigLanguage()
             OpenMDIChildForm(myLanguageConfig)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LanguageToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LanguageToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2056,7 +2056,7 @@ Partial Public Class UiAx00MainMDI
             Me.Close() 'Activate ApplicationClosing
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WithOutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".WithOutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2073,12 +2073,12 @@ Partial Public Class UiAx00MainMDI
             'OpenMDIChildForm(ConfigAnalyzers)
             'SG 03/12/10
             'myConfigAnalyzers = New IConfigGeneral(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigAnalyzers = New IConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
+            myConfigAnalyzers = New UiConfigGeneral() With {.ActiveAnalyzer = AnalyzerIDAttribute}
             OpenMDIChildForm(myConfigAnalyzers)
             'END 03/12/10
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSAnalysersButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSAnalysersButton_Click", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSAnalysersButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2089,9 +2089,9 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub bsTSReportSATButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSReportSATButton.Click
         Try
-            OpenMDIChildForm(ISATReport)
+            OpenMDIChildForm(UiSATReport)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSReportSATButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSReportSATButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2112,30 +2112,30 @@ Partial Public Class UiAx00MainMDI
 
             'RH 30/06/2011 Do not rely in literal texts for the comparison, because texts can change
             'without the compiler be aware of it. Instead compare Types or Properties
-            If (Not ActiveMdiChild Is Nothing) AndAlso String.Equals(ActiveMdiChild.Name, IWSDeleteAuxScreen.Name) Then
-                If String.Equals(IWSDeleteAuxScreen.ScreenUse, "VROTORS") Then
+            If (Not ActiveMdiChild Is Nothing) AndAlso String.Equals(ActiveMdiChild.Name, UiWSDeleteAuxScreen.Name) Then
+                If String.Equals(UiWSDeleteAuxScreen.ScreenUse, "VROTORS") Then
                     cancelOpening = True
                 Else
                     'Execute the closing code of the screen currently open
-                    IWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
-                    IWSDeleteAuxScreen.AcceptButton.PerformClick()
+                    UiWSDeleteAuxScreen.Tag = "Performing Click" 'RH 17/12/2010 To tell the form it is closed by hand
+                    UiWSDeleteAuxScreen.AcceptButton.PerformClick()
                 End If
             ElseIf Not ExistVirtualSavedRotor() Then
                 cancelOpening = True
             End If
 
             If (Not cancelOpening) Then
-                IWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
-                IWSDeleteAuxScreen.ScreenUse = "VROTORS"
+                UiWSDeleteAuxScreen.AnalyzerModel = AnalyzerModelAttribute
+                UiWSDeleteAuxScreen.ScreenUse = "VROTORS"
 
                 If (TypeOf ActiveMdiChild Is UiMonitor) Then
                     ActiveMdiChild.Close()
                 End If
 
-                OpenMDIChildForm(IWSDeleteAuxScreen)
+                OpenMDIChildForm(UiWSDeleteAuxScreen)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteVirtualRotorsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DeleteVirtualRotorsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DeleteVirtualRotorsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2147,11 +2147,11 @@ Partial Public Class UiAx00MainMDI
     Private Sub bsTSResultsButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSResultsButton.Click, ResultsToolStripMenuItem.Click
         Try
             'OpenMDIChildForm(New IResults())
-            IResults.ActiveWSStatus = WSStatusAttribute 'AG 20/03/2012 - inform the WS status (used to disable some buttons)
-            IResults.AnalyzerModel = AnalyzerModelAttribute
-            OpenMDIChildForm(IResults)
+            UiResults.ActiveWSStatus = WSStatusAttribute 'AG 20/03/2012 - inform the WS status (used to disable some buttons)
+            UiResults.AnalyzerModel = AnalyzerModelAttribute
+            OpenMDIChildForm(UiResults)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSResultsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSResultsButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSResultsButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2168,7 +2168,7 @@ Partial Public Class UiAx00MainMDI
             OpenMonitorForm(Nothing)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMonitorButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMonitorButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSMonitorButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2181,10 +2181,10 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub LoadSATReportToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles LoadSATReportToolStripMenuItem.Click
         Try
-            ISATReportLoad.RestorePointMode = False
-            OpenMDIChildForm(ISATReportLoad)
+            UiSATReportLoad.RestorePointMode = False
+            OpenMDIChildForm(UiSATReportLoad)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSATReportToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadSATReportToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadSATReportToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2197,10 +2197,10 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub RestorePreviousDataToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles RestorePreviousDataToolStripMenuItem.Click
         Try
-            ISATReportLoad.RestorePointMode = True
-            OpenMDIChildForm(ISATReportLoad)
+            UiSATReportLoad.RestorePointMode = True
+            OpenMDIChildForm(UiSATReportLoad)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RestorePreviousDataToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2213,9 +2213,9 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub CreateRestorePointToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CreateRestorePointToolStripMenuItem.Click
         Try
-            OpenMDIChildForm(ICreateRestorePoint)
+            OpenMDIChildForm(UiCreateRestorePoint)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RestorePreviousDataToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".RestorePreviousDataToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2228,10 +2228,10 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks></remarks>
     Private Sub OffSystemModuleToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OffSystemModuleToolStripMenuItem.Click
         Try
-            OpenMDIChildForm(IProgOffSystemTest)
+            OpenMDIChildForm(UiProgOffSystemTest)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OffSystemModuleToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OffSystemModuleToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2264,7 +2264,7 @@ Partial Public Class UiAx00MainMDI
     '        Cursor = Cursors.Default
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LegendPicture_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LegendPicture_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".LegendPicture_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
@@ -2293,7 +2293,7 @@ Partial Public Class UiAx00MainMDI
     '        StopMarqueeProgressBar()
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LegendToolButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LegendToolButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".LegendToolButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
     '    Finally
@@ -2304,46 +2304,46 @@ Partial Public Class UiAx00MainMDI
     'End Sub
 
     Private Sub ControlsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ControlsToolStripMenuItem.Click
-        IProgControls.AnalyzerID = AnalyzerIDAttribute
-        IProgControls.WorkSessionID = WorkSessionIDAttribute
+        UiProgControls.AnalyzerID = AnalyzerIDAttribute
+        UiProgControls.WorkSessionID = WorkSessionIDAttribute
 
-        OpenMDIChildForm(IProgControls)
+        OpenMDIChildForm(UiProgControls)
     End Sub
 
     Private Sub SampleResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles SampleResultsToolStripMenuItem.Click
         'SA 01/09/2014
         'BA-1910 ==> Inform the property for the connected Analyzer before open the Historic Patient Results screen
-        IHisResults.ActiveAnalyzer = AnalyzerIDAttribute
+        UiHisResults.ActiveAnalyzer = AnalyzerIDAttribute
 
-        OpenMDIChildForm(IHisResults) 'JB 22/10/2012
+        OpenMDIChildForm(UiHisResults) 'JB 22/10/2012
     End Sub
 
     Private Sub BlankCalibratorResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BlankCalibratorResultsToolStripMenuItem.Click
         'SA 01/09/2014
         'BA-1910 ==> Inform the property for the connected Analyzer before open the Historic Blank&Calibrator Results screen
-        IHisBlankCalibResults.AnalyzerID = AnalyzerIDAttribute
+        UiHisBlankCalibResults.AnalyzerID = AnalyzerIDAttribute
 
-        OpenMDIChildForm(IHisBlankCalibResults)
+        OpenMDIChildForm(UiHisBlankCalibResults)
     End Sub
 
     Private Sub QCResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles QCResultsToolStripMenuItem.Click
-        IQCResultsReview.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IQCResultsReview)
+        UiQCResultsReview.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiQCResultsReview)
     End Sub
 
     Private Sub QCCumulatedResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles QCCumulatedResultsToolStripMenuItem.Click
-        IQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IQCCumulatedReview)
+        UiQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiQCCumulatedReview)
     End Sub
 
     Private Sub ISEResultsToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ISEResultsToolStripMenuItem.Click
-        IISEResultsHistory.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IISEResultsHistory)
+        UiISEResultsHistory.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiISEResultsHistory)
     End Sub
 
     Private Sub HistoricalAnalyzerAlarmsReviewToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HistoricalAnalyzerAlarmsReviewToolStripMenuItem.Click
-        IHisAlarms.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IHisAlarms)
+        UiHisAlarms.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiHisAlarms)
     End Sub
 
     Private Sub bsTSQCResultsReview_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSQCResultsReview.Click
@@ -2351,10 +2351,10 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            IQCResultsReview.AnalyzerID = AnalyzerIDAttribute
-            OpenMDIChildForm(IQCResultsReview)
+            UiQCResultsReview.AnalyzerID = AnalyzerIDAttribute
+            OpenMDIChildForm(UiQCResultsReview)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSQCResultsReview_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSQCResultsReview_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSQCResultsReview_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2370,7 +2370,7 @@ Partial Public Class UiAx00MainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             OpenMDIChildForm(UiChangeRotor)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeReactionsRotorToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeReactionsRotorToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeReactionsRotorToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -2387,7 +2387,7 @@ Partial Public Class UiAx00MainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             OpenMDIChildForm(UiConditioning)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ConditioningToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ConditioningToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ConditioningToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2406,12 +2406,12 @@ Partial Public Class UiAx00MainMDI
             'DL 22/07/2011
             'OpenMDIChildForm(IBarCodesConfig)
             'myConfigBarCode = New IBarCodesConfig(Me) With {.ActiveAnalyzer = AnalyzerIDAttribute}
-            myConfigBarCode = New IBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
+            myConfigBarCode = New UiBarCodesConfig() With {.ActiveAnalyzer = AnalyzerIDAttribute, .WorkSessionID = WorkSessionIDAttribute}
             OpenMDIChildForm(myConfigBarCode)
             'END DL 22/07/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BarcodeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BarcodeToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BarcodeToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2427,9 +2427,9 @@ Partial Public Class UiAx00MainMDI
             'This is the way a form should be called from the main window
             'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
             'The form to be opened should be assigned its AcceptButton property to its default exit button
-            OpenMDIChildForm(IConfigLISMapping)
+            OpenMDIChildForm(UiConfigLISMapping)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LISMappingToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LISMappingToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LISMappingToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2447,7 +2447,7 @@ Partial Public Class UiAx00MainMDI
             'The form to be opened should be assigned its AcceptButton property to its default exit button
             OpenMDIChildForm(UiConfigLIS)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LISConfigToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LISConfigToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LISConfigToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2458,17 +2458,17 @@ Partial Public Class UiAx00MainMDI
             Dim myLegend As String
 
             Select Case Me.ActiveMdiChild.Name
-                Case IWSRotorPositions.Name
+                Case UiWSRotorPositions.Name
                     myLegend = LEGEND_SOURCE.LEGEND_ROTOR.ToString()
 
-                Case IWSSampleRequest.Name
+                Case UiWSSampleRequest.Name
                     myLegend = LEGEND_SOURCE.LEGEND_PREPARATION.ToString()
 
                 Case Else
                     myLegend = String.Empty 'RH 30/06/2011
             End Select
 
-            Using myForm As New ILegend()
+            Using myForm As New UiLegend()
                 myForm.ParentMDI = Me.Location
                 myForm.SourceForm = myLegend
                 OpeningLegend = False
@@ -2493,7 +2493,7 @@ Partial Public Class UiAx00MainMDI
             'StopMarqueeProgressBar()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSInfoButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSInfoButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSInfoButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -2503,8 +2503,8 @@ Partial Public Class UiAx00MainMDI
     End Sub
 
     Private Sub CumulatedButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CumulatedButton.Click
-        IQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
-        OpenMDIChildForm(IQCCumulatedReview)
+        UiQCCumulatedReview.AnalyzerID = AnalyzerIDAttribute
+        OpenMDIChildForm(UiQCCumulatedReview)
     End Sub
 
 
@@ -2526,7 +2526,7 @@ Partial Public Class UiAx00MainMDI
 
     '    '    End If
     '    'Catch ex As Exception
-    '    '    CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsRemTimeTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '    '    GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsRemTimeTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '    '    ShowMessage(Name & ".bsRemTimeTimer_Tick ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    'End Try
     'End Sub
@@ -2650,7 +2650,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsTimerWUp_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsTimerWUp_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".BsTimerWUp_Tick ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2671,12 +2671,12 @@ Partial Public Class UiAx00MainMDI
             'OpenMDIChildForm(myISettings)
 
             'mySettings = New ISettings(Me)
-            mySettings = New ISettings()
+            mySettings = New UiSettings()
             OpenMDIChildForm(mySettings)
             ' XBC 18/01/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeSettingsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeSettingsToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeSettingsToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -2689,7 +2689,7 @@ Partial Public Class UiAx00MainMDI
             QCSimulator.AnalyzerID = AnalyzerIDAttribute
             OpenMDIChildForm(QCSimulator)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QCResultSimulatorMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QCResultSimulatorMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".QCResultSimulatorMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2701,7 +2701,7 @@ Partial Public Class UiAx00MainMDI
     '        'TR 28/10/2011 -Send the end sound command.
     '        MDIAnalyzerManager.StopAnalyzerRinging()
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".StopAnalyzerRinging ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".StopAnalyzerRinging ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
@@ -2714,7 +2714,7 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub AboutToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AboutToolStripMenuItem.Click
         Try
-            myAbout = New IAboutBox()
+            myAbout = New UiAboutBox()
 
             'Inform the required screen properties and open the screen
             myAbout.IsUser = True
@@ -2722,7 +2722,7 @@ Partial Public Class UiAx00MainMDI
             OpenMDIChildForm(myAbout)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AboutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AboutToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2735,11 +2735,11 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub InstrumentInfoToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles InstrumentInfoToolStripMenuItem.Click
         Try
-            myInstrumentInfo = New IInstrumentInfo()
+            myInstrumentInfo = New UiInstrumentInfo()
             OpenMDIChildForm(myInstrumentInfo)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InstrumentInfoToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InstrumentInfoToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2786,7 +2786,7 @@ Partial Public Class UiAx00MainMDI
     '            TotalSecs = TotalSecs + 1
     '        End If
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ElapsedTimeTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ElapsedTimeTimer_Tick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
 
@@ -2795,7 +2795,7 @@ Partial Public Class UiAx00MainMDI
 
     Private Sub TestPrintSortingToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles TestPrintSortingToolStripMenuItem.Click
         'mySortingTest = New ISortingTestsAux(Me)
-        mySortingTest = New ISortingTestsAux()
+        mySortingTest = New UiSortingTestsAux()
         OpenMDIChildForm(mySortingTest)
     End Sub
 
@@ -2811,7 +2811,7 @@ Partial Public Class UiAx00MainMDI
         'End If
 
         'RH 30/03/2012
-        myLogin = New IAx00Login(True)
+        myLogin = New UiAx00Login(True)
         OpenMDIChildForm(myLogin)
     End Sub
 
@@ -2823,11 +2823,11 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub HeadPToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles HeadPToolStripMenuItem.Click
         Try
-            myReport = New IBandTemplateReport()
+            myReport = New UiBandTemplateReport()
             OpenMDIChildForm(myReport)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeadPToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".HeadPToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2892,7 +2892,7 @@ Partial Public Class UiAx00MainMDI
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".UtilitiesToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2915,7 +2915,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
             'myISEUtilities = New IISEUtilities(Me)
-            myISEUtilities = New IISEUtilities(Me)
+            myISEUtilities = New UiISEUtilities(Me)
 
             ' XBC 03/08/2012 - initialize to protect
             Me.ShutDownisPending = False
@@ -2928,7 +2928,7 @@ Partial Public Class UiAx00MainMDI
             OpenMDIChildForm(myISEUtilities)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ISEUtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ISEUtilitiesToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ISEUtilitiesToolStripMenuItem_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3013,10 +3013,10 @@ Partial Public Class UiAx00MainMDI
             If DirectCast(ex, System.ComponentModel.Win32Exception).ErrorCode = -2147467259 Then
                 Dim myMultiLangResourcesDelegate As New MultilanguageResourcesDelegate
 
-                CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("UserManualToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, myMultiLangResourcesDelegate.GetResourceText(Nothing, "MSG_ERROR_READER", CurrentLanguageAttribute))
             Else
-                CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".UserManualToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 ShowMessage("UserManualToolStripMenuItem_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             End If
 
@@ -3042,10 +3042,10 @@ Partial Public Class UiAx00MainMDI
         Try
             ''Dim myLogAcciones As New ApplicationLogManager()
             If showSTARTWSiconFlag Then
-                CreateLogActivity("Btn Start WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+                GlobalBase.CreateLogActivity("Btn Start WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
                 PlaySessionActions()
             ElseIf showPAUSEWSiconFlag Then
-                CreateLogActivity("Btn Pause WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+                GlobalBase.CreateLogActivity("Btn Pause WS", Me.Name & ".bsTSMultiFunctionSessionButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
                 'AG 20/01/2014 - Move this code inside PauseSessionActions method
                 ''JV + AG #1391 26/11/2013
@@ -3063,7 +3063,7 @@ Partial Public Class UiAx00MainMDI
                 PauseSessionActions()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMultiFunctionSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSMultiFunctionSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSMultiFunctionSessionButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3082,7 +3082,7 @@ Partial Public Class UiAx00MainMDI
             'Normal business
             MyClass.InitiateStartSession()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PlaySessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PlaySessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PlaySessionActions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3161,7 +3161,7 @@ Partial Public Class UiAx00MainMDI
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PauseSessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PauseSessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PauseSessionActions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3233,7 +3233,7 @@ Partial Public Class UiAx00MainMDI
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EndRunningSessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EndRunningSessionActions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EndRunningSessionActions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3253,7 +3253,7 @@ Partial Public Class UiAx00MainMDI
     ''' </remarks>
     Private Sub bsTSConnectButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSConnectButton.Click
         Try
-            CreateLogActivity("Btn Connect", Me.Name & ".bsTSConnectButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("Btn Connect", Me.Name & ".bsTSConnectButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
             'AG 07/01/2014 - BT #1436
             If Not MDIAnalyzerManager Is Nothing AndAlso MDIAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
@@ -3265,7 +3265,7 @@ Partial Public Class UiAx00MainMDI
             EnableButtonAndMenus(False)
             Connect()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSConnectButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSConnectButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSConnectButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3280,7 +3280,7 @@ Partial Public Class UiAx00MainMDI
         Try
             Dim myGlobal As New GlobalDataTO
 
-            CreateLogActivity("Btn Instrument", Me.Name & ".bsTSStartInstrumentButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("Btn Instrument", Me.Name & ".bsTSStartInstrumentButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
             ' XBC 06/07/2012
             isStartInstrumentActivating = True
@@ -3396,7 +3396,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSStartInstrumentButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSStartInstrumentButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSStartInstrumentButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             ' XBC 06/07/2012
@@ -3415,7 +3415,7 @@ Partial Public Class UiAx00MainMDI
     Private Sub bsTSShutdownButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSShutdownButton.Click
         Dim myGlobal As New GlobalDataTO
         Try
-            CreateLogActivity("Btn ShutDown", Me.Name & ".bsTSShutdownButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("Btn ShutDown", Me.Name & ".bsTSShutdownButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
             If Not MDIAnalyzerManager Is Nothing Then
                 MDIAnalyzerManager.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
 
@@ -3593,7 +3593,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSShutdownButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSShutdownButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSShutdownButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3608,7 +3608,7 @@ Partial Public Class UiAx00MainMDI
     ''' uPDATED BY: JV 23/01/2014 #1467
     Private Sub bsTSChangeBottlesConfirm_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSChangeBottlesConfirm.Click
         Try
-            CreateLogActivity("Btn ChangeBottles", Me.Name & ".bsTSChangeBottlesConfirm_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("Btn ChangeBottles", Me.Name & ".bsTSChangeBottlesConfirm_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
             If (Not MDIAnalyzerManager Is Nothing) Then
                 MDIAnalyzerManager.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
 
@@ -3643,7 +3643,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSChangeBottlesConfirm_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSChangeBottlesConfirm_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSChangeBottlesConfirm_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -3652,7 +3652,7 @@ Partial Public Class UiAx00MainMDI
 
     Private Sub bsTSSoundOff_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSSoundOff.Click
         Try
-            CreateLogActivity("Btn SoundOff", Me.Name & ".bsTSSoundOff_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("Btn SoundOff", Me.Name & ".bsTSSoundOff_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
             If (Not MDIAnalyzerManager Is Nothing) Then
                 bsTSSoundOff.Enabled = False 'TR 27/03/2012 -diasble the button.
                 SetActionButtonsEnableProperty(False) 'Disable all buttons until Ax00 accept the new instruction
@@ -3660,7 +3660,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSSoundOff_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSSoundOff_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSSoundOff_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3728,7 +3728,7 @@ Partial Public Class UiAx00MainMDI
 
             MyClass.StartSession(pFromHostQueryMDIButton) 'AG 14/01/2014 - BT #1435
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateStartSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateStartSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitiateStartSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -3792,7 +3792,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateAutomaticWSWithLIS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateAutomaticWSWithLIS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CreateAutomaticWSWithLIS ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -3926,8 +3926,8 @@ Partial Public Class UiAx00MainMDI
                         If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState = LISautomateProcessSteps.initialStatus AndAlso userAnswer = DialogResult.Yes Then
                             'XB 23/07/2013
                             If (Not Me.ActiveMdiChild Is Nothing) Then
-                                If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                                    Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                                If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                                    Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                                     If Not WSExecutionsAlreadyCreated Then
                                         'XB 23/07/2013 - auto HQ
                                         'CurrentMdiChild.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
@@ -4284,12 +4284,12 @@ Partial Public Class UiAx00MainMDI
                             'AG 10/05/2012 - If rotor positions screen is opened create WS executions before call the ManageAnalyzer methods
                             'DisabledMdiForms = Me.ActiveMdiChild
                             'Me.ActiveMdiChild.Enabled = False
-                            If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                            If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                                 'XB 23/07/2013 - auto HQ
                                 'If Not autoWSCreationWithLISModeAttribute Then 'AG 09/07/2013
                                 If Not autoWSCreationWithLISModeAttribute And Not HQProcessByUserFlag Then 'AG 09/07/2013
                                     'XB 23/07/2013
-                                    Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                                    Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
 
                                     ' XBC 12/04/2013
                                     'myGlobal = CurrentMdiChild.CreateExecutionsProcess(False, wsReadyToBeSent)
@@ -4399,7 +4399,7 @@ Partial Public Class UiAx00MainMDI
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".StartSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".StartSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".StartSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 11/07/2013 - ws not started automatically
             InitializeAutoWSFlags()
@@ -4531,7 +4531,7 @@ Partial Public Class UiAx00MainMDI
                                     End If
 
                                     If (updateExecutions) Then
-                                        If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                                        If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                                             Dim myExecutionsDelegate As New ExecutionsDelegate
                                             myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                         End If
@@ -4727,7 +4727,7 @@ Partial Public Class UiAx00MainMDI
                                         ' XB 22/07/2013
 
                                         If (updateExecutions) Then
-                                            If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                                            If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                                                 Dim myExecutionsDelegate As New ExecutionsDelegate
                                                 myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                             End If
@@ -5041,7 +5041,7 @@ Partial Public Class UiAx00MainMDI
             myGlobal.SetDatos = userAnswer
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".VerifyISEConditioningBeforeRunning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".VerifyISEConditioningBeforeRunning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".VerifyISEConditioningBeforeRunning ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return myGlobal
@@ -5073,7 +5073,7 @@ Partial Public Class UiAx00MainMDI
 
         Catch ex As Exception
             returnValue.HasError = True
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateExecutionsProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".CreateExecutionsProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             Me.Cursor = Cursors.Default
             Application.DoEvents()
             ShowMessage(Me.Name & "CreateExecutionsProcess ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -5106,7 +5106,7 @@ Partial Public Class UiAx00MainMDI
 
                 ' XB 16/04/2014 - Fix error unblocking preparations - #1599
                 ''AG 31/03/2014 - #1565 - add trace + call new method that updates ISE executions instead of calling create ws executions
-                'CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
+                'GlobalBase.CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
                 'Dim myExecutionDelegate As New ExecutionsDelegate
                 ''Dim createWSInRunning As Boolean = (MDIAnalyzerManager.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
                 ''myGlobal = myExecutionDelegate.CreateWSExecutions(Nothing, MDIAnalyzerManager.ActiveAnalyzer, MDIAnalyzerManager.ActiveWorkSession, _
@@ -5116,7 +5116,7 @@ Partial Public Class UiAx00MainMDI
                 '                                                                     isReady, myAffectedElectrodes)
                 ''AG 31/03/2014 - #1565
 
-                CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("Update ISE executions after conditioning !", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Information, False)
                 Dim myExecutionDelegate As New ExecutionsDelegate
                 Dim createWSInRunning As Boolean = (MDIAnalyzerManager.AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.RUNNING)
 
@@ -5139,7 +5139,7 @@ Partial Public Class UiAx00MainMDI
             myAffectedElectrodes = Nothing 'AG 19/02/2014 - #1514
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CreateWSExecutionsWithISEChanges ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".CreateWSExecutions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".CreateWSExecutionsWithISEChanges ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -5176,7 +5176,7 @@ Partial Public Class UiAx00MainMDI
             'Normal business
             MyClass.InitiateStartSession()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSStartInstrumentButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSStartInstrumentButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSStartInstrumentButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -5251,7 +5251,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSStartInstrumentButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSStartInstrumentButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSStartInstrumentButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -5270,7 +5270,7 @@ Partial Public Class UiAx00MainMDI
         Try
             AbortSessionFromEventClicked()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSAbortSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSAbortSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSAbortSessionButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -5285,7 +5285,7 @@ Partial Public Class UiAx00MainMDI
     ''' <remarks>AG 07/03/2012</remarks>
     Private Sub bsTSRecover_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsTSRecover.Click
         Try
-            CreateLogActivity("Btn Recover", Me.Name & ".bsTSRecover_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("Btn Recover", Me.Name & ".bsTSRecover_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
             If Not MDIAnalyzerManager Is Nothing Then
                 Cursor = Cursors.WaitCursor
                 MDIAnalyzerManager.StopAnalyzerRinging() 'AG 29/05/2012 - Stop Analyzer sound
@@ -5339,7 +5339,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSRecover_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsTSRecover_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".bsTSRecover_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -5374,7 +5374,7 @@ Partial Public Class UiAx00MainMDI
             End If
             'TR 01/08/2011 -END
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistSavedWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistSavedWorkSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExistSavedWorkSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return ExistWS
@@ -5404,7 +5404,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistVirtualSavedRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ExistVirtualSavedRotor", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ExistVirtualSavedRotor ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -5586,10 +5586,10 @@ Partial Public Class UiAx00MainMDI
                 'ShowMessage("AX00", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me)
                 Me.UIThread(Function() ShowMessage("AX00", myGlobal.ErrorCode, myGlobal.ErrorMessage, Me))
                 'DL 15/05/2013
-                CreateLogActivity("Error to create automatic SAT", Name & ".ResetSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity("Error to create automatic SAT", Name & ".ResetSessionButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ResetSession", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".ResetSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".ResetSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -5675,7 +5675,7 @@ Partial Public Class UiAx00MainMDI
             ''TR 27/10/2011 -
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -5889,7 +5889,7 @@ Partial Public Class UiAx00MainMDI
             'TR 28/01/2013 -END
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetScreenLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetScreenLabels ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6014,7 +6014,7 @@ Partial Public Class UiAx00MainMDI
             MenuOptionsByUserLevel() 'TR 23/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".PrepareMenuOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareMenuOptions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6091,7 +6091,7 @@ Partial Public Class UiAx00MainMDI
 
             MenuOptionsByUserLevel() 'TR 24/04/2012
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableWSMenu ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableWSMenu ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EnableWSMenu ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6206,7 +6206,7 @@ Partial Public Class UiAx00MainMDI
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GetAnalyzerInfo", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6277,7 +6277,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateLISActionButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ActivateLISActionButton ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ActivateLISActionButton", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -6314,7 +6314,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTherePendingOnlyISEExecutions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".IsTherePendingOnlyISEExecutions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & " IsTherePendingOnlyISEExecutions, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return returnValue
@@ -6350,7 +6350,7 @@ Partial Public Class UiAx00MainMDI
                 EnableWSMenu()
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetButtonsByNumOfTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetButtonsByNumOfTests", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetButtonsByNumOfTests", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6427,7 +6427,7 @@ Partial Public Class UiAx00MainMDI
                 ShowMessage(Name & ".SetWSActiveDataFromDB ", dataToReturn.ErrorCode, dataToReturn.ErrorMessage)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWSActiveDataFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWSActiveDataFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetWSActiveDataFromDB ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6456,7 +6456,7 @@ Partial Public Class UiAx00MainMDI
 
             SetButtonsByNumOfTests()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetNumOfTestsFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetNumOfTestsFromDB ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetNumOfTestsFromDB ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6535,7 +6535,7 @@ Partial Public Class UiAx00MainMDI
                 ''TR 28/10/2011 -END.
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".Connect ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".Connect ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             'AG 28/07/2010 - Close AutoConnect Thread
@@ -6561,14 +6561,14 @@ Partial Public Class UiAx00MainMDI
             myGlobal = MDIAnalyzerManager.LoadFwAdjustmentsMasterData 'AG 22/09/2011 - change GlobalAnalyzerManager for MDIAnalyzerManager // myGlobal = MyClass.GlobalAnalyzerManager.LoadFwAdjustmentsMasterData
             If myGlobal.HasError OrElse myGlobal Is Nothing Then
                 ' Loading Adjustments failed 
-                MyBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00MainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+                GlobalBase.CreateLogActivity(myGlobal.ErrorCode, Me.Name & ".Ax00MainMDI_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
                 MyBase.ShowMessage(Me.Name, myGlobal.ErrorMessage, String.Empty, MsgParent) 'TR 29/11/2011 -Change ErrorCode by ErrorMessage.
                 MyClass.ErrorStatusLabel.Text = GetMessageText(myGlobal.ErrorCode)
                 'Application.Exit() PDT !!! sortir de l'aplicació ??
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LoadAdjustmentsDS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".LoadAdjustmentsDS ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6742,7 +6742,7 @@ Partial Public Class UiAx00MainMDI
             InitializeAlertGlobesTexts()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAlertGlobes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAlertGlobes ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -6802,7 +6802,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAlertGlobesTexts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAlertGlobesTexts ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -6838,7 +6838,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWorkSessionUserCommandFlags ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWorkSessionUserCommandFlags ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6923,7 +6923,7 @@ Partial Public Class UiAx00MainMDI
             Me.MDIAnalyzerManager.ISE_Manager.IsAnalyzerWarmUp = True 'SGM 13/04/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeStartInstrument ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeStartInstrument ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -6943,8 +6943,8 @@ Partial Public Class UiAx00MainMDI
 
             If Not ActiveMdiChild Is Nothing Then
                 '- RotorPositions: Some user actions event are allowed or not depending the status
-                If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                    Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                    Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                     CurrentMdiChild.RefreshScreenStatus(MDIAnalyzerManager.AnalyzerStatus.ToString, WSStatusAttribute)
                 End If
 
@@ -6953,7 +6953,7 @@ Partial Public Class UiAx00MainMDI
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TreatScreenDueAnalyzerStatusChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".TreatScreenDueAnalyzerStatusChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -6985,7 +6985,7 @@ Partial Public Class UiAx00MainMDI
     '        End Using
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowLegendMain ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowLegendMain ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".ShowLegendMain ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
@@ -7021,7 +7021,7 @@ Partial Public Class UiAx00MainMDI
     '        End If
 
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExistSomeAlarmThatRequiresSendENDRUN ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ExistSomeAlarmThatRequiresSendENDRUN ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".ExistSomeAlarmThatRequiresSendENDRUN ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     '    Return returnValue
@@ -7049,7 +7049,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetWaitingCycle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetWaitingCycle ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetWaitingCycle", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return waitingMachineTime
@@ -7072,7 +7072,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetCycleMachine ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetCycleMachine ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetCycleMachine", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         Return cycleMachineTime
@@ -7135,7 +7135,7 @@ Partial Public Class UiAx00MainMDI
             'DL 12/06/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnterRunning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnterRunning", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".EnterRunning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".EnterRunning", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -7196,7 +7196,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RecoverInstrument", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".RecoverInstrument", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".RecoverInstrument", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".RecoverInstrument", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -7242,7 +7242,7 @@ Partial Public Class UiAx00MainMDI
                 ErrorStatusLabel.Text = String.Empty
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeErrorStatusLabel", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ChangeErrorStatusLabel", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ChangeErrorStatusLabel", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -7304,28 +7304,28 @@ Partial Public Class UiAx00MainMDI
                         Dim auxScreen As UiMonitor = CType(myCurrentMDIForm, UiMonitor)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions) Then
-                        Dim auxScreen As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiWSRotorPositions) Then
+                        Dim auxScreen As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
-                        Dim auxScreen As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiWSSampleRequest) Then
+                        Dim auxScreen As UiWSSampleRequest = CType(myCurrentMDIForm, UiWSSampleRequest)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
-                        Dim auxScreen As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiISEUtilities) Then
+                        Dim auxScreen As UiISEUtilities = CType(myCurrentMDIForm, UiISEUtilities)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is ISATReport) Then
-                        Dim auxScreen As ISATReport = CType(myCurrentMDIForm, ISATReport)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiSATReport) Then
+                        Dim auxScreen As UiSATReport = CType(myCurrentMDIForm, UiSATReport)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is ISATReportLoad) Then
-                        Dim auxScreen As ISATReportLoad = CType(myCurrentMDIForm, ISATReportLoad)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiSATReportLoad) Then
+                        Dim auxScreen As UiSATReportLoad = CType(myCurrentMDIForm, UiSATReportLoad)
                         returnValue = auxScreen.ScreenWorkingProcess
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IResults) Then
-                        Dim auxScreen As IResults = CType(myCurrentMDIForm, IResults)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiResults) Then
+                        Dim auxScreen As UiResults = CType(myCurrentMDIForm, UiResults)
                         returnValue = auxScreen.ScreenWorkingProcess
 
                     End If
@@ -7334,7 +7334,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProcessingBusinessInCourse", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProcessingBusinessInCourse", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProcessingBusinessInCourse", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             returnValue = False
         End Try
@@ -7594,7 +7594,7 @@ Partial Public Class UiAx00MainMDI
             'AG 08/07/2013
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".StartEnterInRunningMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".StartEnterInRunningMode", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".StartEnterInRunningMode", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             SetAutomateProcessStatusValue(LISautomateProcessSteps.notStarted) 'AG 11/07/2013 - ws not started automatically
             InitializeAutoWSFlags()
@@ -7615,7 +7615,7 @@ Partial Public Class UiAx00MainMDI
             '//Var to store the messagebox type to be displayed to the user. 
             Dim messageBoxType As MessageBoxButtons
 
-            CreateLogActivity("Btn Abort", Me.Name & ".AbortSessionFromEventClicked", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("Btn Abort", Me.Name & ".AbortSessionFromEventClicked", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
             If (Not MDIAnalyzerManager Is Nothing) Then
 
@@ -7688,7 +7688,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AbortSessionFromEventClicked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AbortSessionFromEventClicked ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AbortSessionFromEventClicked ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -7791,7 +7791,7 @@ Partial Public Class UiAx00MainMDI
                 myCurrentMDIForm = DisabledMDIChildAttribute(0)
             End If
 
-            If Not myCurrentMDIForm Is Nothing AndAlso (TypeOf myCurrentMDIForm Is IResultsRecover) Then
+            If Not myCurrentMDIForm Is Nothing AndAlso (TypeOf myCurrentMDIForm Is UiResultsRecover) Then
                 specialModeForRecoveryResultsScreenFlag = True
             End If
             'AG 30/09/2012
@@ -7833,7 +7833,7 @@ Partial Public Class UiAx00MainMDI
             LISUtilitiesToolStripMenuItem.Enabled = myESBusin.AllowLISAction(Nothing, LISActions.LISUtilities_Menu, False, False, "", "")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableButtonAndMenus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableButtonAndMenus ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -7949,8 +7949,8 @@ Partial Public Class UiAx00MainMDI
                                 'IsFormClosed = False
 
                                 'SGM 10/05/2012
-                                If TypeOf ActiveMdiChild Is IISEUtilities Then
-                                    Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                                If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                                    Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                     myISEUtilities.myScreenPendingToOpenWhileISEUtilClosing = pFormToOpen
                                     myISEUtilities.IsMDICloseRequested = False
                                     MyClass.IsISEUtilClosing = True
@@ -7974,7 +7974,7 @@ Partial Public Class UiAx00MainMDI
 
                 If (IsFormClosed) Then
                     ' XBC 11/07/2102
-                    If TypeOf pFormToOpen Is IISEUtilities Then
+                    If TypeOf pFormToOpen Is UiISEUtilities Then
                         ISELoadingPending = True
                     End If
                     ' XBC 11/07/2102
@@ -8002,7 +8002,7 @@ Partial Public Class UiAx00MainMDI
 
                     'AG 28/05/2014 - New trace
                     If (Not FormToClose Is Nothing AndAlso TypeOf FormToClose Is UiMonitor) Then
-                        CreateLogActivity("Start Closing IMonitor", Name & ".OpenMDIChildForm", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity("Start Closing IMonitor", Name & ".OpenMDIChildForm", EventLogEntryType.Information, False)
                     End If
 
                     FormToClose.Close()
@@ -8036,8 +8036,8 @@ Partial Public Class UiAx00MainMDI
 
                         IsFormClosed = False
 
-                        If TypeOf ActiveMdiChild Is IISEUtilities Then
-                            Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                            Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                             myISEUtilities.myScreenPendingToOpenWhileISEUtilClosing = Nothing
                             If Not MyClass.IsISEUtilClosing Then
                                 myISEUtilities.IsMDICloseRequested = True
@@ -8061,7 +8061,7 @@ Partial Public Class UiAx00MainMDI
         Catch ex As Exception
             IsFormClosed = False
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenMDIChildForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenMDIChildForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenMDIChildForm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -8069,8 +8069,8 @@ Partial Public Class UiAx00MainMDI
             ' XBC 11/07/2102
             If ISELoadingPending Then
                 If (Not ActiveMdiChild Is Nothing) Then
-                    If TypeOf ActiveMdiChild Is IISEUtilities Then
-                        Dim myISEUtilities As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    If TypeOf ActiveMdiChild Is UiISEUtilities Then
+                        Dim myISEUtilities As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         myISEUtilities.PrepareLoadingMode()
                     End If
                 End If
@@ -8148,7 +8148,7 @@ Partial Public Class UiAx00MainMDI
             Application.DoEvents()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " New ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " New ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'RH: At this point the Ax00MainMDI new object does not exist yet.
             'As the ShowMessage() method references Ax00MainMDI object as the parent window,
             'we can't call it here, so we call MessageBox.Show() instead.
@@ -8220,20 +8220,20 @@ Partial Public Class UiAx00MainMDI
                 ' XB 22/11/2013 - Task #1394
                 DisplayISELockedPreparationsWarningAttribute = False
 
-                IWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
-                IWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
-                IWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
-                IWSRotorPositions.WorkSessionStatus(MDIAnalyzerManager.AnalyzerStatus.ToString) = WSStatusAttribute
-                IWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
+                UiWSRotorPositions.ActiveAnalyzer = AnalyzerIDAttribute
+                UiWSRotorPositions.AnalyzerModel = AnalyzerModelAttribute
+                UiWSRotorPositions.ActiveWorkSession = WorkSessionIDAttribute
+                UiWSRotorPositions.WorkSessionStatus(MDIAnalyzerManager.AnalyzerStatus.ToString) = WSStatusAttribute
+                UiWSRotorPositions.ShowHostQueryScreen = pShowHQScreen 'AG 03/04/2013
 
                 ' XB 17/07/2013 - Auto WS process
                 'XB 23/07/2013 - auto HQ
                 'IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
-                IWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
+                UiWSRotorPositions.AutoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag
                 'XB 23/07/2013
 
                 'AG 09/07/2013
-                IWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
+                UiWSRotorPositions.OpenByAutomaticProcess = pAutomateProcessWithLIS
                 'XB 23/07/2013 - auto HQ
                 ' If autoWSCreationWithLISModeAttribute AndAlso pAutomateProcessWithLIS Then
                 If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso pAutomateProcessWithLIS Then
@@ -8244,20 +8244,20 @@ Partial Public Class UiAx00MainMDI
                 'AG 09/07/2013
 
                 If FormToClose Is Nothing Then
-                    OpenMDIChildForm(IWSRotorPositions)
+                    OpenMDIChildForm(UiWSRotorPositions)
                 Else
                     'RH 16/12/2010 Directly opens the Rotor Positioning form and closes the calling form
-                    IWSRotorPositions.MdiParent = Me
-                    IWSRotorPositions.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-                    IWSRotorPositions.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
-                    IWSRotorPositions.Show()
+                    UiWSRotorPositions.MdiParent = Me
+                    UiWSRotorPositions.applicationMaxMemoryUsage = myApplicationMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+                    UiWSRotorPositions.SQLMaxMemoryUsage = mySQLMaxMemoryUsage 'AG 24/02/2014 - #1520 inform new property
+                    UiWSRotorPositions.Show()
                     Application.DoEvents()
                     FormToClose.Close()
                 End If
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenRotorPositionsForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenRotorPositionsForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenRotorPositionsForm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -8384,7 +8384,7 @@ Partial Public Class UiAx00MainMDI
             'End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenMonitorForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenMonitorForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenMonitorForm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -8403,7 +8403,7 @@ Partial Public Class UiAx00MainMDI
     '    Try
     '        DisplayISELockedPreparationsWarningAttribute = pValue
     '    Catch ex As Exception
-    '        CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetDisplayISELockedPreparationsWarning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetDisplayISELockedPreparationsWarning ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
     '        ShowMessage(Name & ".SetDisplayISELockedPreparationsWarning ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
     '    End Try
     'End Sub
@@ -8495,7 +8495,7 @@ Partial Public Class UiAx00MainMDI
             If (BsTimerWUp.Enabled) Then BsTimerWUp_Tick(Nothing, Nothing)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenMonitorForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OpenMonitorForm ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenMonitorForm ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -8519,7 +8519,7 @@ Partial Public Class UiAx00MainMDI
             RotorPositionsToolStripMenuItem.Enabled = pEnabled
             bsTSPositionButton.Enabled = pEnabled
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetStatusRotorPosOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetStatusRotorPosOptions ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetStatusRotorPosOptions ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -8552,7 +8552,7 @@ Partial Public Class UiAx00MainMDI
 
             EnableWSMenu()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWSActiveData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetWSActiveData ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetWSActiveData ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -8569,7 +8569,7 @@ Partial Public Class UiAx00MainMDI
             NumOfTestsAttribute = pCurrentNumOfTests
             SetButtonsByNumOfTests()
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetNumOfTests ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetNumOfTests ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".SetNumOfTests ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -8661,7 +8661,7 @@ Partial Public Class UiAx00MainMDI
             ' XBC 15/06/2012
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAnalyzerAndWorkSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeAnalyzerAndWorkSession ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeAnalyzerAndWorkSession ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -8766,15 +8766,15 @@ Partial Public Class UiAx00MainMDI
                 'Buttons over analyzer not in Vertical Buttons Bar
                 'Barcode button
                 If Not ActiveMdiChild Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                        Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                    If (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                        Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                         If Not CurrentMdiChild.bsScanningButton Is Nothing Then CurrentMdiChild.bsScanningButton.Enabled = pEnable
                         If Not CurrentMdiChild.bsCheckRotorVolumeButton Is Nothing Then CurrentMdiChild.bsCheckRotorVolumeButton.Enabled = pEnable
                         If Not CurrentMdiChild.bsReagentsCheckVolumePosButton Is Nothing Then CurrentMdiChild.bsReagentsCheckVolumePosButton.Enabled = pEnable
                         'CurrentMdiChild.bsSamplesCheckVolumePosButton.Enabled = pEnable
 
-                    ElseIf (TypeOf ActiveMdiChild Is IWSSampleRequest) Then
-                        Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                    ElseIf (TypeOf ActiveMdiChild Is UiWSSampleRequest) Then
+                        Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                         If Not CurrentMdiChild.bsScanningButton Is Nothing Then CurrentMdiChild.bsScanningButton.Enabled = pEnable
                     End If
                 End If
@@ -8782,7 +8782,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " SetActionButtonsEnableProperty ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & " SetActionButtonsEnableProperty ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -8818,7 +8818,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetEnableMainTab", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & " SetEnableMainTab", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".SetEnableMainTab", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -8932,7 +8932,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FinishWarmUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FinishWarmUp ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FinishWarmUp ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -8973,7 +8973,7 @@ Partial Public Class UiAx00MainMDI
             'Remove Status text
             bsAnalyzerStatus.Text = String.Empty
 
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowStatus", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".ShowStatus", EventLogEntryType.Error, False)
             ShowMessage(Name & ".ShowStatus ", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -8988,7 +8988,7 @@ Partial Public Class UiAx00MainMDI
             ErrorStatusLabel.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText
             ErrorStatusLabel.Text = pMsg
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetErrorStatusMessage", EventLogEntryType.Error, False)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".SetErrorStatusMessage", EventLogEntryType.Error, False)
             ShowMessage(Name & ".SetErrorStatusMessage ", Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -9068,7 +9068,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FinishAutomaticWSCreationWithLISProcess ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".FinishAutomaticWSCreationWithLISProcess ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".FinishAutomaticWSCreationWithLISProcess ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Cursor = Cursors.Default
@@ -9183,7 +9183,7 @@ Partial Public Class UiAx00MainMDI
             MDIAnalyzerManager.autoWSCreationWithLISMode = autoWSCreationWithLISModeAttribute
         Catch ex As Exception
             Cursor = Cursors.Default
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeHQProcessByUserFlag ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitializeHQProcessByUserFlag ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitializeHQProcessByUserFlag ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Cursor = Cursors.Default
@@ -9207,7 +9207,7 @@ Partial Public Class UiAx00MainMDI
                     mydisableButtons = True
                 End If
 
-                If (TypeOf ActiveMdiChild Is IISEUtilities) Then
+                If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
                     mydisableButtons = True
                 End If
 
@@ -9216,7 +9216,7 @@ Partial Public Class UiAx00MainMDI
                 End If
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DisableLISButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DisableLISButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DisableLISButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return mydisableButtons
@@ -9275,7 +9275,7 @@ Partial Public Class UiAx00MainMDI
             End If
             LISWaitTimer.Enabled = pStatus
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableLISWaitTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".EnableLISWaitTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".EnableLISWaitTimer ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -9572,7 +9572,7 @@ Partial Public Class UiAx00MainMDI
                        "IAx00MainMDI.CheckForExceptionsInAutoCreateWSWithLISProcess", EventLogEntryType.Information, False)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckForExceptionsInAutoCreateWSWithLISProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CheckForExceptionsInAutoCreateWSWithLISProcess", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".CheckForExceptionsInAutoCreateWSWithLISProcess", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
         Return toReturnValue
@@ -9610,7 +9610,7 @@ Partial Public Class UiAx00MainMDI
             ReleaseUnManageControls(bf.Controls)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".LanguageConfig_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -9664,12 +9664,12 @@ Partial Public Class UiAx00MainMDI
             Dim bf As BSBaseForm = CType(sender, BSBaseForm)
             ReleaseUnManageControls(bf.Controls)
 
-            If TypeOf sender Is IISEUtilities Then
+            If TypeOf sender Is UiISEUtilities Then
                 MyClass.SetActionButtonsEnableProperty(True)
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CommonForms_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".CommonForms_Closed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         Finally
@@ -9758,7 +9758,7 @@ Partial Public Class UiAx00MainMDI
                 AddHandler LISWaitTimer.Elapsed, AddressOf LISwaitTimer_Timer
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateLISWrapper ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".InitiateLISWrapper ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".InitiateLISWrapper ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -9813,7 +9813,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerCreateChannel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerCreateChannel ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".SynchronousLISManagerCreateChannel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousLISManagerCreateChannel ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -9875,7 +9875,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerRelease ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerRelease ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".SynchronousLISManagerRelease ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousLISManagerRelease ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -10131,7 +10131,7 @@ Partial Public Class UiAx00MainMDI
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerUploadResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".SynchronousLISManagerUploadResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousLISManagerUploadResults ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -10162,7 +10162,7 @@ Partial Public Class UiAx00MainMDI
             End SyncLock
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddResultsIntoQueueToUpload ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".AddResultsIntoQueueToUpload ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".AddResultsIntoQueueToUpload ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -10212,7 +10212,7 @@ Partial Public Class UiAx00MainMDI
                 End If 'If Not MDILISManager Is Nothing Then
             End If 'If Not ProcessingLISManagerObject Then
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerRejectAwosDelayed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerRejectAwosDelayed ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".SynchronousLISManagerRejectAwosDelayed ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousLISManagerRejectAwosDelayed ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -10299,7 +10299,7 @@ Partial Public Class UiAx00MainMDI
                     'AG 02/01/2014 - BT #1433 add more traces to orderdownload LIS workorders (v211 patch2)
                     Dim logTrace As String = String.Empty
                     logTrace = "After LoadLISSavedWS from a previous reset. Number of rejected order tests: " & auxDS.twksOrderTestsLISInfo.Rows.Count
-                    CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
+                    GlobalBase.CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
                     'AG 02/01/2014 - BT #1433
 
                     If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
@@ -10327,7 +10327,7 @@ Partial Public Class UiAx00MainMDI
 
                                 'AG 02/01/2014 - BT #1433 add more traces to orderdownload LIS workorders (v211 patch2)
                                 logTrace = "PendingOrders > 0 and after ProcessXmlMessages. Number of rejected order tests: " & rejectedAwosDS.twksOrderTestsLISInfo.Rows.Count
-                                CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
                                 'AG 02/01/2014 - BT #1433
 
                                 'Third step: Load processed new orders received from LIS
@@ -10351,7 +10351,7 @@ Partial Public Class UiAx00MainMDI
                                     'AG 02/01/2014 - BT #1433 add more traces to orderdownload LIS workorders (v211 patch2)
                                 Else
                                     logTrace = "PendingOrders > 0 and after LoadLISSavedWS returns error or SetDatos = Nothing"
-                                    CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
+                                    GlobalBase.CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
                                     'AG 02/01/2014 - BT #1433
                                 End If
 
@@ -10369,7 +10369,7 @@ Partial Public Class UiAx00MainMDI
                                 'AG 02/01/2014 - BT #1433 add more traces to orderdownload LIS workorders (v211 patch2)
                             Else
                                 logTrace = "PendingOrders > 0 and after ProcessXmlMessages returns error or SetDatos = Nothing"
-                                CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
                                 'AG 02/01/2014 - BT #1433
                             End If
                         End If
@@ -10380,7 +10380,7 @@ Partial Public Class UiAx00MainMDI
                         'AG 02/01/2014 - BT #1433 add more traces to orderdownload LIS workorders (v211 patch2)
                     Else
                         logTrace = "After LoadLISSavedWS from a previous reset. Returns error or SetDatos = Nothing"
-                        CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
+                        GlobalBase.CreateLogActivity(logTrace, "IAx00MainMDI.SynchronousProcessOrdersFromLIS", EventLogEntryType.Information, False)
                         'AG 02/01/2014 - BT #1433
 
                     End If
@@ -10395,7 +10395,7 @@ Partial Public Class UiAx00MainMDI
                 '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousProcessOrdersFromLIS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousProcessOrdersFromLIS ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'ShowMessage(Name & ".SynchronousProcessOrdersFromLIS ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousProcessOrdersFromLIS ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
         End Try
@@ -10457,7 +10457,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerHostQuery ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousLISManagerHostQuery ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".SynchronousLISManagerHostQuery ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousLISManagerHostQuery ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -10490,7 +10490,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousDeleteAllMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SynchronousDeleteAllMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage(Name & ".SynchronousDeleteAllMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousDeleteAllMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
@@ -10557,7 +10557,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProcessAutomaticOrdersDownload ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ProcessAutomaticOrdersDownload ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ProcessAutomaticOrdersDownload ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -10842,12 +10842,12 @@ Partial Public Class UiAx00MainMDI
             If refreshFlag AndAlso Not ActiveMdiChild Is Nothing Then
                 If (TypeOf ActiveMdiChild Is UiMonitor) Then
                     UiMonitor.UpdateWSState(New UIRefreshDS)
-                ElseIf (TypeOf ActiveMdiChild Is IResults) Then
-                    IResults.RefreshExportStatusChanged()
-                ElseIf (TypeOf ActiveMdiChild Is IHisResults) Then
-                    IHisResults.RefreshScreen(Nothing, Nothing)
+                ElseIf (TypeOf ActiveMdiChild Is UiResults) Then
+                    UiResults.RefreshExportStatusChanged()
+                ElseIf (TypeOf ActiveMdiChild Is UiHisResults) Then
+                    UiHisResults.RefreshScreen(Nothing, Nothing)
                 End If
-                CreateLogActivity("LIS notification refresh triggered!!", Me.Name & ".ManageNewLISNotification", EventLogEntryType.Information, False)
+                GlobalBase.CreateLogActivity("LIS notification refresh triggered!!", Me.Name & ".ManageNewLISNotification", EventLogEntryType.Information, False)
             End If
 
             If refreshHQScreenFlag Then
@@ -10880,8 +10880,8 @@ Partial Public Class UiAx00MainMDI
 
                 'LIS Utilities
                 If Not ActiveMdiChild Is Nothing Then
-                    If (TypeOf ActiveMdiChild Is ILISUtilities) Then
-                        ILISUtilities.RefreshElementsEnabled()
+                    If (TypeOf ActiveMdiChild Is UiLISUtilities) Then
+                        UiLISUtilities.RefreshElementsEnabled()
                     End If
                 End If
 
@@ -11125,7 +11125,7 @@ Partial Public Class UiAx00MainMDI
             'Dim myLogAcciones As New ApplicationLogManager()
             '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            CreateLogActivity("QAll button in MDI horizontal bar", Me.Name & ".bsTSQueryAllButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
+            GlobalBase.CreateLogActivity("QAll button in MDI horizontal bar", Me.Name & ".bsTSQueryAllButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
 
             'Send QueryAll and deactivate UI
             If Not MDILISManager Is Nothing Then
@@ -11179,7 +11179,7 @@ Partial Public Class UiAx00MainMDI
             ''END OF PROVISIONAL CODE!!!!
 
             'AG 02/01/2014 - BT#1433 - New log traces (v211 patch2)
-            CreateLogActivity("HQ button in MDI horizontal bar", "IAx00MainMDI.bsTSHostQueryButton_Click", EventLogEntryType.Information, False)
+            GlobalBase.CreateLogActivity("HQ button in MDI horizontal bar", "IAx00MainMDI.bsTSHostQueryButton_Click", EventLogEntryType.Information, False)
 
             'AG 24/02/2014 - use parameter MAX_APP_MEMORYUSAGE into performance counters (but do not show message here!!!) - ' XB 18/02/2014 BT #1499
             Dim PCounters As New AXPerformanceCounters(myApplicationMaxMemoryUsage, mySQLMaxMemoryUsage) 'AG 24/02/2014 - #1520 add parameter
@@ -11198,7 +11198,7 @@ Partial Public Class UiAx00MainMDI
                 'Open the Rotor positions and the LIS monitor screen for monitoring the last host query
                 If Not MDILISManager Is Nothing Then
                     Dim openScreenFlag As Boolean = True
-                    If Not ActiveMdiChild Is Nothing AndAlso (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                    If Not ActiveMdiChild Is Nothing AndAlso (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                         'Do not open rotor positions screen is already open
                         openScreenFlag = False
                     End If
@@ -11208,7 +11208,7 @@ Partial Public Class UiAx00MainMDI
                         OpenRotorPositionsForm(Nothing, True)
                     Else
                         'Current screen is rotor positioning -> Show popup screen
-                        Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                        Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                         If CurrentMdiChild.BarcodeWarningButton.Visible AndAlso CurrentMdiChild.BarcodeWarningButton.Enabled Then
                             CurrentMdiChild.BarcodeWarningButton.PerformClick()
                         End If
@@ -11465,7 +11465,7 @@ Partial Public Class UiAx00MainMDI
         'Cursor = Cursors.Default
 
         'AG 02/01/2014 - BT#1433 - New log traces (v211 patch2)
-        CreateLogActivity("OrderDownload (+) button in MDI horizontal bar", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
+        GlobalBase.CreateLogActivity("OrderDownload (+) button in MDI horizontal bar", "IAx00MainMDI.bsTSOrdersDownloadButton_Click", EventLogEntryType.Information, False)
 
         OrdersDownload()
         ' XB 24/07/2013
@@ -11605,10 +11605,10 @@ Partial Public Class UiAx00MainMDI
                             Case 1
                                 'New samples are added but no set to position then open the Sample Request Screen
                                 'Inform screen properties
-                                IWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
-                                IWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
-                                IWSSampleRequest.ActiveWSStatus = WSStatusAttribute
-                                OpenMDIChildForm(IWSSampleRequest)
+                                UiWSSampleRequest.ActiveAnalyzer = AnalyzerIDAttribute
+                                UiWSSampleRequest.ActiveWorkSession = WorkSessionIDAttribute
+                                UiWSSampleRequest.ActiveWSStatus = WSStatusAttribute
+                                OpenMDIChildForm(UiWSSampleRequest)
 
                                 'XB 23/07/2013 - auto HQ
                                 'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
@@ -11642,7 +11642,7 @@ Partial Public Class UiAx00MainMDI
                                 Exit Select
                             Case 2
                                 'If at least one of the order lis is set to position then open the Rotor Position Screen
-                                If (IWSSampleRequest.Visible) Then
+                                If (UiWSSampleRequest.Visible) Then
                                     'It is not possible because we have close the current MDI so there is not any screen open but the mdi (empty, only the mdi frame)
                                     'XB 23/07/2013 - auto HQ
                                     'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then 'Inform the automatic process send to position + create executions
@@ -11656,10 +11656,10 @@ Partial Public Class UiAx00MainMDI
                                         End If
                                         'AG 07/04/20014
 
-                                        IWSSampleRequest.OpenByAutomaticProcess = True
+                                        UiWSSampleRequest.OpenByAutomaticProcess = True
                                         GlobalBase.CreateLogActivity("AutoCreate WS with LIS: After orders download End process. Final screen SampleRequest + auto send to positioning", "IAx00MainMDI.OrdersDownload", EventLogEntryType.Information, False)
                                     End If
-                                    IWSSampleRequest.SaveWSWithPositioning()
+                                    UiWSSampleRequest.SaveWSWithPositioning()
                                 Else
                                     'AG 10/07/2013 - evaluate if open rotor positions in manual or automatic mode
                                     'XB 23/07/2013 - auto HQ
@@ -11745,7 +11745,7 @@ Partial Public Class UiAx00MainMDI
     Private Sub LISUtilitiesToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LISUtilitiesToolStripMenuItem.Click
         'Call the function OpenMDIChildForm and pass it as parameter the form name you want to open
         'The form to be opened should be assigned its AcceptButton property to its default exit button
-        OpenMDIChildForm(ILISUtilities)
+        OpenMDIChildForm(UiLISUtilities)
     End Sub
 
 #End Region
@@ -11772,7 +11772,7 @@ Partial Public Class UiAx00MainMDI
             'A400HelpProvider.SetHelpNavigator(Me, HelpNavigator.TableOfContents)
             'A400HelpProvider.SetHelpNavigator(Me, HelpNavigator.AssociateIndex)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetHelpProvider ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".SetHelpProvider ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -11781,7 +11781,7 @@ Partial Public Class UiAx00MainMDI
         Try
             'Help.ShowHelp(Me, GetHelpFilePath(HELP_FILE_TYPE.QUICK_GUIDE, CurrentLanguageAttribute))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QuickToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".QuickToolStripMenuItem_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -11791,7 +11791,7 @@ Partial Public Class UiAx00MainMDI
         Try
             'Help.ShowHelp(Me, GetHelpFilePath(HELP_FILE_TYPE.MANUAL, CurrentLanguageAttribute))
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ToolStripMenuItem10_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ToolStripMenuItem10_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -11799,5 +11799,4 @@ Partial Public Class UiAx00MainMDI
 
 #End Region
 
-  
 End Class

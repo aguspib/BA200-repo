@@ -23,7 +23,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
     ''' Base control for all the BSMonitor Controls (that involves Peerpetum)
     ''' </summary>
     ''' <remarks>Created by SGM 1/04/2011</remarks>
-    Public MustInherit Class BSMonitorControlBase
+    Public Class BSMonitorControlBase
         Inherits UserControl
 
 #Region "Constructor"
@@ -33,7 +33,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
             InitializeComponent()
 
             ' Add any initialization after the InitializeComponent() call.
-            'MyClass.CurrentStatus = Status.DISABLED
+            'CurrentStatus = Status.DISABLED
 
         End Sub
 #End Region
@@ -125,7 +125,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return TitleTextAttr
             End Get
             Set(ByVal value As String)
-                MyClass.TitleLabel.Text = value
+                TitleLabel.Text = value
                 TitleTextAttr = value
             End Set
         End Property
@@ -135,7 +135,7 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return TitleAlignmentAttr
             End Get
             Set(ByVal value As ContentAlignment)
-                MyClass.TitleLabel.TextAlign = value
+                TitleLabel.TextAlign = value
                 TitleAlignmentAttr = value
             End Set
         End Property
@@ -155,10 +155,10 @@ Namespace Biosystems.Ax00.Controls.UserControls
 
         Public Property TitleFont() As Font
             Get
-                Return MyClass.TitleFontAttr
+                Return TitleFontAttr
             End Get
             Set(ByVal value As Font)
-                MyClass.TitleLabel.Font = value
+                TitleLabel.Font = value
                 TitleFontAttr = value
             End Set
         End Property
@@ -168,14 +168,14 @@ Namespace Biosystems.Ax00.Controls.UserControls
                 Return TitleForeColorAttr
             End Get
             Set(ByVal value As Color)
-                MyClass.TitleLabel.ForeColor = value
+                TitleLabel.ForeColor = value
                 TitleForeColorAttr = value
             End Set
         End Property
 
         Public Overloads WriteOnly Property Enabled() As Boolean
             Set(ByVal value As Boolean)
-                For Each C As Control In MyClass.Controls
+                For Each C As Control In Controls
                     If TypeOf C Is System.Windows.Forms.Label Then
                         C.Enabled = True
                     Else
@@ -208,7 +208,9 @@ Namespace Biosystems.Ax00.Controls.UserControls
 #Region "Inheritable Methods"
 
 
-        Protected Friend MustOverride Sub RefreshControl()
+        Protected Friend Overridable Sub RefreshControl()
+
+        End Sub
 
         ''' <summary>
         ''' This function handles resizing of the control contents. Usually a InstrumentPanel on controls that implement it.
@@ -235,8 +237,8 @@ Namespace Biosystems.Ax00.Controls.UserControls
         ''' <remarks>Created by SGM 28/04/2011</remarks>
         Protected Friend Sub SetScaleLimits()
             'Try
-            If MyClass.IsLoaded Then
-                Dim myScale As Model.Scale = CType(GetElement(MyClass.InstrumentationControl, MyClass.ScaleElementName), Model.Scale)
+            If IsLoaded Then
+                Dim myScale As Model.Scale = CType(GetElement(InstrumentationControl, ScaleElementName), Model.Scale)
 
                 If myScale IsNot Nothing Then
                     myScale.Minimum = MinLimit

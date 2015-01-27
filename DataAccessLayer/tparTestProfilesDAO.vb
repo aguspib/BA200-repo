@@ -9,7 +9,7 @@ Imports System.Text
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class tparTestProfilesDAO
-        Inherits DAOBase
+          
 
 
 #Region "CRUD Methods"

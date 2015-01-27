@@ -10,7 +10,7 @@ Imports System.Text
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tparISETestsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
         ''' <summary>

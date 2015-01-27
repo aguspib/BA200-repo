@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tinfoISEDAO
 
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 

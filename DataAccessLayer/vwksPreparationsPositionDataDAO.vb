@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class vwksPreparationsPositionDataDAO
-        Inherits DAOBase
+          
 
         Public Function ReadByOrderTestID(ByVal pDBConnection As SqlClient.SqlConnection, _
                                         ByVal pOrderTestID As Integer) As GlobalDataTO

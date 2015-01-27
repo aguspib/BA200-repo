@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IWSDeleteAuxScreen
+Partial Class UiWSDeleteAuxScreen
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -11,7 +11,7 @@ Partial Class IWSDeleteAuxScreen
         MyBase.Dispose(disposing)
     End Sub
 
-  
+
 
     'Required by the Windows Form Designer
     Private components As System.ComponentModel.IContainer
@@ -21,7 +21,7 @@ Partial Class IWSDeleteAuxScreen
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IWSDeleteAuxScreen))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiWSDeleteAuxScreen))
         Me.bsExitButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton
         Me.bsListViewTitleLabel = New Biosystems.Ax00.Controls.UserControls.BSLabel

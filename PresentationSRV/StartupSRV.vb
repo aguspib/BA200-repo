@@ -60,7 +60,7 @@ Public NotInheritable Class StartupSRV
 
         'Note that IAx00Login validates DB existence, create it if concern, and loads Application Current Language
 
-        Using myLoginForm As New IAx00Login()
+        Using myLoginForm As New UiAx00Login()
             If myLoginForm.ShowDialog() = DialogResult.OK Then
                 Dim ShowBackground As Boolean
 #If DEBUG Then
@@ -68,7 +68,7 @@ Public NotInheritable Class StartupSRV
 #Else
                 ShowBackground = True
 #End If
-                Dim myBackForm As New IBackground(TryCast(Ax00ServiceMainMDI, Form), Nothing)
+                Dim myBackForm As New UiBackground(TryCast(Ax00ServiceMainMDI, Form), Nothing)
                 myBackForm.ShowMDI(ShowBackground)
             End If
         End Using

@@ -3,7 +3,7 @@ Option Explicit On
 
 Imports System.Windows.Forms
 
-Public Class IBackground
+Public Class UiBackground
 
     Private WithEvents myMDI As BSBaseForm
     Public Event ExceptionHappened(ByVal ex As Exception)

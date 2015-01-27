@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksCurveResultsDAO
-        Inherits DAOBase
+          
 
         Public Function FindLastCurveID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
 

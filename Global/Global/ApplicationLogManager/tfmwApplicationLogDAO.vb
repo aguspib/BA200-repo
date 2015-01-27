@@ -9,7 +9,7 @@ Imports System.Globalization
 
 Namespace Biosystems.Ax00.Global.DAL
     Public Class tfmwApplicationLogDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' Insert log information into database on table tfmApplicationLogDAO.

@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class tfmwReagentTubeTypesDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>

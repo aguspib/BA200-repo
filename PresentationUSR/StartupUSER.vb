@@ -13,7 +13,7 @@ Public NotInheritable Class StartupUSER
     'Private RunningBackGround As Boolean = False
     'Private Ax00StartUpVisible As Boolean = False
     'Dim iconPath As String = IconsPath
-    Private Ax00StartUp As IAx00StartUp
+    Private Ax00StartUp As UiAx00StartUp
 
 
     Public Sub New()
@@ -74,7 +74,7 @@ Public NotInheritable Class StartupUSER
 
         'Note that IAx00Login validates DB existence, create it if concern, and loads Application Current Language
 
-        Using myLoginForm As New IAx00Login()
+        Using myLoginForm As New UiAx00Login()
             If myLoginForm.ShowDialog() = DialogResult.OK Then
                 'Ax00StartUp.Show()
                 'Application.DoEvents()
@@ -97,12 +97,12 @@ Public NotInheritable Class StartupUSER
                 Dim process As New Thread(AddressOf LoadSemaphores)
                 process.Start()
 
-                Ax00StartUp = New IAx00StartUp(Nothing) With { _
+                Ax00StartUp = New UiAx00StartUp(Nothing) With { _
                             .Title = "Loading...", _
                             .WaitText = "", _
                             .Background = ""}
 
-                Dim myBackForm As New IBackground(TryCast(UiAx00MainMDI, Form), TryCast(Ax00StartUp, Form))
+                Dim myBackForm As New UiBackground(TryCast(UiAx00MainMDI, Form), TryCast(Ax00StartUp, Form))
                 Application.DoEvents()
 
                 myBackForm.TopMost = True 'IT 18/11/2014: BA-2025

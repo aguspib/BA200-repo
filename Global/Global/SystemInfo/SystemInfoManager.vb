@@ -71,7 +71,7 @@ Public Class SystemInfoManager
     '        MySystemInfoTO.GetComputerInfo() ' dl 15/09/2010
 
     '    Catch ex As EvaluateException
-    '        CreateLogActivity(ex.Message, "SystemInfo.LoadApplicationInfoSessionTO", EventLogEntryType.Error, GetSessionInfo().ActivateSystemLog)
+    '        GlobalBase.CreateLogActivity(ex.Message, "SystemInfo.LoadApplicationInfoSessionTO", EventLogEntryType.Error, GetSessionInfo().ActivateSystemLog)
     '    End Try
     '    Return MySystemInfoTO
     'End Function

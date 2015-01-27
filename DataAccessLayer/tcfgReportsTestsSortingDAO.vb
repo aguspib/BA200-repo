@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Types
 Imports System.Text
 
 Public Class tcfgReportsTestsSortingDAO
-    Inherits DAOBase
+      
 
 #Region "Other Methods"
     ''' <summary>

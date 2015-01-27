@@ -5,7 +5,7 @@ Option Infer On
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.BL
 
-Public Class IResultsRecover
+Public Class UiResultsRecover
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
 #Region "Constructor"
@@ -15,7 +15,7 @@ Public Class IResultsRecover
 #End Region
 
 #Region "Declarations"
-    
+
 #End Region
 
 #Region "Private Methods"
@@ -37,7 +37,7 @@ Public Class IResultsRecover
             bsRecoverLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LBL_RESULTS_RECOVERING", currentLanguage)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetScreenLabels", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetScreenLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -62,7 +62,7 @@ Public Class IResultsRecover
 
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".InitializeScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".InitializeScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
     End Sub
@@ -109,7 +109,7 @@ Public Class IResultsRecover
             InitializeScreen()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IResultsRecover_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IResultsRecover_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IResultsRecover_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
         End Try
         ''

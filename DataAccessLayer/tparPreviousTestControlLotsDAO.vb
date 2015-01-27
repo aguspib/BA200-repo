@@ -7,7 +7,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 
 Partial Public Class tparPreviousTestControlLotsDAO
-    Inherits DAOBase
+      
 
 #Region "CRUD Methods"
 

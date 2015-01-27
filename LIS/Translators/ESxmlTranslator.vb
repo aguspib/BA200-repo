@@ -4784,14 +4784,14 @@ Namespace Biosystems.Ax00.LISCommunications
                     'For historical pHistDataDS do the same with equivalent fields
                     Dim ResultQElement As XmlNode = XmlDoc.CreateElement("ci", "qualifyingElement", ClinicalInfoSchema)
                     Dim QElementValue As XmlNode = XmlDoc.CreateElement("ci", "value", ClinicalInfoSchema)
-                    Dim myDAO As New DAOBase 'DL 16/05/2013
+                    'Dim myDAO As New DAOBase 'DL 16/05/2013
 
                     'Use pResultsDS, if ManualResultFlag = False use CONC_Value, else 
                     'use ManualResult or ManualResultText.(For historical pHistDataDS same fields)
                     If Not myResultRow.ManualResultFlag Then
                         'DL 16/05/2013
                         'QElementValue.InnerText = myResultRow.CONC_Value.ToString(InvariantCulture)
-                        QElementValue.InnerText = myDAO.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
+                        QElementValue.InnerText = DAOBase.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
                         'DL 16/05/2013
                     Else
                         If myResultRow.IsManualResultNull AndAlso Not myResultRow.IsManualResultTextNull Then
@@ -4802,7 +4802,7 @@ Namespace Biosystems.Ax00.LISCommunications
                         ElseIf Not myResultRow.IsCONC_ValueNull Then
                             'DL 16/05/2013
                             'QElementValue.InnerText = myResultRow.CONC_Value.ToString(InvariantCulture)
-                            QElementValue.InnerText = myDAO.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
+                            QElementValue.InnerText = DAOBase.ReplaceNumericString(myResultRow.CONC_Value).ToString(InvariantCulture)
                             'DL 16/05/2013
                         End If
                     End If
@@ -4837,7 +4837,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 If Not pHisResultsRow.IsMaxRefRangeNull Then
                                     'DL 16/05/2013
                                     'HiRefValue.InnerText = pHisResultsRow.MaxRefRange.ToString(InvariantCulture)
-                                    HiRefValue.InnerText = myDAO.ReplaceNumericString(pHisResultsRow.MaxRefRange).ToString(InvariantCulture)
+                                    HiRefValue.InnerText = DAOBase.ReplaceNumericString(pHisResultsRow.MaxRefRange).ToString(InvariantCulture)
                                     'DL 16/05/2013
                                 Else
                                     HiRefValue.InnerText = String.Empty
@@ -4846,7 +4846,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 'DL 16/05/2013
                                 'HiRefValue.InnerText = myRefRangesRow.NormalUpperLimit.ToString(InvariantCulture)
                                 If myRefRangesRow.NormalUpperLimit > -1 Then
-                                    HiRefValue.InnerText = myDAO.ReplaceNumericString(myRefRangesRow.NormalUpperLimit).ToString(InvariantCulture)
+                                    HiRefValue.InnerText = DAOBase.ReplaceNumericString(myRefRangesRow.NormalUpperLimit).ToString(InvariantCulture)
                                 End If
                                 'DL 16/05/2013
                             End If
@@ -4865,7 +4865,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 If Not pHisResultsRow.IsMinRefRangeNull Then
                                     'DL 16/05/2013
                                     'LoRefValue.InnerText = pHisResultsRow.MinRefRange.ToString(InvariantCulture)
-                                    LoRefValue.InnerText = myDAO.ReplaceNumericString(pHisResultsRow.MinRefRange).ToString(InvariantCulture)
+                                    LoRefValue.InnerText = DAOBase.ReplaceNumericString(pHisResultsRow.MinRefRange).ToString(InvariantCulture)
                                     'DL 16/05/2013
                                 Else
                                     LoRefValue.InnerText = String.Empty
@@ -4874,7 +4874,7 @@ Namespace Biosystems.Ax00.LISCommunications
                                 'DL 16/05/2013
                                 'LoRefValue.InnerText = myRefRangesRow.NormalLowerLimit.ToString(InvariantCulture)
                                 If myRefRangesRow.NormalLowerLimit > -1 Then
-                                    LoRefValue.InnerText = myDAO.ReplaceNumericString(myRefRangesRow.NormalLowerLimit).ToString(InvariantCulture)
+                                    LoRefValue.InnerText = DAOBase.ReplaceNumericString(myRefRangesRow.NormalLowerLimit).ToString(InvariantCulture)
                                 End If
                                 'DL 16/05/2013
                             End If

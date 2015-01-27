@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
     Public Class tcfgAnalyzerSettingsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>

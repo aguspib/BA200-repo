@@ -8,7 +8,7 @@ Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class tparCalculatedTestsDAO
-        Inherits DAOBase
+
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -58,7 +58,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (String.IsNullOrEmpty(pCalcTest.tparCalculatedTests(0).Decimals.ToString)) Then
                         cmdText &= " NULL, "
                     Else
-                        cmdText &= ReplaceNumericString(pCalcTest.tparCalculatedTests(0).Decimals) & ", "
+                        cmdText &= DAOBase.ReplaceNumericString(pCalcTest.tparCalculatedTests(0).Decimals) & ", "
                     End If
 
                     cmdText &= Convert.ToInt32(pCalcTest.tparCalculatedTests(0).PrintExpTests) & ", " & _
@@ -637,7 +637,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (pCalcTest.tparCalculatedTests(0).IsDecimalsNull OrElse pCalcTest.tparCalculatedTests(0).Decimals.ToString = "") Then
                         cmdText &= " Decimals = NULL "
                     Else
-                        cmdText &= " Decimals = " & ReplaceNumericString(pCalcTest.tparCalculatedTests(0).Decimals)
+                        cmdText &= " Decimals = " & DAOBase.ReplaceNumericString(pCalcTest.tparCalculatedTests(0).Decimals)
                     End If
 
                     'AG 02/09/2014 - BA-1869 - Update also Available when informed on dataset

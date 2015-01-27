@@ -8,7 +8,7 @@ Imports System.Xml
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class twksXmlMessagesDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
         ''' <summary>

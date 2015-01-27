@@ -178,8 +178,8 @@ Partial Public Class UiAx00MainMDI
                             myCurrentMDIForm = DisabledMDIChildAttribute(0)
                         End If
 
-                        If Not myCurrentMDIForm Is Nothing AndAlso TypeOf myCurrentMDIForm Is IWSRotorPositions Then
-                            Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                        If Not myCurrentMDIForm Is Nothing AndAlso TypeOf myCurrentMDIForm Is UiWSRotorPositions Then
+                            Dim CurrentMdiChild As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                             CurrentMdiChild.RefreshwatchDogTimer_Interval(NewIntervalValue)
                         End If
                     End If
@@ -206,7 +206,7 @@ Partial Public Class UiAx00MainMDI
                             ShowStatus(Messages.STARTING_INSTRUMENT)
                         Else
                             'SGM 10/04/2012 not to show Standby in case of ISE utilities open
-                            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is IISEUtilities Then
+                            If Not ActiveMdiChild Is Nothing AndAlso TypeOf ActiveMdiChild Is UiISEUtilities Then
                             Else
                                 If Not ProcessingBusinessInCourse() AndAlso Not Me.ShutDownisPending AndAlso Not Me.StartSessionisPending Then ' AG 08/11/2012 - PENDING Validate - Execute only when the working process progress bar is activate
                                     'If Not Me.ShutDownisPending And Not Me.StartSessionisPending Then ' XBC 23/07/2012
@@ -344,8 +344,8 @@ Partial Public Class UiAx00MainMDI
                     ' Refresh BarCode Info screen
                     If Not ActiveMdiChild Is Nothing Then
 
-                        If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                            Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                        If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                            Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                             CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         ElseIf (TypeOf ActiveMdiChild Is UiMonitor AndAlso Not monitorTreated) Then
                             Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
@@ -586,7 +586,7 @@ Partial Public Class UiAx00MainMDI
                                         End If
 
                                         If (LockISE) Then
-                                            If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is IWSRotorPositions) Then
+                                            If (Me.ActiveMdiChild Is Nothing) OrElse (Not TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
                                                 Dim myExecutionsDelegate As New ExecutionsDelegate
                                                 myGlobal = myExecutionsDelegate.UpdateStatusByExecutionTypeAndStatus(Nothing, WorkSessionIDAttribute, AnalyzerIDAttribute, "PREP_ISE", "PENDING", "LOCKED")
                                             End If
@@ -696,7 +696,7 @@ Partial Public Class UiAx00MainMDI
                     If onlineExportResults.twksWSExecutions.Rows.Count > 0 Then
                         AddResultsIntoQueueToUpload(onlineExportResults)
 
-                        CreateLogActivity("Current results automatic upload (STD, ISE, CALC)", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
+                        GlobalBase.CreateLogActivity("Current results automatic upload (STD, ISE, CALC)", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.Information, False) 'AG 02/01/2014 - BT #1433 (v211 patch2)
 
                         InvokeUploadResultsLIS(False, True) 'AG 30/09/2014 - BA-1440 inform that is an automatic exportation
 
@@ -821,7 +821,7 @@ Partial Public Class UiAx00MainMDI
 
                 'Once the user has answered open the auxiliary screen for recovery results
                 CloseActiveMdiChild(True)  'AG 07/01/2014 - BT #1436 call this method
-                OpenMDIChildForm(IResultsRecover)
+                OpenMDIChildForm(UiResultsRecover)
                 EnableButtonAndMenus(False)
             End If
             'AG 04/12/2013
@@ -1002,8 +1002,8 @@ Partial Public Class UiAx00MainMDI
                     myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
                     MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
 
-                    If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                        Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                        Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         CurrentMdiChild.PrepareErrorMode()
                     End If
 
@@ -1020,8 +1020,8 @@ Partial Public Class UiAx00MainMDI
                 ' The 1st idea was update the ports combo but it was CANCELED due a system error was triggered and it was difficult to solve
                 Dim myRefreshDS As UIRefreshDS = Nothing
                 Dim myRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
-                If (TypeOf ActiveMdiChild Is IConfigGeneral) Then
-                    Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                If (TypeOf ActiveMdiChild Is UiConfigGeneral) Then
+                    Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                     CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS)
 
                 ElseIf (TypeOf ActiveMdiChild Is UiMonitor) Then
@@ -1032,7 +1032,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DisconnectComms ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".DisconnectComms ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".DisconnectComms ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1070,8 +1070,8 @@ Partial Public Class UiAx00MainMDI
 
                 If Not ActiveMdiChild Is Nothing Then
 
-                    If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                        Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                    If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                        Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                         CurrentMdiChild.PrepareErrorMode()
                     End If
 
@@ -1142,7 +1142,7 @@ Partial Public Class UiAx00MainMDI
             ShowMessage(myTitle, "ERROR_COMM", myAdtionalText)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ShowTimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ShowTimeoutMessage ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowTimeoutMessage ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
@@ -1181,8 +1181,8 @@ Partial Public Class UiAx00MainMDI
                 myCurrentMDIForm = DisabledMDIChildAttribute(0)
             End If
 
-            If Not myCurrentMDIForm Is Nothing AndAlso TypeOf myCurrentMDIForm Is IWSRotorPositions Then
-                Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+            If Not myCurrentMDIForm Is Nothing AndAlso TypeOf myCurrentMDIForm Is UiWSRotorPositions Then
+                Dim CurrentMdiChild As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                 CurrentMdiChild.RefreshwatchDogTimer_Enable(pEnable)
             End If
 
@@ -1228,7 +1228,7 @@ Partial Public Class UiAx00MainMDI
                 If MyPortList.Where(Function(a) String.Compare(a, myConnectedPort, False) = 0).Count = 0 Then
 
                     'TR 10/11/2011 -Create a log entry to inform the desconnection.
-                    CreateLogActivity(GetMessageText(e.Message, CurrentLanguageAttribute), Name & ".OnDeviceRemoved", EventLogEntryType.Information, False) 'AG 25/03/2014 - Information instead of Error
+                    GlobalBase.CreateLogActivity(GetMessageText(e.Message, CurrentLanguageAttribute), Name & ".OnDeviceRemoved", EventLogEntryType.Information, False) 'AG 25/03/2014 - Information instead of Error
 
                     'XB + AG 09/09/2013 - error comms while automatic WS creation process is reading barcode
                     If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState = LISautomateProcessSteps.subProcessReadBarcode Then
@@ -1272,8 +1272,8 @@ Partial Public Class UiAx00MainMDI
                             myISEResultWithComErrors.ISEResultType = ISEResultTO.ISEResultTypes.ComError
                             MDIAnalyzerManager.ISE_Manager.LastISEResult = myISEResultWithComErrors
 
-                            If (TypeOf ActiveMdiChild Is IISEUtilities) Then
-                                Dim CurrentMdiChild As IISEUtilities = CType(ActiveMdiChild, IISEUtilities)
+                            If (TypeOf ActiveMdiChild Is UiISEUtilities) Then
+                                Dim CurrentMdiChild As UiISEUtilities = CType(ActiveMdiChild, UiISEUtilities)
                                 CurrentMdiChild.PrepareErrorMode()
                             End If
 
@@ -1290,8 +1290,8 @@ Partial Public Class UiAx00MainMDI
                         ' The 1st idea was update the ports combo but it was CANCELED due a system error was triggered and it was difficult to solve
                         Dim myRefreshDS As UIRefreshDS = Nothing
                         Dim myRefreshEventList As New List(Of GlobalEnumerates.UI_RefreshEvents)
-                        If (TypeOf ActiveMdiChild Is IConfigGeneral) Then
-                            Dim CurrentMdiChild As IConfigGeneral = CType(ActiveMdiChild, IConfigGeneral)
+                        If (TypeOf ActiveMdiChild Is UiConfigGeneral) Then
+                            Dim CurrentMdiChild As UiConfigGeneral = CType(ActiveMdiChild, UiConfigGeneral)
                             CurrentMdiChild.RefreshScreen(myRefreshEventList, myRefreshDS) 'DL16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
 
                             'AG 13/02/2012 - Refresh monitor (new alarm)
@@ -1330,7 +1330,7 @@ Partial Public Class UiAx00MainMDI
             ' ALBERT !!!!!!! HAURIA DE SER AIXO PERO NO FUNCIONA !!!!!!!!!!!!!!!!!!!!!
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OnDeviceRemoved ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".OnDeviceRemoved ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OnDeviceRemoved ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 
@@ -1364,7 +1364,7 @@ Partial Public Class UiAx00MainMDI
             Me.ShowStatus(pMessageID)
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OnManageActivateScreenEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OnManageActivateScreenEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".OnManageActivateScreenEvent ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1378,7 +1378,7 @@ Partial Public Class UiAx00MainMDI
         Try
             MyClass.SetActionButtonsEnableProperty(pEnable)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OnActivateVerticalButtonsEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".OnActivateVerticalButtonsEvent ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".OnActivateVerticalButtonsEvent ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1516,14 +1516,14 @@ Partial Public Class UiAx00MainMDI
                                     If (TypeOf ActiveMdiChild Is UiMonitor) Then
                                         Dim CurrentMdiChild As UiMonitor = CType(ActiveMdiChild, UiMonitor)
                                         CurrentMdiChild.bsErrorProvider1.SetError(Nothing, GetMessageText(GlobalEnumerates.Messages.WS_ABORTED.ToString))
-                                    ElseIf (TypeOf ActiveMdiChild Is IResults) Then
-                                        Dim CurrentMdiChild As IResults = CType(ActiveMdiChild, IResults)
+                                    ElseIf (TypeOf ActiveMdiChild Is UiResults) Then
+                                        Dim CurrentMdiChild As UiResults = CType(ActiveMdiChild, UiResults)
                                         CurrentMdiChild.bsErrorProvider1.SetError(Nothing, GetMessageText(GlobalEnumerates.Messages.WS_ABORTED.ToString))
-                                    ElseIf (TypeOf ActiveMdiChild Is IWSRotorPositions) Then
-                                        Dim CurrentMdiChild As IWSRotorPositions = CType(ActiveMdiChild, IWSRotorPositions)
+                                    ElseIf (TypeOf ActiveMdiChild Is UiWSRotorPositions) Then
+                                        Dim CurrentMdiChild As UiWSRotorPositions = CType(ActiveMdiChild, UiWSRotorPositions)
                                         CurrentMdiChild.bsErrorProvider1.SetError(Nothing, GetMessageText(GlobalEnumerates.Messages.WS_ABORTED.ToString))
-                                    ElseIf (TypeOf ActiveMdiChild Is IWSSampleRequest) Then
-                                        Dim CurrentMdiChild As IWSSampleRequest = CType(ActiveMdiChild, IWSSampleRequest)
+                                    ElseIf (TypeOf ActiveMdiChild Is UiWSSampleRequest) Then
+                                        Dim CurrentMdiChild As UiWSSampleRequest = CType(ActiveMdiChild, UiWSSampleRequest)
                                         CurrentMdiChild.bsErrorProvider1.SetError(Nothing, GetMessageText(GlobalEnumerates.Messages.WS_ABORTED.ToString))
                                     End If
                                 End If
@@ -1591,7 +1591,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowLabelInStatusBar", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowLabelInStatusBar", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ShowLabelInStatusBar", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -1621,7 +1621,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewExecutionStatusDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewExecutionStatusDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewExecutionStatusDone ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1649,8 +1649,8 @@ Partial Public Class UiAx00MainMDI
                     MonitorTreated = True
 
                     '- ResultForm ... (pRefreshDS.ExecutionStatusChanged contains the information to refresh)
-                ElseIf (TypeOf ActiveMdiChild Is IResults AndAlso Not resultTreated) Then
-                    Dim CurrentMdiChild As IResults = CType(ActiveMdiChild, IResults)
+                ElseIf (TypeOf ActiveMdiChild Is UiResults AndAlso Not resultTreated) Then
+                    Dim CurrentMdiChild As UiResults = CType(ActiveMdiChild, UiResults)
                     CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
 
                     resultTreated = True
@@ -1663,7 +1663,7 @@ Partial Public Class UiAx00MainMDI
                     ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
                     'GlobalBase.CreateLogActivity("1- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                     For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
-                        If String.Compare(NoMDIChildActiveFormsAttribute.Item(index).Name, IResultsCalibCurve.Name, False) = 0 Then
+                        If String.Compare(NoMDIChildActiveFormsAttribute.Item(index).Name, UiResultsCalibCurve.Name, False) = 0 Then
                             found = True
                             Exit For
                         End If
@@ -1672,8 +1672,8 @@ Partial Public Class UiAx00MainMDI
                     'GlobalBase.CreateLogActivity("1- AFTER NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
 
                     If found Then
-                        Dim CurrentNoMdiChild As IResultsCalibCurve
-                        CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), IResultsCalibCurve)
+                        Dim CurrentNoMdiChild As UiResultsCalibCurve
+                        CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), UiResultsCalibCurve)
 
                         With CurrentNoMdiChild
                             .ActiveAnalyzer = AnalyzerIDAttribute
@@ -1693,7 +1693,7 @@ Partial Public Class UiAx00MainMDI
 
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewCalculationsDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewCalculationsDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewCalculationsDone ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1721,7 +1721,7 @@ Partial Public Class UiAx00MainMDI
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
                 'GlobalBase.CreateLogActivity("2- BEFORE NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 For index = 0 To NoMDIChildActiveFormsAttribute.Count - 1
-                    If NoMDIChildActiveFormsAttribute.Item(index).Name = IResultsAbsCurve.Name Then
+                    If NoMDIChildActiveFormsAttribute.Item(index).Name = UiResultsAbsCurve.Name Then
                         found = True
                         Exit For
                     End If
@@ -1729,8 +1729,8 @@ Partial Public Class UiAx00MainMDI
                 ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
                 'GlobalBase.CreateLogActivity("2- After NoMDIChildActiveFormsAttribute.Count FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
                 If found Then
-                    Dim CurrentNoMdiChild As IResultsAbsCurve
-                    CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), IResultsAbsCurve)
+                    Dim CurrentNoMdiChild As UiResultsAbsCurve
+                    CurrentNoMdiChild = CType(NoMDIChildActiveFormsAttribute.Item(index), UiResultsAbsCurve)
                     CurrentNoMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentNoMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                 End If
                 ' END DL 24/05/2011
@@ -1738,7 +1738,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewReadingsReception ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewReadingsReception ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewReadingsReception ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1806,23 +1806,23 @@ Partial Public Class UiAx00MainMDI
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'DL 05/06/2012
                         'DL 05/06/2012
                     End If
-                ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
-                    Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+                ElseIf (TypeOf myCurrentMDIForm Is UiWSSampleRequest) Then
+                    Dim CurrentMdiChild As UiWSSampleRequest = CType(myCurrentMDIForm, UiWSSampleRequest)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                     End If
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables Scan barcode /Check bottle volume button. Else enable it
                     'Rotor positions
-                ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions) Then
-                    Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                ElseIf (TypeOf myCurrentMDIForm Is UiWSRotorPositions) Then
+                    Dim CurrentMdiChild As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                     End If
                     'AG 28/03/2012 - When cover open and enabled alarms appears it disables ISE command button. Else enable it
-                ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
-                    Dim CurrentMdiChild As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
+                ElseIf (TypeOf myCurrentMDIForm Is UiISEUtilities) Then
+                    Dim CurrentMdiChild As UiISEUtilities = CType(myCurrentMDIForm, UiISEUtilities)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
@@ -1870,7 +1870,7 @@ Partial Public Class UiAx00MainMDI
             SetActionButtonsEnableProperty(True)
             'Debug.Print("ShowAlarmsOrSensorsWarningMessages called from ManageReceptionEvent-1") 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewAlarmsReception ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewAlarmsReception ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewAlarmsReception ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -1915,7 +1915,7 @@ Partial Public Class UiAx00MainMDI
                 'AG 27/08/2012 - Results recovery process has an special screen 
                 If MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) = "INPROCESS" AndAlso _
                    MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERY_RESULTS_STATUS) = 1 AndAlso _
-                   Not (TypeOf myCurrentMDIForm Is IResultsRecover) Then
+                   Not (TypeOf myCurrentMDIForm Is UiResultsRecover) Then
 
                     'AG 28/11/2013 - BT #1397
                     'Comment the old code
@@ -1928,7 +1928,7 @@ Partial Public Class UiAx00MainMDI
                         recoveryResultsWarnFlag = False
 
                         CloseActiveMdiChild(True)  'AG 07/01/2014 - BT #1436 call this method
-                        OpenMDIChildForm(IResultsRecover)
+                        OpenMDIChildForm(UiResultsRecover)
                         EnableButtonAndMenus(False)
 
 
@@ -1944,7 +1944,7 @@ Partial Public Class UiAx00MainMDI
 
                 ElseIf MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess) <> "INPROCESS" AndAlso _
                        MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERY_RESULTS_STATUS) = 0 AndAlso _
-                       (TypeOf myCurrentMDIForm Is IResultsRecover) Then
+                       (TypeOf myCurrentMDIForm Is UiResultsRecover) Then
 
                     'Close the results recover popup screen and open the monitor screen
                     'WSStatusAttribute = "ABORTED" 'AG 07/03/2014 - integrate patches 'AG 18/02/2014 - #1513 do not abort WS after recover results!! 'After recovery results the worksession becomes aborted
@@ -1983,8 +1983,8 @@ Partial Public Class UiAx00MainMDI
 
                         'DL 05/06/2012 ISE Utilities placed into PresetationCOM layer
 
-                    ElseIf (TypeOf myCurrentMDIForm Is IISEUtilities) Then
-                        Dim CurrentMdiChild As IISEUtilities = CType(myCurrentMDIForm, IISEUtilities)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiISEUtilities) Then
+                        Dim CurrentMdiChild As UiISEUtilities = CType(myCurrentMDIForm, UiISEUtilities)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS)
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                         'ElseIf (TypeOf myCurrentMDIForm Is Biosystems.Ax00.PresentationCOM.IISEUtilities) Then
@@ -1996,13 +1996,13 @@ Partial Public Class UiAx00MainMDI
 
                         'AG 16/03/2012 - If freeze appears while this screen is disable Sw must re-activate it
                         'Sample request
-                    ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
-                        Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiWSSampleRequest) Then
+                        Dim CurrentMdiChild As UiWSSampleRequest = CType(myCurrentMDIForm, UiWSSampleRequest)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                         'Rotor positioning
-                    ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions AndAlso Not wsRotorPositionTreated) Then
-                        Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                    ElseIf (TypeOf myCurrentMDIForm Is UiWSRotorPositions AndAlso Not wsRotorPositionTreated) Then
+                        Dim CurrentMdiChild As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         wsRotorPositionTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
@@ -2178,7 +2178,7 @@ Partial Public Class UiAx00MainMDI
             'Debug.Print("ShowAlarmsOrSensorsWarningMessages called from ManageReceptionEvent-2")
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewSensorValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewSensorValueChanged ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewSensorValueChanged ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -2207,7 +2207,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewWashingStationPositionDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewWashingStationPositionDone ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewWashingStationPositionDone ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
 
         End Try
@@ -2295,16 +2295,16 @@ Partial Public Class UiAx00MainMDI
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                     End If
                     '- Rotor position screen ... (pRefreshDS.RotorPositionChanged contains the information to refresh)
-                ElseIf (TypeOf myCurrentMDIForm Is IWSRotorPositions AndAlso Not wsRotorPositionTreated) Then
-                    Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                ElseIf (TypeOf myCurrentMDIForm Is UiWSRotorPositions AndAlso Not wsRotorPositionTreated) Then
+                    Dim CurrentMdiChild As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'DL 16/09/2011 CurrentMdiChild.RefreshScreen(pRefreshEvent, pRefreshDS)
                         wsRotorPositionTreated = True
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
                     End If
 
-                ElseIf (TypeOf myCurrentMDIForm Is IWSSampleRequest) Then
-                    Dim CurrentMdiChild As IWSSampleRequest = CType(myCurrentMDIForm, IWSSampleRequest)
+                ElseIf (TypeOf myCurrentMDIForm Is UiWSSampleRequest) Then
+                    Dim CurrentMdiChild As UiWSSampleRequest = CType(myCurrentMDIForm, UiWSSampleRequest)
                     If (Not CurrentMdiChild Is Nothing) Then 'IT #1644
                         CurrentMdiChild.RefreshScreen(copyRefreshEventList, copyRefreshDS) 'AG + TR 23/09/2011
                         refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
@@ -2333,7 +2333,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewWRotorPositionChange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewWRotorPositionChange ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewWRotorPositionChange ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2426,15 +2426,15 @@ Partial Public Class UiAx00MainMDI
 
                         If lisWithFilesMode Then
                             'Open popup the IWSIncompleteSamplesAuxScreen 
-                            Using MyForm As New IWSIncompleteSamplesAuxScreen()
+                            Using MyForm As New UiWSIncompleteSamplesAuxScreen()
                                 MyForm.AnalyzerID = AnalyzerIDAttribute
                                 MyForm.WorkSessionID = WorkSessionIDAttribute
                                 MyForm.WorkSessionStatus = WSStatusAttribute
                                 MyForm.SourceScreen = SourceScreen.START_BUTTON
                                 'Validate if active screen is Sample request, 'cause requires the WorkSessionResultDS.
-                                If TypeOf myCurrentMDIForm Is IWSSampleRequest Then
+                                If TypeOf myCurrentMDIForm Is UiWSSampleRequest Then
                                     MyForm.SourceScreen = SourceScreen.SAMPLE_REQUEST
-                                    MyForm.WSOrderTests = CType(myCurrentMDIForm, IWSSampleRequest).myWorkSessionResultDS
+                                    MyForm.WSOrderTests = CType(myCurrentMDIForm, UiWSSampleRequest).myWorkSessionResultDS
                                 End If
 
                                 MyForm.ShowDialog()
@@ -2442,8 +2442,8 @@ Partial Public Class UiAx00MainMDI
 
                                 'TR 14/09/2011 -Set worksession status and set property ChangesMade when WS Samples Request is open
                                 WSStatusAttribute = MyForm.WorkSessionStatus
-                                If TypeOf myCurrentMDIForm Is IWSSampleRequest Then
-                                    CType(myCurrentMDIForm, IWSSampleRequest).ChangesMade = MyForm.ChangesMade
+                                If TypeOf myCurrentMDIForm Is UiWSSampleRequest Then
+                                    CType(myCurrentMDIForm, UiWSSampleRequest).ChangesMade = MyForm.ChangesMade
                                 End If
                             End Using
 
@@ -2499,7 +2499,7 @@ Partial Public Class UiAx00MainMDI
                             'If autoWSCreationWithLISModeAttribute AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                             If (autoWSCreationWithLISModeAttribute OrElse HQProcessByUserFlag) AndAlso automateProcessCurrentState <> LISautomateProcessSteps.notStarted Then
                                 'XB 23/07/2013
-                                CreateLogActivity("AutoCreate WS with LIS: HostQuery monitor screen closed", "IAx00MainMDI.ManageReceptionEvent", EventLogEntryType.Information, False)
+                                GlobalBase.CreateLogActivity("AutoCreate WS with LIS: HostQuery monitor screen closed", "IAx00MainMDI.ManageReceptionEvent", EventLogEntryType.Information, False)
 
                                 'Check if there is something received from LIS pending to be add to WS (see conditions instead of button status)
                                 'If bsTSOrdersDownloadButton.Enabled Then 'Exists lis workorders pending to be added
@@ -2540,8 +2540,8 @@ Partial Public Class UiAx00MainMDI
                 End If 'AG 07/01/2014
 
                 'TR 14/09/2011 -Refresh screen
-                If TypeOf myCurrentMDIForm Is IWSRotorPositions Then
-                    Dim CurrentMdiChild As IWSRotorPositions = CType(myCurrentMDIForm, IWSRotorPositions)
+                If TypeOf myCurrentMDIForm Is UiWSRotorPositions Then
+                    Dim CurrentMdiChild As UiWSRotorPositions = CType(myCurrentMDIForm, UiWSRotorPositions)
                     CurrentMdiChild.ScreenWorkingProcess = False
 
                     'AG 08/01/2014 - BT #1436 Do not activate the screen buttons during recover results process
@@ -2551,12 +2551,12 @@ Partial Public Class UiAx00MainMDI
                     End If
 
                     refreshTriggeredFlag = CurrentMdiChild.RefreshDone 'RH 28/03/2012
-                ElseIf TypeOf myCurrentMDIForm Is IWSSampleRequest Then
+                ElseIf TypeOf myCurrentMDIForm Is UiWSSampleRequest Then
                     'TR 16/09/2011
-                    CType(myCurrentMDIForm, IWSSampleRequest).ScreenWorkingProcess = False
-                    CType(myCurrentMDIForm, IWSSampleRequest).ActiveWSStatus = WSStatusAttribute
-                    CType(myCurrentMDIForm, IWSSampleRequest).ActiveWorkSession = WorkSessionIDAttribute
-                    CType(myCurrentMDIForm, IWSSampleRequest).ChangesMade = True
+                    CType(myCurrentMDIForm, UiWSSampleRequest).ScreenWorkingProcess = False
+                    CType(myCurrentMDIForm, UiWSSampleRequest).ActiveWSStatus = WSStatusAttribute
+                    CType(myCurrentMDIForm, UiWSSampleRequest).ActiveWorkSession = WorkSessionIDAttribute
+                    CType(myCurrentMDIForm, UiWSSampleRequest).ChangesMade = True
                     refreshTriggeredFlag = True
                     Cursor = Cursors.Default
                 Else
@@ -2588,7 +2588,7 @@ Partial Public Class UiAx00MainMDI
             'AG 05/09/2011
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewBarcodeWarnings ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PerformNewBarcodeWarnings ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PerformNewBarcodeWarnings ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
     End Sub
@@ -2800,7 +2800,7 @@ Partial Public Class UiAx00MainMDI
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowAlarmsOrSensorsWarningMessages ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".ShowAlarmsOrSensorsWarningMessages ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & " ShowAlarmWarningMessages, ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
 

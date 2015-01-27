@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class ISortingTestsAux
+Partial Class UiSortingTestsAux
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -24,7 +24,7 @@ Partial Class ISortingTestsAux
         Dim DataGridViewCellStyle3 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle4 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
         Dim DataGridViewCellStyle5 As System.Windows.Forms.DataGridViewCellStyle = New System.Windows.Forms.DataGridViewCellStyle()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(ISortingTestsAux))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiSortingTestsAux))
         Me.TestSortingGB = New Biosystems.Ax00.Controls.UserControls.BSGroupBox()
         Me.bsTestListGrid = New Biosystems.Ax00.Controls.UserControls.BSDataGridView()
         Me.DefaultSortingButton = New Biosystems.Ax00.Controls.UserControls.BSButton()

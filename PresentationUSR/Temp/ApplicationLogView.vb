@@ -45,7 +45,7 @@ Public Class ApplicationLogView
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".PrepareButtons ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".PrepareButtons ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -68,7 +68,7 @@ Public Class ApplicationLogView
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".GenerateLogXml ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".GenerateLogXml ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".GenerateLogXml ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -84,7 +84,7 @@ Public Class ApplicationLogView
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".OpenFileDialogButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".OpenFileDialogButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".OpenFileDialogButton_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
     End Sub
@@ -93,7 +93,7 @@ Public Class ApplicationLogView
         Try
             PrepareButtons()
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Name & ".ApplicationLogView_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Name & ".ApplicationLogView_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".ApplicationLogView_Load ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message, Me)
         End Try
 

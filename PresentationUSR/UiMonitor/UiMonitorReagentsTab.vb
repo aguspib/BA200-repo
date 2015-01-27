@@ -51,7 +51,7 @@ Partial Public Class UiMonitor
             'LegReagentSelLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LGD_RotBSelect", pLanguageID)
             LegReagentSelLabel.Text = myMultiLangResourcesDelegate.GetResourceText(Nothing, "LGD_RotBInProcess", LanguageID)
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentTabLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".GetReagentTabLabels ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".GetReagentTabLabels", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub
@@ -88,7 +88,7 @@ Partial Public Class UiMonitor
             LegendUnknownImage.ImageLocation = MyBase.IconsPath & LEGBCREAGENTUNKNOWN_IconName
             SelectedPictureBox.ImageLocation = MyBase.IconsPath & LEGREAGENTINPROCESS_IconName 'LEGREAGENTSELECTED_IconName
         Catch ex As Exception
-            CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReagentLegendArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".PrepareReagentLegendArea ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".PrepareReagentLegendArea", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", MsgParent)
         End Try
     End Sub

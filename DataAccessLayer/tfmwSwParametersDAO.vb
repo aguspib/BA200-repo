@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Types.ParametersDS
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tfmwSwParametersDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 

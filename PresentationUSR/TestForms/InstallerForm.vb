@@ -17,7 +17,7 @@ Public Class InstallerForm
 
     'Public WithEvents MDIAnalyzerManager As AnalyzerManager
 
-    Protected wfPrecarga As Biosystems.Ax00.PresentationCOM.IAx00StartUp
+    Protected wfPrecarga As Biosystems.Ax00.PresentationCOM.UiAx00StartUp
 
 
     Private Sub InstallerForm_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
@@ -220,7 +220,7 @@ Public Class InstallerForm
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Dim myILISUtilities As New ILISUtilities
+        Dim myILISUtilities As New UiLISUtilities
         myILISUtilities.ShowDialog()
         'SaveLISValue()
     End Sub
@@ -239,7 +239,7 @@ Public Class InstallerForm
 
         Catch ex As Exception
             'Write error SYSTEM_ERROR in the Application Log & show error message
-            CreateLogActivity(ex.Message, Me.Name & " ScreenAccessControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " ScreenAccessControl ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010  "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub

@@ -1,5 +1,5 @@
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IProgTestProfiles
+Partial Class UiProgTestProfiles
     Inherits Biosystems.Ax00.PresentationCOM.BSBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -19,7 +19,7 @@ Partial Class IProgTestProfiles
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IProgTestProfiles))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiProgTestProfiles))
         Me.bsPrintButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsDeleteButton = New Biosystems.Ax00.Controls.UserControls.BSButton()
         Me.bsEditButton = New Biosystems.Ax00.Controls.UserControls.BSButton()

@@ -9,7 +9,7 @@ Imports System.Text
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksResultsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
         ''' <summary>

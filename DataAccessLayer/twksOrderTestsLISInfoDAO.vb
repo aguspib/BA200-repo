@@ -9,7 +9,7 @@ Imports System.Text
 Namespace Biosystems.Ax00.DAL.DAO
 
     Partial Public Class twksOrderTestsLISInfoDAO
-        Inherits DAOBase
+          
 
 #Region "Declarations"
         'Comparisons by fields SpecimenID and AwosID have to be done in a CASE SENSITIVE way. So this SQL Sentence has to

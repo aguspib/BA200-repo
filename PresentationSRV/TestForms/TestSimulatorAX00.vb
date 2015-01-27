@@ -474,7 +474,7 @@ Public Class TestSimulatorAX00
 
     'End Sub
 
-    Private Sub AnswerButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles AnswerButton.Click
+    Private Sub AnswerButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles AnswerButton.Click
         Try
             'Simulate instruction reception
 
@@ -511,15 +511,15 @@ Public Class TestSimulatorAX00
         End Try
     End Sub
 
-    Private Sub CloseButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles CloseButton.Click
+    Private Sub CloseButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles CloseButton.Click
         Me.Close()
     End Sub
 
-    Private Sub TestSimulatorAX00_Activated(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Activated
+    Private Sub TestSimulatorAX00_Activated(ByVal sender As Object, ByVal e As EventArgs) Handles MyBase.Activated
 
     End Sub
 
-    Private Sub BsReceivedTextBox_TextChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceivedTextBox.TextChanged
+    Private Sub BsReceivedTextBox_TextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsReceivedTextBox.TextChanged
 
     End Sub
 

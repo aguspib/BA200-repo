@@ -2,7 +2,7 @@
 Imports Biosystems.Ax00.Controls.UserControls
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
-Partial Class IPositionsAdjustments
+Partial Class UiPositionsAdjustments
     Inherits PesentationLayer.BSAdjustmentBaseForm
 
     'Form overrides dispose to clean up the component list.
@@ -53,7 +53,7 @@ Partial Class IPositionsAdjustments
         Dim PointSeriesLabel3 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
         Dim SplineSeriesView3 As DevExpress.XtraCharts.SplineSeriesView = New DevExpress.XtraCharts.SplineSeriesView
         Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(IPositionsAdjustments))
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(UiPositionsAdjustments))
         Dim SwiftPlotDiagram1 As DevExpress.XtraCharts.SwiftPlotDiagram = New DevExpress.XtraCharts.SwiftPlotDiagram
         Dim ConstantLine18 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine
         Dim ConstantLine19 As DevExpress.XtraCharts.ConstantLine = New DevExpress.XtraCharts.ConstantLine

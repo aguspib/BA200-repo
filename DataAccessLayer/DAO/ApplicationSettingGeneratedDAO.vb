@@ -15,7 +15,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
     Partial Public Class ApplicationSettingDAO
-        Inherits DAOBase
+          
 
 #Region "AUTOMATICALLY GENERATED CODE"
 
@@ -24,8 +24,8 @@ Namespace Biosystems.Ax00.DAL.DAO
 #Region "READ"
 
         Public Function Read(ByVal pDBConnection As SqlClient.SqlConnection, ByVal SettingID As String) As GlobalDataTO
-            Dim resultData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim resultData As GlobalDataTO = Nothing
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
             Dim ApplicationSettingData As New ApplicationSettingDS()
 
             Try
@@ -51,6 +51,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                 End If
 
             Catch ex As Exception
+                If resultData Is Nothing Then resultData = New GlobalDataTO
                 resultData.HasError = True
                 resultData.ErrorCode = "SYSTEM_ERROR"
                 resultData.ErrorMessage = ex.Message

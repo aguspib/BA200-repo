@@ -192,6 +192,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="RotorUtils\ReagentExpirationParsing.vb" />
     <Compile Include="UiConfigLIS.Designer.vb">
       <DependentUpon>UiConfigLIS.vb</DependentUpon>
     </Compile>

@@ -59,7 +59,7 @@ Public Class Ax00MainForm
     Private Sub BsButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
         InitializeApplicationInfoSession("BIOSYSTEMS", "BIOSYSTEMS", "ENG")
 
-        Dim myTestProfilesManagement As New IProgTestProfiles
+        Dim myTestProfilesManagement As New UiProgTestProfiles
         If Not GetFormFromList(myTestProfilesManagement.Name) Then
             myTestProfilesManagement.MdiParent = Me
             myTestProfilesManagement.Show()
@@ -72,7 +72,7 @@ Public Class Ax00MainForm
     End Sub
 
     Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton3.Click
-        Dim myNewContaminacion As New IProgTestContaminations
+        Dim myNewContaminacion As New UiProgTestContaminations
         myNewContaminacion.ShowDialog()
         'MessageBox.Show(GetApplicationInfoSession().UserName)
 
@@ -85,7 +85,7 @@ Public Class Ax00MainForm
     End Sub
 
     Private Sub BsButton6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton6.Click
-        Dim David As New IProgTest
+        Dim David As New UiProgTest
         David.Show()
     End Sub
 
@@ -108,7 +108,7 @@ Public Class Ax00MainForm
                 LocalAnalizerDS = CType(myGlobalDataTO.SetDatos, AnalyzersDS)
             End If
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & " GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " GetAnalyzerInfo ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message) 'AG 07/07/2010 "SYSTEM_ERROR", ex.Message)
         End Try
     End Sub
@@ -293,7 +293,7 @@ Public Class Ax00MainForm
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".ExportResults ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             'DL 15/05/2013
             'ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message)
             Me.UIThread(Function() ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message))

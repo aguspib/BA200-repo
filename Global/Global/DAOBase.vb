@@ -4,26 +4,27 @@ Option Strict On
 
 
 
-Namespace Biosystems.Ax00.Global.DAL
+Namespace Biosystems.Ax00.Global
 
-    Public Class DAOBase
+    Public Module DAOBase
 
-        Private Shared DBServerField As String = String.Empty
-        Private Shared CurrentDBField As String = String.Empty
-        Private Shared ConnectionString As String = String.Empty
+
+        Private DBServerField As String = String.Empty
+        Private CurrentDBField As String = String.Empty
+        Private ConnectionString As String = String.Empty
 
         'RH 17/05/2011
-        Private Shared DBLoginField As String = String.Empty
-        Private Shared DBPasswordField As String = String.Empty
+        Private DBLoginField As String = String.Empty
+        Private DBPasswordField As String = String.Empty
 
-        Public Shared ReadOnly Property DBServer() As String
+        Public ReadOnly Property DBServer() As String
             Get
                 If String.IsNullOrEmpty(DBServerField) Then GetConnectionString()
                 Return DBServerField
             End Get
         End Property
 
-        Public Shared ReadOnly Property CurrentDB() As String
+        Public ReadOnly Property CurrentDB() As String
             Get
                 If String.IsNullOrEmpty(CurrentDBField) Then GetConnectionString()
                 Return CurrentDBField
@@ -31,7 +32,7 @@ Namespace Biosystems.Ax00.Global.DAL
         End Property
 
         'RH 17/05/2011
-        Public Shared ReadOnly Property DBLogin() As String
+        Public ReadOnly Property DBLogin() As String
             Get
                 If String.IsNullOrEmpty(DBLoginField) Then GetConnectionString()
                 Return DBLoginField
@@ -39,7 +40,7 @@ Namespace Biosystems.Ax00.Global.DAL
         End Property
 
         'RH 17/05/2011
-        Public Shared ReadOnly Property DBPassword() As String
+        Public ReadOnly Property DBPassword() As String
             Get
                 If String.IsNullOrEmpty(DBPasswordField) Then GetConnectionString()
                 Return DBPasswordField
@@ -56,7 +57,7 @@ Namespace Biosystems.Ax00.Global.DAL
         ''' Modified by: RH 16/11/2010
         ''' Modified by: RH 17/05/2011 Add DB Login and Password.
         ''' </remarks>
-        Public Shared Function GetConnectionString(Optional ByVal pUpdateConnection As Boolean = False) As String
+        Public Function GetConnectionString(Optional ByVal pUpdateConnection As Boolean = False) As String
             Try
                 'Dim mySecurity As New Security.Security
                 'myConnectionString = mySecurity.Decryption(ConfigurationManager.ConnectionStrings("BiosystemsConn").ConnectionString)
@@ -109,20 +110,14 @@ Namespace Biosystems.Ax00.Global.DAL
         ''' Created by:  SA
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
-        Public Shared Sub BeginTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+        Public Sub BeginTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+
+            'Dim myLogAcciones As New ApplicationLogManager()
+
             Try
-                'Dim cmdText As String = ""
-                'cmdText = " SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED "
 
-                'Dim dbCmd As New SqlClient.SqlCommand
-                'dbCmd.Connection = pDBConnection
 
-                'dbCmd.CommandText = cmdText
-                'dbCmd.ExecuteNonQuery()
-
-                'cmdText = " BEGIN TRANSACTION "
-                'dbCmd.CommandText = cmdText
-                'dbCmd.ExecuteNonQuery()
+                GlobalBase.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(2, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
 
                 Using dbCmd As New SqlClient.SqlCommand()
                     dbCmd.Connection = pDBConnection
@@ -134,10 +129,12 @@ Namespace Biosystems.Ax00.Global.DAL
                 End Using
 
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity(ex) '.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
+                'GlobalBase.CreateLogActivity(ex.Message, "DAOBase.BeginTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
+
+
 
         ''' <summary>
         ''' Commit the Database Transaction that is opened over the specified Database Connection
@@ -147,10 +144,12 @@ Namespace Biosystems.Ax00.Global.DAL
         ''' Created by:  SA
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
-        Public Shared Sub CommitTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+        Public Sub CommitTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+
+            'Dim myLogAcciones As New ApplicationLogManager()
+
             Try
                 Dim cmdText As String = " COMMIT TRANSACTION "
-
                 'Dim dbCmd As New SqlClient.SqlCommand
                 'dbCmd.Connection = pDBConnection
                 'dbCmd.CommandText = cmdText
@@ -160,8 +159,9 @@ Namespace Biosystems.Ax00.Global.DAL
                     dbCmd.ExecuteNonQuery()
                 End Using
 
+                GlobalBase.CreateLogActivity(String.Format("{0}.{1}", New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.ReflectedType.Name, New System.Diagnostics.StackTrace(1, False).GetFrame(0).GetMethod.Name), System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
+
             Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.CommitTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
@@ -174,7 +174,9 @@ Namespace Biosystems.Ax00.Global.DAL
         ''' Created by:  SA
         ''' Modified by RH 23/05/2011 Introduce the Using statement
         ''' </remarks>
-        Public Shared Sub RollbackTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+        Public Sub RollbackTransaction(ByVal pDBConnection As SqlClient.SqlConnection)
+            'Dim myLogAcciones As New ApplicationLogManager()
+
             Try
                 Dim cmdText As String = " ROLLBACK TRANSACTION "
 
@@ -187,10 +189,10 @@ Namespace Biosystems.Ax00.Global.DAL
                     dbCmd.ExecuteNonQuery()
                 End Using
 
-            Catch ex As Exception
-                'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.RollbackTransaction", EventLogEntryType.Error, False)
+                GlobalBase.CreateLogActivity("", System.Reflection.MethodInfo.GetCurrentMethod.Name, EventLogEntryType.Information, False)
 
+            Catch ex As Exception
+                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.RollbackTransaction", EventLogEntryType.Error, False)
             End Try
         End Sub
 
@@ -203,10 +205,57 @@ Namespace Biosystems.Ax00.Global.DAL
         ''' Created by:  SA
         ''' Modified by RH 23/05/2011 Remove unneeded SqlConnection object creation,
         '''             so now there is less presure over the Garbage Collector.
+        '''             MI: Removed ByRef as it was not required by function logic, and it's less efficient on .NET
+        '''             MI: Replaced to internally use typed GlobalDataTo with the idea of removing GlobalDataTo completely in a future iteration.
         ''' </remarks>
-        Public Shared Function GetOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
-            Dim openConnection As New GlobalDataTO
-            'Dim dbConnection As New SqlClient.SqlConnection
+        ''' 
+        Public Function GetOpenDBConnection(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+
+            'Better implementation:
+            Dim connectionSafeDataTo = GetSafeOpenDBConnection(pDBConnection)   'It handles its own exeptions
+            Return connectionSafeDataTo.CloneUntyped()
+
+            'Return GetSafeOpenDBConnection(pDBConnection).GetCompatibleGlobalDataTo
+
+            'Old one:
+            'Dim openConnection As New GlobalDataTO
+            ''Dim dbConnection As New SqlClient.SqlConnection
+            'Dim dbConnection As SqlClient.SqlConnection = Nothing
+
+            'Try
+            '    If (pDBConnection Is Nothing) Then
+            '        'A local Database Connection is opened
+            '        dbConnection = New SqlClient.SqlConnection
+            '        dbConnection.ConnectionString = GetConnectionString()
+            '        dbConnection.Open()
+            '        Console.Out.WriteLine("SQL connection created!")
+            '    Else
+            '        'The opened Database Connection is used
+            '        dbConnection = pDBConnection
+            '        Console.Out.WriteLine("SQL connection reused!")
+            '    End If
+
+            '    openConnection.HasError = False
+            '    openConnection.SetDatos = dbConnection
+
+            'Catch ex As Exception
+            '    openConnection.HasError = True
+            '    openConnection.ErrorCode = "DB_CONNECTION_ERROR"
+            '    openConnection.ErrorMessage = ex.Message
+
+            '    'Dim myLogAcciones As New ApplicationLogManager()
+            '    GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
+
+            'End Try
+
+            'Return openConnection
+        End Function
+
+
+        'Future implementation that returns typed DataTo:
+        Public Function GetSafeOpenDBConnection(ByRef pDBConnection As SqlClient.SqlConnection) As TypedGlobalDataTo(Of SqlClient.SqlConnection)
+
+            Dim openConnection As New TypedGlobalDataTo(Of SqlClient.SqlConnection)
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
             Try
@@ -229,12 +278,13 @@ Namespace Biosystems.Ax00.Global.DAL
                 openConnection.ErrorMessage = ex.Message
 
                 'Dim myLogAcciones As New ApplicationLogManager()
-                GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBConnection", EventLogEntryType.Error, False)
-
+                GlobalBase.CreateLogActivity(ex)
             End Try
 
             Return openConnection
+
         End Function
+
 
         ''' <summary>
         ''' Verify if the informed Database Connection is open; if not, open a new one and
@@ -247,10 +297,11 @@ Namespace Biosystems.Ax00.Global.DAL
         ''' Modified by RH 23/05/2011 Remove unneeded SqlConnection object creation,
         '''             so now there is less presure over the Garbage Collector.
         ''' </remarks>
-        Public Shared Function GetOpenDBTransaction(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function GetOpenDBTransaction(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim openTransaction As New GlobalDataTO
             'Dim dbConnection As New SqlClient.SqlConnection
             Dim dbConnection As SqlClient.SqlConnection = Nothing
+            'Dim myLogAcciones As New ApplicationLogManager()
 
             Try
                 If (pDBConnection Is Nothing) Then
@@ -279,7 +330,6 @@ Namespace Biosystems.Ax00.Global.DAL
                     dbConnection.Close()
                 End If
 
-                'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "DAOBase.GetOpenDBTransaction", EventLogEntryType.Error, False)
             End Try
             Return openTransaction
@@ -321,6 +371,6 @@ Namespace Biosystems.Ax00.Global.DAL
             Return resultData
         End Function
 
-    End Class
+    End Module
 
 End Namespace

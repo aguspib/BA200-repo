@@ -1108,10 +1108,10 @@ Partial Class UiAx00MainMDI
         '
         Me.BsUpdateGlobesTimer.Interval = 500
         '
-        'IAx00MainMDI
+        'UiAx00MainMDI
         '
-        Me.Appearance.BackColor = CType(resources.GetObject("IAx00MainMDI.Appearance.BackColor"), System.Drawing.Color)
-        Me.Appearance.GradientMode = CType(resources.GetObject("IAx00MainMDI.Appearance.GradientMode"), System.Drawing.Drawing2D.LinearGradientMode)
+        Me.Appearance.BackColor = CType(resources.GetObject("UiAx00MainMDI.Appearance.BackColor"), System.Drawing.Color)
+        Me.Appearance.GradientMode = CType(resources.GetObject("UiAx00MainMDI.Appearance.GradientMode"), System.Drawing.Drawing2D.LinearGradientMode)
         Me.Appearance.Options.UseBackColor = True
         Me.Appearance.Options.UseFont = True
         resources.ApplyResources(Me, "$this")
@@ -1130,7 +1130,7 @@ Partial Class UiAx00MainMDI
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MainMenuStrip = Me.BsAx00MenuStrip
         Me.MaximizeBox = False
-        Me.Name = "IAx00MainMDI"
+        Me.Name = "UiAx00MainMDI"
         Me.A400HelpProvider.SetShowHelp(Me, CType(resources.GetObject("$this.ShowHelp"), Boolean))
         Me.BsAx00MenuStrip.ResumeLayout(False)
         Me.BsAx00MenuStrip.PerformLayout()

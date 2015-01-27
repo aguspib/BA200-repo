@@ -8,7 +8,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
 
     Public Class tcfgAnalyzerManagerFlagsDAO
-        Inherits DAOBase
+          
 
         ''' <summary>
         ''' '

@@ -2183,7 +2183,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'Every Samples volume alarm when ISE test operation increases PurgeA by firmware counter
                             If (myInst = AppLayerInstrucionReception.ANSBM1.ToString) Then
                                 'Dim myLogAccionesTmp As New ApplicationLogManager()    ' TO COMMENT !!!
-                                'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 1) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 1) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                                 myGlobal = exec_delg.GetExecutionByPreparationID(dbConnection, myPrepID, WorkSessionIDAttribute, AnalyzerIDAttribute)
                                 If (Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing) Then
@@ -2191,12 +2191,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     If (myExecutionsDS.twksWSExecutions.Rows.Count > 0) Then
                                         Dim myExecutionType As String = myExecutionsDS.twksWSExecutions(0).ExecutionType
-                                        'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 1) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                        'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 1) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                                         If (myExecutionType = "PREP_ISE") Then
                                             If (Not ISE_Manager Is Nothing) Then
                                                 ISE_Manager.PurgeAbyFirmware += 1
-                                                'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 1) - PurgeA [" & ISE_Manager.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                                'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 1) - PurgeA [" & ISE_Manager.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                             End If
                                         End If
                                     End If
@@ -2370,7 +2370,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'Every Samples volume alarm when ISE test operation increases PurgeA by firmware counter
                         If (myInst = AppLayerInstrucionReception.ANSBM1.ToString) Then
                             'Dim myLogAccionesTmp As New ApplicationLogManager()    ' TO COMMENT !!!
-                            'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 2) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                            'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 2) - Sample Volume Alarm !", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
 
                             Dim myExecutionsDS As New ExecutionsDS
                             Dim myExecutionType As String
@@ -2380,11 +2380,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If myExecutionsDS.twksWSExecutions.Rows.Count > 0 Then
                                     myExecutionType = myExecutionsDS.twksWSExecutions(0).TestType
 
-                                    'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 2) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                    'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 2) - Execution Type : " & myExecutionType, "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                     If myExecutionType = "PREP_ISE" Then
                                         If Not ISE_Manager Is Nothing Then
                                             ISE_Manager.PurgeAbyFirmware += 1
-                                            'myLogAccionesTmp.CreateLogActivity("Update Consumptions (Alarm 2) - PurgeA [" & ISE_Manager.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
+                                            'myLogAccionesTmp.GlobalBase.CreateLogActivity("Update Consumptions (Alarm 2) - PurgeA [" & ISE_Manager.PurgeAbyFirmware.ToString & "]", "AnalyzerManager.ProcessstatusReceived", EventLogEntryType.Information, False)   ' TO COMMENT !!!
                                         End If
                                     End If
                                 End If

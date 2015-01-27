@@ -9,7 +9,7 @@ Namespace Biosystems.Ax00.DAL.DAO
 
     'AG 14/05/2010 - creation
     Public Class twksWSBLinesByWellDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
 

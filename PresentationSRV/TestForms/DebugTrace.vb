@@ -8,7 +8,7 @@
         End Try
     End Sub
 
-    Private Sub DebugTrace_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    Private Sub DebugTrace_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
         Try
             Me.ConsoleLabel.Text = "DEBUG TRACE" & vbCrLf
         Catch ex As Exception

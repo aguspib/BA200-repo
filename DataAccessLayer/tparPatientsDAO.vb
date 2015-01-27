@@ -8,7 +8,7 @@ Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
     Partial Public Class tparPatientsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD"
 

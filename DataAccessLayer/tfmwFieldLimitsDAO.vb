@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Types.FieldLimitsDS
 Namespace Biosystems.Ax00.DAL.DAO
 
     Public Class tfmwFieldLimitsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
 

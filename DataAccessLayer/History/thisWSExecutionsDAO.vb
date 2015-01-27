@@ -7,7 +7,7 @@ Imports System.Text
 
 Namespace Biosystems.Ax00.DAL.DAO
     Public Class thisWSExecutionsDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>

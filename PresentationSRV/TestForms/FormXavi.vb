@@ -2,6 +2,8 @@
 Option Strict On
 Option Explicit On
 
+Imports System.Text
+Imports System.Threading
 Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
@@ -31,8 +33,8 @@ Public Class FormXavi
 #Region "Simulation Delayed Responses"
 
     'Simulation Delayed Response timer
-    Private AutoResponseTimerCallBack As System.Threading.TimerCallback
-    Private WithEvents AutoResponseTimer As System.Threading.Timer
+    Private AutoResponseTimerCallBack As TimerCallback
+    Private WithEvents AutoResponseTimer As Timer
 
 
     Private SimulatedResponse As String = ""
@@ -60,15 +62,15 @@ Public Class FormXavi
         Dim myGlobal As New GlobalDataTO
         Try
 
-            MyClass.AutoResponseTimerCallBack = New System.Threading.TimerCallback(AddressOf OnAutoResponseTimerTick)
+            MyClass.AutoResponseTimerCallBack = New TimerCallback(AddressOf OnAutoResponseTimerTick)
 
-            MyClass.AutoResponseTimer = New System.Threading.Timer(MyClass.AutoResponseTimerCallBack, New Object, 100, 0)
+            MyClass.AutoResponseTimer = New Timer(MyClass.AutoResponseTimerCallBack, New Object, 100, 0)
 
             MyClass.SimulatedResponseToSend = MyClass.SimulatedResponse
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
             Throw ex
         End Try
@@ -92,10 +94,10 @@ Public Class FormXavi
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         Finally
             MyClass.SimulatedResponse = ""
             If MyClass.AutoResponseTimer IsNot Nothing Then
@@ -111,24 +113,24 @@ Public Class FormXavi
 #Region "Simulation Processed Responses"
 
     'Simulation Delayed Response timer
-    Private ProcessResponseTimerCallBack As System.Threading.TimerCallback
-    Private WithEvents ProcessResponseTimer As System.Threading.Timer
+    Private ProcessResponseTimerCallBack As TimerCallback
+    Private WithEvents ProcessResponseTimer As Timer
 
     'SOLO PARA SCRIPTS
     Private Function StartProcessResponseTimer(ByVal pTime As Integer) As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
 
-            MyClass.ProcessResponseTimerCallBack = New System.Threading.TimerCallback(AddressOf OnProcessResponseTimerTick)
+            MyClass.ProcessResponseTimerCallBack = New TimerCallback(AddressOf OnProcessResponseTimerTick)
 
-            MyClass.ProcessResponseTimer = New System.Threading.Timer(MyClass.ProcessResponseTimerCallBack, New Object, pTime, 0)
+            MyClass.ProcessResponseTimer = New Timer(MyClass.ProcessResponseTimerCallBack, New Object, pTime, 0)
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StartReadingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartReadingTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
     End Function
@@ -148,10 +150,10 @@ Public Class FormXavi
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnAutoResponseTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
@@ -159,24 +161,24 @@ Public Class FormXavi
 
 
 #Region "Firmware Events"
-    Private WithEvents UTILTimer As System.Threading.Timer
-    Private UTILTimerCallBack As System.Threading.TimerCallback
+    Private WithEvents UTILTimer As Timer
+    Private UTILTimerCallBack As TimerCallback
 
 
     Private Function StartUTILTimer() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
 
-            MyClass.UTILTimerCallBack = New System.Threading.TimerCallback(AddressOf OnUTILTimerTick)
+            MyClass.UTILTimerCallBack = New TimerCallback(AddressOf OnUTILTimerTick)
 
-            Me.UTILTimer = New System.Threading.Timer(MyClass.UTILTimerCallBack, New Object, 1000, 1000)
+            Me.UTILTimer = New Timer(MyClass.UTILTimerCallBack, New Object, 1000, 1000)
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StartUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
     End Function
@@ -191,10 +193,10 @@ Public Class FormXavi
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StopUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StopUTILTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
     End Function
@@ -211,10 +213,10 @@ Public Class FormXavi
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnUTILTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnUTILTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
@@ -222,24 +224,24 @@ Public Class FormXavi
 
 
 #Region "Firmware Events"
-    Private ANSINFOTimerCallBack As System.Threading.TimerCallback
-    Private WithEvents ANSINFOTimer As System.Threading.Timer
+    Private ANSINFOTimerCallBack As TimerCallback
+    Private WithEvents ANSINFOTimer As Timer
 
 
     Private Function StartANSINFOTimer() As GlobalDataTO
         Dim myGlobal As New GlobalDataTO
         Try
 
-            MyClass.ANSINFOTimerCallBack = New System.Threading.TimerCallback(AddressOf OnANSINFOTimerTick)
+            MyClass.ANSINFOTimerCallBack = New TimerCallback(AddressOf OnANSINFOTimerTick)
 
-            MyClass.ANSINFOTimer = New System.Threading.Timer(MyClass.ANSINFOTimerCallBack, New Object, 2000, 2000)
+            MyClass.ANSINFOTimer = New Timer(MyClass.ANSINFOTimerCallBack, New Object, 2000, 2000)
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StartANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StartANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
     End Function
@@ -254,10 +256,10 @@ Public Class FormXavi
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " StopANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " StopANSINFOTimer ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
         Return myGlobal
     End Function
@@ -275,10 +277,10 @@ Public Class FormXavi
 
         Catch ex As Exception
             myGlobal.HasError = True
-            myGlobal.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
+            myGlobal.ErrorCode = Messages.SYSTEM_ERROR.ToString
             myGlobal.ErrorMessage = ex.Message
-            CreateLogActivity(ex.Message, Me.Name & " OnANSINFOTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage("Error", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & " OnANSINFOTimerTick ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage("Error", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
@@ -296,7 +298,7 @@ Public Class FormXavi
 #End Region
 
 #Region "SA Testings"
-    Private Sub BsButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton1.Click
+    Private Sub BsButton1_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton1.Click
 
         'Dim myWorkSession As New WorkSessionsDS
 
@@ -364,7 +366,7 @@ Public Class FormXavi
 
 #Region "AG General Form Events"
 
-    Private Sub Form3_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+    Private Sub Form3_Load(ByVal sender As Object, ByVal e As EventArgs) Handles Me.Load
 
         Dim myGlobal As New GlobalDataTO
 
@@ -527,7 +529,7 @@ Public Class FormXavi
 
 #Region "AG Initial Generate Instructions Testings"
 
-    Private Sub BsShortAction_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsShortAction.Click
+    Private Sub BsShortAction_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsShortAction.Click
         Try
             Dim myGlobal As New GlobalDataTO
 
@@ -535,7 +537,7 @@ Public Class FormXavi
             Dim myInstrucList As New List(Of InstructionParameterTO)
 
 
-            myGlobal = myInstruc.GenerateShortInstruction(GlobalEnumerates.AppLayerEventList.RUNNING)
+            myGlobal = myInstruc.GenerateShortInstruction(AppLayerEventList.RUNNING)
             'myGlobal = myInstruc.GenerateShortInstruction(ApplicationLayer.ClassEventList.CONNECT)
 
             If myGlobal.HasError Or myGlobal.SetDatos Is Nothing Then Exit Try
@@ -570,7 +572,7 @@ Public Class FormXavi
     End Sub
 
 
-    Private Sub BsReceptionButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceptionButton.Click
+    Private Sub BsReceptionButton_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsReceptionButton.Click
         Try
             'Simulate instruction reception
             If BsTextWrite.Text.Trim <> "" Then
@@ -591,7 +593,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsReceptionButton_End_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceptionButton_End.Click
+    Private Sub BsReceptionButton_End_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsReceptionButton_End.Click
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
@@ -614,7 +616,7 @@ Public Class FormXavi
     End Sub
 
 
-    Private Sub BsReceptionButton_Sleeping_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceptionButton_Sleeping.Click
+    Private Sub BsReceptionButton_Sleeping_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsReceptionButton_Sleeping.Click
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
@@ -640,7 +642,7 @@ Public Class FormXavi
 
 #Region "AG Calculations & Time Remaining Testings"
 
-    Private Sub BsExecuteCalc_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsExecuteCalc.Click
+    Private Sub BsExecuteCalc_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsExecuteCalc.Click
         'Try
         '    Dim myGlobal As New GlobalDataTO
         '    Dim myExec As Integer = 1
@@ -672,7 +674,7 @@ Public Class FormXavi
     End Sub
 
 
-    Private Sub BsRemainingTime_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsRemainingTime.Click
+    Private Sub BsRemainingTime_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsRemainingTime.Click
         'Try
         '    Dim resultData As New GlobalDataTO
         '    Dim myWS As New WorkSessionsDelegate
@@ -691,7 +693,7 @@ Public Class FormXavi
 
 #Region "AG - Several Instruction Generation & Reception Testings"
 
-    Private Sub BsButton2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton2.Click
+    Private Sub BsButton2_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton2.Click
         Try
             ''Test use AnalyzerManager class (Step by step until communications with analyzer)
             'If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -710,7 +712,7 @@ Public Class FormXavi
     End Sub
 
 
-    Private Sub BsSendPrep_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsSendPrep.Click
+    Private Sub BsSendPrep_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsSendPrep.Click
         Try
             Dim myglobalto As New GlobalDataTO
             Dim myInstruction As New Instructions
@@ -765,7 +767,7 @@ Public Class FormXavi
 
     End Sub
 
-    Private Sub BsButton3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton3.Click
+    Private Sub BsButton3_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton3.Click
         Try
             'Simulate instruction reception
             If TextBox5.Text.Trim <> "" Then
@@ -793,7 +795,7 @@ Public Class FormXavi
 #Region "Communications Board Testings"
 
     Public Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                      ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles myAnalyzerManager.ReceptionEvent
+                                      ByVal pRefreshEvent As List(Of UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles myAnalyzerManager.ReceptionEvent
         Try
             'If Not pTreated Then
             If BsReceivedTextBox.Text.Length > 10000 Then BsReceivedTextBox.Clear()
@@ -946,7 +948,7 @@ Public Class FormXavi
                 'read CPU
                 If pInstructionSent.Contains("ID:1;") Then 'CPU
                     SimulatedResponse = ANSCPU_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -957,7 +959,7 @@ Public Class FormXavi
                     myArmSelected = "BR1"
                     myArmSelected2 = "(2)"
                     SimulatedResponse = ANSBXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -967,7 +969,7 @@ Public Class FormXavi
                     myArmSelected = "BR2"
                     myArmSelected2 = "(3)"
                     SimulatedResponse = ANSBXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -977,7 +979,7 @@ Public Class FormXavi
                     myArmSelected = "AG1"
                     myArmSelected2 = "(5)"
                     SimulatedResponse = ANSBXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -987,7 +989,7 @@ Public Class FormXavi
                     myArmSelected = "AG2"
                     myArmSelected2 = "(6)"
                     SimulatedResponse = ANSBXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -997,7 +999,7 @@ Public Class FormXavi
                     myArmSelected = "BM1"
                     myArmSelected2 = "(4)"
                     SimulatedResponse = ANSBXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1009,7 +1011,7 @@ Public Class FormXavi
                     myProbeSelected = "DR1"
                     myProbeSelected2 = "(7)"
                     SimulatedResponse = ANSDXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1019,7 +1021,7 @@ Public Class FormXavi
                     myProbeSelected = "DR2"
                     myProbeSelected2 = "(8)"
                     SimulatedResponse = ANSDXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1029,7 +1031,7 @@ Public Class FormXavi
                     myProbeSelected = "DM1"
                     myProbeSelected2 = "(9)"
                     SimulatedResponse = ANSDXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1041,7 +1043,7 @@ Public Class FormXavi
                     myRotorSelected = "RR1"
                     myRotorSelected2 = "(10)"
                     SimulatedResponse = ANSRXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1051,7 +1053,7 @@ Public Class FormXavi
                     myRotorSelected = "RM1"
                     myRotorSelected2 = "(11)"
                     SimulatedResponse = ANSRXX_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1110,7 +1112,7 @@ Public Class FormXavi
                     myFwSelected2 = "CP"
                     myFwSelected3 = "(1)"
                     SimulatedResponse = ANSFCP_Generator()
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         'StartAutoResponseTimer()
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
@@ -1123,7 +1125,7 @@ Public Class FormXavi
                     myFwSelected2 = "BX"
                     myFwSelected3 = "(4)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.BM1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1134,7 +1136,7 @@ Public Class FormXavi
                     myFwSelected2 = "BX"
                     myFwSelected3 = "(2)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.BR1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1145,7 +1147,7 @@ Public Class FormXavi
                     myFwSelected2 = "BX"
                     myFwSelected3 = "(3)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.BR2)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1156,7 +1158,7 @@ Public Class FormXavi
                     myFwSelected2 = "BX"
                     myFwSelected3 = "(5)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.AG1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1167,7 +1169,7 @@ Public Class FormXavi
                     myFwSelected2 = "BX"
                     myFwSelected3 = "(6)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.AG2)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1179,7 +1181,7 @@ Public Class FormXavi
                     myFwSelected2 = "DX"
                     myFwSelected3 = "(7)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.DR1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1190,7 +1192,7 @@ Public Class FormXavi
                     myFwSelected2 = "DX"
                     myFwSelected3 = "(8)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.DR2)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1201,7 +1203,7 @@ Public Class FormXavi
                     myFwSelected2 = "DX"
                     myFwSelected3 = "(9)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.DM1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1213,7 +1215,7 @@ Public Class FormXavi
                     myFwSelected2 = "RX"
                     myFwSelected3 = "(10)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.RR1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1224,7 +1226,7 @@ Public Class FormXavi
                     myFwSelected2 = "RX"
                     myFwSelected3 = "(11)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.RM1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1236,7 +1238,7 @@ Public Class FormXavi
                     myFwSelected2 = "GL"
                     myFwSelected3 = "(12)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.GLF)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1248,7 +1250,7 @@ Public Class FormXavi
                     myFwSelected2 = "JE"
                     myFwSelected3 = "(13)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.JE1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1260,7 +1262,7 @@ Public Class FormXavi
                     myFwSelected2 = "SF"
                     myFwSelected3 = "(14)"
                     SimulatedResponse = ANSF_Generator(POLL_IDs.SF1)
-                    System.Threading.Thread.Sleep(1000) ' 1 second
+                    Thread.Sleep(1000) ' 1 second
                     If SimulatedResponse.Length > 0 Then
                         myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
                         SimulatedResponse = ""
@@ -1308,7 +1310,7 @@ Public Class FormXavi
 
                 End If
 
-                System.Threading.Thread.Sleep(1000) ' 1 second
+                Thread.Sleep(1000) ' 1 second
                 If SimulatedResponse.Length > 0 Then
                     'StartAutoResponseTimer()
                     myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
@@ -1322,7 +1324,7 @@ Public Class FormXavi
                 'CONFIG
                 SimulatedResponse = ANSCONFIG_Generator()
 
-                System.Threading.Thread.Sleep(1000) ' 1 second
+                Thread.Sleep(1000) ' 1 second
                 If SimulatedResponse.Length > 0 Then
                     'StartAutoResponseTimer()
                     myAnalyzerManager.SimulateInstructionReception(SimulatedResponse)
@@ -1377,7 +1379,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsCommTestings_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsCommTestings.Click
+    Private Sub BsCommTestings_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsCommTestings.Click
         Try
             Me.Cursor = Cursors.WaitCursor
 
@@ -1389,19 +1391,19 @@ Public Class FormXavi
 
                 Select Case myInstruction
                     Case "CONNECT"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.CONNECT, True) 'CONNECT
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.CONNECT, True) 'CONNECT
 
                     Case "STATE"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STATE, True) 'STATE
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STATE, True) 'STATE
 
                     Case "STANDBY"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True) 'STANDBY
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.STANDBY, True) 'STANDBY
 
                     Case "SLEEP"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.SLEEP, True) 'SLEEP
 
                     Case "PAUSE"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.PAUSE, True) 'PAUSE
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.PAUSE, True) 'PAUSE
 
                     Case "RUNNING"
                         'myAnalyzerManager.ActiveAnalyzer = Ax00MainMDI.ActiveAnalyzer
@@ -1410,20 +1412,20 @@ Public Class FormXavi
                         'myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.RUNNING, True) 'RUNNING
 
                     Case "START"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.START, True) 'START
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.START, True) 'START
 
                     Case "TEST"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NEXT_PREPARATION, True) 'START
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.NEXT_PREPARATION, True) 'START
 
                     Case "ENDRUN"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ENDRUN, True) 'ENDRUN
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ENDRUN, True) 'ENDRUN
 
                     Case "ABORT"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True) 'ENDRUN
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.ABORT, True) 'ENDRUN
 
 
                     Case "SCRIPT"
-                        myGlobal = myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.COMMAND, True, Nothing, "", Me.BsAction.Text)
+                        myGlobal = myAnalyzerManager.ManageAnalyzer(AnalyzerManagerSwActionList.COMMAND, True, Nothing, "", Me.BsAction.Text)
 
                     Case Else
                 End Select
@@ -1448,8 +1450,8 @@ Public Class FormXavi
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".BsCommTestings_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".BsCommTestings_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         Finally
             Me.Cursor = Cursors.Default
@@ -1458,18 +1460,18 @@ Public Class FormXavi
 
     End Sub
 
-    Private Sub BsClearReception_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsClearReception.Click
+    Private Sub BsClearReception_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsClearReception.Click
         Try
             BsReceivedTextBox.Clear()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".BsClearReception_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".BsClearReception_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         End Try
     End Sub
 
-    Private Sub BsRestore_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsRestore.Click
+    Private Sub BsRestore_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsRestore.Click
         Try
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
                 Dim myAnalyzerManager As AnalyzerManager = CType(AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager"), AnalyzerManager)
@@ -1479,15 +1481,15 @@ Public Class FormXavi
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsRestore_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Me.Name & ".BsRestore_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsRestore_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            ShowMessage(Me.Name & ".BsRestore_Click ", Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
     End Sub
 
 
 #End Region
 
-    Private Sub BsListBox1_SelectedIndexChanged(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsListBox1.SelectedIndexChanged
+    Private Sub BsListBox1_SelectedIndexChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsListBox1.SelectedIndexChanged
         Dim str As String
         str = BsListBox1.SelectedItem.ToString
         BsTextWrite_End.Text = str
@@ -1510,7 +1512,7 @@ Public Class FormXavi
         Dim myGlobal As New GlobalDataTO
 
         Try
-            Dim myDataBuilder As New System.Text.StringBuilder
+            Dim myDataBuilder As New StringBuilder
             myGlobal = MyClass.myFwAdjustmentsDelegate.ConvertDSToString()
             If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                 Dim myData As String = CStr(myGlobal.SetDatos)
@@ -1548,7 +1550,7 @@ Public Class FormXavi
                 myData = myDataBuilder.ToString
                 'myData = myData.Replace(";", "|") 'TESTING!!! para que pase el filtro de sintaxis
                 'myData = myData.Replace(":", ">") 'TESTING!!! para que pase el filtro de sintaxis
-                myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;" & GlobalEnumerates.AppLayerInstrucionReception.ANSADJ.ToString & _
+                myGlobal = myAnalyzerManager.SimulateInstructionReception("A400;" & AppLayerInstrucionReception.ANSADJ.ToString & _
                                                                           ";" & myData)
                 If Me.BsANSADJCheckbox.Checked Then
                     BsReceivedTextBox.Text += Now.ToString("hh:mm:ss") & vbTab & "<< " & "A400;ANSADJ;" & myData & vbCrLf
@@ -1563,7 +1565,7 @@ Public Class FormXavi
     End Sub
 
     'SENSORS
-    Private AnalyzerSensorNumericalValues As New Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)
+    Private AnalyzerSensorNumericalValues As New Dictionary(Of AnalyzerSensors, Single)
 
     Private Enum MonitorSensors
 
@@ -1877,24 +1879,24 @@ Public Class FormXavi
     Private FirstTimePhotometrics As Boolean = True
 
     'MANIFOLD
-    Private ManifoldNumericalValues As New Dictionary(Of GlobalEnumerates.MANIFOLD_ELEMENTS, String)
+    Private ManifoldNumericalValues As New Dictionary(Of MANIFOLD_ELEMENTS, String)
 
     'FLUIDICS
-    Private FluidicsNumericalValues As New Dictionary(Of GlobalEnumerates.FLUIDICS_ELEMENTS, String)
+    Private FluidicsNumericalValues As New Dictionary(Of FLUIDICS_ELEMENTS, String)
 
     'PHOTOMETRICS
-    Private PhotometricsNumericalValues As New Dictionary(Of GlobalEnumerates.PHOTOMETRICS_ELEMENTS, String)
+    Private PhotometricsNumericalValues As New Dictionary(Of PHOTOMETRICS_ELEMENTS, String)
 
     ' CPU VALUES
-    Private CpuValues As New Dictionary(Of GlobalEnumerates.CPU_ELEMENTS, String)
+    Private CpuValues As New Dictionary(Of CPU_ELEMENTS, String)
     ' ARMS VALUES
-    Private ArmsValues As New Dictionary(Of GlobalEnumerates.ARMS_ELEMENTS, String)
+    Private ArmsValues As New Dictionary(Of ARMS_ELEMENTS, String)
     ' PROBES VALUES
-    Private ProbesValues As New Dictionary(Of GlobalEnumerates.PROBES_ELEMENTS, String)
+    Private ProbesValues As New Dictionary(Of PROBES_ELEMENTS, String)
     ' ROTORS VALUES
-    Private RotorsValues As New Dictionary(Of GlobalEnumerates.ROTORS_ELEMENTS, String)
+    Private RotorsValues As New Dictionary(Of ROTORS_ELEMENTS, String)
     ' FIRMWARE VALUES
-    Private FwValues As New Dictionary(Of GlobalEnumerates.FW_INFO, String)
+    Private FwValues As New Dictionary(Of FW_INFO, String)
 
 
     'PENDIENTE
@@ -3204,14 +3206,14 @@ Public Class FormXavi
             Next
 
             If pInstructionSent.Contains("GLF.FO.FAC") Then
-                System.Threading.Thread.Sleep(500)
+                Thread.Sleep(500)
                 Me.BsButton12.PerformClick()
             ElseIf pInstructionSent.Contains(".DE.LDE") Then 'level detection
-                System.Threading.Thread.Sleep(500)
+                Thread.Sleep(500)
                 MyClass.GenerateCommandAnswerData()
             Else
                 If ToSimulateResponse Then
-                    System.Threading.Thread.Sleep(100)
+                    Thread.Sleep(100)
                     MyClass.GenerateCommandAnswerData()
                     'SimulatedResponse = "A400;ANSCMD;END:1;"
                     'AutoCommandResponse()
@@ -3223,12 +3225,12 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsButton4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton4.Click
+    Private Sub BsButton4_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton4.Click
         'AdjustmentsDataGenerator()
         AdjustmentsGenerator()
     End Sub
 
-    Private Sub BsReceptionButton_Error_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsReceptionButton_Error.Click
+    Private Sub BsReceptionButton_Error_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsReceptionButton_Error.Click
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
@@ -3250,7 +3252,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub Btn_ANSCMD_OK_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Btn_ANSCMD_OK.Click
+    Private Sub Btn_ANSCMD_OK_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Btn_ANSCMD_OK.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3269,7 +3271,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub Btn_ANSCMD_ERR_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Btn_ANSCMD_ERR.Click
+    Private Sub Btn_ANSCMD_ERR_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Btn_ANSCMD_ERR.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3289,7 +3291,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsButton7_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton7.Click
+    Private Sub BsButton7_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton7.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3313,7 +3315,7 @@ Public Class FormXavi
 
     End Sub
 
-    Private Sub BsButton6_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton6.Click
+    Private Sub BsButton6_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton6.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3337,7 +3339,7 @@ Public Class FormXavi
 
     End Sub
 
-    Private Sub BsButton5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton5.Click
+    Private Sub BsButton5_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton5.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3358,7 +3360,7 @@ Public Class FormXavi
 
     End Sub
 
-    Private Sub BsButton11_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton11.Click
+    Private Sub BsButton11_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton11.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3378,7 +3380,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsButton10_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton10.Click
+    Private Sub BsButton10_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton10.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3398,7 +3400,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsButton9_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton9.Click
+    Private Sub BsButton9_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton9.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3418,7 +3420,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsButton8_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton8.Click
+    Private Sub BsButton8_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton8.Click
         Try
             'Simulate instruction reception
             If BsTextWrite_End.Text.Trim <> "" Then
@@ -3454,7 +3456,7 @@ Public Class FormXavi
 
     End Sub
 
-    Private Sub BsButton12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton12.Click
+    Private Sub BsButton12_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton12.Click
         Try
             MyClass.GenerateCommandAnswerData()
         Catch ex As Exception
@@ -3462,11 +3464,11 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Button1.Click
         ANSINF_Generator()
     End Sub
 
-    Private Sub Button2_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button2.Click
+    Private Sub Button2_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Button2.Click
         Try
             'Simulate instruction reception
             If Not AppDomain.CurrentDomain.GetData("GlobalAnalyzerManager") Is Nothing Then
@@ -3486,7 +3488,7 @@ Public Class FormXavi
     End Sub
 
     'FLUIDICS
-    Private Sub BsButton15_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton13.Click
+    Private Sub BsButton15_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton13.Click
         Try
             'Simulate instruction reception
             SimulatedResponse = ANSJEX_Generator()
@@ -3501,7 +3503,7 @@ Public Class FormXavi
     End Sub
 
     'MANIFOLD
-    Private Sub BsButton14_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton14.Click
+    Private Sub BsButton14_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton14.Click
         Try
             'Simulate instruction reception
             SimulatedResponse = ANSSFX_Generator()
@@ -3516,7 +3518,7 @@ Public Class FormXavi
     End Sub
 
     ' ANSFCP
-    Private Sub Button3_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button3.Click
+    Private Sub Button3_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Button3.Click
         Try
             'Simulate instruction reception
             SimulatedResponse = ANSFCP_Generator()
@@ -3531,7 +3533,7 @@ Public Class FormXavi
     End Sub
 
     ' ANSFW
-    Private Sub Button4_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button4.Click
+    Private Sub Button4_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Button4.Click
         Try
             'Simulate instruction reception
             SimulatedResponse = ANSF_Generator(POLL_IDs.CPU)
@@ -3546,7 +3548,7 @@ Public Class FormXavi
     End Sub
 
     ' ANSBXX
-    Private Sub BsButton15_Click_1(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton15.Click
+    Private Sub BsButton15_Click_1(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton15.Click
         Try
             'Simulate instruction reception
             SimulatedResponse = ANSBXX_Generator()
@@ -3562,7 +3564,7 @@ Public Class FormXavi
 
     Private myArmSelected As String
     Private myArmSelected2 As String
-    Private Sub BsLabel13_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsLabel13.Click
+    Private Sub BsLabel13_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsLabel13.Click
         Select Case myArmSelected
             Case "BM1"
                 myArmSelected = "BR1"
@@ -3584,7 +3586,7 @@ Public Class FormXavi
         Me.BsLabel16.Text = myArmSelected2
     End Sub
 
-    Private Sub BsButton16_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton16.Click
+    Private Sub BsButton16_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton16.Click
         Try
             'Simulate instruction reception
             SimulatedResponse = ANSDXX_Generator()
@@ -3600,7 +3602,7 @@ Public Class FormXavi
 
     Private myProbeSelected As String
     Private myProbeSelected2 As String
-    Private Sub BsLabel14_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsLabel14.Click
+    Private Sub BsLabel14_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsLabel14.Click
         Select Case myProbeSelected
             Case "DR1"
                 myProbeSelected = "DR2"
@@ -3616,7 +3618,7 @@ Public Class FormXavi
         Me.BsLabel17.Text = myProbeSelected2
     End Sub
 
-    Private Sub BsButton17_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton17.Click
+    Private Sub BsButton17_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton17.Click
         Try
             'Simulate instruction reception
             SimulatedResponse = ANSRXX_Generator()
@@ -3632,7 +3634,7 @@ Public Class FormXavi
 
     Private myRotorSelected As String
     Private myRotorSelected2 As String
-    Private Sub BsLabel15_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsLabel15.Click
+    Private Sub BsLabel15_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsLabel15.Click
         Select Case myRotorSelected
             Case "RR1"
                 myRotorSelected = "RM1"
@@ -3648,7 +3650,7 @@ Public Class FormXavi
     Private myFwSelected As String
     Private myFwSelected2 As String
     Private myFwSelected3 As String
-    Private Sub BsLabel12_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsLabel12.Click
+    Private Sub BsLabel12_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsLabel12.Click
         Select Case myFwSelected
             Case "CPU"
                 myFwSelected = "BM1"
@@ -3711,11 +3713,11 @@ Public Class FormXavi
         Me.BsLabel19.Text = myFwSelected3
     End Sub
 
-    Private Sub BsReceivedTextBox_GotFocus(ByVal sender As Object, ByVal e As System.EventArgs)
+    Private Sub BsReceivedTextBox_GotFocus(ByVal sender As Object, ByVal e As EventArgs)
         BsReceivedTextBox.SelectionStart = BsReceivedTextBox.Text.Length
     End Sub
 
-    Private Sub BsReceivedTextBox_TextChanged(ByVal sender As Object, ByVal e As System.EventArgs) Handles BsReceivedTextBox.TextChanged
+    Private Sub BsReceivedTextBox_TextChanged(ByVal sender As Object, ByVal e As EventArgs) Handles BsReceivedTextBox.TextChanged
         Try
 
             BsReceivedTextBox.Select(BsReceivedTextBox.Text.Length, 0)
@@ -3726,7 +3728,7 @@ Public Class FormXavi
         End Try
     End Sub
 
-    Private Sub BsButton18_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles BsButton18.Click
+    Private Sub BsButton18_Click(ByVal sender As Object, ByVal e As EventArgs) Handles BsButton18.Click
         Dim myGlobal As New GlobalDataTO
         Try
 
@@ -3936,7 +3938,7 @@ Public Class FormXavi
                                 Case ISECommands.POLL
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.CALB
-                                    Threading.Thread.Sleep(3000)
+                                    Thread.Sleep(3000)
                                     myData &= "P:0;" & "R:<CAL Li 22.33 Na 44.55 K 66.77 Cl 88.99 A4F000D\><CAL Li 70.33 Na 99.28 K 86.77 Cl 74.53 A4F000D\>;"
                                 Case ISECommands.SAMP
                                     myData &= "P:0;" & "R:<ISE!>;"
@@ -3955,7 +3957,7 @@ Public Class FormXavi
                                     'Case ISECommands.CLEAN_START    ' ??
                                     '    myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.PUMP_CAL
-                                    Threading.Thread.Sleep(3000)
+                                    Thread.Sleep(3000)
                                     myData &= "P:0;" & "R:<PMC A 2999 B 2999 W 1000 000000D\>;"
                                     ' >> STRT
                                     ' << myData &= "P:0;" & "R:<PMC A 3000 B 2000 W 1000 000000D\>;"
@@ -3970,33 +3972,33 @@ Public Class FormXavi
                                 Case ISECommands.LAST_SLOPES
                                     myData &= "P:0;" & "R:<BMV Li 001.3 Na 895.6 K 006.6 Cl 725.6><AMV Li 258.6 Na 688.7 K 115.8 Cl 789.5><CAL Li 22.33 Na 44.55 K 66.77 Cl 88.99 A4F000D\>;"
                                 Case ISECommands.READ_mV
-                                    Threading.Thread.Sleep(1000)
+                                    Thread.Sleep(1000)
                                     myData &= "P:0;" & "R:<AMV Li 98.9 Na 58.5 K 184.1 Cl 196.2 000000D\>;"
                                 Case ISECommands.READ_PAGE_0_DALLAS
-                                    Threading.Thread.Sleep(2000)
+                                    Thread.Sleep(2000)
                                     myData &= "P:0;" & "R:<DSN 37363431313933FFÙ><DDT 00 0000A6F1EA1E060B00640029057802BC01903400490112A3032004E2019A13A5Ù>;"
                                 Case ISECommands.READ_PAGE_1_DALLAS
-                                    Threading.Thread.Sleep(2000)
+                                    Thread.Sleep(2000)
                                     myData &= "P:0;" & "R:<DSN 37363431313933FFÙ><DDT 01 000000000000F7FFFFFFFFFFFF0A080BF00000000E0FFFFFFFFFFFFFFFF02FFFF,>;"
                                 Case ISECommands.MAINTENANCE
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.DSPA
-                                    Threading.Thread.Sleep(1000)
+                                    Thread.Sleep(1000)
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.DSPB
-                                    Threading.Thread.Sleep(1000)
+                                    Thread.Sleep(1000)
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.PURGEA
-                                    Threading.Thread.Sleep(1000)
+                                    Thread.Sleep(1000)
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.PURGEB
-                                    Threading.Thread.Sleep(1000)
+                                    Thread.Sleep(1000)
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.PRIME_CALA
-                                    Threading.Thread.Sleep(1000)
+                                    Thread.Sleep(1000)
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.PRIME_CALB
-                                    Threading.Thread.Sleep(1000)
+                                    Thread.Sleep(1000)
                                     myData &= "P:0;" & "R:<ISE!>;"
                                 Case ISECommands.DEBUG_mV_ONE
                                     myData &= "P:0;" & "R:<ISE!>;"
@@ -4073,7 +4075,7 @@ Public Class FormXavi
     End Function
 
     'ANSFWU
-    Private Sub Button5_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button5.Click
+    Private Sub Button5_Click(ByVal sender As Object, ByVal e As EventArgs) Handles Button5.Click
         Try
             'Simulate instruction reception
             If myFWUpdateAction = FwUpdateActions.None Then myFWUpdateAction = FwUpdateActions.StartUpdate

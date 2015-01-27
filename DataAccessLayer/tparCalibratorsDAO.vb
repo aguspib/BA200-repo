@@ -9,7 +9,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Partial Public Class tparCalibratorsDAO
-    Inherits DAOBase
+      
 
 #Region "CRUD Methods"
     ''' <summary>

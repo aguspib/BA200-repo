@@ -10,7 +10,7 @@ Namespace Biosystems.Ax00.DAL.DAO
     'AG 14/05/2010 - change name from twksWSBaseLinesDAO to twksWSBLinesDAO
     'Modify all query using new table name!!!
     Public Class twksWSBLinesDAO
-        Inherits DAOBase
+          
 
 #Region "CRUD Methods"
         ''' <summary>

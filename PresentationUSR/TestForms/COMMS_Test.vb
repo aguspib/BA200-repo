@@ -304,7 +304,7 @@ Public Class bsReception
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsCommTestings_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsCommTestings_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         Finally
@@ -319,7 +319,7 @@ Public Class bsReception
             BsReceivedTextBox.Clear()
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsClearReception_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsClearReception_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
 
         End Try
@@ -337,7 +337,7 @@ Public Class bsReception
             End If
 
         Catch ex As Exception
-            CreateLogActivity(ex.Message, Me.Name & ".BsSendNext_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+            GlobalBase.CreateLogActivity(ex.Message, Me.Name & ".BsSendNext_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".BsSendNext_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message)
         End Try
 
@@ -452,7 +452,7 @@ Public Class bsReception
               Select row).ToList()
             If TestList.Count > 0 Then
                 'RH 19/10/2010 Introduce the Using statement
-                Using myCurveForm As New IResultsCalibCurve
+                Using myCurveForm As New UiResultsCalibCurve
                     With myCurveForm
                         .ActiveAnalyzer = analyzerID
                         .ActiveWorkSession = worksessionID
@@ -500,7 +500,7 @@ Public Class bsReception
             Dim resultData As New GlobalDataTO
 
             'Shown the Positioning Warnings Screen
-            Using AuxMe As New ISortingTestsAux()
+            Using AuxMe As New UiSortingTestsAux()
                 AuxMe.openMode = "TESTSELECTION"
                 AuxMe.screenID = "STD"
                 AuxMe.ShowDialog()
