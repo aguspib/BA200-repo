@@ -68,6 +68,13 @@ Partial Public Class UiAx00MainMDI
     Private myAnalyzerSettingsDelegate As New AnalyzerSettingsDelegate
     Private swParams As New SwParametersDelegate
 
+    'MI+XB 27/01/2015 BA-2189
+    '   This object is now shared and readonly to ensure it works always when used on a synclock.
+    '   Analysis shows that the usage of this attribute is widely spread blocking unrelated tasks and methods. 
+    '   TODO: See possible different locks for different unrelated tasks to enforce better performance. 
+    '
+    Shared ReadOnly LockThis As New Object() 'RH 30/03/2012
+
     Public Enum WorkSessionUserActions 'AG 04/08/2011
         NO_WS
         START_WS
@@ -98,7 +105,6 @@ Partial Public Class UiAx00MainMDI
     Private SaveStatusMessageID As GlobalEnumerates.Messages = Messages.CONNECTING
     Private completeWupProcessFlag As Boolean = False 'AG 12/09/2011
 
-    Private lockThis As New Object() 'RH 30/03/2012
 
     Private ClosedByFormCloseButton As Boolean = False 'RH 13/04/2012 To be used only by the common forms
 
@@ -9950,7 +9956,7 @@ Partial Public Class UiAx00MainMDI
                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES *** XB 12/02/2014 - Task #1495
 
                         'Move row from pendingUpload to InCourseUpload
-                        SyncLock lockThis
+                        SyncLock LockThis
                             'AG 17/02/2014 - #1505 use merge instead of loops
                             'For Each row As ExecutionsDS.twksWSExecutionsRow In pendingUploadToLisDS.twksWSExecutions
                             '    inCourseUploadToLisDS.twksWSExecutions.ImportRow(row)
@@ -10071,7 +10077,7 @@ Partial Public Class UiAx00MainMDI
 
                             End If
 
-                            SyncLock lockThis
+                            SyncLock LockThis
                                 'Divide the inCourseUploadToLisDS into several xml messages following the ES rules
                                 Dim myBusiness As New ESBusiness
                                 resultData = myBusiness.DivideResultsToUploadIntoSeveralMessages(Nothing, inCourseUploadToLisDS)
@@ -10110,7 +10116,7 @@ Partial Public Class UiAx00MainMDI
                         End If 'AG 17/02/2014 - #1505
 
                     Else 'Clear class DataSets
-                        SyncLock lockThis
+                        SyncLock LockThis
                             pendingUploadToLisDS.Clear()
                             inCourseUploadToLisDS.Clear()
                         End SyncLock
@@ -10145,7 +10151,7 @@ Partial Public Class UiAx00MainMDI
     Public Sub AddResultsIntoQueueToUpload(ByVal pExecutionsDS As ExecutionsDS)
         Try
             'Move row from parameter to pendingUpload
-            SyncLock lockThis
+            SyncLock LockThis
                 'AG 17/02/2014 - #1505 use merge instead of loops
                 'For Each row As ExecutionsDS.twksWSExecutionsRow In pExecutionsDS.twksWSExecutions
                 '    pendingUploadToLisDS.twksWSExecutions.ImportRow(row)
@@ -10394,7 +10400,7 @@ Partial Public Class UiAx00MainMDI
             Me.UIThread(Function() ShowMessage(Name & ".SynchronousProcessOrdersFromLIS ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))"))
         End Try
 
-        SyncLock lockThis
+        SyncLock LockThis
             resultsOrderDownloadProcess = resultData 'Inform the process results
         End SyncLock
         processingLISOrderDownload = False
@@ -10619,7 +10625,7 @@ Partial Public Class UiAx00MainMDI
 
             'Pass xml information from LIS thread to main thread
             Dim myXMLmessage As New XmlDocument
-            SyncLock lockThis
+            SyncLock LockThis
                 myXMLmessage = pMessage 'From now use the variable myXMLMessage instead of use pMessage
             End SyncLock
 
@@ -11020,7 +11026,7 @@ Partial Public Class UiAx00MainMDI
         Try
             'Pass xml information from LIS thread to main thread
             Dim myXMLmessage As New XmlDocument
-            SyncLock lockThis
+            SyncLock LockThis
                 myXMLmessage = pMessage 'From now use the variable myXMLMessage instead of use pMessage
             End SyncLock
 
@@ -11562,7 +11568,7 @@ Partial Public Class UiAx00MainMDI
                         End If
 
                         'Results are available in variable returnValue (globalDataTO)
-                        SyncLock lockThis
+                        SyncLock LockThis
                             myResults = resultsOrderDownloadProcess
                             If cumulatedResults <> 2 Then
                                 If (Not myResults.HasError) AndAlso (TypeOf (myResults.SetDatos) Is Integer) Then
