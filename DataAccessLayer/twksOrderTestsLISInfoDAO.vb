@@ -390,11 +390,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'Dim cmdText As String = " DELETE twksOrderTestsLISInfo " & vbCrLf & _
+                        '                        " WHERE  OrderTestID IN (SELECT OT.OrderTestID FROM twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                        '                                               " WHERE  OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                        '                                               " AND    O.SampleClass = '" & pSampleClass & "' " & vbCrLf & _
+                        '                                               " AND   (LISRequest IS NULL OR LISRequest = 0)) " & vbCrLf
+
                         Dim cmdText As String = " DELETE twksOrderTestsLISInfo " & vbCrLf & _
-                                                " WHERE  OrderTestID IN (SELECT OT.OrderTestID FROM twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                " WHERE  EXISTS (SELECT OT.OrderTestID FROM twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
                                                                        " WHERE  OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
                                                                        " AND    O.SampleClass = '" & pSampleClass & "' " & vbCrLf & _
-                                                                       " AND   (LISRequest IS NULL OR LISRequest = 0)) " & vbCrLf
+                                                                       " AND   (LISRequest IS NULL OR LISRequest = 0) AND twksOrderTestsLISInfo.OrderTestID = OT.OrderTestID) " & vbCrLf
 
                         Using cmd As New SqlCommand(cmdText, pDBConnection)
                             resultData.AffectedRecords = cmd.ExecuteNonQuery()

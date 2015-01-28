@@ -540,25 +540,47 @@ Partial Public Class tparCalibratorsDAO
                 Dim cmdText As String
 
                 If (Not pUpdateForExcluded) Then
+                    'AJG
+                    'cmdText = " UPDATE tparCalibrators " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  CalibratorID IN (SELECT DISTINCT TC.CalibratorID " & _
+                    '                                  " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                    '                                                                " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                                " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                    '                                  " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                                  " AND    O.SampleClass = 'CALIB') "
                     cmdText = " UPDATE tparCalibrators " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  CalibratorID IN (SELECT DISTINCT TC.CalibratorID " & _
-                                                      " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
-                                                                                    " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                                    " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                      " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
-                                                      " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                      " AND    O.SampleClass = 'CALIB') "
+                              " WHERE EXISTS (SELECT TC.CalibratorID " & _
+                                             " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                                                                           " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                           " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                             " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                                             " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                             " AND    O.SampleClass = 'CALIB' AND tparCalibrators.CalibratorID = TC.CalibratorID) "
                 Else
+                    'AJG
+                    'cmdText = " UPDATE tparCalibrators " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  CalibratorID NOT IN (SELECT DISTINCT TC.CalibratorID " & _
+                    '                                      " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                    '                                                                    " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                                    " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                                      " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                    '                                      " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                                      " AND    O.SampleClass = 'CALIB') " & _
+                    '          " AND    InUse = 1 "
+
                     cmdText = " UPDATE tparCalibrators " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  CalibratorID NOT IN (SELECT DISTINCT TC.CalibratorID " & _
-                                                          " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
-                                                                                        " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                                        " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                          " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
-                                                          " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                          " AND    O.SampleClass = 'CALIB') " & _
+                              " WHERE NOT EXISTS (SELECT TC.CalibratorID " & _
+                                                 " FROM   tparTestCalibrators TC INNER JOIN twksOrderTests OT ON TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & _
+                                                                               " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                               " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                                                 " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                                 " AND    O.SampleClass = 'CALIB' AND tparCalibrators.CalibratorID = TC.CalibratorID) " & _
                               " AND    InUse = 1 "
                 End If
 

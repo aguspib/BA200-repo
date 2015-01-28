@@ -101,8 +101,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pAnalyzerModel.Trim <> String.Empty) Then
                             cmdText &= " OR AnalyzerModel ='" & pAnalyzerModel.Trim & "' " & vbCrLf
                         ElseIf (pAnalyzerID.Trim <> String.Empty) Then
-                            cmdText &= " OR AnalyzerModel IN (SELECT AnalyzerModel FROM tcfgAnalyzers " & vbCrLf & _
-                                                            " WHERE AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "') " & vbCrLf
+                            'AJG
+                            'cmdText &= " OR AnalyzerModel IN (SELECT AnalyzerModel FROM tcfgAnalyzers " & vbCrLf & _
+                            '                                " WHERE AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "') " & vbCrLf
+
+                            cmdText &= " OR EXISTS (SELECT AnalyzerModel FROM tcfgAnalyzers " & vbCrLf & _
+                                                   " WHERE AnalyzerID = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' AND tfmwSwParameters.AnalyzerModel = AnalyzerModel) " & vbCrLf
                         End If
 
                         Dim myParameterDS As New ParametersDS
@@ -159,8 +163,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  P.ParameterName = '" & pParameterName & "' " & vbCrLf
 
                         If (pDependOnModel) Then
-                            cmdText &= " AND P.AnalyzerModel IN (SELECT A.AnalyzerModel FROM tcfgAnalyzers A " & vbCrLf & _
-                                                               " WHERE  A.AnalyzerID = '" & pAnalyzerID & "' )"
+                            'AJG
+                            'cmdText &= " AND P.AnalyzerModel IN (SELECT A.AnalyzerModel FROM tcfgAnalyzers A " & vbCrLf & _
+                            '                                   " WHERE  A.AnalyzerID = '" & pAnalyzerID & "' )"
+
+                            cmdText &= " AND EXISTS (SELECT A.AnalyzerModel FROM tcfgAnalyzers A " & vbCrLf & _
+                                                               " WHERE  A.AnalyzerID = '" & pAnalyzerID & "' AND P.AnalyzerModel = A.AnalyzerModel)"
                         End If
 
                         Dim myParameterDS As New ParametersDS

@@ -82,8 +82,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "FROM vwksWSOrderTests " & vbCrLf
                         cmdText &= "WHERE TestType = 'ISE' " & vbCrLf
                         cmdText &= "AND   ToSendFlag = 1 " & vbCrLf
-                        cmdText &= "AND   OrderTestID IN (SELECT OrderTestID FROM twksWSExecutions  " & vbCrLf
+                        'AJG
+                        'cmdText &= "AND   OrderTestID IN (SELECT OrderTestID FROM twksWSExecutions  " & vbCrLf
+                        cmdText &= "AND   EXISTS (SELECT OrderTestID FROM twksWSExecutions  " & vbCrLf
                         cmdText &= "                      WHERE WorkSessionID = '" & pWorkSessionID & "'" & vbCrLf
+                        'AJG
+                        cmdText &= "                      AND   vwksWSOrderTests.OrderTestID = OrderTestID " & vbCrLf
                         cmdText &= "                      AND   AnalyzerID = '" & pAnalyzerID & "'" & vbCrLf
                         cmdText &= "                      AND   ExecutionType = 'PREP_ISE' " & vbCrLf
                         cmdText &= "                      AND  (ExecutionStatus = 'PENDING'  " & vbCrLf
@@ -96,9 +100,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "FROM vwksWSOrderTests " & vbCrLf
                         cmdText &= "WHERE TestType = 'ISE' " & vbCrLf
                         cmdText &= "AND   ToSendFlag = 1 " & vbCrLf
-                        cmdText &= "AND   OrderTestID IN (SELECT EX.OrderTestID  " & vbCrLf
+                        'AJG
+                        'cmdText &= "AND   OrderTestID IN (SELECT EX.OrderTestID  " & vbCrLf
+                        cmdText &= "AND   EXISTS (SELECT EX.OrderTestID  " & vbCrLf
                         cmdText &= "                      FROM   twksWSExecutions EX LEFT JOIN twksWSPreparations P ON EX.PreparationID = P.PreparationID  " & vbCrLf
                         cmdText &= "                      WHERE  EX.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf
+                        'AJG
+                        cmdText &= "                      AND    vwksWSOrderTests.OrderTestID = EX.OrderTestID " & vbCrLf
                         cmdText &= "                      AND    EX.AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf
                         cmdText &= "                      AND    EX.ExecutionType = 'PREP_ISE' " & vbCrLf
                         cmdText &= "                      AND    EX.ExecutionStatus ='INPROCESS' " & vbCrLf

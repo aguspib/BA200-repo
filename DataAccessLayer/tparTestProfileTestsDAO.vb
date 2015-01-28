@@ -274,9 +274,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "DELETE FROM tparTestProfileTests " & vbCrLf
                         cmdText &= "WHERE  TestID = " & pTestID & vbCrLf
                         cmdText &= "  AND  TestType = '" & pTestType & "'" & vbCrLf
-                        cmdText &= "  AND  TestProfileID IN (SELECT TP.TestProfileID " & vbCrLf
-                        cmdText &= "                         FROM   tparTestProfiles TP " & vbCrLf
-                        cmdText &= "                         WHERE  TP.SampleType = '" & pSampleType.Trim & "')"
+                        'AJG
+                        'cmdText &= "  AND  TestProfileID IN (SELECT TP.TestProfileID " & vbCrLf
+                        cmdText &= "  AND  EXISTS (SELECT TP.TestProfileID " & vbCrLf
+                        cmdText &= "              FROM   tparTestProfiles TP " & vbCrLf
+                        cmdText &= "              WHERE  TP.SampleType = '" & pSampleType.Trim & "' AND tparTestProfileTests.TestProfileID = TP.TestProfileID)"
                     End If
 
                     Dim dbCmd As New SqlClient.SqlCommand
@@ -542,26 +544,47 @@ Namespace Biosystems.Ax00.DAL.DAO
                                   " WHERE  UPPER(TS.SampleType) = UPPER(N'" & pSampleType & "') "
                         '" WHERE  UPPER(TS.SampleType) = '" & pSampleType.ToUpper & "' "
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND T.TestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            'AJG
+                            'cmdText &= " AND T.TestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                " AND    TestType = 'STD') "
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
                                                             " WHERE  TestProfileID = " & pTestProfileID & _
-                                                            " AND    TestType = 'STD') "
+                                                            " AND    TestType = 'STD' AND T.TestID = TestID) "
                         End If
 
                         'Get CALCULATED Tests
+                        'AJG
+                        'cmdText &= " UNION " & _
+                        '           " SELECT 'CALC' AS TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
+                        '                  " CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, CT.Available  " & _
+                        '           " FROM   tparCalculatedTests CT " & _
+                        '           " WHERE ((CT.UniqueSampleType = 1 AND UPPER(CT.SampleType) = UPPER(N'" & pSampleType & "')) " & _
+                        '           " OR     (CT.UniqueSampleType = 0 AND CT.CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & _
+                        '                                                                 " WHERE  ValueType = 'TEST' " & _
+                        '                                                                 " AND UPPER(SampleType) = UPPER(N'" & pSampleType & "')))) " & _
+                        '           " AND    CT.EnableStatus = 1 "
+
                         cmdText &= " UNION " & _
                                    " SELECT 'CALC' AS TestType, CT.CalcTestID AS TestID, CT.CalcTestLongName AS TestName, " & _
                                           " CT.CalcTestID AS TestPosition, 0 AS PreloadedTest, 0 as FactoryCalib, CT.Available  " & _
                                    " FROM   tparCalculatedTests CT " & _
                                    " WHERE ((CT.UniqueSampleType = 1 AND UPPER(CT.SampleType) = UPPER(N'" & pSampleType & "')) " & _
-                                   " OR     (CT.UniqueSampleType = 0 AND CT.CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & _
-                                                                                         " WHERE  ValueType = 'TEST' " & _
-                                                                                         " AND UPPER(SampleType) = UPPER(N'" & pSampleType & "')))) " & _
+                                   " OR     (CT.UniqueSampleType = 0 AND EXISTS (SELECT CalcTestID FROM tparFormulas " & _
+                                                                                " WHERE  ValueType = 'TEST' " & _
+                                                                                " AND UPPER(SampleType) = UPPER(N'" & pSampleType & "') " & _
+                                                                                " AND CT.CalcTestID = CalcTestID))) " & _
                                    " AND    CT.EnableStatus = 1 "
 
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND CT.CalcTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
-                                                                  " WHERE  TestProfileID = " & pTestProfileID & _
-                                                                  " AND    TestType = 'CALC') "
+                            'AJG
+                            'cmdText &= " AND CT.CalcTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                      " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                      " AND    TestType = 'CALC') "
+
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
+                                                        " WHERE  TestProfileID = " & pTestProfileID & _
+                                                        " AND    TestType = 'CALC' AND CT.CalcTestID = TestID) "
                         End If
 
                         'Get ISE Tests
@@ -573,9 +596,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " AND    IT.Enabled = 1 "
 
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND IT.ISETestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
-                                                                " WHERE  TestProfileID = " & pTestProfileID & _
-                                                                " AND    TestType = 'ISE') "
+                            'AJG
+                            'cmdText &= " AND IT.ISETestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                    " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                    " AND    TestType = 'ISE') "
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
+                                                        " WHERE  TestProfileID = " & pTestProfileID & _
+                                                        " AND    TestType = 'ISE' AND IT.ISETestID = TestID) "
                         End If
 
                         'Get OFF-SYSTEM Tests
@@ -586,9 +613,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " WHERE  UPPER(OTS.SampleType) = UPPER(N'" & pSampleType & "') " '& _
                         
                         If (pTestProfileID <> 0) Then
-                            cmdText &= " AND OT.OffSystemTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            'cmdText &= " AND OT.OffSystemTestID NOT IN (SELECT TestID FROM tparTestProfileTests " & _
+                            '                                          " WHERE  TestProfileID = " & pTestProfileID & _
+                            '                                          " AND    TestType = 'OFFS') "
+                            cmdText &= " AND NOT EXISTS (SELECT TestID FROM tparTestProfileTests " & _
                                                                       " WHERE  TestProfileID = " & pTestProfileID & _
-                                                                      " AND    TestType = 'OFFS') "
+                                                                      " AND    TestType = 'OFFS' AND OT.OffSystemTestID = TestID) "
                         End If
 
                         cmdText &= " ORDER BY TestType, TestPosition "

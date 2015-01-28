@@ -325,8 +325,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE FROM tparTestProfiles " & _
+                    '          " WHERE TestProfileID NOT IN (SELECT TestProfileID FROM tparTestProfileTests) "
+
                     cmdText = " DELETE FROM tparTestProfiles " & _
-                              " WHERE TestProfileID NOT IN (SELECT TestProfileID FROM tparTestProfileTests) "
+                              " WHERE NOT EXISTS (SELECT TestProfileID FROM tparTestProfileTests WHERE tparTestProfiles.TestProfileID = TestProfileID) "
 
                     'cmdText = " DELETE FROM tparTestProfiles" & vbCrLf & _
                     '          " WHERE  TestProfileID IN (SELECT tp.TestProfileID " & vbCrLf & _
@@ -653,23 +657,44 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String
                     If (Not pUpdateForExcluded) Then
+                        'AJG
+                        'cmdText = " UPDATE tparTestProfiles " & _
+                        '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                        '          " WHERE  TestProfileID IN (SELECT DISTINCT WSOT.TestProfileID " & _
+                        '                                   " FROM   vwksWSOrderTests WSOT " & _
+                        '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                        '                                   " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                        '                                   " AND    WSOT.SampleClass = 'PATIENT' " & _
+                        '                                   " AND    WSOT.TestProfileID IS NOT NULL) "
+
                         cmdText = " UPDATE tparTestProfiles " & _
                                   " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                                  " WHERE  TestProfileID IN (SELECT DISTINCT WSOT.TestProfileID " & _
-                                                           " FROM   vwksWSOrderTests WSOT " & _
-                                                           " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
-                                                           " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                           " AND    WSOT.SampleClass = 'PATIENT' " & _
-                                                           " AND    WSOT.TestProfileID IS NOT NULL) "
+                                  " WHERE  EXISTS (SELECT DISTINCT WSOT.TestProfileID " & _
+                                                  " FROM   vwksWSOrderTests WSOT " & _
+                                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                                                  " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                                  " AND    WSOT.SampleClass = 'PATIENT' " & _
+                                                  " AND    WSOT.TestProfileID IS NOT NULL AND tparTestProfiles.TestProfileID = WSOT.TestProfileID) "
                     Else
+                        'AJG
+                        'cmdText = " UPDATE tparTestProfiles " & _
+                        '          " SET    InUse = 0 " & _
+                        '          " WHERE  TestProfileID NOT IN (SELECT DISTINCT WSOT.TestProfileID " & _
+                        '                                       " FROM   vwksWSOrderTests WSOT " & _
+                        '                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                        '                                       " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                        '                                       " AND    WSOT.SampleClass = 'PATIENT' " & _
+                        '                                       " AND    WSOT.TestProfileID IS NOT NULL) " & _
+                        '          " AND    InUse = 1 "
+
                         cmdText = " UPDATE tparTestProfiles " & _
                                   " SET    InUse = 0 " & _
-                                  " WHERE  TestProfileID NOT IN (SELECT DISTINCT WSOT.TestProfileID " & _
+                                  " WHERE  NOT EXISTS (SELECT DISTINCT WSOT.TestProfileID " & _
                                                                " FROM   vwksWSOrderTests WSOT " & _
                                                                " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
                                                                " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
                                                                " AND    WSOT.SampleClass = 'PATIENT' " & _
-                                                               " AND    WSOT.TestProfileID IS NOT NULL) " & _
+                                                               " AND    WSOT.TestProfileID IS NOT NULL AND tparTestProfiles.TestProfileID = WSOT.TestProfileID) " & _
                                   " AND    InUse = 1 "
                     End If
 

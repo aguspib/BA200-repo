@@ -411,25 +411,46 @@ Partial Public Class tparControlsDAO
             Else
                 Dim cmdText As String
                 If (Not pUpdateForExcluded) Then
+                    'AJG 
+                    'cmdText = " UPDATE tparControls " & vbCrLf & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
+                    '          " WHERE  ControlID IN (SELECT TC.ControlID " & vbCrLf & _
+                    '                               " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                    '                                                          " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                    '                                                          " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                               " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                    '                               " AND    O.SampleClass = 'CTRL') " & vbCrLf
                     cmdText = " UPDATE tparControls " & vbCrLf & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
-                              " WHERE  ControlID IN (SELECT TC.ControlID " & vbCrLf & _
-                                                   " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
-                                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
-                                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                   " AND    O.SampleClass = 'CTRL') " & vbCrLf
+                              " WHERE  EXISTS (SELECT TC.ControlID " & vbCrLf & _
+                                              " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                                                                         " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                                                                         " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                              " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                              " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                              " AND    O.SampleClass = 'CTRL' AND tparControls.ControlID = TC.ControlID) " & vbCrLf
                 Else
+                    'AJG
+                    'cmdText = " UPDATE tparControls " & vbCrLf & _
+                    '          " SET    InUse = 0 " & vbCrLf & _
+                    '          " WHERE  ControlID NOT IN (SELECT TC.ControlID " & vbCrLf & _
+                    '                                   " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                    '                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                    '                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                    '                                   " AND    O.SampleClass = 'CTRL') " & vbCrLf & _
+                    '          " AND    InUse = 1 " & vbCrLf
                     cmdText = " UPDATE tparControls " & vbCrLf & _
                               " SET    InUse = 0 " & vbCrLf & _
-                              " WHERE  ControlID NOT IN (SELECT TC.ControlID " & vbCrLf & _
-                                                       " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
-                                                                                  " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
-                                                                                  " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                       " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                       " AND    O.SampleClass = 'CTRL') " & vbCrLf & _
+                              " WHERE  NOT EXISTS (SELECT TC.ControlID " & vbCrLf & _
+                                                  " FROM   tparTestControls TC INNER JOIN twksOrderTests OT ON TC.TestType = OT.TestType AND TC.TestID = OT.TestID AND TC.SampleType = OT.SampleType " & vbCrLf & _
+                                                                             " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & vbCrLf & _
+                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                  " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                  " AND    O.SampleClass = 'CTRL' AND tparControls.ControlID = TC.ControlID) " & vbCrLf & _
                               " AND    InUse = 1 " & vbCrLf
                 End If
 

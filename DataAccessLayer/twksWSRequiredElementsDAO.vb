@@ -1681,10 +1681,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pElementStatus <> "") Then
                             cmdText &= " AND RE.ElementStatus = '" & pElementStatus & "' " & vbCrLf
                             If (pElementStatus = "NOPOS") Then
-                                cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                'AJG
+                                'cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                '                                    " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                '                                    " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
+                                '                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                cmdText &= " AND NOT EXISTS (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
                                                                     " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                                     " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                                                    " AND    ElementID IS NOT NULL AND RE.ElementID = ElementID) " & vbCrLf
                             End If
                         End If
 
@@ -1758,10 +1763,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pElementStatus <> "") Then
                             cmdText &= " AND RE.ElementStatus = '" & pElementStatus & "' " & vbCrLf
                             If (pElementStatus = "NOPOS") Then
-                                cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                'AJG
+                                'cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                '                                    " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                '                                    " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
+                                '                                    " AND    ElementID IS NOT NULL) "
+                                cmdText &= " AND NOT EXISTS (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
                                                                     " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                                     " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                    " AND    ElementID IS NOT NULL) "
+                                                                    " AND    ElementID IS NOT NULL AND RE.ElementID = ElementID) "
                             End If
                         End If
                         If (pOnlyNotFinished) Then cmdText &= " AND RE.ElementFinished = 0 " & vbCrLf
@@ -1847,10 +1857,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         If (pElementStatus <> "") Then
                             cmdText &= " AND RE.ElementStatus = '" & pElementStatus & "' " & vbCrLf
                             If (pElementStatus = "NOPOS" AndAlso Not pGetAllNoPos) Then
-                                cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                'AJG
+                                'cmdText &= " AND RE.ElementID NOT IN (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                '                                    " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                '                                    " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
+                                '                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                cmdText &= " AND NOT EXISTS (SELECT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
                                                                     " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                                     " AND    RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                    " AND    ElementID IS NOT NULL) " & vbCrLf
+                                                                    " AND    ElementID IS NOT NULL AND RE.ElementID = ElementID) " & vbCrLf
                             End If
                         End If
                         If (pOnlyNotFinished) Then cmdText &= " AND RE.ElementFinished = 0 " & vbCrLf
@@ -1917,6 +1932,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'AG 02/08/2011 - LotNumber and ExpirationDate are get from tparHistoryReagentBottles
                         'OLD 2on line: " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus, R.LotNumber, R.ExpirationDate " & _
 
+                        'AJG
+                        'Dim cmdText As String = " SELECT RE.TubeContent, RE.ElementID, TR.TestID, T.TestName, RE.ReagentID, R.ReagentName, " & vbCrLf & _
+                        '                               " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus " & vbCrLf & _
+                        '                        " FROM   twksWSRequiredElements RE INNER JOIN tparReagents R      ON RE.ReagentID = R.ReagentID " & vbCrLf & _
+                        '                                                         " INNER JOIN tparTestReagents TR ON RE.ReagentID = TR.ReagentID " & vbCrLf & _
+                        '                                                         " INNER JOIN tparTests T         ON TR.TestID    = T.TestID " & vbCrLf & _
+                        '                        " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                        " AND    RE.TubeContent   = 'REAGENT' " & vbCrLf & _
+                        '                        " AND    TR.TestID IN (SELECT OT.TestID " & vbCrLf & _
+                        '                                             " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                        '                                             " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+
                         Dim cmdText As String = " SELECT RE.TubeContent, RE.ElementID, TR.TestID, T.TestName, RE.ReagentID, R.ReagentName, " & vbCrLf & _
                                                        " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus " & vbCrLf & _
                                                 " FROM   twksWSRequiredElements RE INNER JOIN tparReagents R      ON RE.ReagentID = R.ReagentID " & vbCrLf & _
@@ -1924,9 +1951,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                                  " INNER JOIN tparTests T         ON TR.TestID    = T.TestID " & vbCrLf & _
                                                 " WHERE  RE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND    RE.TubeContent   = 'REAGENT' " & vbCrLf & _
-                                                " AND    TR.TestID IN (SELECT OT.TestID " & vbCrLf & _
-                                                                     " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                     " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+                                                " AND    EXISTS (SELECT OT.TestID " & vbCrLf & _
+                                                                " FROM   twksOrderTests OT INNER JOIN twksWSOrderTests WSOT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                                " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' AND TR.TestID = OT.TestID) " & vbCrLf
 
                         'Dim cmdText As String = " SELECT RE.TubeContent, RE.ElementID, TR.TestID, T.TestName, RE.ReagentID, R.ReagentName, " & vbCrLf & _
                         '                               " RE.MultiItemNumber AS ReagentNumber, RE.RequiredVolume, RE.ElementStatus " & vbCrLf & _
@@ -2258,22 +2285,37 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
+                        '                        " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                        '                        " AND    RP.TubeContent = 'TUBE_SPEC_SOL' " & vbCrLf & _
+                        '                        " AND    RP.SolutionCode IN (SELECT BlankMode FROM tparTests " & vbCrLf & _
+                        '                                                   " WHERE  TestID = " & pOrderTestDetailsRow.TestID & ") " & vbCrLf
+
                         Dim cmdText As String = " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
                                                 " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                                 " AND    RP.TubeContent = 'TUBE_SPEC_SOL' " & vbCrLf & _
-                                                " AND    RP.SolutionCode IN (SELECT BlankMode FROM tparTests " & vbCrLf & _
-                                                                           " WHERE  TestID = " & pOrderTestDetailsRow.TestID & ") " & vbCrLf
+                                                " AND    EXISTS (SELECT BlankMode FROM tparTests " & vbCrLf & _
+                                                                           " WHERE  TestID = " & pOrderTestDetailsRow.TestID & " AND RP.SolutionCode = BlankMode) " & vbCrLf
 
                         If (pOrderTestDetailsRow.SampleClass = "PATIENT") Then
                             If (Not pOrderTestDetailsRow.IsPredilutionModeNull AndAlso pOrderTestDetailsRow.PredilutionMode = "INST") Then
                                 'For patient samples with automatic dilution, get the needed Diluent Solution...
+                                'AJG
+                                'cmdText &= " UNION " & vbCrLf & _
+                                '           " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
+                                '           " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                '           " AND    RP.TubeContent = 'SPEC_SOL' " & vbCrLf & _
+                                '           " AND    RP.SolutionCode IN (SELECT DiluentSolution FROM tparTestSamples " & vbCrLf & _
+                                '                                      " WHERE  TestID = " & pOrderTestDetailsRow.TestID & vbCrLf & _
+                                '                                      " AND    SampleType = '" & pOrderTestDetailsRow.SampleType & "') " & vbCrLf
                                 cmdText &= " UNION " & vbCrLf & _
                                            " SELECT RP.ElementID FROM twksWSRequiredElements RP " & vbCrLf & _
                                            " WHERE  RP.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                            " AND    RP.TubeContent = 'SPEC_SOL' " & vbCrLf & _
-                                           " AND    RP.SolutionCode IN (SELECT DiluentSolution FROM tparTestSamples " & vbCrLf & _
+                                           " AND    EXISTS (SELECT DiluentSolution FROM tparTestSamples " & vbCrLf & _
                                                                       " WHERE  TestID = " & pOrderTestDetailsRow.TestID & vbCrLf & _
-                                                                      " AND    SampleType = '" & pOrderTestDetailsRow.SampleType & "') " & vbCrLf
+                                                                      " AND    SampleType = '" & pOrderTestDetailsRow.SampleType & "' AND RP.SolutionCode = DiluentSolution) " & vbCrLf
                             End If
                         End If
 
@@ -2479,19 +2521,34 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
+                    '                        " SET    SpecimenIDList = SampleID " & vbCrLf & _
+                    '                        " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
+                    '                        " AND    SampleType  = '" & pSampleType.Trim & "' " & vbCrLf & _
+                    '                        " AND    SpecimenIDList IS NULL " & vbCrLf & _
+                    '                        " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                             " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf & _
+                    '                        " UPDATE twksWSRequiredElements " & vbCrLf & _
+                    '                        " SET    PatientID = " & IIf(pSampleIDType = "DB", "N'" & pSampleID.Trim.Replace("'", "''") & "', ", "NULL,").ToString & vbCrLf & _
+                    '                        "        SampleID  = " & IIf(pSampleIDType = "MAN", "N'" & pSampleID.Trim.Replace("'", "''") & "' ", "NULL").ToString & vbCrLf & _
+                    '                        " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
+                    '                        " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                    '                                             " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf
+
                     Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
                                             " SET    SpecimenIDList = SampleID " & vbCrLf & _
                                             " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
                                             " AND    SampleType  = '" & pSampleType.Trim & "' " & vbCrLf & _
                                             " AND    SpecimenIDList IS NULL " & vbCrLf & _
-                                            " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                 " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf & _
+                                            " AND    EXISTS (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                            " WHERE  OT.OrderID = '" & pOrderID.Trim & "' AND twksWSRequiredElements.ElementID = ElementID) " & vbCrLf & _
                                             " UPDATE twksWSRequiredElements " & vbCrLf & _
                                             " SET    PatientID = " & IIf(pSampleIDType = "DB", "N'" & pSampleID.Trim.Replace("'", "''") & "', ", "NULL,").ToString & vbCrLf & _
                                             "        SampleID  = " & IIf(pSampleIDType = "MAN", "N'" & pSampleID.Trim.Replace("'", "''") & "' ", "NULL").ToString & vbCrLf & _
                                             " WHERE  TubeContent = 'PATIENT' " & vbCrLf & _
-                                            " AND    ElementID IN (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                                 " WHERE  OT.OrderID = '" & pOrderID.Trim & "') " & vbCrLf
+                                            " AND    EXISTS (SELECT ElementID FROM twksWSRequiredElemByOrderTest REOT INNER JOIN twksOrderTests OT ON REOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                            " WHERE  OT.OrderID = '" & pOrderID.Trim & "' AND twksWSRequiredElements.ElementID = ElementID) " & vbCrLf
 
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
@@ -2635,12 +2692,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
+                    '                        " SET    ElementStatus = 'NOPOS' " & vbCrLf & _
+                    '                        " WHERE  ElementID IN (SELECT DISTINCT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                    '                                             " WHERE  AnalyzerId = '" & pAnalyzerID & "' " & vbCrLf & _
+                    '                                             " AND    WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                             " AND    RotorType = '" & pRotorType & "') " & vbCrLf
+
                     Dim cmdText As String = " UPDATE twksWSRequiredElements " & vbCrLf & _
                                             " SET    ElementStatus = 'NOPOS' " & vbCrLf & _
-                                            " WHERE  ElementID IN (SELECT DISTINCT ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
-                                                                 " WHERE  AnalyzerId = '" & pAnalyzerID & "' " & vbCrLf & _
-                                                                 " AND    WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                                 " AND    RotorType = '" & pRotorType & "') " & vbCrLf
+                                            " WHERE  EXISTS (SELECT  ElementID FROM twksWSRotorContentByPosition " & vbCrLf & _
+                                                            " WHERE  AnalyzerId = '" & pAnalyzerID & "' " & vbCrLf & _
+                                                            " AND    WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                            " AND    RotorType = '" & pRotorType & "' AND twksWSRequiredElements.ElementID = ElementID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

@@ -758,22 +758,41 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String
                     If (Not pUpdateForExcluded) Then
+                        'AJG
+                        'cmdText = " UPDATE tparTests " & vbCrLf & _
+                        '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
+                        '          " WHERE  TestID IN (SELECT DISTINCT TestID " & vbCrLf & _
+                        '                            " FROM   vwksWSOrderTests " & vbCrLf & _
+                        '                            " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                            " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                            " AND    TestType      = 'STD')" & vbCrLf
+
                         cmdText = " UPDATE tparTests " & vbCrLf & _
                                   " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
-                                  " WHERE  TestID IN (SELECT DISTINCT TestID " & vbCrLf & _
-                                                    " FROM   vwksWSOrderTests " & vbCrLf & _
-                                                    " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                    " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                    " AND    TestType      = 'STD')" & vbCrLf
+                                  " WHERE  EXISTS (SELECT TestID " & vbCrLf & _
+                                                  " FROM   vwksWSOrderTests " & vbCrLf & _
+                                                  " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                  " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                  " AND    TestType      = 'STD' AND tparTests.TestID = TestID)" & vbCrLf
 
                     Else
+                        'AJG
+                        'cmdText = " UPDATE tparTests " & vbCrLf & _
+                        '          " SET    InUse = 0 " & vbCrLf & _
+                        '          " WHERE  TestID NOT IN (SELECT DISTINCT TestID " & vbCrLf & _
+                        '                                " FROM   vwksWSOrderTests " & vbCrLf & _
+                        '                                " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                " AND    TestType      = 'STD') " & vbCrLf & _
+                        '          " AND    InUse = 1 " & vbCrLf
+
                         cmdText = " UPDATE tparTests " & vbCrLf & _
                                   " SET    InUse = 0 " & vbCrLf & _
-                                  " WHERE  TestID NOT IN (SELECT DISTINCT TestID " & vbCrLf & _
+                                  " WHERE  NOT EXISTS (SELECT TestID " & vbCrLf & _
                                                         " FROM   vwksWSOrderTests " & vbCrLf & _
                                                         " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                         " AND    AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                        " AND    TestType      = 'STD') " & vbCrLf & _
+                                                        " AND    TestType      = 'STD' AND tparTests.TestID = TestID) " & vbCrLf & _
                                   " AND    InUse = 1 " & vbCrLf
                     End If
 
@@ -1396,16 +1415,28 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT T.TestID, T.TestName, T.ShortName, T.SpecialTest, T.DecimalsAllowed, TS.SampleType, TS.CalibratorType " & vbCrLf & _
+                        '                        " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
+                        '                        " WHERE  T.InUse = 0 " & vbCrLf & _
+                        '                        " AND    T.SpecialTest = 0 " & vbCrLf & _
+                        '                        " AND   (TS.CalibratorType = 'FACTOR' " & vbCrLf & _
+                        '                        " OR     T.TestID NOT IN (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
+                        '                                                " WHERE CalibratorID = " & pCalibratorID.ToString & ")) " & vbCrLf & _
+                        '                        " AND   (TS.CalibratorType = 'ALTERNATIV' " & vbCrLf & _
+                        '                        " OR     T.TestID NOT IN (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
+                        '                                                " WHERE CalibratorID = " & pCalibratorID.ToString & ")) " & vbCrLf
+
                         Dim cmdText As String = " SELECT T.TestID, T.TestName, T.ShortName, T.SpecialTest, T.DecimalsAllowed, TS.SampleType, TS.CalibratorType " & vbCrLf & _
                                                 " FROM   tparTests T INNER JOIN tparTestSamples TS ON T.TestID = TS.TestID " & vbCrLf & _
                                                 " WHERE  T.InUse = 0 " & vbCrLf & _
                                                 " AND    T.SpecialTest = 0 " & vbCrLf & _
                                                 " AND   (TS.CalibratorType = 'FACTOR' " & vbCrLf & _
-                                                " OR     T.TestID NOT IN (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
-                                                                        " WHERE CalibratorID = " & pCalibratorID.ToString & ")) " & vbCrLf & _
+                                                " OR     NOT EXISTS (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
+                                                                    " WHERE CalibratorID = " & pCalibratorID.ToString & " AND T.TestID = TestID)) " & vbCrLf & _
                                                 " AND   (TS.CalibratorType = 'ALTERNATIV' " & vbCrLf & _
-                                                " OR     T.TestID NOT IN (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
-                                                                        " WHERE CalibratorID = " & pCalibratorID.ToString & ")) " & vbCrLf
+                                                " OR     NOT EXISTS (SELECT TestID FROM tparTestCalibrators " & vbCrLf & _
+                                                                    " WHERE CalibratorID = " & pCalibratorID.ToString & " AND T.TestID = TestID)) " & vbCrLf
 
                         Dim myTestDataDS As New TestsDS()
                         Using cmd As New SqlClient.SqlCommand(cmdText, dbConnection)
