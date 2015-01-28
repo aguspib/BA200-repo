@@ -29,7 +29,8 @@ Partial Public Class UiAx00MainMDI
     Private Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
                                       ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles MDIAnalyzerManager.ReceptionEvent
 
-        Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread))
+        'TODO: If the syncronized execution or Instructions produces a bottle neck, this is the right place to add a thread sync buffer. Only IF REQUIRED. (invesitgate DB optimizations first)
+        Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread), False)
 
     End Sub
 
@@ -51,6 +52,7 @@ Partial Public Class UiAx00MainMDI
     '''              XB - 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
     '''              XB - 20/06/2014 - improve the ISE Timeouts control (E:61) - Task #1441
     '''              AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
+    '''              MI+XB 27/01/2015 BA-2189 Added ToArray in order to prevent IEnumerable being modified from another thread, as it was causing concurrence issues on the For Each operation.
     ''' </remarks>
     Private Function ManageReceptionEvent(ByVal pInstructionReceived As String, _
                                          ByVal pTreated As Boolean, _
@@ -113,20 +115,18 @@ Partial Public Class UiAx00MainMDI
             End If
             'AG 04/04/2012
 
-            SyncLock lockThis
+            SyncLock LockThis
                 copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
-                ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'GlobalBase.CreateLogActivity("BEFORE pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
-                For Each item As GlobalEnumerates.UI_RefreshEvents In pRefreshEvent
+                'MI+XB 27/01/2015 BA-2189
+                For Each item In pRefreshEvent.ToArray
                     'copyRefreshEventList.Add(item)
                     If item = UI_RefreshEvents.BARCODE_POSITION_READ AndAlso incompleteSamplesOpenFlag Then
                         'In this case do not add item
                     Else
                         copyRefreshEventList.Add(item)
                     End If
+
                 Next
-                ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'GlobalBase.CreateLogActivity("AFTER pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
 
                 If pRefreshEvent.Count > 0 Then MDIAnalyzerManager.ReadyToClearUIRefreshDS(pMainThread) 'Inform the ui refresh dataset can be cleared so they are already copied
             End SyncLock

@@ -438,7 +438,7 @@ Namespace Biosystems.Ax00.BL
         ''' </remarks>
         Public Function DeleteConnectedAnalyzersNotActive(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim returnedData As New GlobalDataTO
-            Dim dbConnection As New SqlClient.SqlConnection
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
             Try
                 returnedData = DAOBase.GetOpenDBTransaction(pDBConnection)
                 If (Not returnedData.HasError And Not returnedData.SetDatos Is Nothing) Then
