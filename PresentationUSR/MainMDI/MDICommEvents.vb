@@ -94,10 +94,10 @@ Partial Public Class UiAx00MainMDI
             'Check if the refresh event involves open the incomple samples screen
             Dim barcode_Samples_Warnings As Boolean = False
             If pRefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
-                Dim lnqRes As List(Of UIRefreshDS.SensorValueChangedRow)
-                lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In pRefreshDS.SensorValueChanged _
+
+                Dim lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In pRefreshDS.SensorValueChanged _
                           Where String.Equals(a.SensorID, GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS.ToString) _
-                          Select a).ToList
+                          Select a)
 
                 If lnqRes.Count > 0 Then
                     If lnqRes(0).Value = 1 Then 'Samples barcode warnings
