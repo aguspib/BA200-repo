@@ -370,30 +370,6 @@ Partial Public Class UiAx00MainMDI
                             Dim sensorValue As Single = 0
 
 
-                            ''ISE switch on changed
-                            'sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED)
-                            'If sensorValue = 1 Then
-                            '    ScreenWorkingProcess = False
-                            '    Me.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED) = 0 'Once updated UI clear sensor
-
-                            'End If
-
-                            ''ISE initiated
-                            'sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED)
-                            'If sensorValue >= 1 Then
-                            '    ScreenWorkingProcess = False
-
-                            '    Me.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
-
-                            'End If
-
-                            ''ISE ready changed
-                            'sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED)
-                            'If sensorValue = 1 Then
-                            '    ScreenWorkingProcess = False
-                            '    Me.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED) = 0 'Once updated UI clear sensor
-
-                            'End If
 
                             'ANSISE received SGM 12/06/2012
                             sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED)
@@ -451,16 +427,6 @@ Partial Public Class UiAx00MainMDI
                                     ' Continues with Work Session
                                     Me.StartSession(True)
 
-                                    ' XB 16/12/2013 - Manage Exceptions of ISE module - Task #1441
-                                    'ElseIf Me.StartSessionisInitialPUGsent AndAlso _
-                                    '       (Not Me.StartSessionisCALBsent And _
-                                    '        Not Me.StartSessionisPMCLsent And _
-                                    '        Not Me.StartSessionisBMCLsent) Then
-
-                                    ' XB 28/04/2014 - Task #1587
-                                    'ElseIf Me.StartSessionisInitialPUGsent AndAlso _
-                                    '       (Not Me.StartSessionisCALBsent And Not Me.StartSessionisPMCLsent And Not Me.StartSessionisBMCLsent) AndAlso _
-                                    '       MDIAnalyzerManager.ISE_Manager.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
 
                                 ElseIf (Me.StartSessionisInitialPUGAsent Or Me.StartSessionisInitialPUGBsent) AndAlso _
                                        (Not Me.StartSessionisCALBsent And Not Me.StartSessionisPMCLsent And Not Me.StartSessionisBMCLsent) AndAlso _
@@ -677,10 +643,6 @@ Partial Public Class UiAx00MainMDI
                             NotDisplayAbortMsg = True
                             bsTSAbortSessionButton.PerformClick()
                             NotDisplayAbortMsg = False
-                            'MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS"
-                            'MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption) = ""
-                            'MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = ""
-                            'myGlobal = MDIAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True)
                         End If
                     End If
 
@@ -712,13 +674,6 @@ Partial Public Class UiAx00MainMDI
                 '                                 EventLogEntryType.FailureAudit, False)
             End If
 
-            'AG 17/07/2013 - Commented and moved until StartEnterInRunningMode to avoid create 2 threads calling EnterRunning method
-            ''AG 08/07/2013 - Special mode for work with LIS with automatic actions
-            'If autoWSCreationWithLISModeAttribute AndAlso (automateProcessCurrentState = LISautomateProcessSteps.subProcessDownloadOrders OrElse _
-            '                                               automateProcessCurrentState = LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning OrElse automateProcessCurrentState = LISautomateProcessSteps.ExitNoWorkOrders) Then
-            '    CreateAutomaticWSWithLIS()
-            'End If
-            ''AG 08/07/2013
 
 
             'Debug.Print("IAx00MainMDI.ManageReceptionEvent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 12/06/2012 - time estimation
@@ -753,13 +708,6 @@ Partial Public Class UiAx00MainMDI
 
             '//JVV 20/09/2013 Si el evento de Auto_Report está activo, se tratará según este if
             If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.AUTO_REPORT) Then
-                'Dim sOrderIDs As String = String.Empty
-                'With copyRefreshDS
-                '    For Each dr As DataRow In .AutoReport.Rows
-                '        sOrderIDs &= dr("OrderID").ToString & " / "
-                '    Next
-                'End With
-                'MessageBox.Show("AutoReport per: " & sOrderIDs)
 
                 '//1- marcar las ordenes como impresas una vez lo estén (campo Printed=1) -> twksResults ??
                 '//2- generar alarmas si ha habido un error en la impresión (impresora no disponible, etc.) ??

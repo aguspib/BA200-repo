@@ -19,7 +19,7 @@ Namespace Biosystems.Ax00.BL
         Private ReadOnly DatePattern As String = SystemInfoManager.OSDateFormat
         Private ReadOnly TimePattern As String = SystemInfoManager.OSShortTimeFormat
 
-        Private lockThis As New Object()
+        Private ReadOnly lockThis As New Object()
 
 #End Region
 
