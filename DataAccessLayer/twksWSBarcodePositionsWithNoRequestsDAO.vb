@@ -671,11 +671,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT * FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
+                        '                        " WHERE  BP.LISStatus = 'ASKING' " & vbCrLf & _
+                        '                        " AND    BP.BarcodeInfo NOT IN (SELECT DISTINCT SOT.SpecimenID " & vbCrLf & _
+                        '                                                      " FROM   tparSavedWSOrderTests SOT INNER JOIN tparSavedWS S ON SOT.SavedWSID = S.SavedWSID " & vbCrLf & _
+                        '                                                       " WHERE  S.FromLIMS = 1) " & vbCrLf
+
                         Dim cmdText As String = " SELECT * FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
                                                 " WHERE  BP.LISStatus = 'ASKING' " & vbCrLf & _
-                                                " AND    BP.BarcodeInfo NOT IN (SELECT DISTINCT SOT.SpecimenID " & vbCrLf & _
+                                                " AND    NOT EXISTS (SELECT SOT.SpecimenID " & vbCrLf & _
                                                                               " FROM   tparSavedWSOrderTests SOT INNER JOIN tparSavedWS S ON SOT.SavedWSID = S.SavedWSID " & vbCrLf & _
-                                                                               " WHERE  S.FromLIMS = 1) " & vbCrLf
+                                                                               " WHERE  S.FromLIMS = 1 AND BP.BarcodeInfo = SOT.SpecimenID) " & vbCrLf
 
                         Dim myDataSet As New BarcodePositionsWithNoRequestsDS
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)

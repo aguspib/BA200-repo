@@ -431,23 +431,44 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String
                     If (Not pUpdateForExcluded) Then
+                        'AJG
+                        'cmdText = " UPDATE tparOffSystemTests " & vbCrLf & _
+                        '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
+                        '          " WHERE  OffSystemTestID IN (SELECT DISTINCT WSOT.TestID " & vbCrLf & _
+                        '                                     " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                        '                                     " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                     " AND    WSOT.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                     " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                        '                                     " AND    WSOT.TestType      = 'OFFS') " & vbCrLf
+
                         cmdText = " UPDATE tparOffSystemTests " & vbCrLf & _
                                   " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
-                                  " WHERE  OffSystemTestID IN (SELECT DISTINCT WSOT.TestID " & vbCrLf & _
-                                                             " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
-                                                             " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                             " AND    WSOT.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                             " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
-                                                             " AND    WSOT.TestType      = 'OFFS') " & vbCrLf
+                                  " WHERE  EXISTS (SELECT DISTINCT WSOT.TestID " & vbCrLf & _
+                                                  " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                  " AND    WSOT.AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                  " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                                                  " AND    WSOT.TestType      = 'OFFS' AND tparOffSystemTests.OffSystemTestID = WSOT.TestID) " & vbCrLf
                     Else
+                        'AJG
+                        'cmdText = " UPDATE tparOffSystemTests " & vbCrLf & _
+                        '          " SET    InUse = 0 " & vbCrLf & _
+                        '          " WHERE  OffSystemTestID NOT IN (SELECT DISTINCT WSOT.TestID " & vbCrLf & _
+                        '                                         " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                        '                                         " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                         " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                         " AND    WSOT.SampleClass = 'PATIENT' " & vbCrLf & _
+                        '                                         " AND    WSOT.TestType = 'OFFS') " & vbCrLf & _
+                        '          " AND    InUse = 1 " & vbCrLf
+
                         cmdText = " UPDATE tparOffSystemTests " & vbCrLf & _
                                   " SET    InUse = 0 " & vbCrLf & _
-                                  " WHERE  OffSystemTestID NOT IN (SELECT DISTINCT WSOT.TestID " & vbCrLf & _
-                                                                 " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
-                                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                                 " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                                 " AND    WSOT.SampleClass = 'PATIENT' " & vbCrLf & _
-                                                                 " AND    WSOT.TestType = 'OFFS') " & vbCrLf & _
+                                  " WHERE  NOT EXISTS (SELECT WSOT.TestID " & vbCrLf & _
+                                                      " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                                                      " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                      " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                      " AND    WSOT.SampleClass = 'PATIENT' " & vbCrLf & _
+                                                      " AND    WSOT.TestType = 'OFFS' tparOffSystemTests.OffSystemTestID = WSOT.TestID) " & vbCrLf & _
                                   " AND    InUse = 1 " & vbCrLf
                     End If
 

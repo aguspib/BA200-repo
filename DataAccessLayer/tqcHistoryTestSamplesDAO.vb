@@ -169,13 +169,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                             'Get only active Tests/SampleTypes having QC Results pending to Cumulate
                             cmdText &= " WHERE DeletedSampleType = 0 " & vbCrLf
                             cmdText &= " AND   DeletedTest       = 0 " & vbCrLf
-                            cmdText &= " AND   QCTestSampleID IN (SELECT DISTINCT QCTestSampleID FROM tqcResults " & vbCrLf & _
+                            'AJG
+                            'cmdText &= " AND   QCTestSampleID IN (SELECT DISTINCT QCTestSampleID FROM tqcResults " & vbCrLf & _
+                            '                                    " WHERE  AnalyzerID   = N'" & pAnalyzerID.Replace("'", "''").Trim & "' " & vbCrLf & _
+                            '                                    " AND    ClosedResult = 0) " & vbCrLf
+                            cmdText &= " AND   EXISTS (SELECT QCTestSampleID FROM tqcResults " & vbCrLf & _
                                                                 " WHERE  AnalyzerID   = N'" & pAnalyzerID.Replace("'", "''").Trim & "' " & vbCrLf & _
-                                                                " AND    ClosedResult = 0) " & vbCrLf
+                                                                " AND    ClosedResult = 0 AND tqcHistoryTestSamples.QCTestSampleID = QCTestSampleID) " & vbCrLf
                         Else
                             'Get all Tests/Sample Types having at least a Cumulated Serie saved
-                            cmdText &= " WHERE QCTestSampleID IN (SELECT DISTINCT QCTestSampleID FROM tqcCumulatedResults " & vbCrLf & _
-                                                                " WHERE  AnalyzerID   = N'" & pAnalyzerID.Replace("'", "''").Trim & "') " & vbCrLf
+                            'AJG
+                            'cmdText &= " WHERE QCTestSampleID IN (SELECT DISTINCT QCTestSampleID FROM tqcCumulatedResults " & vbCrLf & _
+                            '                                    " WHERE  AnalyzerID   = N'" & pAnalyzerID.Replace("'", "''").Trim & "') " & vbCrLf
+                            cmdText &= " WHERE EXISTS (SELECT DISTINCT QCTestSampleID FROM tqcCumulatedResults " & vbCrLf & _
+                                                      " WHERE  AnalyzerID   = N'" & pAnalyzerID.Replace("'", "''").Trim & "' AND tqcHistoryTestSamples.QCTestSampleID = QCTestSampleID) " & vbCrLf
                         End If
 
                         'Sort returned Tests/Sample Types by Preloaded flag (System Tests first), Name and SampleType

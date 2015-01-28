@@ -98,9 +98,15 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                 Else
                     Dim cmdText As String
+
+                    'AJG
+                    'cmdText = "DELETE twksOrderDemographics" & vbCrLf & _
+                    '          "  WHERE OrderID NOT IN (SELECT OrderID" & vbCrLf & _
+                    '          "                          FROM twksOrderTests)"
+
                     cmdText = "DELETE twksOrderDemographics" & vbCrLf & _
-                              "  WHERE OrderID NOT IN (SELECT OrderID" & vbCrLf & _
-                              "                          FROM twksOrderTests)"
+                              "  WHERE NOT EXISTS (SELECT OrderID" & vbCrLf & _
+                              "                   FROM twksOrderTests WHERE twksOrderDemographics.OrderID = OrderID)"
 
                     Dim cmd As SqlCommand
 

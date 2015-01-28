@@ -860,6 +860,29 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT RCP.AnalyzerID, RCP.WorkSessionID, RCP.RotorType, RCP.CellNumber, " & vbCrLf & _
+                        '                              " (CASE WHEN RE.PatientID IS NULL THEN RE.SampleID ELSE RE.PatientID END) AS ExternalPID, " & vbCrLf & _
+                        '                              "  RE.SampleType, REOT.StatFlag, NULL AS PatientID, 1 AS CompletedFlag, 0 AS NotSampleType, " & vbCrLf & _
+                        '                              "  'COMPLETED' AS LISStatus, RCP.BarCodeInfo, NULL AS MessageID, RCP.RingNumber, WSA.WSStatus, RCP.Status AS CellStatus " & vbCrLf & _
+                        '                        " FROM   twksWSRotorContentByPosition RCP INNER JOIN twksWSRequiredElements RE ON RCP.ElementID = RE.ElementID " & vbCrLf & _
+                        '                                                                                                    " AND RCP.WorkSessionID = RE.WorkSessionID " & vbCrLf & _
+                        '                                                                                                    " AND RE.TubeContent = 'PATIENT' " & vbCrLf & _
+                        '                                                                " INNER JOIN twksWSRequiredElemByOrderTest REOT ON RE.ElementID = REOT.ElementID " & vbCrLf & _
+                        '                                                                " INNER JOIN twksWSAnalyzers WSA ON RCP.AnalyzerID    = WSA.AnalyzerID " & vbCrLf & _
+                        '                                                                                              " AND RCP.WorkSessionID = WSA.WorkSessionID " & vbCrLf & _
+                        '                        " WHERE  RCP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                        " AND    RCP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                        " AND    RCP.RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '                        " AND    RCP.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
+                        '                        " AND   (RCP.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf & _
+                        '                        " AND    RCP.BarcodeInfo IN (SELECT RC.BarcodeInfo FROM twksWSRotorContentByPosition RC " & vbCrLf & _
+                        '                                                   " WHERE  RC.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                                                   " AND    RC.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                                   " AND    RC.RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '                                                   " AND    RC.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
+                        '                                                   " AND   (RC.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf
+
                         Dim cmdText As String = " SELECT RCP.AnalyzerID, RCP.WorkSessionID, RCP.RotorType, RCP.CellNumber, " & vbCrLf & _
                                                       " (CASE WHEN RE.PatientID IS NULL THEN RE.SampleID ELSE RE.PatientID END) AS ExternalPID, " & vbCrLf & _
                                                       "  RE.SampleType, REOT.StatFlag, NULL AS PatientID, 1 AS CompletedFlag, 0 AS NotSampleType, " & vbCrLf & _
@@ -875,14 +898,32 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    RCP.RotorType     = 'SAMPLES' " & vbCrLf & _
                                                 " AND    RCP.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
                                                 " AND   (RCP.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf & _
-                                                " AND    RCP.BarcodeInfo IN (SELECT RC.BarcodeInfo FROM twksWSRotorContentByPosition RC " & vbCrLf & _
-                                                                           " WHERE  RC.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                                           " AND    RC.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                                           " AND    RC.RotorType     = 'SAMPLES' " & vbCrLf & _
-                                                                           " AND    RC.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
-                                                                           " AND   (RC.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf
+                                                " AND    EXISTS (SELECT RC.BarcodeInfo FROM twksWSRotorContentByPosition RC " & vbCrLf & _
+                                                                " WHERE  RC.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                                " AND    RC.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                                " AND    RC.RotorType     = 'SAMPLES' " & vbCrLf & _
+                                                                " AND    RC.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
+                                                                " AND   (RC.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf & _
+                                                                " AND    RCP.BarcodeInfo = RC.BarcodeInfo" & vbCrLf
 
                         If (pExcludeDuplicates) Then cmdText &= " GROUP BY RC.BarcodeInfo HAVING COUNT(*) = 1 " & vbCrLf
+                        'AJG
+                        'cmdText &= " ) UNION " & vbCrLf & _
+                        '           " SELECT BPW.*, RCP.RingNumber, WSA.WSStatus, RCP.Status AS CellStatus " & vbCrLf & _
+                        '           " FROM   twksWSBarcodePositionsWithNoRequests BPW INNER JOIN twksWSRotorContentByPosition RCP ON BPW.AnalyzerID    = RCP.AnalyzerID " & vbCrLf & _
+                        '                                                                                                      " AND BPW.WorkSessionID = RCP.WorkSessionID " & vbCrLf & _
+                        '                                                                                                      " AND BPW.RotorType     = RCP.RotorType " & vbCrLf & _
+                        '                                                                                                      " AND BPW.CellNumber    = RCP.CellNumber " & vbCrLf & _
+                        '                                                           " INNER JOIN twksWSAnalyzers WSA ON BPW.AnalyzerID    = WSA.AnalyzerID " & vbCrLf & _
+                        '                                                                                         " AND BPW.WorkSessionID = WSA.WorkSessionID " & vbCrLf & _
+                        '           " WHERE  BPW.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '           " AND    BPW.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '           " AND    BPW.RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '           " AND    BPW.BarcodeInfo IN (SELECT BP.BarcodeInfo FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
+                        '                                      " WHERE  BP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                                      " AND    BP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                      " AND    BP.RotorType     = 'SAMPLES' " & vbCrLf
+
                         cmdText &= " ) UNION " & vbCrLf & _
                                    " SELECT BPW.*, RCP.RingNumber, WSA.WSStatus, RCP.Status AS CellStatus " & vbCrLf & _
                                    " FROM   twksWSBarcodePositionsWithNoRequests BPW INNER JOIN twksWSRotorContentByPosition RCP ON BPW.AnalyzerID    = RCP.AnalyzerID " & vbCrLf & _
@@ -894,10 +935,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " WHERE  BPW.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                    " AND    BPW.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                    " AND    BPW.RotorType     = 'SAMPLES' " & vbCrLf & _
-                                   " AND    BPW.BarcodeInfo IN (SELECT BP.BarcodeInfo FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
-                                                              " WHERE  BP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                              " AND    BP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                              " AND    BP.RotorType     = 'SAMPLES' " & vbCrLf
+                                   " AND    EXISTS (SELECT BP.BarcodeInfo FROM twksWSBarcodePositionsWithNoRequests BP " & vbCrLf & _
+                                                   " WHERE  BP.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                   " AND    BP.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                   " AND    BP.RotorType     = 'SAMPLES' " & vbCrLf & _
+                                                   " AND    BPW.BarcodeInfo  = BP.BarcodeInfo " & vbCrLf
 
                         If (pExcludeDuplicates) Then cmdText &= " GROUP BY BP.BarcodeInfo HAVING COUNT(*) = 1 " & vbCrLf
                         cmdText &= " ) ORDER BY ExternalPID, SampleType " & vbCrLf
@@ -2093,10 +2135,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= " MultiTubeNumber = NULL "
                     cmdText &= " WHERE RotorType = '" & GlobalEnumerates.Rotors.SAMPLES.ToString() & "' "
                     cmdText &= " AND (Status = 'NO_INUSE' "
-                    cmdText &= " AND CellNumber NOT IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions "
-                    cmdText &= "                        WHERE AnalyzerID = '" & pAnalyzerID & "' "
-                    cmdText &= "                        AND WorkSessionID = '" & pWorkSessionID & "' "
-                    cmdText &= "                        AND RotorType = '" & GlobalEnumerates.Rotors.SAMPLES.ToString() & "')) "
+                    'AJG
+                    'cmdText &= " AND CellNumber NOT IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions "
+                    cmdText &= " AND NOT EXISTS (SELECT CellNumber FROM twksWSNotInUseRotorPositions "
+                    cmdText &= "                WHERE AnalyzerID = '" & pAnalyzerID & "' "
+                    'AJG
+                    cmdText &= "                AND twksWSRotorContentByPosition.CellNumber = CellNumber"
+                    cmdText &= "                AND WorkSessionID = '" & pWorkSessionID & "' "
+                    cmdText &= "                AND RotorType = '" & GlobalEnumerates.Rotors.SAMPLES.ToString() & "')) "
                     cmdText &= " OR BarcodeStatus = 'ERROR' "
 
                     If (cmdText <> "") Then
@@ -2354,21 +2400,38 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Dim cmdText As String = " UPDATE twksWSRotorContentByPosition " & vbCrLf
                     If (pNewElementStatus <> String.Empty) Then
                         'It is an IN USE Calibrator, update fields Status and TubeType for all Calibrator kit positions - search them in table of required WS Elements
+                        'AJG
+                        'cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "', " & vbCrLf & _
+                        '                  " Status   = '" & pNewElementStatus.Trim & "' " & vbCrLf & _
+                        '           " WHERE (ElementID IN (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
+                        '                                " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                " AND    TubeContent   = 'CALIB' " & vbCrLf & _
+                        '                                " AND    CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+
                         cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "', " & vbCrLf & _
                                           " Status   = '" & pNewElementStatus.Trim & "' " & vbCrLf & _
-                                   " WHERE (ElementID IN (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
+                                   " WHERE EXISTS (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
                                                         " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                         " AND    TubeContent   = 'CALIB' " & vbCrLf & _
-                                                        " AND    CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+                                                        " AND    CalibratorID  = " & pCalibratorID.ToString & " AND twksWSRotorContentByPosition.ElementID = ElementID) " & vbCrLf
                     Else
                         'It is a NOT IN USE Calibrator, update field TubeType for all Calibrator kit positions - search them in table of not in use WS Elements
+                        'AJG
+                        'cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "' " & vbCrLf & _
+                        '           " WHERE  (CellNumber IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions " & vbCrLf & _
+                        '                                  " WHERE AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                  " AND   WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                  " AND   RotorType     = 'SAMPLES' " & vbCrLf & _
+                        '                                  " AND   TubeContent   = 'CALIB' " & vbCrLf & _
+                        '                                  " AND   CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+
                         cmdText &= " SET    TubeType = '" & pNewTubeType.Trim & "' " & vbCrLf & _
-                                   " WHERE  (CellNumber IN (SELECT CellNumber FROM twksWSNotInUseRotorPositions " & vbCrLf & _
+                                   " WHERE  EXISTS (SELECT CellNumber FROM twksWSNotInUseRotorPositions " & vbCrLf & _
                                                           " WHERE AnalyzerID    = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                           " AND   WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                           " AND   RotorType     = 'SAMPLES' " & vbCrLf & _
                                                           " AND   TubeContent   = 'CALIB' " & vbCrLf & _
-                                                          " AND   CalibratorID  = " & pCalibratorID.ToString & ")) " & vbCrLf
+                                                          " AND   CalibratorID  = " & pCalibratorID.ToString & " AND twksWSRotorContentByPosition.CellNumber = CellNumber) " & vbCrLf
                     End If
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)

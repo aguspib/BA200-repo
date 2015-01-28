@@ -648,9 +648,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                             cmdText &= " WHERE  VirtualRotorID = " & pVirtualRotorID
                         ElseIf (String.Compare(pRotorType, String.Empty, False) <> 0) Then
                             'Get content of the Internal Rotor of the informed type
-                            cmdText &= " WHERE VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
-                                                                " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
-                                                                " AND    InternalRotor = 1) "
+                            'AJG
+                            'cmdText &= " WHERE VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                            '                                    " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                            '                                    " AND    InternalRotor = 1) "
+                            cmdText &= " WHERE EXISTS (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                                                      " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                                                      " AND    InternalRotor = 1 AND tparVirtualRotorPositions.VirtualRotorID = VirtualRotorID) "
                         End If
 
                         Dim myVRotorPosDataDS As New VirtualRotorPosititionsDS
@@ -716,12 +720,20 @@ Namespace Biosystems.Ax00.DAL.DAO
                                       " AND    RingNumber     = " & pRingNumber & vbCrLf & _
                                       " AND    CellNumber     = " & pCellNumber & vbCrLf
                         Else
+                            'AJG
+                            'cmdText = " SELECT * FROM tparVirtualRotorPositions " & vbCrLf & _
+                            '          " WHERE  RingNumber = " & pRingNumber & vbCrLf & _
+                            '          " AND    CellNumber = " & pCellNumber & vbCrLf & _
+                            '          " AND    VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                            '                                    " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
+                            '                                    " AND    InternalRotor = 1) "
+
                             cmdText = " SELECT * FROM tparVirtualRotorPositions " & vbCrLf & _
                                       " WHERE  RingNumber = " & pRingNumber & vbCrLf & _
                                       " AND    CellNumber = " & pCellNumber & vbCrLf & _
-                                      " AND    VirtualRotorID IN (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
+                                      " AND    EXISTS (SELECT VirtualRotorID FROM tparVirtualRotors " & vbCrLf & _
                                                                 " WHERE  RotorType     = '" & pRotorType & "' " & vbCrLf & _
-                                                                " AND    InternalRotor = 1) "
+                                                                " AND    InternalRotor = 1 AND tparVirtualRotorPositions.VirtualRotorID = VirtualRotorID) "
                         End If
 
                         Dim queryResults As New VirtualRotorPosititionsDS

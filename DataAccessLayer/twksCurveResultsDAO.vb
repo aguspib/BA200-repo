@@ -309,10 +309,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
 
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE from twksCurveResults " & vbCrLf & _
+                    '                        " WHERE CurveResultsID IN (SELECT DISTINCT CurveResultsID " & vbCrLf & _
+                    '                                                 " FROM   twksResults " & vbCrLf & _
+                    '                                                 " WHERE  OrderTestID = " & pOrderTestID.ToString & ") " & vbCrLf
+
                     Dim cmdText As String = " DELETE from twksCurveResults " & vbCrLf & _
-                                            " WHERE CurveResultsID IN (SELECT DISTINCT CurveResultsID " & vbCrLf & _
-                                                                     " FROM   twksResults " & vbCrLf & _
-                                                                     " WHERE  OrderTestID = " & pOrderTestID.ToString & ") " & vbCrLf
+                                            " WHERE EXISTS (SELECT CurveResultsID " & vbCrLf & _
+                                                           " FROM   twksResults " & vbCrLf & _
+                                                           " WHERE  OrderTestID = " & pOrderTestID.ToString & " AND twksCurveResults.CurveResultsID = CurveResultsID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

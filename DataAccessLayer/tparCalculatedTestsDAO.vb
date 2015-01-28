@@ -855,9 +855,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                         '                                              " AND    TestType  = 'CALC' " & vbCrLf & _
                         '                                              " AND    [Value] = '" & pTestID.ToString & "') " & vbCrLf
 
+                        'AJG
+                        'Dim cmdText As String = " SELECT * FROM tparCalculatedTests " & vbCrLf & _
+                        '" WHERE  CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf & _
+                        '                      " WHERE  ValueType = 'TEST' " & vbCrLf
+
                         Dim cmdText As String = " SELECT * FROM tparCalculatedTests " & vbCrLf & _
-                        " WHERE  CalcTestID IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf & _
-                                              " WHERE  ValueType = 'TEST' " & vbCrLf
+                        " WHERE EXISTS (SELECT CalcTestID FROM tparFormulas " & vbCrLf & _
+                                       " WHERE  ValueType = 'TEST' AND tparCalculatedTests.CalcTestID = CalcTestID " & vbCrLf
 
                         cmdText &= " AND    TestType  = '" & pTestType & "' " & vbCrLf & _
                                    " AND    [Value] = '" & pTestID.ToString & "') " & vbCrLf
@@ -935,8 +940,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                             Case "CALC"
                                 cmdText &= " SELECT 'CALC' AS TestTypeCode, SampleType AS SampleTypeCode, CalcTestID AS TestCode, CalcTestLongName AS TestName, Available " & vbCrLf
                                 cmdText &= " FROM   tparCalculatedTests" & vbCrLf
-                                cmdText &= " WHERE  CalcTestID NOT IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf
-                                cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC') " & vbCrLf
+                                'AJG
+                                'cmdText &= " WHERE  CalcTestID NOT IN (SELECT CalcTestID FROM tparFormulas " & vbCrLf
+                                'cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC') " & vbCrLf
+                                cmdText &= " WHERE NOT EXISTS (SELECT CalcTestID FROM tparFormulas " & vbCrLf
+                                cmdText &= "                           WHERE ValueType = 'TEST' AND TestType  = 'CALC' AND tparCalculatedTests.CalcTestID = CalcTestID) " & vbCrLf
                                 cmdText &= " ORDER BY TestTypeCode, SampleTypeCode, TestName"
 
                                 ' ISE: field PreloadedTest doesn't exist in ISE table because all ISE Tests are intrinsically Factory Tests, so for ISE PreloadedTest is set to 1 as a fixed value.
@@ -1017,23 +1025,42 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String
                     If (Not pUpdateForExcluded) Then
+                        'AJG
+                        'cmdText = " UPDATE tparCalculatedTests " & _
+                        '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                        '          " WHERE  CalcTestID IN (SELECT DISTINCT WSOT.TestID " & _
+                        '                                " FROM   vwksWSOrderTests WSOT " & _
+                        '                                " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                        '                                " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                        '                                " AND    WSOT.SampleClass = 'PATIENT' " & _
+                        '                                " AND    WSOT.TestType = 'CALC') "
                         cmdText = " UPDATE tparCalculatedTests " & _
                                   " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                                  " WHERE  CalcTestID IN (SELECT DISTINCT WSOT.TestID " & _
-                                                        " FROM   vwksWSOrderTests WSOT " & _
-                                                        " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
-                                                        " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                        " AND    WSOT.SampleClass = 'PATIENT' " & _
-                                                        " AND    WSOT.TestType = 'CALC') "
+                                  " WHERE EXISTS (SELECT WSOT.TestID " & _
+                                                 " FROM   vwksWSOrderTests WSOT " & _
+                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                                                 " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                                 " AND    WSOT.SampleClass = 'PATIENT' " & _
+                                                 " AND    WSOT.TestType = 'CALC' AND tparCalculatedTests.CalcTestID = WSOT.TestID) "
                     Else
+                        'AJG
+                        'cmdText = " UPDATE tparCalculatedTests " & _
+                        '          " SET    InUse = 0 " & _
+                        '          " WHERE  CalcTestID NOT IN (SELECT DISTINCT WSOT.TestID " & _
+                        '                                    " FROM   vwksWSOrderTests WSOT " & _
+                        '                                    " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
+                        '                                    " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                        '                                    " AND    WSOT.SampleClass = 'PATIENT' " & _
+                        '                                    " AND    WSOT.TestType = 'CALC') " & _
+                        '          " AND    InUse = 1 "
                         cmdText = " UPDATE tparCalculatedTests " & _
                                   " SET    InUse = 0 " & _
-                                  " WHERE  CalcTestID NOT IN (SELECT DISTINCT WSOT.TestID " & _
+                                  " WHERE NOT EXISTS (SELECT WSOT.TestID " & _
                                                             " FROM   vwksWSOrderTests WSOT " & _
                                                             " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & _
                                                             " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
                                                             " AND    WSOT.SampleClass = 'PATIENT' " & _
-                                                            " AND    WSOT.TestType = 'CALC') " & _
+                                                            " AND    WSOT.TestType = 'CALC' AND tparCalculatedTests.CalcTestID = WSOT.TestID) " & _
                                   " AND    InUse = 1 "
                     End If
 
@@ -1334,11 +1361,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                     Else
                         'Set the EnableStatus of all Calculated Tests having the specified one included in 
                         'their Formula
-                        cmdText &= " WHERE CalcTestID IN (SELECT CalcTestID " & _
-                                                         " FROM   tparFormulas " & _
-                                                         " WHERE  ValueType = 'TEST' " & _
-                                                         " AND    TestType  = 'CALC' " & _
-                                                         " AND    [Value] = '" & pCalcTestID.ToString & "') "
+                        'AJG
+                        'cmdText &= " WHERE CalcTestID IN (SELECT CalcTestID " & _
+                        '                                 " FROM   tparFormulas " & _
+                        '                                 " WHERE  ValueType = 'TEST' " & _
+                        '                                 " AND    TestType  = 'CALC' " & _
+                        '                                 " AND    [Value] = '" & pCalcTestID.ToString & "') "
+
+                        cmdText &= " WHERE EXISTS (SELECT CalcTestID " & _
+                                                  " FROM   tparFormulas " & _
+                                                  " WHERE  ValueType = 'TEST' " & _
+                                                  " AND    TestType  = 'CALC' " & _
+                                                  " AND    [Value] = '" & pCalcTestID.ToString & "' AND tparCalculatedTests.CalcTestID = CalcTestID) "
                     End If
 
                     Dim cmd As New SqlCommand

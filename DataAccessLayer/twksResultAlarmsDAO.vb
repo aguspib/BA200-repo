@@ -179,9 +179,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE FROM twksResultAlarms " & _
+                    '          " WHERE  OrderTestID NOT IN (SELECT OrderTestID " & _
+                    '                                     " FROM twksWSOrderTests) "
+
                     cmdText = " DELETE FROM twksResultAlarms " & _
-                              " WHERE  OrderTestID NOT IN (SELECT OrderTestID " & _
-                                                         " FROM twksWSOrderTests) "
+                              " WHERE  NOT EXISTS (SELECT OrderTestID " & _
+                                                         " FROM twksWSOrderTests WHERE twksResultAlarms.OrderTestID = OrderTestID) "
 
                     Dim cmd As New SqlCommand
                     cmd = New SqlCommand
@@ -220,9 +225,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE FROM twksResultAlarms " & _
+                    '          " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & _
+                    '                                 " WHERE OrderID = '" & pOrderID & "') "
+
                     cmdText = " DELETE FROM twksResultAlarms " & _
-                              " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & _
-                                                     " WHERE OrderID = '" & pOrderID & "') "
+                              " WHERE  EXISTS (SELECT OrderTestID FROM twksOrderTests " & _
+                                                     " WHERE OrderID = '" & pOrderID & "' AND twksResultAlarms.OrderTestID = OrderTestID) "
 
                     Dim dbCmd As New SqlCommand
                     dbCmd.Connection = pDBConnection

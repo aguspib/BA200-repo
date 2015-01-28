@@ -114,11 +114,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksWSOrderTests " & vbCrLf & _
+                    '                        " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                        " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksOrderTests OT " & vbCrLf & _
+                    '                                               " WHERE  OT.OrderID = '" & pOrderID & "') " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksWSOrderTests " & vbCrLf & _
                                             " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                            " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
-                                                                   " FROM   twksOrderTests OT " & vbCrLf & _
-                                                                   " WHERE  OT.OrderID = '" & pOrderID & "') " & vbCrLf
+                                            " AND    EXISTS (SELECT OT.OrderTestID " & vbCrLf & _
+                                                            " FROM   twksOrderTests OT " & vbCrLf & _
+                                                            " WHERE  OT.OrderID = '" & pOrderID & "' AND twksWSOrderTests.OrderTestID = OT.OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -240,14 +247,24 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksWSOrderTests " & vbCrLf & _
+                    '                        " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                        " AND    OpenOTFlag = 1 " & vbCrLf & _
+                    '                        " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                    '                                               " WHERE  OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                    '                                               " AND    O.SampleClass = '" & pSampleClass & "' " & vbCrLf & _
+                    '                                               " AND   (LISRequest IS NULL OR LISRequest = 0)) " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksWSOrderTests " & vbCrLf & _
                                             " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
                                             " AND    OpenOTFlag = 1 " & vbCrLf & _
-                                            " AND    OrderTestID IN (SELECT OT.OrderTestID " & vbCrLf & _
-                                                                   " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
-                                                                   " WHERE  OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                                                                   " AND    O.SampleClass = '" & pSampleClass & "' " & vbCrLf & _
-                                                                   " AND   (LISRequest IS NULL OR LISRequest = 0)) " & vbCrLf
+                                            " AND    EXISTS (SELECT OT.OrderTestID " & vbCrLf & _
+                                                            " FROM   twksOrderTests OT INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & vbCrLf & _
+                                                            " WHERE  OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                                                            " AND    O.SampleClass = '" & pSampleClass & "' " & vbCrLf & _
+                                                            " AND   (LISRequest IS NULL OR LISRequest = 0) AND twksWSOrderTests.OrderTestID = OT.OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -613,6 +630,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT COUNT(*) AS NumWithNoExec " & vbCrLf & _
+                        '                        " FROM   twksWSOrderTests WSOT INNER JOIN twksWSRequiredElemByOrderTest WSREOT " & vbCrLf & _
+                        '                                                             " ON WSOT.OrderTestID = WSREOT.OrderTestID " & vbCrLf & _
+                        '                                                            " AND WSREOT.ElementID = " & pElementID.ToString & vbCrLf & _
+                        '                        " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                        " AND    WSOT.ToSendFlag = 1 " & vbCrLf & _
+                        '                        " AND    WSOT.OpenOTFlag = 0 " & vbCrLf & _
+                        '                        " AND    WSOT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions " & vbCrLf & _
+                        '                                                         " WHERE WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+
                         Dim cmdText As String = " SELECT COUNT(*) AS NumWithNoExec " & vbCrLf & _
                                                 " FROM   twksWSOrderTests WSOT INNER JOIN twksWSRequiredElemByOrderTest WSREOT " & vbCrLf & _
                                                                                      " ON WSOT.OrderTestID = WSREOT.OrderTestID " & vbCrLf & _
@@ -620,8 +648,8 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND    WSOT.ToSendFlag = 1 " & vbCrLf & _
                                                 " AND    WSOT.OpenOTFlag = 0 " & vbCrLf & _
-                                                " AND    WSOT.OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions " & vbCrLf & _
-                                                                                 " WHERE WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+                                                " AND    NOT EXISTS (SELECT OrderTestID FROM twksWSExecutions " & vbCrLf & _
+                                                                    " WHERE WorkSessionID = '" & pWorkSessionID & "' AND WSOT.OrderTestID = OrderTestID) " & vbCrLf
 
                         Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                             resultData.SetDatos = dbCmd.ExecuteScalar()
@@ -1305,10 +1333,15 @@ Namespace Biosystems.Ax00.DAL.DAO
                         End If
 
                         If (pOrderTestID = -1) Then
-                            cmdText &= " AND WSOT.OrderTestID NOT IN (SELECT DISTINCT OrderTestID FROM twksWSExecutions " & vbCrLf & _
-                                                                    " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                                    " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                                    " AND    SampleClass   = '" & pSampleClass.Trim & "') " & vbCrLf
+                            'AJG
+                            'cmdText &= " AND WSOT.OrderTestID NOT IN (SELECT DISTINCT OrderTestID FROM twksWSExecutions " & vbCrLf & _
+                            '                                        " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                            '                                        " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                            '                                        " AND    SampleClass   = '" & pSampleClass.Trim & "') " & vbCrLf
+                            cmdText &= " AND NOT EXISTS (SELECT DISTINCT OrderTestID FROM twksWSExecutions " & vbCrLf & _
+                                                        " WHERE  AnalyzerID    = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                        " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                        " AND    SampleClass   = '" & pSampleClass.Trim & "' AND WSOT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             'Filter by an specific Order Test 
                             cmdText &= " AND WSOT.OrderTestID = " & pOrderTestID & vbCrLf

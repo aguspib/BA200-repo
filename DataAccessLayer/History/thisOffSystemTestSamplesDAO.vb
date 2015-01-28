@@ -117,10 +117,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM thisOffSystemTestSamples " & vbCrLf & _
+                    '                        " WHERE  ClosedOffSystemTest  = 1 " & vbCrLf & _
+                    '                        " AND    HistOffSystemTestID  NOT IN (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
+                    '                                                            " WHERE  TestType = 'OFFS') " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM thisOffSystemTestSamples " & vbCrLf & _
                                             " WHERE  ClosedOffSystemTest  = 1 " & vbCrLf & _
-                                            " AND    HistOffSystemTestID  NOT IN (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
-                                                                                " WHERE  TestType = 'OFFS') " & vbCrLf
+                                            " AND NOT EXISTS (SELECT HistTestID  FROM thisWSOrderTests " & vbCrLf & _
+                                                              " WHERE  TestType = 'OFFS' AND thisOffSystemTestSamples.HistOffSystemTestID = HistTestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

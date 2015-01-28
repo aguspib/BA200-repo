@@ -257,10 +257,18 @@ Partial Public Class tparContaminationsDAO
                 resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 resultData.HasError = True
             Else
+                'AJG
+                'Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                '                        " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
+                '                        " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                '                                                          " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                '                        " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
+                '                        " AND     TestContaminaCuvetteID = " & pTestID & ") "
+
                 Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
                                         " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
-                                        " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
-                                                                          " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                                        " AND EXISTS (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                                                     " WHERE  TestID = " & pTestID & " AND tparContaminations.ReagentContaminatorID = ReagentID)) " & vbCrLf & _
                                         " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
                                         " AND     TestContaminaCuvetteID = " & pTestID & ") "
 
@@ -366,6 +374,19 @@ Partial Public Class tparContaminationsDAO
                                             " AND    RE2.WorkSessionID = '" & pWorkSessionID.Trim & "' AND RE2.TubeContent = 'REAGENT' " & vbCrLf
 
                     '(2) Subquery to get Washing Solutions to avoid Well Contaminations caused by Tests requested in the Work Session 
+                    'AJG
+                    'cmdText &= " UNION " & vbCrLf & _
+                    '           " SELECT WashingSolutionR1, WashingSolutionR2 " & vbCrLf & _
+                    '           " FROM   tparContaminations C INNER JOIN twksOrderTests OT ON C.TestContaminaCuvetteID = OT.TestID " & vbCrLf & _
+                    '           " WHERE  C.ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '           " AND   (C.WashingSolutionR1 IS NOT NULL OR C.WashingSolutionR2 IS NOT NULL) " & vbCrLf & _
+                    '           " AND    OT.TestType = 'STD' " & vbCrLf & _
+                    '           " AND    OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                    '           " AND    OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                    '                                     " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                                     " AND    OpenOTFlag    = 0 " & vbCrLf & _
+                    '                                     " AND    ToSendFlag    = 1) " & vbCrLf
+
                     cmdText &= " UNION " & vbCrLf & _
                                " SELECT WashingSolutionR1, WashingSolutionR2 " & vbCrLf & _
                                " FROM   tparContaminations C INNER JOIN twksOrderTests OT ON C.TestContaminaCuvetteID = OT.TestID " & vbCrLf & _
@@ -373,10 +394,10 @@ Partial Public Class tparContaminationsDAO
                                " AND   (C.WashingSolutionR1 IS NOT NULL OR C.WashingSolutionR2 IS NOT NULL) " & vbCrLf & _
                                " AND    OT.TestType = 'STD' " & vbCrLf & _
                                " AND    OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
-                               " AND    OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                         " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                         " AND    OpenOTFlag    = 0 " & vbCrLf & _
-                                                         " AND    ToSendFlag    = 1) " & vbCrLf
+                               " AND    EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                               " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                               " AND    OpenOTFlag    = 0 " & vbCrLf & _
+                                               " AND    ToSendFlag    = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
 
                     '(3) Subquery to get Washing Solution needed to clean Wells that remain contaminated from the previous Work Session
                     cmdText &= " UNION " & vbCrLf & _
@@ -495,12 +516,20 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'AJG
+                    'Dim cmdText As String = " SELECT * FROM tparTestReagents TR " & vbCrLf & _
+                    '                        " WHERE  TR.TestID = " & pContaminatorTestID & vbCrLf & _
+                    '                        " AND    TR.ReagentID IN (SELECT C.ReagentContaminatedID " & vbCrLf & _
+                    '                                                " FROM   tparContaminations C INNER JOIN tparTestReagents TR2 ON C.ReagentContaminatorID = TR2.ReagentID " & vbCrLf & _
+                    '                                                " WHERE  TR2.TestID = " & pContaminatedTestID & vbCrLf & _
+                    '                                                " AND    C.ContaminationType = 'R1') " & vbCrLf
+
                     Dim cmdText As String = " SELECT * FROM tparTestReagents TR " & vbCrLf & _
                                             " WHERE  TR.TestID = " & pContaminatorTestID & vbCrLf & _
-                                            " AND    TR.ReagentID IN (SELECT C.ReagentContaminatedID " & vbCrLf & _
-                                                                    " FROM   tparContaminations C INNER JOIN tparTestReagents TR2 ON C.ReagentContaminatorID = TR2.ReagentID " & vbCrLf & _
-                                                                    " WHERE  TR2.TestID = " & pContaminatedTestID & vbCrLf & _
-                                                                    " AND    C.ContaminationType = 'R1') " & vbCrLf
+                                            " AND    EXISTS (SELECT C.ReagentContaminatedID " & vbCrLf & _
+                                                            " FROM   tparContaminations C INNER JOIN tparTestReagents TR2 ON C.ReagentContaminatorID = TR2.ReagentID " & vbCrLf & _
+                                                            " WHERE  TR2.TestID = " & pContaminatedTestID & vbCrLf & _
+                                                            " AND    C.ContaminationType = 'R1' AND TR.ReagentID = C.ReagentContaminatedID) " & vbCrLf
 
                     Dim myTestReagentsDS As New TestReagentsDS
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
@@ -680,12 +709,22 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'Dim cmdText As String = " SELECT C.ContaminationID, C.ContaminationType, C.ReagentContaminatorID, C.ReagentContaminatedID, " & vbCrLf & _
+                    '                               " C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
+                    '                        " FROM   tparContaminations C " & vbCrLf & _
+                    '                        " WHERE  (C.ContaminationType IN ('R1', 'R2') " & vbCrLf & _
+                    '                        " AND     C.ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                    '                                                            " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                    '                        " OR     (C.ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '                        " AND     C.TestContaminaCuvetteID = " & pTestID & ") " & vbCrLf & _
+                    '                        " ORDER BY C.ContaminationType "
+
                     Dim cmdText As String = " SELECT C.ContaminationID, C.ContaminationType, C.ReagentContaminatorID, C.ReagentContaminatedID, " & vbCrLf & _
                                                    " C.TestContaminaCuvetteID, C.WashingSolutionR1, C.WashingSolutionR2 " & vbCrLf & _
                                             " FROM   tparContaminations C " & vbCrLf & _
                                             " WHERE  (C.ContaminationType IN ('R1', 'R2') " & vbCrLf & _
-                                            " AND     C.ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
-                                                                                " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                                            " AND    EXISTS (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                                                            " WHERE  TestID = " & pTestID & " AND C.ReagentContaminatorID = ReagentID)) " & vbCrLf & _
                                             " OR     (C.ContaminationType = 'CUVETTES' " & vbCrLf & _
                                             " AND     C.TestContaminaCuvetteID = " & pTestID & ") " & vbCrLf & _
                                             " ORDER BY C.ContaminationType "
@@ -748,10 +787,17 @@ Partial Public Class tparContaminationsDAO
             If (Not resultData.HasError And Not resultData.SetDatos Is Nothing) Then
                 dbConnection = CType(resultData.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'Dim cmdText As String = " SELECT * FROM tparContaminations " & vbCrLf & _
+                    '                        " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
+                    '                        " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                    '                                                          " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                    '                        " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '                        " AND     TestContaminaCuvetteID = " & pTestID & ") "
+
                     Dim cmdText As String = " SELECT * FROM tparContaminations " & vbCrLf & _
                                             " WHERE  (ContaminationType IN ('R1', 'R2') " & vbCrLf & _
-                                            " AND     ReagentContaminatorID IN (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
-                                                                              " WHERE  TestID = " & pTestID & ")) " & vbCrLf & _
+                                            " AND    EXISTS (SELECT ReagentID FROM tparTestReagents " & vbCrLf & _
+                                                            " WHERE  TestID = " & pTestID & " AND tparContaminations.ReagentContaminatorID = ReagentID)) " & vbCrLf & _
                                             " OR     (ContaminationType = 'CUVETTES' " & vbCrLf & _
                                             " AND     TestContaminaCuvetteID = " & pTestID & ") "
 
@@ -1034,14 +1080,24 @@ Partial Public Class tparContaminationsDAO
             If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
                 dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
                 If (Not dbConnection Is Nothing) Then
+                    'AJG
+                    'Dim cmdText As String = "SELECT COUNT(*) AS NumContaminations " & vbCrLf & _
+                    '                        "FROM   tparContaminations " & vbCrLf & _
+                    '                        "WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
+                    '                        "AND    WashingSolutionR2 = '" & pWashingSolution & "' " & vbCrLf & _
+                    '                        "AND    TestContaminaCuvetteID IN (SELECT DISTINCT TestID FROM vwksWSOrderTests " & vbCrLf & _
+                    '                                                         " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                    '                                                         " AND    TestType = 'STD' " & vbCrLf & _
+                    '                                                         " AND    OpenOTFlag = 0) " & vbCrLf
+
                     Dim cmdText As String = "SELECT COUNT(*) AS NumContaminations " & vbCrLf & _
                                             "FROM   tparContaminations " & vbCrLf & _
                                             "WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
                                             "AND    WashingSolutionR2 = '" & pWashingSolution & "' " & vbCrLf & _
-                                            "AND    TestContaminaCuvetteID IN (SELECT DISTINCT TestID FROM vwksWSOrderTests " & vbCrLf & _
-                                                                             " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
-                                                                             " AND    TestType = 'STD' " & vbCrLf & _
-                                                                             " AND    OpenOTFlag = 0) " & vbCrLf
+                                            "AND    EXISTS (SELECT TestID FROM vwksWSOrderTests " & vbCrLf & _
+                                                           " WHERE  WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf & _
+                                                           " AND    TestType = 'STD' " & vbCrLf & _
+                                                           " AND    OpenOTFlag = 0 AND tparContaminations.TestContaminaCuvetteID = TestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
                         myGlobalDataTO.SetDatos = dbCmd.ExecuteScalar()
@@ -1083,10 +1139,16 @@ Partial Public Class tparContaminationsDAO
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
+                'AJG
+                'Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                '                        " WHERE  ContaminationType = 'R1' " & vbCrLf & _
+                '                        " AND    ReagentContaminatorID IN (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1) " & vbCrLf & _
+                '                        " AND    ReagentContaminatedID IN (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1) " & vbCrLf
+
                 Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
                                         " WHERE  ContaminationType = 'R1' " & vbCrLf & _
-                                        " AND    ReagentContaminatorID IN (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1) " & vbCrLf & _
-                                        " AND    ReagentContaminatedID IN (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1) " & vbCrLf
+                                        " AND    EXISTS (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1 AND tparContaminations.ReagentContaminatorID = ReagentID) " & vbCrLf & _
+                                        " AND    EXISTS (SELECT ReagentID FROM tparReagents WHERE PreloadedReagent = 1 AND tparContaminations.ReagentContaminatedID = ReagentID) " & vbCrLf
 
                 'Execute the SQL Sentence
                 Using dbCmd As New SqlCommand(cmdText, pDBConnection)
@@ -1122,9 +1184,14 @@ Partial Public Class tparContaminationsDAO
                 resultData.HasError = True
                 resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
             Else
+                'AJG
+                'Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
+                '                        " WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
+                '                        " AND    TestContaminaCuvetteID IN (SELECT TestID FROM tparTests WHERE PreloadedTest = 1) " & vbCrLf
+
                 Dim cmdText As String = " DELETE FROM tparContaminations " & vbCrLf & _
                                         " WHERE  ContaminationType = 'CUVETTES' " & vbCrLf & _
-                                        " AND    TestContaminaCuvetteID IN (SELECT TestID FROM tparTests WHERE PreloadedTest = 1) " & vbCrLf
+                                        " AND    EXISTS (SELECT TestID FROM tparTests WHERE PreloadedTest = 1 AND tparContaminations.TestContaminaCuvetteID = TestID) " & vbCrLf
 
                 'Execute the SQL Sentence
                 Using dbCmd As New SqlCommand(cmdText, pDBConnection)

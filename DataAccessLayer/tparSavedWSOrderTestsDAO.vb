@@ -286,14 +286,24 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.HasError = True
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM tparSavedWSOrderTests " & _
+                    '                        " WHERE  SavedWSID = " & pSavedWSID & _
+                    '                        " AND    SampleClass = 'PATIENT' " & _
+                    '                        " AND   (TestType = 'STD'  AND TestID NOT IN (SELECT TestID FROM tparTests)) " & _
+                    '                        " OR    (TestType = 'CALC' AND TestID NOT IN (SELECT CalcTestID FROM tparCalculatedTests)) " & _
+                    '                        " OR    (TestType = 'CALC' AND TestID IN (SELECT CalcTestID FROM tparCalculatedTests WHERE EnableStatus = 0)) " & _
+                    '                        " OR    (TestType = 'ISE'  AND TestID IN (SELECT ISETestID FROM tparISETests WHERE Enabled = 0)) " & _
+                    '                        " OR    (TestType = 'OFFS' AND TestID NOT IN (SELECT OffSystemTestID FROM tparOffSystemTests)) "
+
                     Dim cmdText As String = " DELETE FROM tparSavedWSOrderTests " & _
                                             " WHERE  SavedWSID = " & pSavedWSID & _
                                             " AND    SampleClass = 'PATIENT' " & _
-                                            " AND   (TestType = 'STD'  AND TestID NOT IN (SELECT TestID FROM tparTests)) " & _
-                                            " OR    (TestType = 'CALC' AND TestID NOT IN (SELECT CalcTestID FROM tparCalculatedTests)) " & _
-                                            " OR    (TestType = 'CALC' AND TestID IN (SELECT CalcTestID FROM tparCalculatedTests WHERE EnableStatus = 0)) " & _
-                                            " OR    (TestType = 'ISE'  AND TestID IN (SELECT ISETestID FROM tparISETests WHERE Enabled = 0)) " & _
-                                            " OR    (TestType = 'OFFS' AND TestID NOT IN (SELECT OffSystemTestID FROM tparOffSystemTests)) "
+                                            " AND   (TestType = 'STD'  AND NOT EXISTS (SELECT TestID FROM tparTests WHERE tparSavedWSOrderTests.TestID = TestID)) " & _
+                                            " OR    (TestType = 'CALC' AND NOT EXISTS (SELECT CalcTestID FROM tparCalculatedTests WHERE tparSavedWSOrderTests.TestID = CalcTestID)) " & _
+                                            " OR    (TestType = 'CALC' AND EXISTS     (SELECT CalcTestID FROM tparCalculatedTests WHERE EnableStatus = 0 AND tparSavedWSOrderTests.TestID = CalcTestID)) " & _
+                                            " OR    (TestType = 'ISE'  AND EXISTS     (SELECT ISETestID FROM tparISETests WHERE Enabled = 0 AND tparSavedWSOrderTests.TestID = ISETestID)) " & _
+                                            " OR    (TestType = 'OFFS' AND NOT EXISTS (SELECT OffSystemTestID FROM tparOffSystemTests WHERE tparSavedWSOrderTests.TestID = OffSystemTestID)) "
 
                     'Execute the SQL sentence 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
@@ -336,8 +346,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT COUNT(*) FROM tparSavedWSOrderTests " & vbCrLf & _
+                        '                        " WHERE  SavedWSID IN (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 1) " & vbCrLf & _
+                        '                        " AND    UPPER(SampleID) = UPPER(N'" & pSampleID.Trim.Replace("'", "''") & "') " & vbCrLf
+
                         Dim cmdText As String = " SELECT COUNT(*) FROM tparSavedWSOrderTests " & vbCrLf & _
-                                                " WHERE  SavedWSID IN (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 1) " & vbCrLf & _
+                                                " WHERE  EXISTS (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 1 AND tparSavedWSOrderTests.SavedWSID = SavedWSID) " & vbCrLf & _
                                                 " AND    UPPER(SampleID) = UPPER(N'" & pSampleID.Trim.Replace("'", "''") & "') " & vbCrLf
 
                         Dim thereAreOTs As Boolean = False
@@ -592,10 +607,22 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
+                        'AJG
+                        'Dim cmdText As String = " SELECT DISTINCT SampleID, StatFlag, MIN(CreationOrder) AS CreationOrder, " & vbCrLf & _
+                        '                                       " (CASE WHEN SampleID IS NULL THEN NULL " & vbCrLf & _
+                        '                                             " WHEN SUBSTRING(SampleID,1, 1)= '#' THEN 'AUTO' " & vbCrLf & _
+                        '                                             " WHEN SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
+                        '                                             " ELSE 'MANUAL' END) AS SampleIDType " & vbCrLf & _
+                        '                        " FROM   tparSavedWSOrderTests " & vbCrLf & _
+                        '                        " WHERE  SavedWSID = " & pSavedWSID.ToString & vbCrLf & _
+                        '                        " AND    SampleClass = 'PATIENT' " & vbCrLf & _
+                        '                        " GROUP BY SampleID, StatFlag " & vbCrLf & _
+                        '                        " ORDER BY StatFlag DESC, CreationOrder " & vbCrLf
+
                         Dim cmdText As String = " SELECT DISTINCT SampleID, StatFlag, MIN(CreationOrder) AS CreationOrder, " & vbCrLf & _
                                                                " (CASE WHEN SampleID IS NULL THEN NULL " & vbCrLf & _
                                                                      " WHEN SUBSTRING(SampleID,1, 1)= '#' THEN 'AUTO' " & vbCrLf & _
-                                                                     " WHEN SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
+                                                                     " WHEN EXISTS (SELECT PatientID FROM tparPatients WHERE tparSavedWSOrderTests.SampleID = PatientID) THEN 'DB' " & vbCrLf & _
                                                                      " ELSE 'MANUAL' END) AS SampleIDType " & vbCrLf & _
                                                 " FROM   tparSavedWSOrderTests " & vbCrLf & _
                                                 " WHERE  SavedWSID = " & pSavedWSID.ToString & vbCrLf & _
@@ -704,14 +731,34 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (Not dbConnection Is Nothing) Then
 
                         'AG 17/09/2014 - BA-1869 - Rewrite query adding LEFT OUTER JOIN clauses
-						Dim cmdText As String = " SELECT OT.SampleClass, OT.SampleID, OT.StatFlag, OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.Selected, " & vbCrLf & _
+                        'AJG
+                        'Dim cmdText As String = " SELECT OT.SampleClass, OT.SampleID, OT.StatFlag, OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.Selected, " & vbCrLf & _
+                        '                         " OT.ReplicatesNumber, OT.ControlID, OT.CreationOrder, OT.TestName, OT.FormulaText, OT.AwosID, OT.SpecimenID, " & vbCrLf & _
+                        '                         " OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.CalcTestIDs, OT.CalcTestNames, SW.SavedWSName, " & vbCrLf & _
+                        '                         " (CASE WHEN OT.ExternalQC IS NULL THEN 0 ELSE OT.ExternalQC END) AS ExternalQC,  " & vbCrLf & _
+                        '                         " (CASE WHEN OT.DeletedTestFlag IS NULL THEN 0 ELSE OT.DeletedTestFlag END) AS DeletedTestFlag, " & vbCrLf & _
+                        '                         " (CASE WHEN OT.SampleID IS NULL THEN NULL  " & vbCrLf & _
+                        '                               "WHEN SUBSTRING(OT.SampleID,1, 1)= '#' THEN 'AUTO' " & vbCrLf & _
+                        '                               "WHEN OT.SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
+                        '                               "ELSE 'MAN' END) AS PatienTIDType " & vbCrLf & _
+                        '                  " FROM   tparSavedWSOrderTests OT INNER JOIN tparSavedWS SW ON OT.SavedWSID = SW.SavedWSID  " & vbCrLf & _
+                        '                  " LEFT OUTER JOIN tparTests T ON OT.TestType = 'STD' AND OT.TestID = T.TestID " & vbCrLf & _
+                        '                  " LEFT OUTER JOIN tparCalculatedTests  CT ON OT.TestType = 'CALC' AND OT.TestID = CT.CalcTestID  " & vbCrLf & _
+                        '                  " LEFT OUTER JOIN tparISETests IT ON OT.TestType = 'ISE' AND OT.TestID = IT.ISETestID " & vbCrLf & _
+                        '                  " LEFT OUTER JOIN tparOffSystemTests OFT ON OT.TestType = 'OFFS' AND OT.TestID = OFT.OffSystemTestID " & vbCrLf & _
+                        '                  " WHERE  OT.SavedWSID =" & pSavedWSID & vbCrLf & _
+                        '                  " AND (CASE OT.TestType WHEN  'STD' THEN T.Available WHEN 'CALC' THEN CT.Available WHEN 'ISE' THEN IT.Available WHEN 'OFFS' THEN OFT.Available END) = 1 " & vbCrLf & _
+                        '" ORDER BY OT.SavedWSOrderTestID " 'BA-1963
+
+
+                        Dim cmdText As String = " SELECT OT.SampleClass, OT.SampleID, OT.StatFlag, OT.TestType, OT.TestID, OT.SampleType, OT.TubeType, OT.Selected, " & vbCrLf & _
                                " OT.ReplicatesNumber, OT.ControlID, OT.CreationOrder, OT.TestName, OT.FormulaText, OT.AwosID, OT.SpecimenID, " & vbCrLf & _
                                " OT.ESOrderID, OT.LISOrderID, OT.ESPatientID, OT.LISPatientID, OT.CalcTestIDs, OT.CalcTestNames, SW.SavedWSName, " & vbCrLf & _
                                " (CASE WHEN OT.ExternalQC IS NULL THEN 0 ELSE OT.ExternalQC END) AS ExternalQC,  " & vbCrLf & _
                                " (CASE WHEN OT.DeletedTestFlag IS NULL THEN 0 ELSE OT.DeletedTestFlag END) AS DeletedTestFlag, " & vbCrLf & _
                                " (CASE WHEN OT.SampleID IS NULL THEN NULL  " & vbCrLf & _
                                      "WHEN SUBSTRING(OT.SampleID,1, 1)= '#' THEN 'AUTO' " & vbCrLf & _
-                                     "WHEN OT.SampleID IN (SELECT PatientID FROM tparPatients) THEN 'DB' " & vbCrLf & _
+                                     "WHEN EXISTS (SELECT PatientID FROM tparPatients WHERE OT.SampleID = PatientID) THEN 'DB' " & vbCrLf & _
                                      "ELSE 'MAN' END) AS PatienTIDType " & vbCrLf & _
                         " FROM   tparSavedWSOrderTests OT INNER JOIN tparSavedWS SW ON OT.SavedWSID = SW.SavedWSID  " & vbCrLf & _
                         " LEFT OUTER JOIN tparTests T ON OT.TestType = 'STD' AND OT.TestID = T.TestID " & vbCrLf & _
@@ -720,7 +767,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                         " LEFT OUTER JOIN tparOffSystemTests OFT ON OT.TestType = 'OFFS' AND OT.TestID = OFT.OffSystemTestID " & vbCrLf & _
                         " WHERE  OT.SavedWSID =" & pSavedWSID & vbCrLf & _
                         " AND (CASE OT.TestType WHEN  'STD' THEN T.Available WHEN 'CALC' THEN CT.Available WHEN 'ISE' THEN IT.Available WHEN 'OFFS' THEN OFT.Available END) = 1 " & vbCrLf & _
-						" ORDER BY OT.SavedWSOrderTestID " 'BA-1963
+                        " ORDER BY OT.SavedWSOrderTestID " 'BA-1963
                         'AG 17/09/2014 - BA-1869
 
                         Dim SavedWSOrderTestsDS As New SavedWSOrderTestsDS
@@ -909,7 +956,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                                             " AND    TestType = '" & pTestType.Trim & "' " & vbCrLf
 
                     If (pSavedWSID = -1) Then
-                        cmdText &= " AND SavedWSID IN (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 0) " & vbCrLf
+                        'AJG
+                        'cmdText &= " AND SavedWSID IN (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 0) " & vbCrLf
+                        cmdText &= " AND EXISTS (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 0 AND tparSavedWSOrderTests.SavedWSID) " & vbCrLf
                     Else
                         cmdText &= " AND SavedWSID = " & pSavedWSID.ToString
                     End If
@@ -991,11 +1040,18 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE tparSavedWSOrderTests " & vbCrLf & _
+                    '                        " SET    DeletedTestFlag = 1, TestName = N'" & pLISValue.Trim & "' " & vbCrLf & _
+                    '                        " WHERE  TestType = '" & pTestType.Trim & "' " & vbCrLf & _
+                    '                        " AND    TestID = " & pTestID.ToString & vbCrLf & _
+                    '                        " AND    SavedWSID IN (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 1) " & vbCrLf
+
                     Dim cmdText As String = " UPDATE tparSavedWSOrderTests " & vbCrLf & _
                                             " SET    DeletedTestFlag = 1, TestName = N'" & pLISValue.Trim & "' " & vbCrLf & _
                                             " WHERE  TestType = '" & pTestType.Trim & "' " & vbCrLf & _
                                             " AND    TestID = " & pTestID.ToString & vbCrLf & _
-                                            " AND    SavedWSID IN (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 1) " & vbCrLf
+                                            " AND    EXISTS (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 1 AND tparSavedWSOrderTests.SavedWSID = SavedWSID) " & vbCrLf
 
                     'Filter data by SampleType when the optional parameter is informed
                     If (pSampleType <> String.Empty) Then cmdText &= " AND SampleType = '" & pSampleType.Trim & "' " & vbCrLf

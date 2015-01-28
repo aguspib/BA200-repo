@@ -326,10 +326,17 @@ Namespace Biosystems.Ax00.DAL.DAO
                         'AG 01/09/2010 - use optional parameter and change query if needed
                         'cmdText += "WHERE testcalibratorid in (select testcalibratorid from tpartestcalibrators where testid = " & pTestID & ") "
                         If (pSampleType = "") Then
-                            cmdText &= "WHERE TestCalibratorID IN (SELECT TestCalibratorID FROM tparTestCalibrators WHERE TestID = " & pTestID & ") "
+                            'AJG
+                            'cmdText &= "WHERE TestCalibratorID IN (SELECT TestCalibratorID FROM tparTestCalibrators WHERE TestID = " & pTestID & ") "
+                            cmdText &= "WHERE EXISTS (SELECT TestCalibratorID FROM tparTestCalibrators WHERE TestID = " & pTestID & _
+                                        " AND tparTestCalibratorValues.TestCalibratorID = TestCalibratorID) " & vbCrLf
                         Else
-                            cmdText &= "WHERE TestCalibratorID IN (SELECT TestCalibratorID FROM tparTestCalibrators " & _
-                                                                 " WHERE  TestID = " & pTestID & " AND SampleType = '" & pSampleType & "' ) "
+                            'AJG
+                            'cmdText &= "WHERE TestCalibratorID IN (SELECT TestCalibratorID FROM tparTestCalibrators " & _
+                            '                                     " WHERE  TestID = " & pTestID & " AND SampleType = '" & pSampleType & "' ) "
+                            cmdText &= "WHERE EXISTS (SELECT TestCalibratorID FROM tparTestCalibrators " & _
+                                                                 " WHERE  TestID = " & pTestID & " AND SampleType = '" & pSampleType & _
+                                                                 "'  AND tparTestCalibratorValues.TestCalibratorID = TestCalibratorID) " & vbCrLf
                         End If
 
                         'AG 01/02/2011 - change DESC for ASC

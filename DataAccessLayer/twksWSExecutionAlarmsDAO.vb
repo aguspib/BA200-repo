@@ -183,10 +183,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksWSExecutionAlarms " & _
+                    '                        " WHERE  ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & _
+                    '                                               " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
+                    '                                               " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "')"
+
                     Dim cmdText As String = " DELETE twksWSExecutionAlarms " & _
-                                            " WHERE  ExecutionID IN (SELECT ExecutionID FROM twksWSExecutions " & _
-                                                                   " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
-                                                                   " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "')"
+                                            " WHERE  EXISTS (SELECT ExecutionID FROM twksWSExecutions " & _
+                                                            " WHERE  AnalyzerID = '" & pAnalyzerID.Trim.Replace("'", "''") & "' " & _
+                                                            " AND    WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' AND twksWSExecutionAlarms.ExecutionID = ExecutionID)"
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords += dbCmd.ExecuteNonQuery
