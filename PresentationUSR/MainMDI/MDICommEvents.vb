@@ -30,7 +30,7 @@ Partial Public Class UiAx00MainMDI
                                       ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles MDIAnalyzerManager.ReceptionEvent
 
         'TODO: If the syncronized execution or Instructions produces a bottle neck, this is the right place to add a thread sync buffer. Only IF REQUIRED. (invesitgate DB optimizations first)
-        Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread), True)
+        Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread), False)
 
     End Sub
 
