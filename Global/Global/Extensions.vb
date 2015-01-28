@@ -162,7 +162,9 @@ Namespace Biosystems.Ax00.Global
                 Else
                     control.BeginInvoke(code)
                 End If
+                Return
             End If
+            code.Invoke()
         End Sub
 
 
