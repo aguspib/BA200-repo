@@ -55,6 +55,7 @@
               <xs:element name="DecimalsAllowed" msprop:Generator_ColumnVarNameInTable="columnDecimalsAllowed" msprop:Generator_ColumnPropNameInRow="DecimalsAllowed" msprop:Generator_ColumnPropNameInTable="DecimalsAllowedColumn" msprop:Generator_UserColumnName="DecimalsAllowed" type="xs:short" minOccurs="0" />
               <xs:element name="TestPosition" msprop:Generator_ColumnVarNameInTable="columnTestPosition" msprop:Generator_ColumnPropNameInRow="TestPosition" msprop:Generator_ColumnPropNameInTable="TestPositionColumn" msprop:Generator_UserColumnName="TestPosition" type="xs:int" minOccurs="0" />
               <xs:element name="ControlLevel" msprop:Generator_ColumnVarNameInTable="columnControlLevel" msprop:Generator_ColumnPropNameInRow="ControlLevel" msprop:Generator_ColumnPropNameInTable="ControlLevelColumn" msprop:Generator_UserColumnName="ControlLevel" type="xs:int" minOccurs="0" />
+              <xs:element name="EnableStatus" msprop:Generator_ColumnVarNameInTable="columnEnableStatus" msprop:Generator_ColumnPropNameInRow="EnableStatus" msprop:Generator_ColumnPropNameInTable="EnableStatusColumn" msprop:Generator_UserColumnName="EnableStatus" type="xs:boolean" default="true" minOccurs="0" />
             </xs:sequence>
           </xs:complexType>
         </xs:element>
