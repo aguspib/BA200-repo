@@ -468,7 +468,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                       " AND    WSOT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                       " AND    WSOT.SampleClass = 'PATIENT' " & vbCrLf & _
-                                                      " AND    WSOT.TestType = 'OFFS' tparOffSystemTests.OffSystemTestID = WSOT.TestID) " & vbCrLf & _
+                                                      " AND    WSOT.TestType = 'OFFS' AND tparOffSystemTests.OffSystemTestID = WSOT.TestID) " & vbCrLf & _
                                   " AND    InUse = 1 " & vbCrLf
                     End If
 

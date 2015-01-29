@@ -2591,6 +2591,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                    " AND   O.SampleClass = 'PATIENT' " & vbCrLf
 
                         '...finally, get all Patient Samples linked to the informed WorkSession for Off-System Tests as unselected and Open
+                        'AJG
                         'cmdText &= " UNION " & vbCrLf & _
                         '           " SELECT DISTINCT OT.Selected AS Selected, O.SampleClass AS SampleClass, O.StatFlag, O.PatientID, O.SampleID, O.OrderID, OT.TubeType, " & vbCrLf & _
                         '                  " OT.OrderTestID, OT.TestType, OT.TestID, OST.[Name] AS TestName, OT.SampleType, OT.ReplicatesNumber AS NumReplicates,  OT.LISRequest, " & vbCrLf & _

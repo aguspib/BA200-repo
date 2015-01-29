@@ -904,7 +904,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                                 " AND    RC.RotorType     = 'SAMPLES' " & vbCrLf & _
                                                                 " AND    RC.Status NOT IN ('FREE', 'NO_INUSE') " & vbCrLf & _
                                                                 " AND   (RC.BarCodeInfo IS NOT NULL AND  RCP.BarCodeInfo <> '') " & vbCrLf & _
-                                                                " AND    RCP.BarcodeInfo = RC.BarcodeInfo" & vbCrLf
+                                                                " AND    RCP.BarcodeInfo = RC.BarcodeInfo " & vbCrLf
 
                         If (pExcludeDuplicates) Then cmdText &= " GROUP BY RC.BarcodeInfo HAVING COUNT(*) = 1 " & vbCrLf
                         'AJG

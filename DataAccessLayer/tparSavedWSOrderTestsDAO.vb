@@ -958,7 +958,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (pSavedWSID = -1) Then
                         'AJG
                         'cmdText &= " AND SavedWSID IN (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 0) " & vbCrLf
-                        cmdText &= " AND EXISTS (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 0 AND tparSavedWSOrderTests.SavedWSID) " & vbCrLf
+                        cmdText &= " AND EXISTS (SELECT SavedWSID FROM tparSavedWS WHERE FromLIMS = 0 AND tparSavedWSOrderTests.SavedWSID = SavedWSID) " & vbCrLf
                     Else
                         cmdText &= " AND SavedWSID = " & pSavedWSID.ToString
                     End If

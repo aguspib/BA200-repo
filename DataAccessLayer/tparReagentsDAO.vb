@@ -401,7 +401,7 @@ Partial Public Class tparReagentsDAO
                                                                          " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
                                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
                                               " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                              " AND    O.SampleClass = 'BLANK' AND tparReagents.ReagentIDM = TR.ReagentID) "
+                                              " AND    O.SampleClass = 'BLANK' AND tparReagents.ReagentID = TR.ReagentID) "
                 Else
                     'AJG
                     'cmdText = " UPDATE tparReagents " & _
