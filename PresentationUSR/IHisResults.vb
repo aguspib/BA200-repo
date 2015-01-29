@@ -1461,7 +1461,7 @@ Public Class UiHisResults
             If (Not VerifyExportToLISAllowed()) Then Return
 
             Dim StartTime As DateTime = Now
-            Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
+            Dim selectedRows = GetSelectedRows()
             If (selectedRows.Count = 0) Then Exit Sub
 
             'BT #1505 - Evaluate if the number of Historic Patient Results selected to Export to LIS is lower than the allowed limit
@@ -1574,7 +1574,7 @@ Public Class UiHisResults
             searchGroup.Enabled = pStatus
             exitButton.Enabled = pStatus
 
-            Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
+            Dim selectedRows = GetSelectedRows()
             historyDeleteButton.Enabled = (pStatus AndAlso selectedRows.Count > 0)
 
             'AG 24/07/2014 - #1886 - RQ00086
@@ -1712,7 +1712,7 @@ Public Class UiHisResults
     ''' <remarks>
     ''' Created by:  JB 24/10/2012
     ''' </remarks>
-    Protected Overridable Function GetSelectedRows() As List(Of HisWSResultsDS.vhisWSResultsRow)
+    Protected Overridable Function GetSelectedRows() As IEnumerable(Of HisWSResultsDS.vhisWSResultsRow)
         Try
             Dim dataTable As HisWSResultsDS.vhisWSResultsDataTable = DirectCast(historyGrid.DataSource, HisWSResultsDS.vhisWSResultsDataTable)
             If (dataTable IsNot Nothing) Then Return (From row In dataTable Where row.Selected).ToList
@@ -1733,8 +1733,8 @@ Public Class UiHisResults
     Private Sub SelectAllRows(ByVal selection As Boolean)
         Try
             UpdateFormBehavior(False)
-
-            Dim dataTable As HisWSResultsDS.vhisWSResultsDataTable = DirectCast(historyGrid.DataSource, HisWSResultsDS.vhisWSResultsDataTable)
+            'Me.historyGridView.BeginDataUpdate()
+            Dim dataTable = DirectCast(historyGrid.DataSource, HisWSResultsDS.vhisWSResultsDataTable)
             If (dataTable IsNot Nothing) Then
                 For Each row As HisWSResultsDS.vhisWSResultsRow In dataTable
                     row.Selected = selection
@@ -1747,6 +1747,7 @@ Public Class UiHisResults
             ShowMessage(Name & ".SelectAllRows ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         Finally
             UpdateFormBehavior(True)
+            'Me.historyGridView.EndDataUpdate()
         End Try
     End Sub
 
@@ -1817,10 +1818,11 @@ Public Class UiHisResults
             Dim StartTime As DateTime = Now                         '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
             'Dim myLogAcciones As New ApplicationLogManager()        '*** TO CONTROL THE TOTAL TIME OF CRITICAL PROCESSES ***
 
-            Dim myHisWSResults As New List(Of HisWSResultsDS.vhisWSResultsRow)
+            'Dim myHisWSResults As New List(Of HisWSResultsDS.vhisWSResultsRow)
+            Dim myHisWSResults As IEnumerable(Of HisWSResultsDS.vhisWSResultsRow) = Nothing
 
             'Get the list of Historic Patient Results selected in the grid
-            Dim myInitialHisWSResults As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
+            Dim myInitialHisWSResults = GetSelectedRows()
             sampleTypesChkComboBox.Properties.TextEditStyle = TextEditStyles.DisableTextEditor
 
             'For all Calculated Tests, search all Tests in the Formula and verify which Experimental Tests have to be printed 
@@ -1841,13 +1843,13 @@ Public Class UiHisResults
                 End If
             End If
 
-            If (myHisWSResults.Count > 0) Then
+            If (myHisWSResults IsNot Nothing AndAlso myHisWSResults.Count > 0) Then
                 'BT #1309 - Sort data to print by TestPosition field
-                Dim myHisWSResultsSorted As List(Of HisWSResultsDS.vhisWSResultsRow) = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
+                Dim myHisWSResultsSorted = (From a As HisWSResultsDS.vhisWSResultsRow In myHisWSResults _
                                                                                     Order By a.TestPosition _
                                                                                       Select a).ToList
 
-                myHisWSResults.Clear()
+                'myHisWSResults.Clear()
 
                 If (Not pCompactReport) Then
                     XRManager.ShowHistoricResultsByPatientSampleReport(myHisWSResultsSorted)
@@ -2161,7 +2163,7 @@ Public Class UiHisResults
         Try
             If (e.Column Is Nothing) Then Exit Sub
             If (e.Column.Name = "Selected") Then
-                Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
+                Dim selectedRows = GetSelectedRows()
 
                 e.Info.InnerElements.Clear()
                 e.Painter.DrawObject(e.Info)
@@ -2185,10 +2187,11 @@ Public Class UiHisResults
     ''' Modified by: AG 14/02/2014 - BT #1505 ==> Set declared lists to Nothing to release memory  
     ''' </remarks>
     Private Sub historyGridView_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles historyGridView.Click
+        SuspendLayout()
         Try
             With historyGridView.CalcHitInfo(historyGrid.PointToClient(MousePosition))
                 If (.InColumnPanel AndAlso Not .Column Is Nothing AndAlso .Column.Name = "Selected") Then
-                    Dim selectedRows As List(Of HisWSResultsDS.vhisWSResultsRow) = GetSelectedRows()
+                    Dim selectedRows = GetSelectedRows()
                     If (historyGridView.DataRowCount > 0) Then
                         SelectAllRows(selectedRows.Count <> historyGridView.DataRowCount)
                     End If
@@ -2200,6 +2203,7 @@ Public Class UiHisResults
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".historyGridView_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Name & ".historyGridView_Click ", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString(), ex.Message + " ((" + ex.HResult.ToString + "))")
         End Try
+        ResumeLayout()
     End Sub
 
     ''' <summary>
