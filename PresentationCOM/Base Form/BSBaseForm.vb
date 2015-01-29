@@ -1241,8 +1241,11 @@ Public Class BSBaseForm
     ''' </remarks>
     Protected Overrides Function ProcessDialogKey(ByVal keyData As Keys) As Boolean
         If (Me.ActiveControl IsNot Nothing) Then
-            If (Me.Name <> "IAx00MainMDI") AndAlso (keyData = Keys.Return AndAlso Me.ActiveControl.GetType.Name <> "BSButton") Then
-                If (String.Compare(Me.Name, "IAx00Login", False) <> 0) Then
+            'MIC: Please, avoid checking a data type by its name property. It is not safe, can be changed in code, renamed, etc.
+            'If (Me.Name <> "IAx00MainMDI") AndAlso (keyData = Keys.Return AndAlso Me.ActiveControl.GetType.Name <> "BSButton") Then
+            Dim formClassName = Me.GetType.Name
+            If (formClassName <> "UiAx00MainMDI") AndAlso (keyData = Keys.Return AndAlso Me.ActiveControl.GetType.Name <> "BSButton") Then
+                If (String.Compare(formClassName, "UiAx00Login", False) <> 0) Then
                     'Send the TAB key
                     SendKeys.Send("{Tab}")
                     Return True

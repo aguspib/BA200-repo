@@ -1300,7 +1300,7 @@ Partial Class UiWSTestSelectionAuxScreen
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSTestSelectionAuxScreen"
+        Me.Name = "UiWSTestSelectionAuxScreen"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsAdviceGroupBox.ResumeLayout(False)

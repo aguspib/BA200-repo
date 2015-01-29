@@ -3078,7 +3078,7 @@ Partial Class UiProgTest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgTest"
+        Me.Name = "UiProgTest"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
         Me.Text = "Test Programing"

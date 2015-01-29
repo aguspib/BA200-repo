@@ -195,7 +195,7 @@ Partial Class UiResultsSummaryTable
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IResultsSummaryTable"
+        Me.Name = "UiResultsSummaryTable"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsPatientGridGroupBox.ResumeLayout(False)

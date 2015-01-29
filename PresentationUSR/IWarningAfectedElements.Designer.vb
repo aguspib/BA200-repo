@@ -200,7 +200,7 @@ Partial Class UiWarningAfectedElements
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWarningAfectedElements"
+        Me.Name = "UiWarningAfectedElements"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "
         Me.AfectedElementGroupBox.ResumeLayout(False)

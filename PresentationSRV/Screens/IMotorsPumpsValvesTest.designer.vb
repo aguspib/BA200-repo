@@ -7548,7 +7548,7 @@ Partial Class UiMotorsPumpsValvesTest
         Me.Controls.Add(Me.BsTabPagesControl)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IMotorsPumpsValvesTest"
+        Me.Name = "UiMotorsPumpsValvesTest"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "MotorsTest"
         Me.BsMessagesPanel.ResumeLayout(False)

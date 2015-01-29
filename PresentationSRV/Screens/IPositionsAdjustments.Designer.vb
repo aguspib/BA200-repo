@@ -1984,7 +1984,7 @@ Partial Class UiPositionsAdjustments
         Me.Controls.Add(Me.BsTabPagesControl)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IPositionsAdjustments"
+        Me.Name = "UiPositionsAdjustments"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = ""
         Me.BsTabPagesControl.ResumeLayout(False)

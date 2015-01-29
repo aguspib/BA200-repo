@@ -552,7 +552,7 @@ Partial Class UiBarCodeAdjustments
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IBarCodeAdjustments"
+        Me.Name = "UiBarCodeAdjustments"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = ""
         Me.BsMessagesPanel.ResumeLayout(False)

@@ -530,7 +530,7 @@ Partial Class UiProgOffSystemTest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgOffSystemTest"
+        Me.Name = "UiProgOffSystemTest"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsTestDetailsGroupBox.ResumeLayout(False)

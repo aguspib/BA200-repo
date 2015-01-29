@@ -102,7 +102,7 @@ Partial Class UiWSTestSelectionWarning
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSTestSelectionWarning"
+        Me.Name = "UiWSTestSelectionWarning"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsNotPosWarningGroupBox.ResumeLayout(False)

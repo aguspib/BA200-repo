@@ -712,7 +712,7 @@ Partial Class UiResultsAbsCurve
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IResultsAbsCurve"
+        Me.Name = "UiResultsAbsCurve"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

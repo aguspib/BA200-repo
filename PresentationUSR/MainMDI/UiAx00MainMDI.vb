@@ -8012,7 +8012,7 @@ Partial Public Class UiAx00MainMDI
 
             Else
                 'RH 07/06/2011 Don't rely on changeable text strings, but in class type
-                ' (ActiveMdiChild.Name <> "IMonitor" versus TypeOf ActiveMdiChild Is IMonitor)
+                ' (ActiveMdiChild.Name <> "UiMonitor" versus TypeOf ActiveMdiChild Is IMonitor)
                 If (Not ActiveMdiChild Is Nothing) AndAlso (Not TypeOf ActiveMdiChild Is UiMonitor) Then
                     'Execute the closing code of the screen currently open
                     Dim myScreenName As String = ActiveMdiChild.Name

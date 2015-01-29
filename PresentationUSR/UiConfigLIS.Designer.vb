@@ -1138,7 +1138,7 @@ Partial Class UiConfigLIS
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IConfigLIS"
+        Me.Name = "UiConfigLIS"
         Me.ShowInTaskbar = False
         Me.Text = ""
         CType(Me.bsErrorProvider1, System.ComponentModel.ISupportInitialize).EndInit()

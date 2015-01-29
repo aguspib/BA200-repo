@@ -147,7 +147,7 @@ Partial Class UiWSManualRepetition
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSManualRepetition"
+        Me.Name = "UiWSManualRepetition"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

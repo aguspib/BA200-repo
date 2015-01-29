@@ -918,7 +918,7 @@ Partial Class UiStressModeTest
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IStressModeTest"
+        Me.Name = "UiStressModeTest"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "StressModeTest"
         Me.BsMessagesPanel.ResumeLayout(False)

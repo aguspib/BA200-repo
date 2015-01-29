@@ -303,7 +303,7 @@ Partial Class UiQCResultsEditionAux
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCResultsEditionAux"
+        Me.Name = "UiQCResultsEditionAux"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

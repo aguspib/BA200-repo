@@ -248,7 +248,7 @@ Partial Class UiProgAuxTestContaminations
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgAuxTestContaminations"
+        Me.Name = "UiProgAuxTestContaminations"
         Me.Text = " "
         Me.bsTestListGroupBox.ResumeLayout(False)
         CType(Me.bsContaminationsDataGridView, System.ComponentModel.ISupportInitialize).EndInit()

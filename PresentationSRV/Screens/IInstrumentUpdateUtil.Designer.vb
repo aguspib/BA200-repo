@@ -758,7 +758,7 @@ Partial Class UiInstrumentUpdateUtil
         Me.Controls.Add(Me.BsMessagesPanel)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IInstrumentUpdateUtil"
+        Me.Name = "UiInstrumentUpdateUtil"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.BsTabPagesControl.ResumeLayout(False)
         Me.BsAdjustmentsTab.ResumeLayout(False)

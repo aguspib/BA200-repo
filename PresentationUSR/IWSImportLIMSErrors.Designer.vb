@@ -189,7 +189,7 @@ Partial Class UiWSImportLIMSErrors
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSImportLIMSErrors"
+        Me.Name = "UiWSImportLIMSErrors"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

@@ -1263,7 +1263,7 @@ Partial Class UiTankLevelsAdjustments
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "ITankLevelsAdjustments"
+        Me.Name = "UiTankLevelsAdjustments"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.BsTabPagesControl.ResumeLayout(False)
         Me.BsScalesTabPage.ResumeLayout(False)

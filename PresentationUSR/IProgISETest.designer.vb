@@ -1197,7 +1197,7 @@ Partial Class UiProgISETest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgISETest"
+        Me.Name = "UiProgISETest"
         Me.ShowInTaskbar = False
         Me.Text = ""
         CType(Me.DecimalsUpDown, System.ComponentModel.ISupportInitialize).EndInit()

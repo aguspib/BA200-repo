@@ -2427,7 +2427,7 @@ Partial Class UiPhotometryAdjustments
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IPhotometryAdjustments"
+        Me.Name = "UiPhotometryAdjustments"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "PhotometryAdjustments"
         Me.BsTabPagesControl.ResumeLayout(False)
