@@ -591,23 +591,43 @@ Namespace Biosystems.Ax00.DAL.DAO
                 Else
                     Dim cmdText As String
                     If (Not pUpdateForExcluded) Then
+                        'AJG
+                        'cmdText = " UPDATE tparPatients " & vbCrLf & _
+                        '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
+                        '          " WHERE  PatientID IN (SELECT WSOT.PatientID " & vbCrLf & _
+                        '                               " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                        '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                               " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                               " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                        '                               " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf
                         cmdText = " UPDATE tparPatients " & vbCrLf & _
                                   " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & vbCrLf & _
-                                  " WHERE  PatientID IN (SELECT WSOT.PatientID " & vbCrLf & _
+                                  " WHERE  EXISTS (SELECT WSOT.PatientID " & vbCrLf & _
                                                        " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
                                                        " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                        " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                                        " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
-                                                       " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf
+                                                       " AND    WSOT.PatientID IS NOT NULL AND tparPatients.PatientID = WSOT.PatientID) " & vbCrLf
                     Else
+                        'AJG
+                        'cmdText = " UPDATE tparPatients " & vbCrLf & _
+                        '          " SET    InUse = 0 " & vbCrLf & _
+                        '          " WHERE  PatientID NOT IN (SELECT WSOT.PatientID " & vbCrLf & _
+                        '                                   " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                        '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                   " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                                   " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                        '                                   " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf & _
+                        '          " AND    InUse = 1 " & vbCrLf
+
                         cmdText = " UPDATE tparPatients " & vbCrLf & _
                                   " SET    InUse = 0 " & vbCrLf & _
-                                  " WHERE  PatientID NOT IN (SELECT WSOT.PatientID " & vbCrLf & _
-                                                           " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
-                                                           " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                           " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                           " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
-                                                           " AND    WSOT.PatientID IS NOT NULL) " & vbCrLf & _
+                                  " WHERE  NOT EXISTS (SELECT WSOT.PatientID " & vbCrLf & _
+                                                      " FROM   vwksWSOrderTests WSOT " & vbCrLf & _
+                                                      " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                      " AND    WSOT.AnalyzerID    = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                      " AND    WSOT.SampleClass   = 'PATIENT' " & vbCrLf & _
+                                                      " AND    WSOT.PatientID IS NOT NULL AND tparPatients.PatientID = WSOT.PatientID) " & vbCrLf & _
                                   " AND    InUse = 1 " & vbCrLf
                     End If
 

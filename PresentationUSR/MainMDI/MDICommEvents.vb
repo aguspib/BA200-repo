@@ -29,7 +29,8 @@ Partial Public Class UiAx00MainMDI
     Private Sub OnManageReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
                                       ByVal pRefreshEvent As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Handles MDIAnalyzerManager.ReceptionEvent
 
-        Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread))
+        'TODO: If the syncronized execution or Instructions produces a bottle neck, this is the right place to add a thread sync buffer. Only IF REQUIRED. (invesitgate DB optimizations first)
+        Me.UIThread(Function() ManageReceptionEvent(pInstructionReceived, pTreated, pRefreshEvent, pRefreshDS, pMainThread), False)
 
     End Sub
 
@@ -51,6 +52,7 @@ Partial Public Class UiAx00MainMDI
     '''              XB - 23/05/2014 - Do not shows ISE warnings if there are no ISE preparations into the WS - task #1638
     '''              XB - 20/06/2014 - improve the ISE Timeouts control (E:61) - Task #1441
     '''              AG 30/09/2014 - BA-1440 inform that is an automatic exportation when call method InvokeUploadResultsLIS
+    '''              MI+XB 27/01/2015 BA-2189 Added ToArray in order to prevent IEnumerable being modified from another thread, as it was causing concurrence issues on the For Each operation.
     ''' </remarks>
     Private Function ManageReceptionEvent(ByVal pInstructionReceived As String, _
                                          ByVal pTreated As Boolean, _
@@ -92,10 +94,10 @@ Partial Public Class UiAx00MainMDI
             'Check if the refresh event involves open the incomple samples screen
             Dim barcode_Samples_Warnings As Boolean = False
             If pRefreshEvent.Contains(GlobalEnumerates.UI_RefreshEvents.SENSORVALUE_CHANGED) Then
-                Dim lnqRes As List(Of UIRefreshDS.SensorValueChangedRow)
-                lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In pRefreshDS.SensorValueChanged _
+
+                Dim lnqRes = (From a As UIRefreshDS.SensorValueChangedRow In pRefreshDS.SensorValueChanged _
                           Where String.Equals(a.SensorID, GlobalEnumerates.AnalyzerSensors.BARCODE_WARNINGS.ToString) _
-                          Select a).ToList
+                          Select a)
 
                 If lnqRes.Count > 0 Then
                     If lnqRes(0).Value = 1 Then 'Samples barcode warnings
@@ -113,20 +115,18 @@ Partial Public Class UiAx00MainMDI
             End If
             'AG 04/04/2012
 
-            SyncLock lockThis
+            SyncLock LockThis
                 copyRefreshDS = CType(pRefreshDS.Copy(), UIRefreshDS)
-                ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'GlobalBase.CreateLogActivity("BEFORE pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
-                For Each item As GlobalEnumerates.UI_RefreshEvents In pRefreshEvent
+                'MI+XB 27/01/2015 BA-2189
+                For Each item In pRefreshEvent.ToArray
                     'copyRefreshEventList.Add(item)
                     If item = UI_RefreshEvents.BARCODE_POSITION_READ AndAlso incompleteSamplesOpenFlag Then
                         'In this case do not add item
                     Else
                         copyRefreshEventList.Add(item)
                     End If
+
                 Next
-                ''TR 18/09/2012 -Log to trace incase Exception error is race TO DELETE.
-                'GlobalBase.CreateLogActivity("AFTER pRefreshEvent FOR.", Me.Name & ".ManageReceptionEvent ", EventLogEntryType.FailureAudit, False)
 
                 If pRefreshEvent.Count > 0 Then MDIAnalyzerManager.ReadyToClearUIRefreshDS(pMainThread) 'Inform the ui refresh dataset can be cleared so they are already copied
             End SyncLock
@@ -370,30 +370,6 @@ Partial Public Class UiAx00MainMDI
                             Dim sensorValue As Single = 0
 
 
-                            ''ISE switch on changed
-                            'sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED)
-                            'If sensorValue = 1 Then
-                            '    ScreenWorkingProcess = False
-                            '    Me.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED) = 0 'Once updated UI clear sensor
-
-                            'End If
-
-                            ''ISE initiated
-                            'sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED)
-                            'If sensorValue >= 1 Then
-                            '    ScreenWorkingProcess = False
-
-                            '    Me.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_CONNECTION_FINISHED) = 0 'Once updated UI clear sensor
-
-                            'End If
-
-                            ''ISE ready changed
-                            'sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED)
-                            'If sensorValue = 1 Then
-                            '    ScreenWorkingProcess = False
-                            '    Me.MDIAnalyzerManager.SetSensorValue(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED) = 0 'Once updated UI clear sensor
-
-                            'End If
 
                             'ANSISE received SGM 12/06/2012
                             sensorValue = Me.MDIAnalyzerManager.GetSensorValue(GlobalEnumerates.AnalyzerSensors.ISECMD_ANSWER_RECEIVED)
@@ -451,16 +427,6 @@ Partial Public Class UiAx00MainMDI
                                     ' Continues with Work Session
                                     Me.StartSession(True)
 
-                                    ' XB 16/12/2013 - Manage Exceptions of ISE module - Task #1441
-                                    'ElseIf Me.StartSessionisInitialPUGsent AndAlso _
-                                    '       (Not Me.StartSessionisCALBsent And _
-                                    '        Not Me.StartSessionisPMCLsent And _
-                                    '        Not Me.StartSessionisBMCLsent) Then
-
-                                    ' XB 28/04/2014 - Task #1587
-                                    'ElseIf Me.StartSessionisInitialPUGsent AndAlso _
-                                    '       (Not Me.StartSessionisCALBsent And Not Me.StartSessionisPMCLsent And Not Me.StartSessionisBMCLsent) AndAlso _
-                                    '       MDIAnalyzerManager.ISE_Manager.LastProcedureResult <> ISEManager.ISEProcedureResult.Exception Then
 
                                 ElseIf (Me.StartSessionisInitialPUGAsent Or Me.StartSessionisInitialPUGBsent) AndAlso _
                                        (Not Me.StartSessionisCALBsent And Not Me.StartSessionisPMCLsent And Not Me.StartSessionisBMCLsent) AndAlso _
@@ -677,10 +643,6 @@ Partial Public Class UiAx00MainMDI
                             NotDisplayAbortMsg = True
                             bsTSAbortSessionButton.PerformClick()
                             NotDisplayAbortMsg = False
-                            'MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess) = "INPROCESS"
-                            'MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption) = ""
-                            'MDIAnalyzerManager.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = ""
-                            'myGlobal = MDIAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ABORT, True)
                         End If
                     End If
 
@@ -712,13 +674,6 @@ Partial Public Class UiAx00MainMDI
                 '                                 EventLogEntryType.FailureAudit, False)
             End If
 
-            'AG 17/07/2013 - Commented and moved until StartEnterInRunningMode to avoid create 2 threads calling EnterRunning method
-            ''AG 08/07/2013 - Special mode for work with LIS with automatic actions
-            'If autoWSCreationWithLISModeAttribute AndAlso (automateProcessCurrentState = LISautomateProcessSteps.subProcessDownloadOrders OrElse _
-            '                                               automateProcessCurrentState = LISautomateProcessSteps.ExitHostQueryNotAvailableButGoToRunning OrElse automateProcessCurrentState = LISautomateProcessSteps.ExitNoWorkOrders) Then
-            '    CreateAutomaticWSWithLIS()
-            'End If
-            ''AG 08/07/2013
 
 
             'Debug.Print("IAx00MainMDI.ManageReceptionEvent: " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0)) 'AG 12/06/2012 - time estimation
@@ -753,13 +708,6 @@ Partial Public Class UiAx00MainMDI
 
             '//JVV 20/09/2013 Si el evento de Auto_Report está activo, se tratará según este if
             If copyRefreshEventList.Contains(GlobalEnumerates.UI_RefreshEvents.AUTO_REPORT) Then
-                'Dim sOrderIDs As String = String.Empty
-                'With copyRefreshDS
-                '    For Each dr As DataRow In .AutoReport.Rows
-                '        sOrderIDs &= dr("OrderID").ToString & " / "
-                '    Next
-                'End With
-                'MessageBox.Show("AutoReport per: " & sOrderIDs)
 
                 '//1- marcar las ordenes como impresas una vez lo estén (campo Printed=1) -> twksResults ??
                 '//2- generar alarmas si ha habido un error en la impresión (impresora no disponible, etc.) ??

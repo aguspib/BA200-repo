@@ -540,7 +540,7 @@ Partial Class UiQCCumulatedReview
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCCumulatedReview"
+        Me.Name = "UiQCCumulatedReview"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsTestSampleGroupBox.ResumeLayout(False)

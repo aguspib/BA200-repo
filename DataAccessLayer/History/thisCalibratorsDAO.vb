@@ -120,10 +120,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM thisCalibrators " & vbCrLf & _
+                    '                        " WHERE  ClosedCalibrator = 1 " & vbCrLf & _
+                    '                        " AND    HistCalibratorID NOT IN (SELECT HistCalibratorID FROM thisTestCalibratorsValues) " & vbCrLf & _
+                    '                        " AND    HistCalibratorID NOT IN (SELECT HistCalibratorID FROM thisTestSamples) " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM thisCalibrators " & vbCrLf & _
                                             " WHERE  ClosedCalibrator = 1 " & vbCrLf & _
-                                            " AND    HistCalibratorID NOT IN (SELECT HistCalibratorID FROM thisTestCalibratorsValues) " & vbCrLf & _
-                                            " AND    HistCalibratorID NOT IN (SELECT HistCalibratorID FROM thisTestSamples) " & vbCrLf
+                                            " AND NOT EXISTS (SELECT HistCalibratorID FROM thisTestCalibratorsValues WHERE thisCalibrators.HistCalibratorID = HistCalibratorID) " & vbCrLf & _
+                                            " AND NOT EXISTS (SELECT HistCalibratorID FROM thisTestSamples WHERE thisCalibrators.HistCalibratorID = HistCalibratorID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

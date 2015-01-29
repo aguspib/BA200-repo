@@ -299,7 +299,7 @@ Partial Class UiWSIncompleteSamplesAuxScreen
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSIncompleteSamplesAuxScreen"
+        Me.Name = "UiWSIncompleteSamplesAuxScreen"
         Me.ShowInTaskbar = False
         Me.Text = "  "
         Me.bsOrderDetailsGroupBox.ResumeLayout(False)

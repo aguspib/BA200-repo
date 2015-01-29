@@ -962,8 +962,12 @@ Namespace Biosystems.Ax00.DAL.DAO
 
                     cmdText &= " AND WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf
                     cmdText &= " AND AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf
-                    cmdText &= " AND OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & vbCrLf
+                    'AJG
+                    'cmdText &= " AND OrderTestID IN (SELECT OrderTestID FROM twksOrderTests " & vbCrLf
+                    'cmdText &= "                     WHERE  TestID = " & pTestID & vbCrLf
+                    cmdText &= " AND EXISTS (SELECT OrderTestID FROM twksOrderTests " & vbCrLf
                     cmdText &= "                     WHERE  TestID = " & pTestID & vbCrLf
+                    cmdText &= " AND twksWSExecutions.OrderTestID = OrderTestID " & vbCrLf
 
                     If (pSampleType <> "") Then
                         cmdText &= " AND SampleType = '" & pSampleType & "' " & vbCrLf
@@ -1327,16 +1331,29 @@ Namespace Biosystems.Ax00.DAL.DAO
                         Dim additionalFilter As String = " AND RerunNumber = 1 "
                         If (pOrderTestID <> -1) Then additionalFilter = " AND OrderTestID = " & pOrderTestID.ToString
 
+                        'AJG
+                        'Dim cmdText As String = " SELECT DISTINCT OrderTestID FROM twksWSExecutions " & vbCrLf & _
+                        '                        " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                        " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                        " AND    ExecutionStatus IN ('PENDING', 'LOCKED') " & vbCrLf & _
+                        '                        additionalFilter & vbCrLf & _
+                        '                        " AND    OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions " & vbCrLf & _
+                        '                                                   " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                                   " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                        '                                                   " AND    ExecutionStatus NOT IN ('PENDING', 'LOCKED') " & vbCrLf & _
+                        '                                                   additionalFilter & ") " & vbCrLf & _
+                        '                        " ORDER BY OrderTestID " & vbCrLf
+
                         Dim cmdText As String = " SELECT DISTINCT OrderTestID FROM twksWSExecutions " & vbCrLf & _
                                                 " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                 " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                                 " AND    ExecutionStatus IN ('PENDING', 'LOCKED') " & vbCrLf & _
                                                 additionalFilter & vbCrLf & _
-                                                " AND    OrderTestID NOT IN (SELECT OrderTestID FROM twksWSExecutions " & vbCrLf & _
-                                                                           " WHERE  AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
-                                                                           " AND    WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
-                                                                           " AND    ExecutionStatus NOT IN ('PENDING', 'LOCKED') " & vbCrLf & _
-                                                                           additionalFilter & ") " & vbCrLf & _
+                                                " AND    NOT EXISTS (SELECT WSE.OrderTestID FROM twksWSExecutions WSE " & vbCrLf & _
+                                                                    " WHERE  WSE.AnalyzerID = '" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                                                                    " AND    WSE.WorkSessionID = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                                                                    " AND    WSE.ExecutionStatus NOT IN ('PENDING', 'LOCKED') " & vbCrLf & _
+                                                                           additionalFilter & " AND twksWSExecutions.OrderTestID = WSE.OrderTestID) " & vbCrLf & _
                                                 " ORDER BY OrderTestID " & vbCrLf
 
                         Dim myOTsToDeleteDS As New OrderTestsDS
@@ -3058,15 +3075,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString()
                 Else
+                    'AJG
+                    'Dim cmdText As String = " UPDATE twksWSExecutions SET ExecutionStatus = '" & pNewStatus.Trim & "' " & vbCrLf & _
+                    '                        " WHERE  WorkSessionID   = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
+                    '                        " AND    AnalyzerID      = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                    '                        " AND    ExecutionType   = 'PREP_ISE' " & vbCrLf & _
+                    '                        " AND    ExecutionStatus = '" & pCurrentStatus.Trim & "' " & vbCrLf & _
+                    '                        " AND    OrderTestID IN (SELECT OrderTestID " & vbCrLf & _
+                    '                                               " FROM   twksOrderTests OT INNER JOIN tparISETests IT ON OT.TestID = IT.ISETestID " & vbCrLf & _
+                    '                                               " WHERE  OT.TestType = 'ISE' " & vbCrLf & _
+                    '                                               " AND    UPPER(IT.ISE_ResultID) = UPPER('" & pISEElectrode.Trim & "')) " & vbCrLf
+
                     Dim cmdText As String = " UPDATE twksWSExecutions SET ExecutionStatus = '" & pNewStatus.Trim & "' " & vbCrLf & _
                                             " WHERE  WorkSessionID   = '" & pWorkSessionID.Trim & "' " & vbCrLf & _
                                             " AND    AnalyzerID      = N'" & pAnalyzerID.Trim.Replace("'", "''") & "' " & vbCrLf & _
                                             " AND    ExecutionType   = 'PREP_ISE' " & vbCrLf & _
                                             " AND    ExecutionStatus = '" & pCurrentStatus.Trim & "' " & vbCrLf & _
-                                            " AND    OrderTestID IN (SELECT OrderTestID " & vbCrLf & _
-                                                                   " FROM   twksOrderTests OT INNER JOIN tparISETests IT ON OT.TestID = IT.ISETestID " & vbCrLf & _
-                                                                   " WHERE  OT.TestType = 'ISE' " & vbCrLf & _
-                                                                   " AND    UPPER(IT.ISE_ResultID) = UPPER('" & pISEElectrode.Trim & "')) " & vbCrLf
+                                            " AND    EXISTS (SELECT OrderTestID " & vbCrLf & _
+                                                            " FROM   twksOrderTests OT INNER JOIN tparISETests IT ON OT.TestID = IT.ISETestID " & vbCrLf & _
+                                                            " WHERE  OT.TestType = 'ISE' " & vbCrLf & _
+                                                            " AND    UPPER(IT.ISE_ResultID) = UPPER('" & pISEElectrode.Trim & "') AND twksWSExecutions.OrderTestID = OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -3116,7 +3144,9 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText = cmdText & "   SET ExecutionStatus = 'LOCKED'" & vbCrLf
                     cmdText = cmdText & " WHERE WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf
                     cmdText = cmdText & " AND AnalyzerID = '" & pAnalyzerID & "' " & vbCrLf
-                    cmdText = cmdText & " AND ExecutionID IN (SELECT E.ExecutionID  FROM twksWSExecutions E " & vbCrLf
+                    'AJG
+                    'cmdText = cmdText & " AND ExecutionID IN (SELECT E.ExecutionID  FROM twksWSExecutions E " & vbCrLf
+                    cmdText = cmdText & " AND EXISTS (SELECT E.ExecutionID  FROM twksWSExecutions E " & vbCrLf
                     cmdText = cmdText & " INNER JOIN twksOrderTests OD ON E.OrderTestID = OD.OrderTestID " & vbCrLf
                     cmdText = cmdText & " INNER JOIN tparTestSamples TS ON OD.TestID = TS.TestID AND OD.SampleType = TS.SampleType " & vbCrLf
 
@@ -3133,7 +3163,7 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText = cmdText & " AND TS.PredilutionUseFlag = 'TRUE' AND TS.PredilutionMode = 'INST' " & vbCrLf
                     cmdText = cmdText & " AND TS.DiluentSolution = '" & pDiluentCode & "' " & vbCrLf
                     cmdText = cmdText & " AND E.WorkSessionID = '" & pWorkSessionID & "' " & vbCrLf
-                    cmdText = cmdText & " AND E.AnalyzerID = '" & pAnalyzerID & "' ) " & vbCrLf
+                    cmdText = cmdText & " AND E.AnalyzerID = '" & pAnalyzerID & "' AND twksWSExecutions.ExecutionID = E.ExecutionID) " & vbCrLf
 
                     'Execute the SQL sentence 
                     'AG 25/07/2014 #1886 - RQ00086 - improve memory usage
@@ -4533,10 +4563,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    WSE.ExecutionType = 'PREP_STD' " & vbCrLf & _
                                                 " AND   (WSE.SampleClass = 'CTRL' OR WSE.SampleClass = 'PATIENT') " & vbCrLf
 
+                        'AJG
+                        'If (pSampleType <> String.Empty) Then cmdText &= " AND (OT.SampleType = '" & pSampleType.Trim & "' " & vbCrLf & _
+                        '                                                 "  OR  OT.SampleType IN (SELECT TS.SampleType FROM tparTestSamples TS " & vbCrLf & _
+                        '                                                                        " WHERE  TS.TestID = " & pTestID.ToString & vbCrLf & _
+                        '                                                                        " AND    TS.SampleTypeAlternative = '" & pSampleType.Trim & "')) " & vbCrLf
+
                         If (pSampleType <> String.Empty) Then cmdText &= " AND (OT.SampleType = '" & pSampleType.Trim & "' " & vbCrLf & _
-                                                                         "  OR  OT.SampleType IN (SELECT TS.SampleType FROM tparTestSamples TS " & vbCrLf & _
+                                                                         "  OR  EXISTS (SELECT TS.SampleType FROM tparTestSamples TS " & vbCrLf & _
                                                                                                 " WHERE  TS.TestID = " & pTestID.ToString & vbCrLf & _
-                                                                                                " AND    TS.SampleTypeAlternative = '" & pSampleType.Trim & "')) " & vbCrLf
+                                                                                                " AND    TS.SampleTypeAlternative = '" & pSampleType.Trim & "' AND OT.SampleType = TS.SampleType)) " & vbCrLf
                         cmdText &= " ORDER BY WSE.SampleClass, WSE.ExecutionID " & vbCrLf
 
                         Dim executionDataDS As New ExecutionsDS

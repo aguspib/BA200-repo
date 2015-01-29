@@ -312,7 +312,10 @@ Namespace Biosystems.Ax00.DAL.DAO
                     cmdText &= "      ,LISTestName = NULL" & vbCrLf
                     cmdText &= "      ,LISSampleType = NULL" & vbCrLf
                     cmdText &= "      ,LISUnits = NULL" & vbCrLf
-                    cmdText &= " WHERE HistOrderTestID IN (SELECT DISTINCT HistOrderTestID FROM thisWSResults WHERE LISMessageID = '" & pLISMessageID & "')"
+                    'AJG. ADDED THOSE TWO LINES OF CODE
+                    'cmdText &= " WHERE HistOrderTestID IN (SELECT DISTINCT HistOrderTestID FROM thisWSResults WHERE LISMessageID = '" & pLISMessageID & "')"
+                    cmdText &= " WHERE EXISTS (SELECT HistOrderTestID FROM thisWSResults WHERE LISMessageID = '" & pLISMessageID & "' " & vbCrLf
+                    cmdText &= " AND thisWSOrderTests.HistOrderTestID = HistOrderTestID) "
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

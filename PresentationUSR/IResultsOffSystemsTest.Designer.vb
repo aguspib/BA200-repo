@@ -168,7 +168,7 @@ Partial Class UiResultsOffSystemsTest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IResultsOffSystemsTest"
+        Me.Name = "UiResultsOffSystemsTest"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

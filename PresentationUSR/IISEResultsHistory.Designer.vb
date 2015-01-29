@@ -1512,7 +1512,7 @@ Partial Class UiISEResultsHistory
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IISEResultsHistory"
+        Me.Name = "UiISEResultsHistory"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " "

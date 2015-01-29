@@ -375,7 +375,7 @@ Partial Class UiQCCumulateControlResults
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCCumulateControlResults"
+        Me.Name = "UiQCCumulateControlResults"
         Me.ShowInTaskbar = False
         Me.bsControlListGroupBox.ResumeLayout(False)
         Me.bsControlGroupBox.ResumeLayout(False)

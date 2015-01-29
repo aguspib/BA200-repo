@@ -350,10 +350,10 @@ Partial Class UiHisAlarms
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IHisAlarms"
+        Me.Name = "UiHisAlarms"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
-        Me.Text = "IHisAlarms"
+        Me.Text = "UiHisAlarms"
         Me.bsSearchGroup.ResumeLayout(False)
         Me.bsHistoryGroup.ResumeLayout(False)
         CType(Me.xtraHistoryGrid, System.ComponentModel.ISupportInitialize).EndInit()

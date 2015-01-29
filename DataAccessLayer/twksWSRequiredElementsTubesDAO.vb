@@ -227,9 +227,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksWSRequiredElementsTubes " & vbCrLf & _
+                    '                        " WHERE  ElementID IN (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
+                    '                                             " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksWSRequiredElementsTubes " & vbCrLf & _
-                                            " WHERE  ElementID IN (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
-                                                                 " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "') " & vbCrLf
+                                            " WHERE  EXISTS (SELECT ElementID FROM twksWSRequiredElements " & vbCrLf & _
+                                                            " WHERE  WorkSessionID = '" & pWorkSessionID.Trim & "' AND twksWSRequiredElementsTubes.ElementID = ElementID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

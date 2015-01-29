@@ -505,7 +505,7 @@ Partial Class UiProgCalculatedTest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgCalculatedTest"
+        Me.Name = "UiProgCalculatedTest"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsCalTestDefGroupBox.ResumeLayout(False)

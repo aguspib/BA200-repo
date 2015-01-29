@@ -491,7 +491,7 @@ Partial Class UiHistoricalReports
         Me.Controls.Add(Me.BsTitleLabel)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IHistoricalReports"
+        Me.Name = "UiHistoricalReports"
         Me.Text = "HistoricalReports"
         CType(Me.RepositoryItemRichTextEdit1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.SRVAdjustmentsDSBindingSource, System.ComponentModel.ISupportInitialize).EndInit()

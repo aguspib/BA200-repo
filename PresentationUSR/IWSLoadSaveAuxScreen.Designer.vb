@@ -142,7 +142,7 @@ Partial Class UiWSLoadSaveAuxScreen
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSLoadSaveAuxScreen"
+        Me.Name = "UiWSLoadSaveAuxScreen"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsLoadSaveGroupBox.ResumeLayout(False)

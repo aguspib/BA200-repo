@@ -220,7 +220,7 @@ Partial Class UiWSNotPosWarning
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSNotPosWarning"
+        Me.Name = "UiWSNotPosWarning"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsAdviceGroupBox.ResumeLayout(False)

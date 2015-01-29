@@ -438,16 +438,27 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
                     Dim cmdText As String
+                    'AJG
+                    'cmdText = " DELETE twksWSRequiredElemByOrderTest " & vbCrLf & _
+                    '          " WHERE  ElementID IN (SELECT ElementID " & vbCrLf & _
+                    '                               " FROM   twksWSRequiredElements " & vbCrLf & _
+                    '                               " WHERE  WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "') " & vbCrLf
+
                     cmdText = " DELETE twksWSRequiredElemByOrderTest " & vbCrLf & _
-                              " WHERE  ElementID IN (SELECT ElementID " & vbCrLf & _
+                              " WHERE  EXISTS (SELECT ElementID " & vbCrLf & _
                                                    " FROM   twksWSRequiredElements " & vbCrLf & _
-                                                   " WHERE  WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "') " & vbCrLf
+                                                   " WHERE  WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' AND twksWSRequiredElemByOrderTest.ElementID = ElementID) " & vbCrLf
 
                     If (pDelOnlyOpened) Then
-                        cmdText &= " AND OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
-                                                       " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
-                                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
-                                                       " AND    OT.OrderTestStatus = 'OPEN') " & vbCrLf
+                        'AJG
+                        'cmdText &= " AND OrderTestID IN (SELECT WSOT.OrderTestID " & vbCrLf & _
+                        '                               " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                        '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                        '                               " AND    OT.OrderTestStatus = 'OPEN') " & vbCrLf
+                        cmdText &= " AND EXISTS (SELECT WSOT.OrderTestID " & vbCrLf & _
+                                                " FROM   twksWSOrderTests WSOT INNER JOIN twksOrderTests OT ON WSOT.OrderTestID = OT.OrderTestID " & vbCrLf & _
+                                                " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID.Trim.Replace("'", "''") & "' " & vbCrLf & _
+                                                " AND    OT.OrderTestStatus = 'OPEN' AND twksWSRequiredElemByOrderTest.OrderTestID = WSOT.OrderTestID) " & vbCrLf
                     End If
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)

@@ -555,7 +555,7 @@ Partial Class UiLevelDetectionTest
         Me.Controls.Add(Me.BsLevelDetectionTestPanel)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "ILevelDetectionTest"
+        Me.Name = "UiLevelDetectionTest"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "StressModeTest"
         Me.BsMessagesPanel.ResumeLayout(False)

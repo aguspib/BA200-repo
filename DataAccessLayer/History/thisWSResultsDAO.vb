@@ -386,20 +386,38 @@ Namespace Biosystems.Ax00.DAL.DAO
                     If (String.Compare(pSampleClass.Trim, String.Empty, False) <> 0) Then sampleClassFilter = " = '" & pSampleClass.Trim & "' "
 
                     If (String.Compare(pAnalyzerID.Trim, String.Empty, False) = 0) Then
+                        'AJG
+                        'cmdText &= " WHERE ClosedResult = 0 " & vbCrLf & _
+                        '           " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                        '                                     " WHERE  SampleClass " & sampleClassFilter & vbCrLf & _
+                        '                                     " AND    TestType   =  'STD' " & vbCrLf & _
+                        '                                     " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+
                         cmdText &= " WHERE ClosedResult = 0 " & vbCrLf & _
-                                   " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                                   " AND EXISTS (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
                                                              " WHERE  SampleClass " & sampleClassFilter & vbCrLf & _
                                                              " AND    TestType   =  'STD' " & vbCrLf & _
-                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf & _
+                                                             " AND thisWSResults.HistOrderTestID = HistOrderTestID" & vbCrLf
 
                     Else
+                        'AJG
+                        'cmdText &= " WHERE  AnalyzerID  = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '           " AND   ClosedResult = 0 " & vbCrLf & _
+                        '           " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                        '                                     " WHERE  AnalyzerID =  N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
+                        '                                     " AND    SampleClass " & sampleClassFilter & vbCrLf & _
+                        '                                     " AND    TestType   =  'STD' " & vbCrLf & _
+                        '                                     " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+
                         cmdText &= " WHERE  AnalyzerID  = N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                    " AND   ClosedResult = 0 " & vbCrLf & _
-                                   " AND   HistOrderTestID IN (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
+                                   " AND EXISTS (SELECT HistOrderTestID FROM thisWSOrderTests " & vbCrLf & _
                                                              " WHERE  AnalyzerID =  N'" & pAnalyzerID.Trim & "' " & vbCrLf & _
                                                              " AND    SampleClass " & sampleClassFilter & vbCrLf & _
                                                              " AND    TestType   =  'STD' " & vbCrLf & _
-                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf
+                                                             " AND    HistTestID =  " & pHistTestID.ToString & vbCrLf & _
+                                                             " AND thisWSResults.HistOrderTestID = HistOrderTestID" & vbCrLf
                     End If
 
                     If (String.Compare(pSampleType.Trim, String.Empty, False) <> 0) Then cmdText &= " AND SampleType =  '" & pSampleType.Trim & "' " & vbCrLf

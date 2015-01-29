@@ -135,10 +135,16 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.HasError = True
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM tparSavedWS " & vbCrLf & _
+                    '                        " WHERE SavedWSID = " & pSavedWSID & vbCrLf & _
+                    '                        " AND   SavedWSID NOT IN (SELECT DISTINCT SavedWSID FROM tparSavedWSOrderTests " & vbCrLf & _
+                    '                                                 " WHERE SavedWSID = " & pSavedWSID & ") " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM tparSavedWS " & vbCrLf & _
                                             " WHERE SavedWSID = " & pSavedWSID & vbCrLf & _
-                                            " AND   SavedWSID NOT IN (SELECT DISTINCT SavedWSID FROM tparSavedWSOrderTests " & vbCrLf & _
-                                                                     " WHERE SavedWSID = " & pSavedWSID & ") " & vbCrLf
+                                            " AND   NOT EXISTS (SELECT DISTINCT SavedWSID FROM tparSavedWSOrderTests " & vbCrLf & _
+                                                               " WHERE SavedWSID = " & pSavedWSID & " AND tparSavedWS.SavedWSID = SavedWSID) " & vbCrLf
 
                     'Execute the SQL sentence 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)

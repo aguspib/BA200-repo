@@ -519,7 +519,7 @@ Partial Class UiProgControls
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgControls"
+        Me.Name = "UiProgControls"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsControlGroupBox.ResumeLayout(False)

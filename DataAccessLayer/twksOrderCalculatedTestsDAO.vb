@@ -78,9 +78,13 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'Dim cmdText As String = " DELETE twksOrderCalculatedTests " & vbCrLf & _
+                    '                        " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                    '                                               " WHERE  WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksOrderCalculatedTests " & vbCrLf & _
-                                            " WHERE  OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
-                                                                   " WHERE  WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+                                            " WHERE  EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                                            " WHERE  WorkSessionID = '" & pWorkSessionID & "' AND twksOrderCalculatedTests.OrderTestID = OrderTestID) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -164,9 +168,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                         cmdText &= "           FROM twksOrderCalculatedTests OCT INNER JOIN twksOrderTests OT ON OCT.CalcOrderTestID = OT.OrderTestID " & vbCrLf
                         cmdText &= "                                             INNER JOIN tparCalculatedTests CT ON OT.TestID = CT.CalcTestID " & vbCrLf
                         cmdText &= "                                             LEFT OUTER JOIN twksOrderTestsLISInfo OTL ON OCT.CalcOrderTestID = OTL.OrderTestID" & vbCrLf
-                        cmdText &= "          WHERE OCT.OrderTestID IN (SELECT OrderTestID " & vbCrLf
-                        cmdText &= "                                      FROM twksWSOrderTests " & vbCrLf
-                        cmdText &= "                                     WHERE WorkSessionID = '" & pWorkSessionID & "') " & vbCrLf
+                        'AJG
+                        'cmdText &= "          WHERE OCT.OrderTestID IN (SELECT OrderTestID " & vbCrLf
+                        cmdText &= "          WHERE EXISTS (SELECT OrderTestID " & vbCrLf
+                        cmdText &= "                        FROM twksWSOrderTests " & vbCrLf
+                        cmdText &= "                        WHERE WorkSessionID = '" & pWorkSessionID & "' AND OCT.OrderTestID = OrderTestID) " & vbCrLf
                         cmdText &= "            AND OT.TestType = 'CALC' " & vbCrLf
                         cmdText &= "ORDER BY OCT.OrderTestID "
 

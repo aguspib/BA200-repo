@@ -555,9 +555,9 @@ Partial Class UiHisResults
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IHisResults"
+        Me.Name = "UiHisResults"
         Me.ShowInTaskbar = False
-        Me.Text = "IHisResults"
+        Me.Text = "UiHisResults"
         Me.searchGroup.ResumeLayout(False)
         Me.searchGroup.PerformLayout()
         CType(Me.testTypesChkComboBox.Properties, System.ComponentModel.ISupportInitialize).EndInit()

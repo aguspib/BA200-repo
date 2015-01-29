@@ -497,9 +497,9 @@ Partial Class UiHisBlankCalibResults
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IHisBlankCalibResults"
+        Me.Name = "UiHisBlankCalibResults"
         Me.ShowInTaskbar = False
-        Me.Text = "IHisBlankCalibResults"
+        Me.Text = "UiHisBlankCalibResults"
         Me.searchGroup.ResumeLayout(False)
         Me.searchGroup.PerformLayout()
         Me.historyGroup.ResumeLayout(False)

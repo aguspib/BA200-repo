@@ -377,9 +377,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.HasError = True
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
+                    '                        " WHERE  OrderID = '" & pOrderID.Trim & "' " & vbCrLf & _
+                    '                        " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
                                             " WHERE  OrderID = '" & pOrderID.Trim & "' " & vbCrLf & _
-                                            " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+                                            " AND    NOT EXISTS (SELECT OrderID FROM twksOrderTests WHERE twksOrders.OrderID = OrderID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         dataToReturn.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -415,9 +420,14 @@ Namespace Biosystems.Ax00.DAL.DAO
                     dataToReturn.HasError = True
                     dataToReturn.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
+                    '                        " WHERE  SampleClass = '" & pSampleClass.Trim & "' " & vbCrLf & _
+                    '                        " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+
                     Dim cmdText As String = " DELETE FROM twksOrders " & vbCrLf & _
                                             " WHERE  SampleClass = '" & pSampleClass.Trim & "' " & vbCrLf & _
-                                            " AND    OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+                                            " AND    NOT EXISTS (SELECT OrderID FROM twksOrderTests WHERE twksOrders.OrderID = OrderID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         dataToReturn.AffectedRecords = dbCmd.ExecuteNonQuery()
@@ -473,12 +483,19 @@ Namespace Biosystems.Ax00.DAL.DAO
                                                 " AND    UPPER(OT.SampleType) = UPPER('" & pSampleType.Trim & "') " & vbCrLf
 
                         If (pWorkSessionID.Trim <> "") Then
+                            'AJG
+                            'cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
+                            '           " AND OT.TestType IN ('STD', 'ISE') " & vbCrLf & _
+                            '           " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                            '                                  " WHERE WorkSessionID = '" & pWorkSessionID.ToString & "' " & vbCrLf & _
+                            '                                  " AND   OpenOTFlag = 0 " & vbCrLf & _
+                            '                                  " AND   ToSendFlag = 1) " & vbCrLf
                             cmdText &= " AND OT.OrderTestStatus = 'OPEN' " & vbCrLf & _
                                        " AND OT.TestType IN ('STD', 'ISE') " & vbCrLf & _
-                                       " AND OT.OrderTestID IN (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
+                                       " AND EXISTS (SELECT OrderTestID FROM twksWSOrderTests " & vbCrLf & _
                                                               " WHERE WorkSessionID = '" & pWorkSessionID.ToString & "' " & vbCrLf & _
                                                               " AND   OpenOTFlag = 0 " & vbCrLf & _
-                                                              " AND   ToSendFlag = 1) " & vbCrLf
+                                                              " AND   ToSendFlag = 1 AND OT.OrderTestID = OrderTestID) " & vbCrLf
                         Else
                             cmdText &= " AND OT.OrderTestID IN (" & pOrderTestsList & ") " & vbCrLf
                         End If
@@ -664,8 +681,12 @@ Namespace Biosystems.Ax00.DAL.DAO
                     resultData.HasError = True
                     resultData.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE twksOrders " & vbCrLf & _
+                    '                        " WHERE  OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+
                     Dim cmdText As String = " DELETE twksOrders " & vbCrLf & _
-                                            " WHERE  OrderID NOT IN (SELECT OrderID FROM twksOrderTests) " & vbCrLf
+                                            " WHERE  NOT EXISTS (SELECT OrderID FROM twksOrderTests WHERE twksOrders.OrderID = OrderID) " & vbCrLf
 
                     Using dbCmd As New SqlCommand(cmdText, pDBConnection)
                         resultData.AffectedRecords = dbCmd.ExecuteNonQuery()

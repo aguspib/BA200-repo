@@ -10900,11 +10900,11 @@ Partial Class UiMonitor
         Me.LookAndFeel.UseDefaultLookAndFeel = false
         Me.MaximizeBox = false
         Me.MinimizeBox = false
-        Me.Name = "IMonitor"
+        Me.Name = "UiMonitor"
         Me.ShowIcon = false
         Me.ShowInTaskbar = false
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual
-        Me.Text = "IMonitor"
+        Me.Text = "UiMonitor"
         CType(Me.MonitorTabs,System.ComponentModel.ISupportInitialize).EndInit
         Me.MonitorTabs.ResumeLayout(false)
         Me.MainTab.ResumeLayout(false)

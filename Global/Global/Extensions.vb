@@ -139,16 +139,35 @@ Namespace Biosystems.Ax00.Global
         ''' </summary>
         ''' <remarks>
         ''' Created by: RH - 26/05/2011
+        ''' Modified by: MI+XB 27/01/2015 BA-2189 
         ''' http://www.codeproject.com/KB/cs/AvoidingInvokeRequired.aspx
         ''' </remarks>
         <Extension()> _
         Public Sub UIThread(ByVal control As System.Windows.Forms.Control, ByVal code As Action)
+            'This method uses async version of UIThread(control, code, async flag) (see method below)
+            UIThread(control, code, False)
+        End Sub
+        ''' <summary>
+        ''' Created by MI+XB 27/01/2015 BA-2189
+        ''' </summary>
+        ''' <param name="control">Control execxution context for the thread operation</param>
+        ''' <param name="code">Delegate of the code being executed</param>
+        ''' <param name="WaitExecution">Request sync or async execution</param>
+        ''' <remarks></remarks>
+        <Extension()> _
+        Public Sub UIThread(ByVal control As System.Windows.Forms.Control, ByVal code As Action, WaitExecution As Boolean)
             If (control.InvokeRequired) Then
-                control.BeginInvoke(code)
+                If WaitExecution Then
+                    control.Invoke(code)
+                Else
+                    control.BeginInvoke(code)
+                End If
                 Return
             End If
             code.Invoke()
         End Sub
+
+
 
         ''' <summary>
         ''' Executes UI method from another thread

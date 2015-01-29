@@ -675,7 +675,7 @@ Partial Class UiQCResultsReview
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IQCResultsReview"
+        Me.Name = "UiQCResultsReview"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = ""

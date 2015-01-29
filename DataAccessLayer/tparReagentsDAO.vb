@@ -383,25 +383,47 @@ Partial Public Class tparReagentsDAO
             Else
                 Dim cmdText As String
                 If (Not pUpdateForExcluded) Then
+                    'AJG
+                    'cmdText = " UPDATE tparReagents " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  ReagentID IN (SELECT TR.ReagentID " & _
+                    '                               " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                    '                                                          " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                          " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                               " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                    '                               " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                               " AND    O.SampleClass = 'BLANK') "
                     cmdText = " UPDATE tparReagents " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  ReagentID IN (SELECT TR.ReagentID " & _
-                                                   " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
-                                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
-                                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                   " AND    O.SampleClass = 'BLANK') "
+                              " WHERE  EXISTS (SELECT TR.ReagentID " & _
+                                              " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                                                                         " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                         " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                              " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                                              " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                              " AND    O.SampleClass = 'BLANK' AND tparReagents.ReagentID = TR.ReagentID) "
                 Else
+                    'AJG
+                    'cmdText = " UPDATE tparReagents " & _
+                    '          " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
+                    '          " WHERE  ReagentID NOT IN (SELECT TR.ReagentID " & _
+                    '                                   " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                    '                                                              " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                    '                                                              " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                    '                                   " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                    '                                   " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                    '                                   " AND    O.SampleClass = 'BLANK') " & _
+                    '          " AND    InUse = 1 "
+
                     cmdText = " UPDATE tparReagents " & _
                               " SET    InUse = " & Convert.ToInt32(IIf(pFlag, 1, 0)) & _
-                              " WHERE  ReagentID NOT IN (SELECT TR.ReagentID " & _
-                                                       " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
-                                                                                  " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
-                                                                                  " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
-                                                       " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
-                                                       " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
-                                                       " AND    O.SampleClass = 'BLANK') " & _
+                              " WHERE  NOT EXISTS (SELECT TR.ReagentID " & _
+                                                  " FROM   tparTestReagents TR INNER JOIN twksOrderTests OT ON TR.TestID = OT.TestID " & _
+                                                                             " INNER JOIN twksWSOrderTests WSOT ON OT.OrderTestID = WSOT.OrderTestID " & _
+                                                                             " INNER JOIN twksOrders O ON OT.OrderID = O.OrderID " & _
+                                                  " WHERE  WSOT.WorkSessionID = '" & pWorkSessionID & "' " & _
+                                                  " AND    OT.AnalyzerID = '" & pAnalyzerID.Trim & "' " & _
+                                                  " AND    O.SampleClass = 'BLANK' AND tparReagents.ReagentID = TR.ReagentID) " & _
                               " AND    InUse = 1 "
                 End If
 

@@ -346,7 +346,7 @@ Partial Class UiProgTestProfiles
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgTestProfiles"
+        Me.Name = "UiProgTestProfiles"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsProfileNameGrpbox.ResumeLayout(False)

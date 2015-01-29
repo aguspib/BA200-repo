@@ -128,7 +128,7 @@ Partial Class UiBarCodeEdit
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IBarCodeEdit"
+        Me.Name = "UiBarCodeEdit"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsEnterBarcodeGroupBox.ResumeLayout(False)

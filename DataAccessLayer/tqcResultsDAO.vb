@@ -177,15 +177,26 @@ Namespace Biosystems.Ax00.DAL.DAO
                     myGlobalDataTO.HasError = True
                     myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.DB_CONNECTION_ERROR.ToString
                 Else
+                    'AJG
+                    'Dim cmdText As String = " DELETE tqcResults " & vbCrLf & _
+                    '                        " WHERE  QCTestSampleID = " & pQCTestSampleID.ToString() & vbCrLf & _
+                    '                        " AND    QCControlLotID = " & pQCControlLotID.ToString() & vbCrLf & _
+                    '                        " AND    AnalyzerID     = N'" & pAnalyzerID.Replace("'", "''").Trim & "' " & vbCrLf & _
+                    '                        " AND    RunsGroupNumber IN (SELECT RunsGroup FROM tqcRunsGroups " & vbCrLf & _
+                    '                                                   " WHERE  QCTestSampleID = " & pQCTestSampleID.ToString() & vbCrLf & _
+                    '                                                   " AND    QCControlLotID = " & pQCControlLotID.ToString() & vbCrLf & _
+                    '                                                   " AND    AnalyzerID     = N'" & pAnalyzerID.Replace("'", "''").Trim & "' " & vbCrLf & _
+                    '                                                   " AND    CumResultsNum  = " & pCumResultsNum.ToString & ") " & vbCrLf
+
                     Dim cmdText As String = " DELETE tqcResults " & vbCrLf & _
                                             " WHERE  QCTestSampleID = " & pQCTestSampleID.ToString() & vbCrLf & _
                                             " AND    QCControlLotID = " & pQCControlLotID.ToString() & vbCrLf & _
                                             " AND    AnalyzerID     = N'" & pAnalyzerID.Replace("'", "''").Trim & "' " & vbCrLf & _
-                                            " AND    RunsGroupNumber IN (SELECT RunsGroup FROM tqcRunsGroups " & vbCrLf & _
+                                            " AND    EXISTS (SELECT RunsGroup FROM tqcRunsGroups " & vbCrLf & _
                                                                        " WHERE  QCTestSampleID = " & pQCTestSampleID.ToString() & vbCrLf & _
                                                                        " AND    QCControlLotID = " & pQCControlLotID.ToString() & vbCrLf & _
                                                                        " AND    AnalyzerID     = N'" & pAnalyzerID.Replace("'", "''").Trim & "' " & vbCrLf & _
-                                                                       " AND    CumResultsNum  = " & pCumResultsNum.ToString & ") " & vbCrLf
+                                                                       " AND    CumResultsNum  = " & pCumResultsNum.ToString & " AND tqcResults.RunsGroupNumber = RunsGroup) " & vbCrLf
 
                     Using dbCmd As New SqlClient.SqlCommand(cmdText, pDBConnection)
                         myGlobalDataTO.AffectedRecords = dbCmd.ExecuteNonQuery()
