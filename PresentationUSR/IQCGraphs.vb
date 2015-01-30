@@ -803,6 +803,7 @@ Public Class UiQCGraphs
 
                 'ADDED THIS IN ORDER TO SHOW POINTS
                 CType(bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).View, LineSeriesView).MarkerVisibility = DevExpress.Utils.DefaultBoolean.True
+                bsQCResultChartControl.SeriesTemplate.ArgumentScaleType = ScaleType.Qualitative
 
                 'Set the color for each Control/Lot to graph; inform the Legend text with the Control Name
                 If (bsQCResultChartControl.Series.Count = 1) Then
@@ -1018,7 +1019,10 @@ Public Class UiQCGraphs
 
                     If (myMaxNumOfResults <= minQCSeries) Then
                         'BT #1668 - When SEVERAL Controls have been selected, the ArgumentScaleType has to be set to QUALITATIVE if there are less than 51 Results to plot 
-                        bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative
+                        'bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Qualitative
+                        bsQCResultChartControl.Series(openQCResultRow.ControlNameLotNum).ArgumentScaleType = ScaleType.Numerical
+                        myDiagram.AxisX.NumericScaleOptions.ScaleMode = ScaleMode.Manual
+                        myDiagram.AxisX.NumericScaleOptions.MeasureUnit = NumericMeasureUnit.Ones
                     Else
                         'BA-1885 - If the number of results to plot is greater than 50, property ArgumentScaleType is set to NUMERICAL to avoid 
                         'overlapping of values in X-Axis
