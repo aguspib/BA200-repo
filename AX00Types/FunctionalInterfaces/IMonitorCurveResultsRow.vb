@@ -1,6 +1,6 @@
 ﻿''' MIC
 ''' <summary>
-''' This is an OO interface that is implemented in all DataSet rows that attend the graphic curve functionality
+''' This is an OO interface that is implemented in all DataSet rows that attend the graphical curve functionality
 ''' </summary>
 ''' <remarks>Currently used by the results monitor curve data to retrieve information for several, different typed datasets</remarks>
 Public Interface IMonitorCurveResultsRow
