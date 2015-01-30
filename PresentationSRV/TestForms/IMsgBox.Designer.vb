@@ -111,10 +111,10 @@ Partial Class UiMsgBox
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IMsgBox"
+        Me.Name = "UiMsgBox"
         Me.ShowInTaskbar = False
         Me.StartPosition = FormStartPosition.CenterParent
-        Me.Text = "IMsgBox"
+        Me.Text = "UiMsgBox"
         CType(Me.BsMessageIcon, ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 

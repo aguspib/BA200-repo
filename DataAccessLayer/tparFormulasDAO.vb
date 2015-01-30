@@ -5,9 +5,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
-
     Public Class tparFormulasDAO
-          
 
 #Region "CRUD Methods"
 
@@ -120,7 +118,7 @@ Namespace Biosystems.Ax00.DAL.DAO
             Return resultData
         End Function
 
-        
+
 #End Region
 
 #Region "Other Methods"
@@ -217,6 +215,9 @@ Namespace Biosystems.Ax00.DAL.DAO
         '''              SA  26/05/2010 - Query changed to get also the name of the informed Calculated Test and the Formula Text
         '''              SA  12/03/2012 - Changed the function template
         '''              SA  18/04/2012 - Changed the SQL by adding a DISTINCT due to the same Test can be more than once in a Formula Text
+        '''              SA  28/01/2015 - BA-1610 ==> Changed the SQL Query to get also value of field EnableStatus for all STD Tests included 
+        '''                                           in the Formula of the specified Calculated Test. For the rest of Test Types EnableStatus 
+        '''                                           is returned as TRUE 
         ''' </remarks>
         Public Function ReadTestsInFormula(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pCalcTestID As Integer) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
@@ -227,8 +228,11 @@ Namespace Biosystems.Ax00.DAL.DAO
                 If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
-                        Dim cmdText As String = " SELECT DISTINCT F.CalcTestID, TC.CalcTestLongName AS TestName, TC.FormulaText, F.TestType, " & vbCrLf & _
-                                                                " F.ValueType, F.[Value], F.SampleType " & vbCrLf & _
+                        Dim cmdText As String = " SELECT DISTINCT  F.CalcTestID, TC.CalcTestLongName AS TestName, TC.FormulaText, F.TestType, " & vbCrLf & _
+                                                                "  F.ValueType, F.[Value], F.SampleType, " & vbCrLf & _
+                                                                " (CASE WHEN F.TestType = 'STD' THEN (SELECT EnableStatus FROM tparTestSamples TS " & vbCrLf & _
+                                                                                                    " WHERE F.[Value] = TS.TestID AND F.SampleType = TS.SampleType) " & vbCrLf & _
+                                                                "  ELSE 1 END) AS EnableStatus " & vbCrLf & _
                                                 " FROM   tparFormulas F INNER JOIN tparCalculatedTests TC ON F.CalcTestID = TC.CalcTestID " & vbCrLf & _
                                                 " WHERE  F.CalcTestID = " & pCalcTestID.ToString & vbCrLf & _
                                                 " AND    F.ValueType  = 'TEST' " & vbCrLf & _

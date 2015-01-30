@@ -226,7 +226,7 @@ Partial Class UiConfigLISMapping
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IConfigLISMapping"
+        Me.Name = "UiConfigLISMapping"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsLISMappingGroupBox.ResumeLayout(False)

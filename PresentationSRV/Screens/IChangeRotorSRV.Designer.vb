@@ -215,7 +215,7 @@ Partial Class UiChangeRotorSRV
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IChangeRotorSRV"
+        Me.Name = "UiChangeRotorSRV"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsChangeRotorGroupBox.ResumeLayout(False)

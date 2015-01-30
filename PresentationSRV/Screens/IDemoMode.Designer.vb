@@ -281,7 +281,7 @@ Partial Class UiDemoMode
         Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IDemoMode"
+        Me.Name = "UiDemoMode"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "DemoMode"
         Me.BsDemoModeInfoPanel.ResumeLayout(False)

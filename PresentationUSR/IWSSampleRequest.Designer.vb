@@ -741,7 +741,7 @@ Partial Class UiWSSampleRequest
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSSampleRequest"
+        Me.Name = "UiWSSampleRequest"
         Me.ShowInTaskbar = False
         Me.Text = "WS_Preparation"
         CType(Me.bsSampleClassesTabControl, System.ComponentModel.ISupportInitialize).EndInit()

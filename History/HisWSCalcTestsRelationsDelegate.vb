@@ -76,7 +76,7 @@ Namespace Biosystems.Ax00.BL
         ''' Modified by: SA 09/09/2014 - BA-1868 ==> Changes to solve errors found in the unit test
         ''' AG 13/10/2014 - BA-2006 In a CalcultedTest the Print Partial Tests (printExpTests) apply only 1 level, not in cascade when the calctest forms part of another calctest formula
         ''' </remarks>
-        Public Function MarkExcludedExpTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisResultsDataTable As List(Of HisWSResultsDS.vhisWSResultsRow), _
+        Public Function MarkExcludedExpTests(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pHisResultsDataTable As IEnumerable(Of HisWSResultsDS.vhisWSResultsRow), _
                                              ByVal pAnalyzerID As String) As GlobalDataTO
             Dim resultData As GlobalDataTO = Nothing
             Dim testsWereExcluded As Boolean = False

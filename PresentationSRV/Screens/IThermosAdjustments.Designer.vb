@@ -1815,7 +1815,7 @@ Partial Class UiThermosAdjustments
         Me.Controls.Add(Me.BsTabPagesControl)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IThermosAdjustments"
+        Me.Name = "UiThermosAdjustments"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = ""
         Me.BsTabPagesControl.ResumeLayout(False)

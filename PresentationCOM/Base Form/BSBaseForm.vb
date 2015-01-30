@@ -1238,20 +1238,28 @@ Public Class BSBaseForm
     ''' Modified by: AG 10/12/2010 - Do not executed code is ActiveControl is Nothing
     '''              TR 07/02/2012 - New implementation of sending TAB key instead ENTER
     '''              SA 12/03/2012 - Undo last DL changes for screen IWSSampleRequest; they do not work
+    '''              MI 30/01/2015 - http://confluence.ginper.local:8090/display/AREA/Don%27t+use+Name+property+of+WinForms+controls
     ''' </remarks>
     Protected Overrides Function ProcessDialogKey(ByVal keyData As Keys) As Boolean
         If (Me.ActiveControl IsNot Nothing) Then
-            If (Me.Name <> "IAx00MainMDI") AndAlso (keyData = Keys.Return AndAlso Me.ActiveControl.GetType.Name <> "BSButton") Then
-                If (String.Compare(Me.Name, "IAx00Login", False) <> 0) Then
-                    'Send the TAB key
-                    SendKeys.Send("{Tab}")
-                    Return True
-                End If
+            Dim returnIsPressed = (keyData = Keys.Return)
+            If returnIsPressed AndAlso ProcessEnterAsTab() AndAlso (Me.ActiveControl.GetType IsNot GetType(BSButton)) Then
+                SendKeys.Send("{Tab}")
+                Return True
             End If
         End If
         Return MyBase.ProcessDialogKey(keyData)
     End Function
 
+
+    ''' <summary>
+    ''' This function indicates if this form needs to process Enter key as a TAB key to navigate through application controls.
+    ''' </summary>
+    ''' <returns>A boolean, true means ENTER are TABS.</returns>
+    ''' <remarks>By default, any form that does not provide its own implementation, will process Enter as a TAB if it is not a MDI container</remarks>
+    Protected Overridable Function ProcessEnterAsTab() As Boolean
+        Return Not Me.IsMdiContainer
+    End Function
 
     'SGM 05/01/2012
     Private Sub FormBack_Exception(ByVal ex As Exception) Handles FormBack.ExceptionHappened

@@ -1007,7 +1007,7 @@ Partial Class UiResults
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IResults"
+        Me.Name = "UiResults"
         Me.Text = "Results Screen"
         CType(GridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.bsPanel4.ResumeLayout(False)

@@ -220,7 +220,7 @@ Partial Class UiSortingTestsAux
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "ISortingTestsAux"
+        Me.Name = "UiSortingTestsAux"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.TestSortingGB.ResumeLayout(False)

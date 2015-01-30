@@ -473,7 +473,7 @@ Partial Class UiProgTestContaminations
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
-        Me.Name = "IProgTestContaminations"
+        Me.Name = "UiProgTestContaminations"
         Me.ShowInTaskbar = False
         Me.Text = ""
         Me.bsTestListGroupBox.ResumeLayout(False)

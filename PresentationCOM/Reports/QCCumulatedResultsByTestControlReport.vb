@@ -5,6 +5,7 @@ Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Types
 Imports DevExpress.XtraCharts
 Imports System.Drawing
+Imports System.Globalization
 
 Public Class QCCumulatedResultsByTestControlReport
     Private mControlsRow As QCCumulatedSummaryDS.QCCumulatedSummaryTableRow
@@ -205,5 +206,6 @@ Public Class QCCumulatedResultsByTestControlReport
         End With
     End Sub
 #End Region
+
 
 End Class

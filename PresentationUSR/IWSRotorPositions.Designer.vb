@@ -6284,7 +6284,7 @@ Partial Class UiWSRotorPositions
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSRotorPositions"
+        Me.Name = "UiWSRotorPositions"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.Manual

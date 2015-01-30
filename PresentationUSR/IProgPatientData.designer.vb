@@ -1001,7 +1001,7 @@ Partial Class UiProgPatientData
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgPatientData"
+        Me.Name = "UiProgPatientData"
         Me.ShowIcon = False
         Me.ShowInTaskbar = False
         Me.Text = " "

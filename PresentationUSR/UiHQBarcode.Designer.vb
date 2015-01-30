@@ -301,7 +301,7 @@ Partial Class UiHQBarcode
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "HQBarcode"
+        Me.Name = "UiHQBarcode"
         Me.ShowInTaskbar = False
         Me.Text = "  "
         Me.bsOrderDetailsGroupBox.ResumeLayout(False)

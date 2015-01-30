@@ -101,7 +101,7 @@ Partial Class UiErrorCodes
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IErrorCodes"
+        Me.Name = "UiErrorCodes"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.WindowsDefaultLocation
         Me.Text = " "
         Me.bsLanguageSelectionGroupBox.ResumeLayout(False)

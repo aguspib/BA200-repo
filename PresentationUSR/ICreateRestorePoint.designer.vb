@@ -154,7 +154,7 @@ Partial Class UiCreateRestorePoint
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "ICreateRestorePoint"
+        Me.Name = "UiCreateRestorePoint"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsCreateRestorePointGroupBox.ResumeLayout(False)

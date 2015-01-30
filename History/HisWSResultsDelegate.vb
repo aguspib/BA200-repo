@@ -530,7 +530,7 @@ Namespace Biosystems.Ax00.BL
 
                 '1) Convert alarmList into Remarks description with "," char as separator
                 Dim myAlarms() As String
-                Dim list As List(Of AlarmsDS.tfmwAlarmsRow)
+                'Dim list As List(Of AlarmsDS.tfmwAlarmsRow)
 
                 If Not pRow.IsAlarmListNull AndAlso Not String.IsNullOrEmpty(pRow.AlarmList) Then
                     pRow.BeginEdit()
@@ -542,15 +542,31 @@ Namespace Biosystems.Ax00.BL
 
                     For Each ID As String In myAlarms
                         If String.Compare(ID, "", False) <> 0 Then
-                            list = (From a As AlarmsDS.tfmwAlarmsRow In pAlarmsDefinition.tfmwAlarms _
-                                    Where String.Compare(a.AlarmID, ID, False) = 0 Select a).ToList
-                            If list.Count > 0 Then
+                            'Dim list = (From a As AlarmsDS.tfmwAlarmsRow In pAlarmsDefinition.tfmwAlarms _
+                            '        Where (String.Compare(a.AlarmID, ID, False) = 0) Select a)
+
+                            'If list.Count > 0 Then
+                            '    If pRow.IsRemarksNull Then
+                            '        pRow.Remarks = list(0).Description
+                            '    Else
+                            '        pRow.Remarks &= ", " & list(0).Description
+                            '    End If
+                            'End If
+
+
+                            Dim result As AlarmsDS.tfmwAlarmsRow = Nothing
+                            For Each a In From a1 In pAlarmsDefinition.tfmwAlarms Where String.Compare(a1.AlarmID, ID, False) = 0
+                                result = a
+                                Exit For
+                            Next
+                            If result IsNot Nothing Then
                                 If pRow.IsRemarksNull Then
-                                    pRow.Remarks = list(0).Description
+                                    pRow.Remarks = result.Description
                                 Else
-                                    pRow.Remarks &= ", " & list(0).Description
+                                    pRow.Remarks &= ", " & result.Description
                                 End If
                             End If
+
                         End If
                     Next
 
@@ -558,7 +574,7 @@ Namespace Biosystems.Ax00.BL
                     pRow.AcceptChanges()
                 End If
 
-                list = Nothing
+                'list = Nothing
                 Erase myAlarms
 
                 'AG 13/02/2014 - #1505

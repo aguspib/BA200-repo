@@ -125,7 +125,7 @@ Partial Class UiWSDeleteAuxScreen
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IWSDeleteAuxScreen"
+        Me.Name = "UiWSDeleteAuxScreen"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsAuxDeleteGroupBox.ResumeLayout(False)

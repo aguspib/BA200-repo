@@ -335,6 +335,8 @@ Partial Public Class TestControlsDS
 
         Private columnControlLevel As Global.System.Data.DataColumn
 
+        Private columnEnableStatus As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -579,6 +581,14 @@ Partial Public Class TestControlsDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property EnableStatusColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnEnableStatus
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -641,9 +651,10 @@ Partial Public Class TestControlsDS
                     ByVal MeasureUnit As String, _
                     ByVal DecimalsAllowed As Short, _
                     ByVal TestPosition As Integer, _
-                    ByVal ControlLevel As Integer) As tparTestControlsRow
+                    ByVal ControlLevel As Integer, _
+                    ByVal EnableStatus As Boolean) As tparTestControlsRow
             Dim rowtparTestControlsRow As tparTestControlsRow = CType(Me.NewRow, tparTestControlsRow)
-            Dim columnValuesArray() As Object = New Object() {TestID, SampleType, ControlID, MinConcentration, MaxConcentration, TS_User, TS_DateTime, TestName, NumberOfControls, ControlReplicates, ControlName, LotNumber, ExpirationDate, TubeType, TargetMean, TargetSD, ActiveControl, InUse, RejectionCriteria, TestTypeIcon, TestType, PreloadedTest, MeasureUnit, DecimalsAllowed, TestPosition, ControlLevel}
+            Dim columnValuesArray() As Object = New Object() {TestID, SampleType, ControlID, MinConcentration, MaxConcentration, TS_User, TS_DateTime, TestName, NumberOfControls, ControlReplicates, ControlName, LotNumber, ExpirationDate, TubeType, TargetMean, TargetSD, ActiveControl, InUse, RejectionCriteria, TestTypeIcon, TestType, PreloadedTest, MeasureUnit, DecimalsAllowed, TestPosition, ControlLevel, EnableStatus}
             rowtparTestControlsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparTestControlsRow)
             Return rowtparTestControlsRow
@@ -692,6 +703,7 @@ Partial Public Class TestControlsDS
             Me.columnDecimalsAllowed = MyBase.Columns("DecimalsAllowed")
             Me.columnTestPosition = MyBase.Columns("TestPosition")
             Me.columnControlLevel = MyBase.Columns("ControlLevel")
+            Me.columnEnableStatus = MyBase.Columns("EnableStatus")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -749,9 +761,12 @@ Partial Public Class TestControlsDS
             MyBase.Columns.Add(Me.columnTestPosition)
             Me.columnControlLevel = New Global.System.Data.DataColumn("ControlLevel", GetType(Integer), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnControlLevel)
+            Me.columnEnableStatus = New Global.System.Data.DataColumn("EnableStatus", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnEnableStatus)
             Me.columnSampleType.MaxLength = 20
             Me.columnTS_User.MaxLength = 16
             Me.columnActiveControl.DefaultValue = CType(False, Boolean)
+            Me.columnEnableStatus.DefaultValue = CType(True, Boolean)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -1288,6 +1303,21 @@ Partial Public Class TestControlsDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property EnableStatus() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparTestControls.EnableStatusColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'EnableStatus' in table 'tparTestControls' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparTestControls.EnableStatusColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparTestControls.TestIDColumn)
         End Function
@@ -1596,6 +1626,18 @@ Partial Public Class TestControlsDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetControlLevelNull()
             Me(Me.tabletparTestControls.ControlLevelColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsEnableStatusNull() As Boolean
+            Return Me.IsNull(Me.tabletparTestControls.EnableStatusColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetEnableStatusNull()
+            Me(Me.tabletparTestControls.EnableStatusColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

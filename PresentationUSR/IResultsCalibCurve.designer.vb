@@ -579,7 +579,7 @@ Partial Class UiResultsCalibCurve
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IResultsCalibCurve"
+        Me.Name = "UiResultsCalibCurve"
         Me.ShowInTaskbar = False
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Tag = " "

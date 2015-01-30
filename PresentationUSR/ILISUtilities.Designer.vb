@@ -196,7 +196,7 @@ Partial Class UiLISUtilities
         Me.LookAndFeel.SkinName = "Blue"
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MinimizeBox = False
-        Me.Name = "ILISUtilities"
+        Me.Name = "UiLISUtilities"
         Me.Text = "*LIS Utilities"
         Me.BsGroupBox1.ResumeLayout(False)
         Me.MainGroupBox.ResumeLayout(False)

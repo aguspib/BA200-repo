@@ -196,7 +196,7 @@ Partial Class UiSATReportLoad
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "ISATReportLoad"
+        Me.Name = "UiSATReportLoad"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.bsLoadRestoreSATGroupBox.ResumeLayout(False)

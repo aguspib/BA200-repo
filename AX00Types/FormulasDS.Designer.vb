@@ -315,6 +315,8 @@ Partial Public Class FormulasDS
 
         Private columnAvailable As Global.System.Data.DataColumn
 
+        Private columnEnableStatus As Global.System.Data.DataColumn
+
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub New()
@@ -440,6 +442,14 @@ Partial Public Class FormulasDS
         End Property
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public ReadOnly Property EnableStatusColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnEnableStatus
+            End Get
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0"), _
          Global.System.ComponentModel.Browsable(False)> _
         Public ReadOnly Property Count() As Integer
@@ -476,9 +486,9 @@ Partial Public Class FormulasDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtparFormulasRow(ByVal CalcTestID As Integer, ByVal Position As Integer, ByVal ValueType As String, ByVal TestType As String, ByVal Value As String, ByVal TestName As String, ByVal SampleType As String, ByVal FormulaText As String, ByVal TestTypeTestIDSampleType As String, ByVal Available As Boolean) As tparFormulasRow
+        Public Overloads Function AddtparFormulasRow(ByVal CalcTestID As Integer, ByVal Position As Integer, ByVal ValueType As String, ByVal TestType As String, ByVal Value As String, ByVal TestName As String, ByVal SampleType As String, ByVal FormulaText As String, ByVal TestTypeTestIDSampleType As String, ByVal Available As Boolean, ByVal EnableStatus As Boolean) As tparFormulasRow
             Dim rowtparFormulasRow As tparFormulasRow = CType(Me.NewRow, tparFormulasRow)
-            Dim columnValuesArray() As Object = New Object() {CalcTestID, Position, ValueType, TestType, Value, TestName, SampleType, FormulaText, TestTypeTestIDSampleType, Available}
+            Dim columnValuesArray() As Object = New Object() {CalcTestID, Position, ValueType, TestType, Value, TestName, SampleType, FormulaText, TestTypeTestIDSampleType, Available, EnableStatus}
             rowtparFormulasRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparFormulasRow)
             Return rowtparFormulasRow
@@ -486,9 +496,9 @@ Partial Public Class FormulasDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
-        Public Overloads Function AddtparFormulasRow(ByVal CalcTestID As Integer, ByVal Position As Integer, ByVal ValueType As String, ByVal TestType As String, ByVal Value As String, ByVal TestName As String, ByVal SampleType As String, ByVal FormulaText As String, ByVal Available As Boolean) As tparFormulasRow
+        Public Overloads Function AddtparFormulasRow(ByVal CalcTestID As Integer, ByVal Position As Integer, ByVal ValueType As String, ByVal TestType As String, ByVal Value As String, ByVal TestName As String, ByVal SampleType As String, ByVal FormulaText As String, ByVal Available As Boolean, ByVal EnableStatus As Boolean) As tparFormulasRow
             Dim rowtparFormulasRow As tparFormulasRow = CType(Me.NewRow, tparFormulasRow)
-            Dim columnValuesArray() As Object = New Object() {CalcTestID, Position, ValueType, TestType, Value, TestName, SampleType, FormulaText, Nothing, Available}
+            Dim columnValuesArray() As Object = New Object() {CalcTestID, Position, ValueType, TestType, Value, TestName, SampleType, FormulaText, Nothing, Available, EnableStatus}
             rowtparFormulasRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowtparFormulasRow)
             Return rowtparFormulasRow
@@ -521,6 +531,7 @@ Partial Public Class FormulasDS
             Me.columnFormulaText = MyBase.Columns("FormulaText")
             Me.columnTestTypeTestIDSampleType = MyBase.Columns("TestTypeTestIDSampleType")
             Me.columnAvailable = MyBase.Columns("Available")
+            Me.columnEnableStatus = MyBase.Columns("EnableStatus")
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -546,7 +557,10 @@ Partial Public Class FormulasDS
             MyBase.Columns.Add(Me.columnTestTypeTestIDSampleType)
             Me.columnAvailable = New Global.System.Data.DataColumn("Available", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnAvailable)
+            Me.columnEnableStatus = New Global.System.Data.DataColumn("EnableStatus", GetType(Boolean), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnEnableStatus)
             Me.columnTestTypeTestIDSampleType.ReadOnly = True
+            Me.columnEnableStatus.DefaultValue = CType(True, Boolean)
         End Sub
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
@@ -849,6 +863,21 @@ Partial Public Class FormulasDS
 
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Property EnableStatus() As Boolean
+            Get
+                Try
+                    Return CType(Me(Me.tabletparFormulas.EnableStatusColumn), Boolean)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'EnableStatus' in table 'tparFormulas' is DBNull.", e)
+                End Try
+            End Get
+            Set(value As Boolean)
+                Me(Me.tabletparFormulas.EnableStatusColumn) = value
+            End Set
+        End Property
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Function IsCalcTestIDNull() As Boolean
             Return Me.IsNull(Me.tabletparFormulas.CalcTestIDColumn)
         End Function
@@ -965,6 +994,18 @@ Partial Public Class FormulasDS
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
         Public Sub SetAvailableNull()
             Me(Me.tabletparFormulas.AvailableColumn) = Global.System.Convert.DBNull
+        End Sub
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Function IsEnableStatusNull() As Boolean
+            Return Me.IsNull(Me.tabletparFormulas.EnableStatusColumn)
+        End Function
+
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(), _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "4.0.0.0")> _
+        Public Sub SetEnableStatusNull()
+            Me(Me.tabletparFormulas.EnableStatusColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
 

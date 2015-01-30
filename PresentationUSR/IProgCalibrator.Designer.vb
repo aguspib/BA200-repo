@@ -986,7 +986,7 @@ Partial Class UiProgCalibrator
         Me.LookAndFeel.UseDefaultLookAndFeel = False
         Me.MaximizeBox = False
         Me.MinimizeBox = False
-        Me.Name = "IProgCalibrator"
+        Me.Name = "UiProgCalibrator"
         Me.ShowInTaskbar = False
         Me.Text = " "
         Me.CalibratorTabControl.ResumeLayout(False)

@@ -21,62 +21,59 @@ Partial Public Class QCCumulatedResultsByTestControlReport
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram
-        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions
-        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series
-        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointOptions1 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim PointOptions2 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel
-        Dim PointOptions3 As DevExpress.XtraCharts.PointOptions = New DevExpress.XtraCharts.PointOptions
-        Dim LineSeriesView2 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView
-        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle
-        Me.Detail = New DevExpress.XtraReports.UI.DetailBand
-        Me.XrTableReport = New DevExpress.XtraReports.UI.XRTable
-        Me.XrTableReportRow = New DevExpress.XtraReports.UI.XRTableRow
-        Me.XrCellVisibleCumResultsNum = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellCumDateTime = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellTotalRuns = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellMean = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellMeasureUnit = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellSD = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellCV = New DevExpress.XtraReports.UI.XRTableCell
-        Me.XrCellRange = New DevExpress.XtraReports.UI.XRTableCell
-        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand
-        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand
-        Me.GroupFooter1 = New DevExpress.XtraReports.UI.GroupFooterBand
-        Me.XrLJGraph = New DevExpress.XtraReports.UI.XRChart
-        Me.XrPanel3 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrGraphHeaderLabel = New DevExpress.XtraReports.UI.XRLabel
-        Me.ReportHeader = New DevExpress.XtraReports.UI.ReportHeaderBand
-        Me.XrPanel2 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrLabelCellCV = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCellMean = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCellMeasureUnit = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCellTotalRuns = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCellRange = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCellSD = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCellCumDateTime = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrPanel4 = New DevExpress.XtraReports.UI.XRPanel
-        Me.XrN = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelN = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrRanges = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelRanges = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelCV = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrCV = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrSD = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelSD = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrUnit = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelUnit = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrMean = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLotNumber = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelMean = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelLotNumber = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrControlName = New DevExpress.XtraReports.UI.XRLabel
-        Me.XrLabelControlName = New DevExpress.XtraReports.UI.XRLabel
-        Me.CumulatedResultsDS1 = New Biosystems.Ax00.Types.CumulatedResultsDS
-        Me.ControlLotID = New DevExpress.XtraReports.Parameters.Parameter
+        Dim XyDiagram1 As DevExpress.XtraCharts.XYDiagram = New DevExpress.XtraCharts.XYDiagram()
+        Dim RectangleGradientFillOptions1 As DevExpress.XtraCharts.RectangleGradientFillOptions = New DevExpress.XtraCharts.RectangleGradientFillOptions()
+        Dim Series1 As DevExpress.XtraCharts.Series = New DevExpress.XtraCharts.Series()
+        Dim PointSeriesLabel1 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim LineSeriesView1 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim PointSeriesLabel2 As DevExpress.XtraCharts.PointSeriesLabel = New DevExpress.XtraCharts.PointSeriesLabel()
+        Dim LineSeriesView2 As DevExpress.XtraCharts.LineSeriesView = New DevExpress.XtraCharts.LineSeriesView()
+        Dim ChartTitle1 As DevExpress.XtraCharts.ChartTitle = New DevExpress.XtraCharts.ChartTitle()
+        Me.Detail = New DevExpress.XtraReports.UI.DetailBand()
+        Me.XrTableReport = New DevExpress.XtraReports.UI.XRTable()
+        Me.XrTableReportRow = New DevExpress.XtraReports.UI.XRTableRow()
+        Me.XrCellVisibleCumResultsNum = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellCumDateTime = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellTotalRuns = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellMean = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellMeasureUnit = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellSD = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellCV = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.XrCellRange = New DevExpress.XtraReports.UI.XRTableCell()
+        Me.TopMargin = New DevExpress.XtraReports.UI.TopMarginBand()
+        Me.BottomMargin = New DevExpress.XtraReports.UI.BottomMarginBand()
+        Me.GroupFooter1 = New DevExpress.XtraReports.UI.GroupFooterBand()
+        Me.XrLJGraph = New DevExpress.XtraReports.UI.XRChart()
+        Me.XrPanel3 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrGraphHeaderLabel = New DevExpress.XtraReports.UI.XRLabel()
+        Me.ReportHeader = New DevExpress.XtraReports.UI.ReportHeaderBand()
+        Me.XrPanel2 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrLabelCellCV = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCellMean = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCellMeasureUnit = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCellTotalRuns = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCellRange = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCellSD = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCellCumDateTime = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrPanel4 = New DevExpress.XtraReports.UI.XRPanel()
+        Me.XrN = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelN = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrRanges = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelRanges = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelCV = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrCV = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrSD = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelSD = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrUnit = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelUnit = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrMean = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLotNumber = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelMean = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelLotNumber = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrControlName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.XrLabelControlName = New DevExpress.XtraReports.UI.XRLabel()
+        Me.CumulatedResultsDS1 = New Biosystems.Ax00.Types.CumulatedResultsDS()
+        Me.ControlLotID = New DevExpress.XtraReports.Parameters.Parameter()
         CType(Me.XrTableReport, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.XrLJGraph, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(XyDiagram1, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -107,7 +104,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         '
         Me.XrTableReportRow.Cells.AddRange(New DevExpress.XtraReports.UI.XRTableCell() {Me.XrCellVisibleCumResultsNum, Me.XrCellCumDateTime, Me.XrCellTotalRuns, Me.XrCellMean, Me.XrCellMeasureUnit, Me.XrCellSD, Me.XrCellCV, Me.XrCellRange})
         Me.XrTableReportRow.Name = "XrTableReportRow"
-        Me.XrTableReportRow.Weight = 0.88
+        Me.XrTableReportRow.Weight = 0.88R
         '
         'XrCellVisibleCumResultsNum
         '
@@ -116,7 +113,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellVisibleCumResultsNum.Name = "XrCellVisibleCumResultsNum"
         Me.XrCellVisibleCumResultsNum.StylePriority.UseFont = False
         Me.XrCellVisibleCumResultsNum.Text = "XrCellVisibleCumResultsNum"
-        Me.XrCellVisibleCumResultsNum.Weight = 0.10476190476190478
+        Me.XrCellVisibleCumResultsNum.Weight = 0.10476190476190478R
         '
         'XrCellCumDateTime
         '
@@ -125,7 +122,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellCumDateTime.Name = "XrCellCumDateTime"
         Me.XrCellCumDateTime.StylePriority.UseFont = False
         Me.XrCellCumDateTime.Text = "XrCellCumDateTime"
-        Me.XrCellCumDateTime.Weight = 0.77380850655691946
+        Me.XrCellCumDateTime.Weight = 0.77380850655691946R
         '
         'XrCellTotalRuns
         '
@@ -136,7 +133,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellTotalRuns.StylePriority.UseTextAlignment = False
         Me.XrCellTotalRuns.Text = "XrCellTotalRuns"
         Me.XrCellTotalRuns.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrCellTotalRuns.Weight = 0.076389785039992747
+        Me.XrCellTotalRuns.Weight = 0.076389785039992747R
         '
         'XrCellMean
         '
@@ -149,7 +146,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellMean.StylePriority.UseTextAlignment = False
         Me.XrCellMean.Text = "XrCellMean"
         Me.XrCellMean.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrCellMean.Weight = 0.42271895635695672
+        Me.XrCellMean.Weight = 0.42271895635695672R
         '
         'XrCellMeasureUnit
         '
@@ -162,7 +159,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellMeasureUnit.StylePriority.UseTextAlignment = False
         Me.XrCellMeasureUnit.Text = "XrCellMeasureUnit"
         Me.XrCellMeasureUnit.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
-        Me.XrCellMeasureUnit.Weight = 0.32961308615548279
+        Me.XrCellMeasureUnit.Weight = 0.32961308615548279R
         '
         'XrCellSD
         '
@@ -173,7 +170,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellSD.StylePriority.UseTextAlignment = False
         Me.XrCellSD.Text = "XrCellSD"
         Me.XrCellSD.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrCellSD.Weight = 0.377301465897333
+        Me.XrCellSD.Weight = 0.377301465897333R
         '
         'XrCellCV
         '
@@ -186,7 +183,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellCV.StylePriority.UseTextAlignment = False
         Me.XrCellCV.Text = "XrCellCV"
         Me.XrCellCV.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopRight
-        Me.XrCellCV.Weight = 0.364287315096174
+        Me.XrCellCV.Weight = 0.364287315096174R
         '
         'XrCellRange
         '
@@ -195,7 +192,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrCellRange.Padding = New DevExpress.XtraPrinting.PaddingInfo(20, 0, 0, 0, 100.0!)
         Me.XrCellRange.StylePriority.UsePadding = False
         Me.XrCellRange.Text = "XrCellRange"
-        Me.XrCellRange.Weight = 0.5511189801352363
+        Me.XrCellRange.Weight = 0.5511189801352363R
         '
         'TopMargin
         '
@@ -206,6 +203,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         '
         'BottomMargin
         '
+        Me.BottomMargin.HeightF = 100.0!
         Me.BottomMargin.Name = "BottomMargin"
         Me.BottomMargin.Padding = New DevExpress.XtraPrinting.PaddingInfo(0, 0, 0, 0, 100.0!)
         Me.BottomMargin.TextAlignment = DevExpress.XtraPrinting.TextAlignment.TopLeft
@@ -218,15 +216,13 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         '
         'XrLJGraph
         '
-        Me.XrLJGraph.AppearanceName = "Light"
+        Me.XrLJGraph.AppearanceNameSerializable = "Light"
         Me.XrLJGraph.BorderColor = System.Drawing.Color.DarkGray
         Me.XrLJGraph.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         XyDiagram1.AxisX.GridLines.Visible = True
-        XyDiagram1.AxisX.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisX.VisibleInPanesSerializable = "-1"
-        XyDiagram1.AxisY.VisualRange.AutoSideMargins = True
         XyDiagram1.AxisY.VisibleInPanesSerializable = "-1"
         Me.XrLJGraph.Diagram = XyDiagram1
         Me.XrLJGraph.EmptyChartText.Font = New System.Drawing.Font("Verdana", 12.0!)
@@ -234,34 +230,29 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         RectangleGradientFillOptions1.Color2 = System.Drawing.Color.FromArgb(CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer), CType(CType(224, Byte), Integer))
         RectangleGradientFillOptions1.GradientMode = DevExpress.XtraCharts.RectangleGradientMode.TopLeftToBottomRight
         Me.XrLJGraph.FillStyle.Options = RectangleGradientFillOptions1
-        Me.XrLJGraph.IndicatorsPaletteName = "Default"
         Me.XrLJGraph.Legend.AlignmentHorizontal = DevExpress.XtraCharts.LegendAlignmentHorizontal.Center
         Me.XrLJGraph.Legend.AlignmentVertical = DevExpress.XtraCharts.LegendAlignmentVertical.Bottom
         Me.XrLJGraph.Legend.Direction = DevExpress.XtraCharts.LegendDirection.LeftToRight
         Me.XrLJGraph.Legend.EquallySpacedItems = False
-        Me.XrLJGraph.Legend.Visibility = DefaultBoolean.False
+        Me.XrLJGraph.Legend.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.XrLJGraph.LocationFloat = New DevExpress.Utils.PointFloat(12.5!, 52.50003!)
         Me.XrLJGraph.Name = "XrLJGraph"
         Me.XrLJGraph.PaletteBaseColorNumber = 4
         Me.XrLJGraph.PaletteName = "Black and White"
         Series1.ArgumentScaleType = DevExpress.XtraCharts.ScaleType.Numerical
-        PointSeriesLabel1.LineVisibility = DefaultBoolean.True        
+        PointSeriesLabel1.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
         Series1.Label = PointSeriesLabel1
-        Series1.LabelsVisibility = DefaultBoolean.False
+        Series1.LabelsVisibility = DevExpress.Utils.DefaultBoolean.[False]
         Series1.LegendTextPattern = "{V}"
         Series1.Name = "Series 1"
-        PointOptions2.PointView = DevExpress.XtraCharts.PointView.ArgumentAndValues
-        'Series1.PointOptions = PointOptions2
         Series1.ShowInLegend = False
-        Series1.SynchronizePointOptions = False
         LineSeriesView1.LineMarkerOptions.BorderVisible = False
         LineSeriesView1.LineMarkerOptions.Size = 1
         Series1.View = LineSeriesView1
         Me.XrLJGraph.SeriesSerializable = New DevExpress.XtraCharts.Series() {Series1}
-        PointSeriesLabel2.LineVisibility = DefaultBoolean.True
+        PointSeriesLabel2.LineVisibility = DevExpress.Utils.DefaultBoolean.[True]
         Me.XrLJGraph.SeriesTemplate.Label = PointSeriesLabel2
         Me.XrLJGraph.SeriesTemplate.LegendTextPattern = "{V}"
-        Me.XrLJGraph.SeriesTemplate.SynchronizePointOptions = False
         Me.XrLJGraph.SeriesTemplate.View = LineSeriesView2
         Me.XrLJGraph.SizeF = New System.Drawing.SizeF(627.4996!, 296.4583!)
         Me.XrLJGraph.StylePriority.UseBackColor = False
@@ -269,7 +260,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrLJGraph.StylePriority.UseBorders = False
         ChartTitle1.Font = New System.Drawing.Font("Tahoma", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         ChartTitle1.Text = "Linear"
-        ChartTitle1.Visibility = DefaultBoolean.False
+        ChartTitle1.Visibility = DevExpress.Utils.DefaultBoolean.[False]
         Me.XrLJGraph.Titles.AddRange(New DevExpress.XtraCharts.ChartTitle() {ChartTitle1})
         '
         'XrPanel3
@@ -277,8 +268,8 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrPanel3.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPanel3.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel3.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel3.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrGraphHeaderLabel})
         Me.XrPanel3.LocationFloat = New DevExpress.Utils.PointFloat(12.5!, 10.0!)
         Me.XrPanel3.Name = "XrPanel3"
@@ -308,7 +299,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         'XrPanel2
         '
         Me.XrPanel2.Borders = DevExpress.XtraPrinting.BorderSide.Bottom
-        Me.XrPanel2.BorderWidth = 2
+        Me.XrPanel2.BorderWidth = 2.0!
         Me.XrPanel2.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrLabelCellCV, Me.XrLabelCellMean, Me.XrLabelCellMeasureUnit, Me.XrLabelCellTotalRuns, Me.XrLabelCellRange, Me.XrLabelCellSD, Me.XrLabelCellCumDateTime})
         Me.XrPanel2.LocationFloat = New DevExpress.Utils.PointFloat(12.5!, 69.58333!)
         Me.XrPanel2.Name = "XrPanel2"
@@ -424,8 +415,8 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.XrPanel4.BackColor = System.Drawing.Color.WhiteSmoke
         Me.XrPanel4.BorderColor = System.Drawing.Color.DarkGray
         Me.XrPanel4.Borders = CType((((DevExpress.XtraPrinting.BorderSide.Left Or DevExpress.XtraPrinting.BorderSide.Top) _
-                    Or DevExpress.XtraPrinting.BorderSide.Right) _
-                    Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
+            Or DevExpress.XtraPrinting.BorderSide.Right) _
+            Or DevExpress.XtraPrinting.BorderSide.Bottom), DevExpress.XtraPrinting.BorderSide)
         Me.XrPanel4.Controls.AddRange(New DevExpress.XtraReports.UI.XRControl() {Me.XrN, Me.XrLabelN, Me.XrRanges, Me.XrLabelRanges, Me.XrLabelCV, Me.XrCV, Me.XrSD, Me.XrLabelSD, Me.XrUnit, Me.XrLabelUnit, Me.XrMean, Me.XrLotNumber, Me.XrLabelMean, Me.XrLabelLotNumber, Me.XrControlName, Me.XrLabelControlName})
         Me.XrPanel4.LocationFloat = New DevExpress.Utils.PointFloat(0.0!, 0.0!)
         Me.XrPanel4.Name = "XrPanel4"
@@ -651,7 +642,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         '
         Me.ControlLotID.Name = "ControlLotID"
         Me.ControlLotID.Type = GetType(Integer)
-        Me.ControlLotID.Value = 0
+        Me.ControlLotID.ValueInfo = "0"
         Me.ControlLotID.Visible = False
         '
         'QCCumulatedResultsByTestControlReport
@@ -662,7 +653,7 @@ Partial Public Class QCCumulatedResultsByTestControlReport
         Me.FilterString = "[QCControlLotID] = ?ControlLotID"
         Me.Margins = New System.Drawing.Printing.Margins(100, 100, 35, 100)
         Me.Parameters.AddRange(New DevExpress.XtraReports.Parameters.Parameter() {Me.ControlLotID})
-        Me.Version = "10.2"
+        Me.Version = "14.2"
         CType(Me.XrTableReport, System.ComponentModel.ISupportInitialize).EndInit()
         CType(XyDiagram1, System.ComponentModel.ISupportInitialize).EndInit()
         CType(PointSeriesLabel1, System.ComponentModel.ISupportInitialize).EndInit()
