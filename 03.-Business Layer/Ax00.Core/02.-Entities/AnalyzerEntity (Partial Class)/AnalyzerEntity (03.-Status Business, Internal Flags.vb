@@ -2031,7 +2031,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''                                           use the new RotorChangeServices (Change rotor process)
         '''              IT 30/01/2015 - BA-2216
         ''' </remarks>
-        Private Function RecoverStableSetup(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function ManageInterruptedProcess(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Dim stableSetupAchieved As Boolean = True '/True means that is not necessary any action to reachs a stable setup 

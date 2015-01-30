@@ -753,7 +753,8 @@ Namespace Biosystems.Ax00.Core.Entities
                         End If
                         'AG 29/03/2012
 
-                        myGlobal = RecoverStableSetup(Nothing) 'AG 20/06/2012 - Evaluate value for FLAGS and determine the next action to be sent in order to achieve a stable setup
+                        'IT 30/01/205 - BA-2216
+                        myGlobal = ManageInterruptedProcess(Nothing) 'AG 20/06/2012 - Evaluate value for FLAGS and determine the next action to be sent in order to achieve a stable setup
 
                         'AG 28/11/2013 - BT #1397
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.CONNECTprocess.ToString) = "INPROCESS" AndAlso Not runningConnectionPollSnSent AndAlso _
