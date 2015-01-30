@@ -28,6 +28,7 @@ Public Class IChangeRotor
     Private ExistBaseLineInitError As Boolean = False
     Private statusMDIChangedFlag As Boolean = False
     Private _processIsPaused As Boolean = False
+    Private _recoverProcess As Boolean = False 'BA-2216
 
 #End Region
 
@@ -124,6 +125,7 @@ Public Class IChangeRotor
     '''              SA 22/04/2014 - BT #1595 ==> Added Connected=False to the list of conditions verified to disable screen buttons 
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 19/12/2014 - BA-2143
+    '''              IT 30/01/2015 - BA-2216
     ''' </remarks>
     Private Sub EnableButtons()
         Try
@@ -165,7 +167,8 @@ Public Class IChangeRotor
 
                 ElseIf (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "CLOSED") AndAlso _
                        (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "END") AndAlso _
-                       (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END") Then
+                       ((AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "END") OrElse
+                        (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "CANCELED")) Then 'BA-2216
 
                     bsChangeRotortButton.Enabled = True
                     bsContinueButton.Enabled = False
@@ -198,6 +201,11 @@ Public Class IChangeRotor
                     bsChangeRotortButton.Enabled = True
                     bsContinueButton.Enabled = False
                     bsCancelButton.Enabled = True
+
+                ElseIf (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") AndAlso _
+                       (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") Then 'BA-2216
+                    bsChangeRotorFinalizeButton.Enabled = True
+                    bsChangeRotorReadButton.Enabled = True
                 Else
                     bsChangeRotortButton.Enabled = IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.RAISE_WASH_STATION)
                 End If
@@ -353,6 +361,7 @@ Public Class IChangeRotor
     '''                                           during the light adjustment process 
     '''              IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 19/12/2014 - BA-2143
+    '''              IT 30/01/2015 - BA-2216
     ''' </remarks>
     Public Overrides Sub RefreshScreen(ByVal pRefreshEventType As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pRefreshDS As Biosystems.Ax00.Types.UIRefreshDS)
         Try
@@ -377,6 +386,8 @@ Public Class IChangeRotor
                     bsContinueButton.Enabled = True 'IAx00MainMDI.ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.CHANGE_REACTIONS_ROTOR)
 
                     AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED) = 0 'Once updated UI clear sensor
+                    RecoverProcess(True) 'BA-2216
+
                 End If
 
                 '2nd step is finish when valid ALIGHT o not more chances!!
@@ -433,6 +444,14 @@ Public Class IChangeRotor
                 End If
                 'IT 19/12/2014 - BA-2143 (END)
 
+                'IT 30/01/2015 - BA-2216  (INI)
+                sensorValue = AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED)
+                If (sensorValue = 1) Then
+                    RefreshProgressBar()
+                    AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED) = 0 'Once updated UI clear sensor
+                End If
+                'IT 30/01/2015 - BA-2216  (END)
+
                 RefreshDoneField = True 'RH 28/03/2012
             End If
 
@@ -475,16 +494,6 @@ Public Class IChangeRotor
 
             If (AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 1) Then bsChangeRotortButton.Enabled = False 'DL 25/09/2012
 
-            'BA-2143 - INI
-            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
-                _processIsPaused = True
-            ElseIf (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
-                If _processIsPaused Then
-                    StartProgressBar()
-                End If
-            End If
-            'BA-2143 - END
-
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", ".RefreshScreen " & Me.Name, EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".RefreshScreen", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -508,6 +517,7 @@ Public Class IChangeRotor
     Private Sub IChangeRotor_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
         Try
             InitializeScreen()
+            RecoverProcess() 'IT 30/01/2015 - BA-2216
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".IChangeRotor_Load ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".IChangeRotor_Load", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -522,64 +532,12 @@ Public Class IChangeRotor
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 19/12/2014 - BA-2143
+    '''              IT 30/01/2015 - BA-2216
     ''' </remarks>
     Private Sub bsChangeRotortButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsChangeRotortButton.Click
-        Dim resultData As New GlobalDataTO
         Try
             CreateLogActivity("Btn ChangeRotor", Me.Name & ".bsChangeRotortButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            bsStatusImage.Visible = False 'DL 22/02/2012
-            dxProgressBar.Position = 0
-            _processIsPaused = False 'BA-2143
-
-            If (AnalyzerController.IsAnalyzerInstantiated) Then
-
-                bsChangeRotortButton.Enabled = False
-                bsContinueButton.Enabled = False
-                bsChangeRotorFinalizeButton.Enabled = False 'BA-2143
-                bsChangeRotorReadButton.Enabled = False 'BA-2143
-
-                If AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
-                    'Show message
-                    ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
-                    bsChangeRotortButton.Enabled = True
-                Else
-                    ScreenWorkingProcess = True
-                    IAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
-                    IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
-                End If
-
-                Try
-                    If AnalyzerController.Instance.ChangeRotorStartProcess() Then
-                        'Disable buttons
-                        'DL 28/02/2012
-                        dxProgressBar.Visible = False
-                        bsStatusImage.Visible = False
-                        'DL 28/02/2012
-
-                        bsChangeRotortButton.Enabled = False
-                        bsCancelButton.Enabled = False
-                    End If
-                Catch ex As Exception
-                    ScreenWorkingProcess = False
-                    ShowMessage("Warning", resultData.ErrorCode)
-
-                    'DL 28/02/2012
-                    dxProgressBar.Visible = True
-                    dxProgressBar.Position = dxProgressBar.Properties.Maximum
-
-                    bsStatusImage.Image = Image.FromFile(WRONGIconName)
-                    bsStatusImage.Visible = True
-
-                    IAx00MainMDI.EnableButtonAndMenus(True)
-                    IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Enable vertical action buttons bar
-                    'DL 28/02/2012
-                End Try
-
-            End If
-
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
-            Cursor = Cursors.Default        'DL 04/04/2012
-
+            ChangeRotorStart()
         Catch ex As Exception
             CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Me.Name & ".bsChangeRotortButton_Click ", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
             ShowMessage(Me.Name & ".bsChangeRotortButton_Click", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
@@ -597,42 +555,12 @@ Public Class IChangeRotor
     ''' <remarks>
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 19/12/2014 - BA-2143
+    '''              IT 30/01/2015 - BA-2216
     ''' </remarks>
     Private Sub bsContinueButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsContinueButton.Click
-        Dim resultData As New GlobalDataTO
-
         Try
             CreateLogActivity("Btn Continue", Me.Name & ".bsContinueButton_Click", EventLogEntryType.Information, False) 'JV #1360 24/10/2013
-            If (AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then 'AG 25/05/2012
-                'Show message
-                ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
-                'AG 25/05/2012
-            Else
-                ' goneSecondReject = False
-                bsChangeRotortButton.Enabled = False
-                ExistBaseLineInitError = False
-            End If
-
-            Try
-                If AnalyzerController.Instance.ChangeRotorContinueProcess() Then
-
-                    IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.LIGHT_ADJUSTMENT)
-                    statusMDIChangedFlag = True
-                    StartProgressBar() 'BA-2143 
-
-                End If
-            Catch ex As Exception
-                ShowMessage("Warning", resultData.ErrorCode)
-
-                'DL 28/02/2012. begin
-                dxProgressBar.Visible = False
-                bsStatusImage.Visible = False
-                'DL 28/02/2012. end
-            End Try
-
-            IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
-            Cursor = Cursors.Default        'DL 04/04/2012
-
+            ChangeRotorContinue()
         Catch ex As Exception
             IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
             Cursor = Cursors.Default        'DL 04/04/2012
@@ -642,6 +570,12 @@ Public Class IChangeRotor
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
     Private Sub bsChangeRotorReadButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorReadButton.Click
         Try
 
@@ -663,6 +597,12 @@ Public Class IChangeRotor
         End Try
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="sender"></param>
+    ''' <param name="e"></param>
+    ''' <remarks></remarks>
     Private Sub bsChangeRotorFinalizeButton_Click(sender As Object, e As EventArgs) Handles bsChangeRotorFinalizeButton.Click
         Try
 
@@ -690,19 +630,16 @@ Public Class IChangeRotor
     ''' 
     ''' </summary>
     ''' <remarks>
-    ''' Created by: IT 13/01/2015 - BA-2143
+    ''' Created by:  IT 13/01/2015 - BA-2143
+    ''' Modified by: IT 30/01/2015 - BA-2216
     ''' </remarks>
     Private Sub StartProgressBar()
         'DL 28/02/2012. Begin
         Dim secondsInPause As Integer = 0
 
-        If (Not _processIsPaused) Then
-            dxProgressBar.Position = 0
-        Else
-            secondsInPause = dxProgressBar.Position
-            _processIsPaused = False
-        End If
+        _processIsPaused = IsProcessPaused()
 
+        secondsInPause = dxProgressBar.Position
         dxProgressBar.Visible = True
         dxProgressBar.Show()
 
@@ -754,9 +691,198 @@ Public Class IChangeRotor
             If Not AnalyzerController.Instance.Analyzer.Connected Then
                 dxProgressBar.Visible = False
                 bsStatusImage.Visible = False
-                '   bsCancelButton.Enabled = True
+                'bsCancelButton.Enabled = True
             End If
             'DL 26/09/2012. end
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub ChangeRotorStart()
+        Dim resultData As New GlobalDataTO
+        Dim processStarted As Boolean = False
+
+        bsStatusImage.Visible = False 'DL 22/02/2012
+        dxProgressBar.Position = 0
+        _processIsPaused = False
+
+        If (AnalyzerController.IsAnalyzerInstantiated) Then
+
+            bsChangeRotortButton.Enabled = False
+            bsContinueButton.Enabled = False
+            bsChangeRotorFinalizeButton.Enabled = False 'BA-2143
+            bsChangeRotorReadButton.Enabled = False 'BA-2143
+
+            If AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then
+                'Show message
+                ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
+                bsChangeRotortButton.Enabled = True
+            Else
+                ScreenWorkingProcess = True
+                IAx00MainMDI.EnableButtonAndMenus(False) 'AG 18/10/2011
+                IAx00MainMDI.SetActionButtonsEnableProperty(False) 'AG 12/07/2011 - Disable all vertical action buttons bar
+            End If
+
+            Try
+                processStarted = AnalyzerController.Instance.ChangeRotorStartProcess(_recoverProcess)
+
+                If (processStarted) Then
+                    'Disable buttons
+                    'DL 28/02/2012
+                    dxProgressBar.Visible = False
+                    bsStatusImage.Visible = False
+                    'DL 28/02/2012
+
+                    bsChangeRotortButton.Enabled = False
+                    bsCancelButton.Enabled = False
+                End If
+
+            Catch ex As Exception
+                ScreenWorkingProcess = False
+                ShowMessage("Warning", resultData.ErrorCode)
+
+                'DL 28/02/2012
+                dxProgressBar.Visible = True
+                dxProgressBar.Position = dxProgressBar.Properties.Maximum
+
+                bsStatusImage.Image = Image.FromFile(WRONGIconName)
+                bsStatusImage.Visible = True
+
+                IAx00MainMDI.EnableButtonAndMenus(True)
+                IAx00MainMDI.SetActionButtonsEnableProperty(True) 'Enable vertical action buttons bar
+                'DL 28/02/2012
+            End Try
+
+        End If
+
+        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+        Cursor = Cursors.Default        'DL 04/04/2012
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub ChangeRotorContinue()
+        Dim resultData As New GlobalDataTO
+        Dim processStarted As Boolean = False
+
+        If (AnalyzerController.IsAnalyzerInstantiated) AndAlso AnalyzerController.Instance.Analyzer.ExistBottleAlarms Then 'AG 25/05/2012
+            'Show message
+            'ShowMessage("Warning", GlobalEnumerates.Messages.NOT_LEVEL_AVAILABLE.ToString)
+            'AG 25/05/2012
+        Else
+            bsChangeRotortButton.Enabled = False
+            ExistBaseLineInitError = False
+        End If
+
+        Try
+            processStarted = AnalyzerController.Instance.ChangeRotorContinueProcess(_recoverProcess)
+
+            If (processStarted) Then
+                IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.LIGHT_ADJUSTMENT)
+                statusMDIChangedFlag = True
+                StartProgressBar() 'BA-2143 
+            End If
+        Catch ex As Exception
+            ShowMessage("Warning", resultData.ErrorCode)
+
+            'DL 28/02/2012. begin
+            dxProgressBar.Visible = False
+            bsStatusImage.Visible = False
+            'DL 28/02/2012. end
+        End Try
+
+        IAx00MainMDI.ShowStatus(GlobalEnumerates.Messages.STANDBY) 'DL 04/04/2012
+        Cursor = Cursors.Default        'DL 04/04/2012
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks>
+    ''' Created by: IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Function IsProcessPaused() As Boolean
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
+            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) <> "CANCELED") OrElse
+            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) <> "CANCELED") OrElse
+            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) <> "CANCELED") OrElse
+            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) <> "CANCELED") OrElse
+            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) <> "CANCELED") Then
+                Return False
+            End If
+        End If
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
+            If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "") Then
+                Return False
+            End If
+        End If
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "CLOSED") Then
+            Return False
+        End If
+
+        Return True
+
+    End Function
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Created by: IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub RefreshProgressBar()
+
+        If (statusMDIChangedFlag) Then
+            If IsProcessPaused() Then
+                _processIsPaused = True
+            Else
+                If (_processIsPaused) Then
+                    StartProgressBar()
+                End If
+            End If
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <param name="continueProcess"></param>
+    ''' <remarks>
+    ''' Created by: IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub RecoverProcess(Optional ByVal continueProcess As Boolean = False)
+
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Or
+            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
+
+            If (Not continueProcess) Then
+                _recoverProcess = True
+                ChangeRotorStart()
+            Else
+
+                If (_recoverProcess) Then
+                    If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) <> "") Then
+                        ChangeRotorContinue()
+                    End If
+                    _recoverProcess = False
+                End If
+
+            End If
         End If
 
     End Sub

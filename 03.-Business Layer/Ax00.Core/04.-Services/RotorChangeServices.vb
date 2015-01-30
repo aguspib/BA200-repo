@@ -24,6 +24,7 @@ Namespace Biosystems.Ax00.Core.Services
     ''' </summary>
     ''' <remarks>
     ''' Created by:  IT 19/12/2014 - BA-2143
+    ''' Modified by: IT 30/01/2015 - BA-2216
     ''' </remarks>
     Public Class RotorChangeServices
 
@@ -38,6 +39,7 @@ Namespace Biosystems.Ax00.Core.Services
         Private _forceEmptyAndFinalize As Boolean = False
         Private _staticBaseLineFinished As Boolean = False
         Private _dynamicBaseLineValid As Boolean = False
+        Private _isInRecovering As Boolean = False
 
 #End Region
 
@@ -71,47 +73,51 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function StartProcess() As Boolean
+        Public Function StartProcess(ByVal isInRecovering As Boolean) As Boolean
             Dim resultData As New GlobalDataTO
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
-            Initialize()
+            If (Not isInRecovering) Then
+                Initialize()
 
-            If _analyzer.ExistBottleAlarms Then
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "CANCELED")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
-                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
-                Return False
-            Else
-                'TR 28/10/2011 -Turn off Sound alarm
-                _analyzer.StopAnalyzerRinging()
-                If _analyzer.Connected Then
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
-                    _staticBaseLineFinished = False
-
-                    resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, GlobalEnumerates.Ax00WashStationControlModes.UP, "")
-
-                    If resultData.HasError Then
-                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "")
-                        Throw New Exception(resultData.ErrorCode)
-                    End If
-                Else
+                If _analyzer.ExistBottleAlarms Then
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "PAUSED")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "CANCELED")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "CANCELED")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
+                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "CANCELED")
                     Return False
-                End If
-            End If
+                Else
+                    'TR 28/10/2011 -Turn off Sound alarm
+                    _analyzer.StopAnalyzerRinging()
+                    If _analyzer.Connected Then
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "")
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "")
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
+                        _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
+                        _staticBaseLineFinished = False
 
-            'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                        resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH_STATION_CTRL, True, Nothing, GlobalEnumerates.Ax00WashStationControlModes.UP, "")
+
+                        If resultData.HasError Then
+                            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "")
+                            Throw New Exception(resultData.ErrorCode)
+                        End If
+                    Else
+                        Return False
+                    End If
+                End If
+
+                'Update analyzer session flags into DataBase
+                If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                    resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                End If
+            Else
+                InitializeRecover()
             End If
 
             Return True
@@ -123,29 +129,18 @@ Namespace Biosystems.Ax00.Core.Services
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function ContinueProcess() As Boolean
+        Public Function ContinueProcess(ByVal isInRecovering As Boolean) As Boolean
             Dim resultData As New GlobalDataTO
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
             If (_analyzer.Connected) Then 'AG 06/02/2012 - add AnalyzerController.Instance.Analyzer.Connected to the activation rule
-
-                resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True, Nothing, Nothing, Nothing)
-                _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
-
-                If Not resultData.HasError Then
-                    _analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
+                If (isInRecovering) Then
+                    RecoverProcess()
                 Else
-                    _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "")
-                    Throw New Exception(resultData.ErrorCode)
+                    ExecuteNewRotorStep()
                 End If
             Else
                 Return False
-            End If
-
-            'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
             End If
 
             Return True
@@ -184,26 +179,30 @@ Namespace Biosystems.Ax00.Core.Services
         ''' Modified by:  AG 20/01/2015 - BA-2216
         ''' </remarks>
         Public Function RecoverProcess() As Boolean
-            Dim valueToReturn As Boolean = True
             Try
+                _isInRecovering = True
 
-                InitializeRecover() 'Initialize flags
                 Dim nextStep As RotorChangeStepsEnum
                 nextStep = GetNextStep()
 
-                If nextStep = RotorChangeStepsEnum.NewRotor Then
-                    ExecuteNewRotorStep()
-                Else
-                    'CheckIfCanContinue()
-                End If
+                Select nextStep
+                    Case RotorChangeStepsEnum.NewRotor,
+                         RotorChangeStepsEnum.DynamicBaseLineRead,            
+                         RotorChangeStepsEnum.Finalize
+                        ValidateProcess()
+                    Case RotorChangeStepsEnum.DynamicBaseLineEmpty
+                        ProcessDynamicBaseLine()
+                End Select
 
+                _isInRecovering = False
+
+                Return True
 
             Catch ex As Exception
-                valueToReturn = False
                 Dim myLogAcciones As New ApplicationLogManager()
                 myLogAcciones.CreateLogActivity(ex.Message, "RotorChangeServices.RecoverProcess", EventLogEntryType.Error, False)
+                Return False
             End Try
-            Return valueToReturn
         End Function
 
 #End Region
@@ -216,16 +215,18 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks></remarks>
         Private Sub CheckIfCanContinue()
 
-            Dim nextStep As RotorChangeStepsEnum
-            nextStep = GetNextStep()
+            If (Not _isInRecovering) Then
+                Dim nextStep As RotorChangeStepsEnum
+                nextStep = GetNextStep()
 
-            Select Case nextStep
-                Case RotorChangeStepsEnum.Washing,
-                     RotorChangeStepsEnum.StaticBaseLine,
-                     RotorChangeStepsEnum.DynamicBaseLineFill,
-                     RotorChangeStepsEnum.DynamicBaseLineEmpty
-                    ValidateProcess()
-            End Select
+                Select Case nextStep
+                    Case RotorChangeStepsEnum.Washing,
+                         RotorChangeStepsEnum.StaticBaseLine,
+                         RotorChangeStepsEnum.DynamicBaseLineFill,
+                         RotorChangeStepsEnum.DynamicBaseLineEmpty
+                        ValidateProcess()
+                End Select
+            End If
 
         End Sub
 
@@ -239,6 +240,9 @@ Namespace Biosystems.Ax00.Core.Services
             _currentStep = GetNextStep()
 
             Select Case _currentStep
+
+                Case RotorChangeStepsEnum.NewRotor
+                    ExecuteNewRotorStep()
 
                 Case RotorChangeStepsEnum.Washing
                     If (_analyzer.CheckIfWashingIsPossible()) Then
@@ -273,7 +277,8 @@ Namespace Biosystems.Ax00.Core.Services
                     End If
 
                 Case RotorChangeStepsEnum.DynamicBaseLineRead
-                        ExecuteDynamicBaseLineReadStep()
+                    RestartProcess()
+                    ExecuteDynamicBaseLineReadStep()
 
                 Case RotorChangeStepsEnum.DynamicBaseLineEmpty
                     If (IsEmptyingAllowed()) Then
@@ -311,7 +316,8 @@ Namespace Biosystems.Ax00.Core.Services
             If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Then
 
                 'AG 20/01/2015 BA-2216
-                If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "") Then
+                If ((_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "") Or
+                    (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "INI")) Then
                     Return RotorChangeStepsEnum.NewRotor
                 End If
 
@@ -378,6 +384,10 @@ Namespace Biosystems.Ax00.Core.Services
 
                     If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "CANCELED") Then
                         Return RotorChangeStepsEnum.DynamicBaseLineFill
+                    End If
+
+                    If ((_isInRecovering) And (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") And (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "")) Then
+                        Return RotorChangeStepsEnum.DynamicBaseLineRead
                     End If
 
                     If ((_forceEmptyAndFinalize) Or (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED")) Then
@@ -479,6 +489,7 @@ Namespace Biosystems.Ax00.Core.Services
             'User execute the change reaction rotor: Sw instructions NRotor + Wash + Alight
             _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
             resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True) 'Send a WASH instruction (Conditioning complete)
+            _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
 
             'Update analyzer session flags into DataBase
             If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
@@ -497,7 +508,7 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.CurrentInstructionAction = InstructionActions.FlightEmptying
             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.EmptyRotor), "0"})
             _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
-
+            _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
             _forceEmptyAndFinalize = False
 
         End Sub
@@ -511,6 +522,7 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.CurrentInstructionAction = InstructionActions.FlightReading
             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.Perform), "0"})
             _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+            _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
 
             _dynamicBaseLineValid = False
 
@@ -525,6 +537,7 @@ Namespace Biosystems.Ax00.Core.Services
             _analyzer.CurrentInstructionAction = InstructionActions.FlightFilling
             Dim myParams As New List(Of String)(New String() {CStr(Ax00FlightAction.FillRotor), "0"})
             _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT, True, Nothing, Nothing, String.Empty, myParams)
+            _analyzer.SetAnalyzerNotReady()
 
         End Sub
 
@@ -580,6 +593,8 @@ Namespace Biosystems.Ax00.Core.Services
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
+
+                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
@@ -602,6 +617,8 @@ Namespace Biosystems.Ax00.Core.Services
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
+
+                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
@@ -624,6 +641,8 @@ Namespace Biosystems.Ax00.Core.Services
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
+
+                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
@@ -642,13 +661,16 @@ Namespace Biosystems.Ax00.Core.Services
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "CANCELED")
 
                 _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.DYNAMIC_BASELINE_ERROR, 1, True)
-                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.Alarms.BASELINE_INIT_ERR, 1, True)
+                '_analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.Alarms.BASELINE_INIT_ERR, 1, True)
+                _analyzer.Alarms.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
 
                 'Update analyzer session flags into DataBase
                 If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
+
+                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
@@ -671,6 +693,8 @@ Namespace Biosystems.Ax00.Core.Services
                     Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
                     resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
                 End If
+
+                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
@@ -686,12 +710,14 @@ Namespace Biosystems.Ax00.Core.Services
 
             If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "INPROCESS")
-            End If
 
-            'Update analyzer session flags into DataBase
-            If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
-                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
-                resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                'Update analyzer session flags into DataBase
+                If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                    Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                    resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+                End If
+
+                _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PROCESS_STATUS_CHANGED, 1, True)
             End If
 
         End Sub
@@ -735,27 +761,59 @@ Namespace Biosystems.Ax00.Core.Services
         ''' <remarks>AG 20/01/2015 BA-2216</remarks>
         Private Sub InitializeRecover()
 
+            Dim resultData As New GlobalDataTO
+            Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
+
             Initialize()
 
+            _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 1, True)
+
             If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "INI") Then
-                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "" 'Re-send NROTOR
+                '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "" 'Re-send NROTOR
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "INI") Then
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "") 'Re-send Washing
 
             ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "INI") Then
-                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.BaseLine) = "" 'Re-send ALIGHT
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "") 'Re-send ALIGHT
 
             ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "INI") Then
                 _staticBaseLineFinished = True
-                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "" 'Re-send FLIGHT mode fill
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "") 'Re-send FLIGHT mode fill
 
-            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "INI") Then
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "INI") Then
                 _staticBaseLineFinished = True
-                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "" 'Re-send FLIGHT mode read
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "") 'Re-send FLIGHT mode read
 
-            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) = "INI") Then
+            ElseIf ((_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "") Or (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "INI")) And
+                (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") Then
+                _dynamicBaseLineValid = False
+                _forceEmptyAndFinalize = True
+                _analyzer.Alarms.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "") 'Re-send FLIGHT mode read
+
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "INI") Then
                 _staticBaseLineFinished = True
                 _dynamicBaseLineValid = True
-                _analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "" 'Re-send FLIGHT mode empty
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "") 'Re-send FLIGHT mode empty
+
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED") And
+                (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") Then
+                _forceEmptyAndFinalize = True
+                _dynamicBaseLineValid = False
+                _analyzer.Alarms.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+
+            ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED") And
+               (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "END") Then
+                _dynamicBaseLineValid = True
+
+
             End If
+
+            If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then
+                Dim myFlagsDelg As New AnalyzerManagerFlagsDelegate
+                resultData = myFlagsDelg.Update(Nothing, myAnalyzerFlagsDS)
+            End If
+
         End Sub
 
         ''' <summary>
@@ -766,8 +824,15 @@ Namespace Biosystems.Ax00.Core.Services
             Dim resultData As New GlobalDataTO
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
-            _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "INI")
-            resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True) 'Send a WASH instruction (Conditioning complete)
+            resultData = _analyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.NROTOR, True, Nothing, Nothing, Nothing)
+            _analyzer.SetAnalyzerNotReady() 'AG 20/01/2014 after send a instruction set the analyzer as not ready
+
+            If Not resultData.HasError Then
+                _analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.NEW_ROTOR_PERFORMED) = 0 'Once instruction has been sent clear sensor
+            Else
+                _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess, "")
+                Throw New Exception(resultData.ErrorCode)
+            End If
 
             'Update analyzer session flags into DataBase
             If myAnalyzerFlagsDS.tcfgAnalyzerManagerFlags.Rows.Count > 0 Then

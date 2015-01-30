@@ -36,6 +36,7 @@ Partial Public Class IAx00MainMDI
     '''              AG 06/11/2013 - Task #1375
     '''              AG 09/01/2014 - refactoring code in VerticalButtons partial class inherits form
     '''              IT 23/10/2014 - REFACTORING (BA-2016) 
+    '''              IT 30/01/2015 - BA-2216
     ''' </remarks>
     Private Sub ActivateActionButtonBarOrSendNewAction()
         Try
@@ -87,8 +88,9 @@ Partial Public Class IAx00MainMDI
                             bsTSRecover.Enabled = False 'AG 12/03/2012
 
                             'AG 20/06/2012 - If analyzer is in STANDBY  but there are no alight results and start instrument is NOT IN PROCESS -> activate button Start instrument 
-                            If myAx00Status = AnalyzerManagerStatus.STANDBY AndAlso Not AnalyzerController.Instance.Analyzer.ExistsALIGHT AndAlso _
-                            (String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "INPROCESS", False) <> 0 AndAlso String.Compare(AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess), "PAUSED", False) <> 0) Then
+                            If (myAx00Status = AnalyzerManagerStatus.STANDBY AndAlso Not AnalyzerController.Instance.Analyzer.ExistsALIGHT) AndAlso _
+                            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) <> "INPROCESS") AndAlso (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess) <> "PAUSED") AndAlso _
+                            (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) <> "INPROCESS") AndAlso (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) <> "PAUSED") Then 'IT 30/01/2015 - BA-2216
                                 'Means we are in Standby from Service Sw or we have restore database and connected with an analyzer already started
                                 'Solution: Repeat the Start Instrument Process
                                 ApplyRulesStandByWithOutALIGHT(myAx00Ready)

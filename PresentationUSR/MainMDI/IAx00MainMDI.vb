@@ -7667,6 +7667,33 @@ Partial Public Class IAx00MainMDI
         End If
     End Sub
 
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by:  IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub RecoverProcesses()
+
+        If (AnalyzerController.Instance.Analyzer.Connected) Then
+            RecoverChangeRotorProcess()
+        End If
+
+    End Sub
+
+    ''' <summary>
+    ''' 
+    ''' </summary>
+    ''' <remarks>
+    ''' Modified by:  IT 30/01/2015 - BA-2216
+    ''' </remarks>
+    Private Sub RecoverChangeRotorProcess()
+        If (AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") Or
+            AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED" Then
+            CloseActiveMdiChild()
+            OpenMDIChildForm(IChangeRotor)
+        End If
+    End Sub
 
 #End Region
 

@@ -130,14 +130,15 @@ Namespace Biosystems.Ax00.App
         ''' <returns></returns>
         ''' <remarks>
         ''' Modified by:  IT 19/12/2014 - BA-2143
+        '''               IT 30/01/2015 - BA-2216
         ''' </remarks>
-        Public Function ChangeRotorStartProcess() As Boolean
+        Public Function ChangeRotorStartProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
                 If (_rotorChangeServices Is Nothing) Then
                     _rotorChangeServices = New RotorChangeServices(Analyzer)
                 End If
 
-                Return _rotorChangeServices.StartProcess()
+                Return _rotorChangeServices.StartProcess(isInRecovering)
             Catch ex As Exception
                 Throw ex
             End Try
@@ -149,10 +150,15 @@ Namespace Biosystems.Ax00.App
         ''' <returns></returns>
         ''' <remarks>
         ''' Modified by:  IT 19/12/2014 - BA-2143
+        '''               IT 30/01/2015 - BA-2216
         ''' </remarks>
-        Public Function ChangeRotorContinueProcess() As Boolean
+        Public Function ChangeRotorContinueProcess(ByVal isInRecovering As Boolean) As Boolean
             Try
-                Return _rotorChangeServices.ContinueProcess()
+                If (_rotorChangeServices Is Nothing) Then
+                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                End If
+
+                Return _rotorChangeServices.ContinueProcess(isInRecovering)
             Catch ex As Exception
                 Throw ex
             End Try
@@ -163,9 +169,14 @@ Namespace Biosystems.Ax00.App
         ''' </summary>
         ''' <remarks>
         ''' Modified by:  IT 19/12/2014 - BA-2143
+        '''               IT 30/01/2015 - BA-2216
         ''' </remarks>
         Public Sub ChangeRotorRepeatDynamicBaseLineReadStep()
             Try
+                If (_rotorChangeServices Is Nothing) Then
+                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                End If
+
                 _rotorChangeServices.RepeatDynamicBaseLineReadStep()
             Catch ex As Exception
                 Throw ex
@@ -177,9 +188,14 @@ Namespace Biosystems.Ax00.App
         ''' </summary>
         ''' <remarks>
         ''' Modified by:  IT 19/12/2014 - BA-2143
+        '''               IT 30/01/2015 - BA-2216
         ''' </remarks>
         Public Sub ChangeRotorFinalizeProcess()
             Try
+                If (_rotorChangeServices Is Nothing) Then
+                    _rotorChangeServices = New RotorChangeServices(Analyzer)
+                End If
+
                 _rotorChangeServices.EmptyAndFinalizeProcess()
             Catch ex As Exception
                 Throw ex

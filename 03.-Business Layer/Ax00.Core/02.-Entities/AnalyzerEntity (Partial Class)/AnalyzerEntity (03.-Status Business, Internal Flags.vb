@@ -2029,6 +2029,7 @@ Namespace Biosystems.Ax00.Core.Entities
         '''              XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
         '''              AG 20 and 19/01/2015 BA-2216 add dynamic BL functionality and fix issues found!!! (Start instrument process)
         '''                                           use the new RotorChangeServices (Change rotor process)
+        '''              IT 30/01/2015 - BA-2216
         ''' </remarks>
         Private Function RecoverStableSetup(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -2170,15 +2171,16 @@ Namespace Biosystems.Ax00.Core.Entities
 
 
                     'New rotor in course
-                ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
+                ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Or
+                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "PAUSED" Then
+
                     '1.	NewRotor = 'INI'
                     '2.	BaseLine = 'INI'
                     '3. DynamicBL_Fill  = 'INI'
                     '4. DynamicBL_Read  = 'INI'
                     '5. DynamicBL_Empty = 'INI'
 
-                    Dim myRotorServices As New RotorChangeServices(Me)
-                    myRotorServices.RecoverProcess()
+                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERING_PROCESSES, 1, True) 'IT 30/01/2015 - BA-2216
 
                     'Recover in course
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then

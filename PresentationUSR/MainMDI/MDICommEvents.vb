@@ -1834,6 +1834,7 @@ Partial Public Class IAx00MainMDI
     ''' <param name="configSettingsLISTreated"></param>
     ''' <remarks>AG 08/01/2014
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
+    '''              IT 30/01/2015 - BA-2216
     ''' </remarks>
     Private Sub PerformNewSensorValueChanged(ByVal copyRefreshEventList As List(Of GlobalEnumerates.UI_RefreshEvents), copyRefreshDS As UIRefreshDS, _
                                           ByRef monitorTreated As Boolean, ByRef changeRotorTreated As Boolean, ByRef conditioningTreated As Boolean, _
@@ -2118,6 +2119,13 @@ Partial Public Class IAx00MainMDI
                 Cursor = Cursors.Default
             End If
             lnqRes = Nothing
+
+            'IT 30/01/2015 - BA-2216 - INI
+            If AnalyzerController.Instance.Analyzer.GetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERING_PROCESSES) = 1 Then
+                AnalyzerController.Instance.Analyzer.SetSensorValue(GlobalEnumerates.AnalyzerSensors.RECOVERING_PROCESSES) = 0
+                RecoverProcesses()
+            End If
+            'IT 30/01/2015 - BA-2216 - END
 
             'Sensor Messages (messages do not required ActiveMdiChild)
             '---------------------------------------------------------
