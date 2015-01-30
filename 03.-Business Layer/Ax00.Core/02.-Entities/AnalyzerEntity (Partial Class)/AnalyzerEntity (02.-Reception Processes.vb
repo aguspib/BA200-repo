@@ -381,7 +381,7 @@ Namespace Biosystems.Ax00.Core.Entities
                             'Translation method
                             Dim myAlarmsReceivedList As New List(Of GlobalEnumerates.Alarms)
                             Dim myAlarmsStatusList As New List(Of Boolean)
-                            Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2146
+                            Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
 
                             Dim myAlarms As New List(Of GlobalEnumerates.Alarms)
                             Dim myErrorCode As New List(Of Integer)
@@ -418,20 +418,20 @@ Namespace Biosystems.Ax00.Core.Entities
                             End If
                             'end SGM 02/07/2012
 
-                            'AG 04/12/2014 BA-2146
+                            'AG 04/12/2014 BA-2236
                             Dim index As Integer = 0
                             Dim errorCodeID As String = ""
-                            'AG 04/12/2014 BA-2146
+                            'AG 04/12/2014 BA-2236
 
                             For Each alarmID As GlobalEnumerates.Alarms In myAlarms
-                                'AG 04/12/2014 BA-2146 - Method 
+                                'AG 04/12/2014 BA-2236 - Method 
                                 'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
                                 errorCodeID = ""
                                 If index <= myErrorCode.Count - 1 Then
                                     errorCodeID = myErrorCode(index).ToString
                                 End If
                                 PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
-                                'AG 04/12/2014 BA-2146
+                                'AG 04/12/2014 BA-2236
                                 index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
                             Next
 
@@ -456,10 +456,10 @@ Namespace Biosystems.Ax00.Core.Entities
                                     myGlobal = ManageAlarms_SRV(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList)
                                     ' XBC 16/10/2012
                                 Else
-                                    'AG 04/12/2014 BA-2146
+                                    'AG 04/12/2014 BA-2236
                                     'myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList)
                                     myGlobal = ManageAlarms(Nothing, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
-                                    'AG 04/12/2014 BA-2146
+                                    'AG 04/12/2014 BA-2236
                                 End If
 
                             Else 'if not new alarms sure the ansinfo instruction is activated
@@ -1310,7 +1310,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 '    If (Not dbConnection Is Nothing) Then
                 Dim myAlarmsReceivedList As New List(Of GlobalEnumerates.Alarms)
                 Dim myAlarmsStatusList As New List(Of Boolean)
-                Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2146
+                Dim myAlarmsAdditionalInfoList As New List(Of String) 'AG 09/12/2014 BA-2236
 
                 '1- Read the different instruction fields (implement in the same way as we do for instance at ProcessStatusReceived)
                 '   and fill the internal alarm & alarm status lists using the method PrepareLocalAlarmList 
@@ -1402,20 +1402,20 @@ Namespace Biosystems.Ax00.Core.Entities
                 End If
                 'end SGM 09/11/2012
 
-                'AG 04/12/2014 BA-2146
+                'AG 04/12/2014 BA-2236
                 Dim index As Integer = 0
                 Dim errorCodeID As String = ""
-                'AG 04/12/2014 BA-2146
+                'AG 04/12/2014 BA-2236
 
                 For Each alarmID As GlobalEnumerates.Alarms In myAlarms
-                    'AG 04/12/2014 BA-2146 - Method 
+                    'AG 04/12/2014 BA-2236 - Method 
                     'PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, "", Nothing, True) 'AG 13/04/2012 - last parameter (optional) must be true for the error code alarms
                     errorCodeID = ""
                     If index <= myErrorCode.Count - 1 Then
                         errorCodeID = myErrorCode(index).ToString
                     End If
                     PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
-                    'AG 04/12/2014 BA-2146
+                    'AG 04/12/2014 BA-2236
                     index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
                 Next
 
@@ -1444,10 +1444,10 @@ Namespace Biosystems.Ax00.Core.Entities
                             myGlobal = ManageAlarms_SRV(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myFwCodeErrorReceivedList, True)
                             ' XBC 16/10/2012
                         Else
-                            'AG 04/12/2014 BA-2146
+                            'AG 04/12/2014 BA-2236
                             'myGlobal = ManageAlarms(dbConnection, myAlarmsReceivedList, myAlarmsStatusList)
                             myGlobal = ManageAlarms(dbConnection, myAlarmsReceivedList, myAlarmsStatusList, myAlarmsAdditionalInfoList)
-                            'AG 04/12/2014 BA-2146
+                            'AG 04/12/2014 BA-2236
                         End If
                     End If
 

@@ -1004,7 +1004,7 @@ Namespace Biosystems.Ax00.Global
             '***********************
             'Calculations remarks!!!
             '***********************
-            'AG 05/12/2014 BA-2146 code improvement
+            'AG 05/12/2014 BA-2236 code improvement
             'Calculations remarks!!!. In previous versions there were defined in enum CaalculationRemarks but it is better to unify this enum
             'because every alarm added into this enumerate must be also added into method ConvertToAlarmIDEnumerate (in AnalyzerManager class) select case
             'Now I have improve the method ConvertToAlarmIDEnumerate that automatically converts all alarms from String to enum but it demands use all alarms defined in tfmwAlarms exists in the same enumerate
@@ -1076,7 +1076,7 @@ Namespace Biosystems.Ax00.Global
             QC_OUT_OF_RANGE 'AG 20/07/2012
         End Enum
 
-        'AG 04/12/2014 BA-2146 code improvement. Comment this enum and use the Enum Alarms
+        'AG 04/12/2014 BA-2236 code improvement. Comment this enum and use the Enum Alarms
         ''Calculation remarks List
         'Public Enum CaalculationRemarks
         '    'Generic absorbance remarks

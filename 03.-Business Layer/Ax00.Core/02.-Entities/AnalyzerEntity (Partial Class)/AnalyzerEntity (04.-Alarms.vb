@@ -1493,7 +1493,7 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' Created by:  AG 18/03/2011
         ''' Modified by: AG 13/04/2012 - Added optional parameter pAddAlwaysFlag
         '''              AG 25/07/2012 - Added optional parameters pAddInfo and pAdditionalInfoList to be used for the volume missing and clot alarms
-        '''              AG 04/12/2014 BA-2146 add new optional parameters ErrorCode and pErrorCodesList
+        '''              AG 04/12/2014 BA-2236 add new optional parameters ErrorCode and pErrorCodesList
         ''' </remarks>
         Private Sub PrepareLocalAlarmList(ByVal pAlarmCode As GlobalEnumerates.Alarms, ByVal pAlarmStatus As Boolean, _
                                           ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
@@ -1675,21 +1675,21 @@ Namespace Biosystems.Ax00.Core.Entities
                 If (addFlag) Then
                     'New alarm exists ... add to list with TRUE status only if alarm doesnt exists
                     If Not myAlarmListAttribute.Contains(pAlarmCode) Then
-                        'AG 04/12/2014 BA-2146
+                        'AG 04/12/2014 BA-2236
                         AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
 
                         'AG 24/07/2012 - some alarms are never markt as solved. They can be duplicated in pAlarmList
                     ElseIf alarmsWithOKTypeFalse.Contains(pAlarmCode.ToString) Then
                         'AG 29/08/2012 - exception BASELINE_WELL_WARN (change reactions rotor recommend). It can appear several times in the same WS but the alarm is generated once
                         If pAlarmCode <> GlobalEnumerates.Alarms.BASELINE_WELL_WARN Then
-                            'AG 04/12/2014 BA-2146
+                            'AG 04/12/2014 BA-2236
                             AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
                         End If
 
                         'AG 07/09/2012 - base line init can appear several times in Running, for these alarm repetitions a flag defines when stop WS
                     ElseIf pAlarmCode = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
                         If wellBaseLineAutoPausesSession <> 0 Then
-                            'AG 04/12/2014 BA-2146
+                            'AG 04/12/2014 BA-2236
                             AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
                         End If
                         'AG 07/09/2012
@@ -1846,8 +1846,8 @@ Namespace Biosystems.Ax00.Core.Entities
         ''' <param name="pAlarmStatusList"></param>
         ''' <param name="pAddInfo"></param>
         ''' <param name="pAdditionalInfoList"></param>
-        ''' <remarks>AG 04/12/2014 BA-2146
-        ''' AG 09/12/2014 BA-2146 remove parameters pErrorCode and pErrorCodeList. We will use the AdditionalInfo field also for store the error codes</remarks>
+        ''' <remarks>AG 04/12/2014 BA-2236
+        ''' AG 09/12/2014 BA-2236 remove parameters pErrorCode and pErrorCodeList. We will use the AdditionalInfo field also for store the error codes</remarks>
         Private Sub AddLocalActiveAlarmToList(ByVal pAlarmCode As GlobalEnumerates.Alarms, _
                                   ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
                                   Optional ByVal pAddInfo As String = "", _
@@ -1857,7 +1857,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 pAlarmStatusList.Add(True)
 
                 'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
-                'AG 09/12/2014 BA-2146 now also for store the error codes
+                'AG 09/12/2014 BA-2236 now also for store the error codes
                 If Not pAdditionalInfoList Is Nothing AndAlso pAddInfo <> "" Then
                     pAdditionalInfoList.Add(pAddInfo)
                 End If
@@ -4595,7 +4595,7 @@ Namespace Biosystems.Ax00.Core.Entities
 
             Dim alarmIDEnumList As New List(Of GlobalEnumerates.Alarms)
             For Each row As String In pAlarmStringCodes
-                'AG 04/12/2014 BA-2146 code improvement
+                'AG 04/12/2014 BA-2236 code improvement
                 alarmIDEnumList.Add(DirectCast([Enum].Parse(GetType(GlobalEnumerates.Alarms), row), GlobalEnumerates.Alarms))
 
                 'This select must be updated with every alarmID added into enumerate GlobalEnumerates.Alarms
@@ -4790,7 +4790,7 @@ Namespace Biosystems.Ax00.Core.Entities
                 '    End Select
                 'End If
                 '' XBC 18/10/2012 
-                'AG 04/12/2014 BA-2146
+                'AG 04/12/2014 BA-2236
 
             Next
             Return alarmIDEnumList

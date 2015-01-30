@@ -616,7 +616,7 @@ Namespace Biosystems.Ax00.BL
         ''' <remarks>
         ''' AG 14/06/2011 creation - Testing PENDING
         ''' Modified by: RH 30/01/2012 New version
-        ''' AG 15/01/2015 BA-2146 (6) add comments
+        ''' AG 15/01/2015 BA-2236 (6) add comments
         ''' </remarks>
         Public Function DecodeAdditionalInfo(ByVal pAlarmID As String, ByVal pAdditionalInfo As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -628,7 +628,7 @@ Namespace Biosystems.Ax00.BL
 
                 Info = pAdditionalInfo.Split(Separators, StringSplitOptions.None)
 
-                'AG 15/01/2015 BA-2146 (6) - COMMENTS about existing code!!
+                'AG 15/01/2015 BA-2236 (6) - COMMENTS about existing code!!
                 'This method is used for decode the current WS alarms and also the historicls
                 'Current code works OK but if in the future there are new SPECS that implies use different number of separators
                 'Could generate problems for show information in historics alarms generated in previous versions because they have number of separators different

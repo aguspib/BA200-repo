@@ -1044,7 +1044,7 @@ Public Class IHisAlarms
     ''' <remarks>
     ''' Created by:  JB 28/09/2012 (addapted from IMonitorAlarmsTab.vb -> UpdateAlarmsTab() )
     ''' Modified by: JV 27/01/2014 #1463
-    ''' AG 09/12/2014 BA-2146 show the error code when informed 'Alarm Description [error code]' it is stored in AdditionalInfo column
+    ''' AG 09/12/2014 BA-2236 show the error code when informed 'Alarm Description [error code]' it is stored in AdditionalInfo column
     ''' </remarks>
     Private Sub DecodeAlarmDescription(ByRef pRow As HisWSAnalyzerAlarmsDS.vwksAlarmsMonitorRow)
         Dim myGlobalDataTO As New GlobalDataTO
@@ -1172,10 +1172,10 @@ Public Class IHisAlarms
 
                         pRow.Description &= Environment.NewLine & additionalInfo
 
-                        'AG 09/12/2014 BA-2146 - AdditionalInfo = ErrorCode
+                        'AG 09/12/2014 BA-2236 - AdditionalInfo = ErrorCode
                     ElseIf Not myGlobalDataTO.HasError AndAlso IsNumeric(pRow.AdditionalInfo) Then
                         pRow.Description &= " - [" & pRow.AdditionalInfo.ToString & "]"
-                        'AG 09/12/2014 BA-2146
+                        'AG 09/12/2014 BA-2236
 
                     End If
                 End If

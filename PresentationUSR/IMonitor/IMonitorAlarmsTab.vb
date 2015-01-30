@@ -76,7 +76,7 @@ Partial Public Class IMonitor
     '''              SG 30/07/2012 - Decode field Additional Info for ISE Alarms
     '''              SA 23/10/2013 - BT #1355 ==> Special process for Warning Alarm WS_PAUSE_MODE_WARN: if the Alarm has been solved (Pause Mode has finished),
     '''                              the total time the Analyzer was in this state is shown following the Alarm description and formatted as [Hours:Minutes:Seconds]
-    '''              AG 09/12/2014 BA-2146 show the error code when informed 'Alarm Description [error code]' it is stored in AdditionalInfo column
+    '''              AG 09/12/2014 BA-2236 show the error code when informed 'Alarm Description [error code]' it is stored in AdditionalInfo column
     ''' </remarks>
     Public Sub UpdateAlarmsTab(ByVal pRefreshDS As UIRefreshDS)
         Try
@@ -252,10 +252,10 @@ Partial Public Class IMonitor
 
                                     row.Description &= Environment.NewLine & additionalInfo
 
-                                    'AG 09/12/2014 BA-2146 - AdditionalInfo = ErrorCode
+                                    'AG 09/12/2014 BA-2236 - AdditionalInfo = ErrorCode
                                 ElseIf Not myGloblaData.HasError AndAlso IsNumeric(row.AdditionalInfo) Then
                                     row.Description &= " - [" & row.AdditionalInfo.ToString & "]"
-                                    'AG 09/12/2014 BA-2146
+                                    'AG 09/12/2014 BA-2236
 
                                 End If
                             End If
