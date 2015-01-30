@@ -7,7 +7,6 @@ Imports Biosystems.Ax00.DAL.DAO
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.BL
-
     Public Class HistoryControlLotsDelegate
 
 #Region "Public Methods"
@@ -347,125 +346,6 @@ Namespace Biosystems.Ax00.BL
         End Function
 #End Region
 
-#Region "TO DELETE - OLD FUNCTIONS"
-        '''' <summary>
-        '''' When basic data of a Control (Name and/or Sample Type) is changed in Controls Programming Screen,
-        '''' values are updated for all not delete records the Control has in the history table of QC Module
-        '''' Besides, if Min/Max Concentration values have been changed for Tests/Sample Types linked to the Control/Lot
-        '''' they are updated also in the correspondent history table in QC Module
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pControlDS">Typed DataSet ControlDS containing data to update the Control basic
-        ''''                          information in the history table of QC Module</param>
-        '''' <param name="pTestControlsDS">Typed DataSet TestControlsDS with the list of Tests/SampleTypes unlinked from the Control</param>
-        '''' <param name="pDeletedTestControlsDS">Typed DataSet SelectedTestsDS with the list of Tests/SampleTypes unlinked from the Control</param>
-        '''' <param name="pLotChanged">Flag indicating if the Lot used for the Control has been changed. When True, it indicates that is not
-        ''''                           needed to execute the accumulation of QC results for unlinked Tests/SampleTypes</param>
-        '''' <returns>GlobalDataTO containing success/error information</returns>
-        '''' <remarks>
-        '''' Created by:  SA 20/05/2011
-        '''' Modified by: SA 21/12/2011 - Once the open QC Results for the updated Control/Lot and the deleted Test/Sample Types have been cumulated
-        ''''                              and deleted, if the CalculationMode is STATISTIC, QC Results used to calculate the statistical values are
-        ''''                              also deleted
-        '''' </remarks>
-        'Public Function UpdateControlOLD(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pControlDS As ControlsDS, ByVal pTestControlsDS As TestControlsDS, _
-        '                              ByVal pDeletedTestControlsDS As SelectedTestsDS, ByVal pLotChanged As Boolean) As GlobalDataTO
-        '    Dim myGlobalDataTO As New GlobalDataTO
-        '    Dim dbConnection As New SqlClient.SqlConnection
-        '    Try
-        '        myGlobalDataTO = DAOBase.GetOpenDBTransaction(pDBConnection)
-        '        If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(myGlobalDataTO.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                'Update basic Control Data
-        '                Dim myHistoryControlLotsDAO As New tqcHistoryControlLotsDAO
-        '                myGlobalDataTO = myHistoryControlLotsDAO.UpdateControlData(dbConnection, pControlDS)
-
-        '                Dim myQCControlLotID As Integer = 0
-        '                If (Not myGlobalDataTO.HasError) Then
-        '                    'Get the identifier of the ControlLot in the history table of QC Module
-        '                    myGlobalDataTO = myHistoryControlLotsDAO.GetQCControlLotIDByControlIDAndLotNumber(dbConnection, pControlDS.tparControls(0).ControlID, _
-        '                                                                                                      pControlDS.tparControls(0).LotNumber)
-
-        '                    If (Not myGlobalDataTO.HasError AndAlso Not myGlobalDataTO.SetDatos Is Nothing) Then
-        '                        Dim myHistoryControlLotDS As HistoryControlLotsDS = DirectCast(myGlobalDataTO.SetDatos, HistoryControlLotsDS)
-        '                        If (myHistoryControlLotDS.tqcHistoryControlLots.Rows.Count = 1) Then
-        '                            myQCControlLotID = myHistoryControlLotDS.tqcHistoryControlLots(0).QCControlLotID
-
-        '                            Dim myHistoryTestSampleDS As HistoryTestSamplesDS
-        '                            Dim myHistoryTestSamplesDelegate As New HistoryTestSamplesDelegate
-        '                            Dim myHistoryTestControlLotsDelegate As New HistoryTestControlLotsDelegate
-
-        '                            'Update Min/Max Concentration values for the Tests/Sample Types linked to the Control
-        '                            For Each testControlRow As TestControlsDS.tparTestControlsRow In pTestControlsDS.tparTestControls.Rows
-        '                                'Get the identifier of the Test/SampleType in the history table of QC Module
-        '                                myGlobalDataTO = myHistoryTestSamplesDelegate.ReadByTestIDAndSampleTypeOLD(dbConnection, testControlRow.TestID, _
-        '                                                                                                        testControlRow.SampleType)
-        '                                If (myGlobalDataTO.HasError) Then Exit For
-
-        '                                myHistoryTestSampleDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
-        '                                If (myHistoryTestSampleDS.tqcHistoryTestSamples.Rows.Count = 1) Then
-        '                                    'Once the two identifiers have been found, update Min/Max Concentration values 
-        '                                    myGlobalDataTO = myHistoryTestControlLotsDelegate.Update(dbConnection, myHistoryTestSampleDS.tqcHistoryTestSamples(0).QCTestSampleID, _
-        '                                                                                             myQCControlLotID, testControlRow.MinConcentration, testControlRow.MaxConcentration)
-        '                                    If (myGlobalDataTO.HasError) Then Exit For
-        '                                End If
-        '                            Next
-
-        '                            If (Not myGlobalDataTO.HasError) AndAlso (Not pLotChanged) Then
-        '                                'Search if there are QC Results pending to accumulate for the Control and each unlinked Tests/SampleTypes
-        '                                For Each deletedTC As SelectedTestsDS.SelectedTestTableRow In pDeletedTestControlsDS.SelectedTestTable.Rows
-        '                                    'Get the identifier of the Test/SampleType in the history table of QC Module
-        '                                    myGlobalDataTO = myHistoryTestSamplesDelegate.ReadByTestIDAndSampleTypeOLD(dbConnection, deletedTC.TestID, deletedTC.SampleType)
-        '                                    If (myGlobalDataTO.HasError) Then Exit For
-
-        '                                    myHistoryTestSampleDS = DirectCast(myGlobalDataTO.SetDatos, HistoryTestSamplesDS)
-        '                                    If (myHistoryTestSampleDS.tqcHistoryTestSamples.Rows.Count = 1) Then
-        '                                        'Cumulated all pending QC Results for the Control/Lot and Test/SampleType
-        '                                        Dim myCumResultsDelegate As New CumulatedResultsDelegate
-        '                                        myGlobalDataTO = myCumResultsDelegate.SaveCumulateResult(dbConnection, myHistoryTestSampleDS.tqcHistoryTestSamples(0).QCTestSampleID, _
-        '                                                                                                 myQCControlLotID)
-        '                                        If (myGlobalDataTO.HasError) Then Exit For
-
-        '                                        If (myHistoryTestSampleDS.tqcHistoryTestSamples(0).CalculationMode = "STATISTIC") Then
-        '                                            'Delete the group of QC Results used to calculate the statistic values for the Test/SampleType and Control/Lot
-        '                                            Dim myQCResultsDelegate As New QCResultsDelegate
-        '                                            myGlobalDataTO = myQCResultsDelegate.DeleteStatisticResults(dbConnection, myHistoryTestSampleDS.tqcHistoryTestSamples(0).QCTestSampleID, _
-        '                                                                                                        myQCControlLotID)
-        '                                            If (myGlobalDataTO.HasError) Then Exit For
-        '                                        End If
-        '                                    End If
-        '                                Next
-        '                            End If
-        '                        End If
-        '                    End If
-        '                End If
-
-        '                If (Not myGlobalDataTO.HasError) Then
-        '                    'When the Database Connection was opened locally, then the Commit is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
-        '                Else
-        '                    'When the Database Connection was opened locally, then the Rollback is executed
-        '                    If (pDBConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-        '                End If
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        'When the Database Connection was opened locally, then the Rollback is executed
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then DAOBase.RollbackTransaction(dbConnection)
-
-        '        myGlobalDataTO.HasError = True
-        '        myGlobalDataTO.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        myGlobalDataTO.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, " HistoryControlLotsDelegate.UpdateControl", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return myGlobalDataTO
-        'End Function        
-#End Region
     End Class
 End Namespace
 

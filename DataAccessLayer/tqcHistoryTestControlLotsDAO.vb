@@ -5,9 +5,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
-
     Public Class tqcHistoryTestControlLotsDAO
-          
 
 #Region "CRUD Methods"
         ''' <summary>
@@ -336,121 +334,6 @@ Namespace Biosystems.Ax00.DAL.DAO
         End Function
 #End Region
 
-#Region "TO DELETE - OLD METHODS"
-        '''' <summary>
-        '''' Get values of all Control/Lots linked to the specified Test/SampleType
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pQCTestSampleID">Identifier of Test/SampleType in QC</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet HistoryTestControlLotsDS with all values defined for 
-        ''''          all Control/Lots linked to the specified Test/SampleType</returns>
-        '''' <remarks>
-        '''' Created by:  TR 27/05/2011
-        '''' Modified by: SA 25/01/2012 - Get only Controls/Lots having non cumulated QC Results
-        '''' </remarks>
-        'Public Function GetAllControlsLinkedToTestSampleType(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pQCTestSampleID As Integer) As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = " SELECT DISTINCT HCL.QCControlLotID, HCL.ControlName, HTCL.WestgardControlNum " & vbCrLf & _
-        '                                        " FROM   tqcHistoryTestControlLots HTCL INNER JOIN tqcHistoryControlLots HCL ON HTCL.QCControlLotID = HCL.QCControlLotID " & vbCrLf & _
-        '                                                                              " INNER JOIN tqcResults R ON HTCL.QCTestSampleID = R.QCTestSampleID " & vbCrLf & _
-        '                                                                                                     " AND HTCL.QCControlLotID = R.QCControlLotID " & vbCrLf & _
-        '                                        " WHERE  HTCL.QCTestSampleID = " & pQCTestSampleID & vbCrLf & _
-        '                                        " AND    HCL.ClosedLot = 0 " & vbCrLf & _
-        '                                        " AND    HCL.DeletedControl = 0 " & vbCrLf & _
-        '                                        " ORDER BY HCL.ControlName "
-
-        '                Dim myHistoryTestControlLotsDS As New HistoryTestControlLotsDS
-        '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-        '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                        dbDataAdapter.Fill(myHistoryTestControlLotsDS.tqcHistoryTestControlLots)
-        '                    End Using
-        '                End Using
-
-        '                resultData.SetDatos = myHistoryTestControlLotsDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData = New GlobalDataTO
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, " tqcHistoryTestControlLotsDAO.GetAllControlsLinkedToTestSampleType", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-
-        '''' <summary>
-        '''' Get the identifiers in history tables of QC Module for the specified Test/SampleType and Control/Lot
-        '''' </summary>
-        '''' <param name="pDBConnection">Open DB Connection</param>
-        '''' <param name="pTestID">Test Identifier</param>
-        '''' <param name="pSampleType">Sample Type Code</param>
-        '''' <param name="pControlID">Control Identifier</param>
-        '''' <param name="pLotNumber">Lot Number</param>
-        '''' <returns>GlobalDataTO containing a typed DataSet HistoryTestControlLotsDS with the identifiers of the
-        ''''          Test/SampleType and the Control/Lot in QC Module</returns>
-        '''' <remarks>
-        '''' Created by:  SA 17/06/2011
-        '''' </remarks>
-        'Public Function GetQCIDsForTestAndControl(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pTestID As Integer, ByVal pSampleType As String, _
-        '                                          ByVal pControlID As Integer, ByVal pLotNumber As String) As GlobalDataTO
-        '    Dim resultData As GlobalDataTO = Nothing
-        '    Dim dbConnection As SqlClient.SqlConnection = Nothing
-
-        '    Try
-        '        resultData = GetOpenDBConnection(pDBConnection)
-        '        If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-        '            dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-        '            If (Not dbConnection Is Nothing) Then
-        '                Dim cmdText As String = " SELECT HTCL.QCTestSampleID, HTCL.QCControlLotID " & vbCrLf & _
-        '                                        " FROM   tqcHistoryTestControlLots HTCL INNER JOIN tqcHistoryTestSamples HTS ON HTCL.QCTestSampleID = HTS.QCTestSampleID " & vbCrLf & _
-        '                                                                              " INNER JOIN tqcHistoryControlLots HCL ON HTCL.QCControlLotID = HCL.QCControlLotID " & vbCrLf & _
-        '                                        " WHERE  HTS.TestID            = " & pTestID & vbCrLf & _
-        '                                        " AND    HTS.SampleType        = '" & pSampleType & "' " & vbCrLf & _
-        '                                        " AND    HTS.DeletedSampleType = 0 " & vbCrLf & _
-        '                                        " AND    HTS.DeletedTest       = 0 " & vbCrLf & _
-        '                                        " AND    HCL.ControlID         = " & pControlID & vbCrLf & _
-        '                                        " AND    HCL.LotNumber         = N'" & pLotNumber.Replace("'", "''") & "' " & vbCrLf & _
-        '                                        " AND    HCL.ClosedLot         = 0 " & vbCrLf & _
-        '                                        " AND    HCL.DeletedControl    = 0 "
-
-        '                Dim myHistoryTestControlLotsDS As New HistoryTestControlLotsDS
-        '                Using dbCmd As New SqlClient.SqlCommand(cmdText, dbConnection)
-        '                    Using dbDataAdapter As New SqlClient.SqlDataAdapter(dbCmd)
-        '                        dbDataAdapter.Fill(myHistoryTestControlLotsDS.tqcHistoryTestControlLots)
-        '                    End Using
-        '                End Using
-
-        '                resultData.SetDatos = myHistoryTestControlLotsDS
-        '                resultData.HasError = False
-        '            End If
-        '        End If
-        '    Catch ex As Exception
-        '        resultData = New GlobalDataTO
-        '        resultData.HasError = True
-        '        resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString
-        '        resultData.ErrorMessage = ex.Message
-
-        '        'Dim myLogAcciones As New ApplicationLogManager()
-        '        GlobalBase.CreateLogActivity(ex.Message, " tqcHistoryTestControlLotsDAO.GetQCIDsForTestAndControl", EventLogEntryType.Error, False)
-        '    Finally
-        '        If (pDBConnection Is Nothing AndAlso Not dbConnection Is Nothing) Then dbConnection.Close()
-        '    End Try
-        '    Return resultData
-        'End Function
-#End Region
     End Class
 End Namespace
 

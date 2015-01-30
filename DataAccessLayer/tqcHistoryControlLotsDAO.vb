@@ -5,9 +5,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Global
 
 Namespace Biosystems.Ax00.DAL.DAO
-
     Public Class tqcHistoryControlLotsDAO
-          
 
 #Region "CRUD Methods"
         ''' <summary>
