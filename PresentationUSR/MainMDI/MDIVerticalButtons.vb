@@ -646,6 +646,7 @@ Partial Public Class IAx00MainMDI
     ''' <remarks>AG 09/01/2013 - refactoring
     ''' Modified by: IT 23/10/2014 - REFACTORING (BA-2016)
     '''              IT 01/12/2014 - BA-2075
+    '''              IT 30/01/2015 - BA-2216
     ''' </remarks>
     Private Sub ApplyRulesForStandBy(ByVal myAx00Ready As Boolean, ByVal myAx00Action As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal myAx00Status As GlobalEnumerates.AnalyzerManagerStatus)
         Try
@@ -763,7 +764,9 @@ Partial Public Class IAx00MainMDI
 
                         'AG 12/03/2012
                         'bsTSStartInstrumentButton.Enabled = Not bsTSChangeBottlesConfirm.Enabled
-                        If Not bsTSChangeBottlesConfirm.Enabled Then
+                        If (Not bsTSChangeBottlesConfirm.Enabled) AndAlso
+                            (Not AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "INPROCESS") AndAlso
+                            (Not AnalyzerController.Instance.Analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess) = "PAUSED") Then 'BA-2216
                             bsTSStartInstrumentButton.Enabled = ActivateButtonWithAlarms(GlobalEnumerates.ActionButton.START_INSTRUMENT)
                         Else
                             bsTSStartInstrumentButton.Enabled = False

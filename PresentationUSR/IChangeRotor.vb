@@ -665,7 +665,7 @@ Public Class IChangeRotor
             If Not AnalyzerController.Instance.Analyzer.Connected Then ScreenWorkingProcess = False 'DL 26/09/2012
         End While
 
-        If (Not _processIsPaused) Then
+        If (Not _processIsPaused) And (Not ScreenWorkingProcess) Then
             dxProgressBar.Position = dxProgressBar.Properties.Maximum
             dxProgressBar.Show()
             Application.DoEvents()
