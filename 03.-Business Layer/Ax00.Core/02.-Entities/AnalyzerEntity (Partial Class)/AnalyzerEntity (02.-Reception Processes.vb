@@ -432,6 +432,7 @@ Namespace Biosystems.Ax00.Core.Entities
                                 End If
                                 PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
                                 'AG 04/12/2014 BA-2146
+                                index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
                             Next
 
                             ' XBC 16/10/2012 - Alarms treatment for Service
@@ -1415,6 +1416,7 @@ Namespace Biosystems.Ax00.Core.Entities
                     End If
                     PrepareLocalAlarmList(alarmID, True, myAlarmsReceivedList, myAlarmsStatusList, errorCodeID, myAlarmsAdditionalInfoList, True)
                     'AG 04/12/2014 BA-2146
+                    index += 1 'AG 30/01/2015 BA-2222 increment the counter!!
                 Next
 
                 'AG 02/03/2012
