@@ -768,6 +768,7 @@ Namespace Biosystems.Ax00.Core.Services
 
             _analyzer.UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 1, True)
 
+            'NEWROTORprocess in INPROCESS status
             If (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "INI") Then
                 '_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.NewRotor) = "" 'Re-send NROTOR
             ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.Washing) = "INI") Then
@@ -796,6 +797,8 @@ Namespace Biosystems.Ax00.Core.Services
                 _dynamicBaseLineValid = True
                 _analyzer.UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "") 'Re-send FLIGHT mode empty
 
+
+                'NEWROTORprocess in PAUSED status
             ElseIf (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) = "CANCELED") And
                 (_analyzer.SessionFlag(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) = "CANCELED") Then
                 _forceEmptyAndFinalize = True
