@@ -206,14 +206,6 @@ Public Class QCCumulatedResultsByTestControlReport
         End With
     End Sub
 #End Region
-    Shared ReadOnly defaultDateTimeMask As String = Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.FullDateTimePattern
-    Private Sub ReportHeader_BeforePrint(sender As Object, e As Drawing.Printing.PrintEventArgs) Handles ReportHeader.BeforePrint
-        Dim DTFI = New DateTimeFormatInfo()
-        DTFI.FullDateTimePattern = "YY-MM-dd hh:mm"
-        Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat = DTFI
-    End Sub
 
-    Private Sub BottomMargin_AfterPrint(sender As Object, e As EventArgs) Handles BottomMargin.AfterPrint
-        Threading.Thread.CurrentThread.CurrentCulture.DateTimeFormat.FullDateTimePattern = defaultDateTimeMask
-    End Sub
+
 End Class

@@ -1197,11 +1197,11 @@ Public Class UiAx00Login
         Try
             ChangePasswordButtonStatus()
 
-            If (e.KeyCode = Keys.Enter) Then
-                bsPasswordTextBox.Focus()
-                bsPasswordTextBox.SelectAll()
-                e.Handled = True
-            End If
+            '    If (e.KeyCode = Keys.Enter) Then
+            '        bsPasswordTextBox.Focus()
+            '        bsPasswordTextBox.SelectAll()
+            '        e.Handled = True
+            '    End If
 
         Catch ex As Exception
             GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".BsUserIDTextBox_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
@@ -1215,18 +1215,18 @@ Public Class UiAx00Login
     ''' <remarks>
     ''' Created by:  RH 09/03/2012
     ''' </remarks>
-    Private Sub bsPasswordTextBox_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles bsPasswordTextBox.KeyUp
-        Try
-            If (e.KeyCode = Keys.Enter) Then
-                bsLoginButton.Focus()
-                e.Handled = True
-            End If
+    'Private Sub bsPasswordTextBox_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles bsPasswordTextBox.KeyUp
+    'Try
+    '    If (e.KeyCode = Keys.Enter) Then
+    '        bsLoginButton.Focus()
+    '        e.Handled = True
+    '    End If
 
-        Catch ex As Exception
-            GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPasswordTextBox_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
-            ShowMessage(Name & ".bsPasswordTextBox_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
-        End Try
-    End Sub
+    'Catch ex As Exception
+    '    GlobalBase.CreateLogActivity(ex.Message + " ((" + ex.HResult.ToString + "))", Name & ".bsPasswordTextBox_KeyUp", EventLogEntryType.Error, GetApplicationInfoSession().ActivateSystemLog)
+    '    ShowMessage(Name & ".bsPasswordTextBox_KeyUp", GlobalEnumerates.Messages.SYSTEM_ERROR.ToString, ex.Message + " ((" + ex.HResult.ToString + "))", Me)
+    'End Try
+    'End Sub
 
     Private Sub bsUserIDTextBox_Enter(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles bsUserIDTextBox.Enter
         BsErrorProvider1.Clear()
@@ -1299,5 +1299,13 @@ Public Class UiAx00Login
         Catch ex As Exception
 
         End Try
+    End Sub
+
+    Private Sub bsUserIDTextBox_TextChanged(sender As Object, e As EventArgs) Handles bsUserIDTextBox.TextChanged
+
+    End Sub
+
+    Private Sub bsLoginTimer_Tick(sender As Object, e As EventArgs) Handles bsLoginTimer.Tick
+
     End Sub
 End Class
