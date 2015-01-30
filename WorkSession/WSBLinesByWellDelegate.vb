@@ -420,7 +420,7 @@ Namespace Biosystems.Ax00.BL
 
                         'If not force reset then decide depending the parameter that depends by model
                         If Not pForceResetFlag Then
-                            resultData = myParams.ReadTextValueByParameterName(Nothing, GlobalEnumerates.SwParameters.BL_TYPE_FOR_WELLREJECT.ToString(), pAnalyzerModel)
+                            resultData = myParams.ReadTextValueByParameterName(dbConnection, GlobalEnumerates.SwParameters.BL_TYPE_FOR_WELLREJECT.ToString(), pAnalyzerModel)
                             If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
                                 Dim textValue As String = ""
                                 textValue = CStr(resultData.SetDatos)

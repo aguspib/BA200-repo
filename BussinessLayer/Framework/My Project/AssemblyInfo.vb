@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("BioSystems")> 
 <Assembly: AssemblyProduct("Framework")> 
-<Assembly: AssemblyCopyright("Copyright © BioSystems 2014")> 
+<Assembly: AssemblyCopyright("Copyright © BioSystems 2015")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' mediante el asterisco ('*'), como se muestra a continuación:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("3.0.4.0")> 
-<Assembly: AssemblyFileVersion("3.0.4.0")> 
+<Assembly: AssemblyVersion("3.0.5.0")> 
+<Assembly: AssemblyFileVersion("3.0.5.0")> 
