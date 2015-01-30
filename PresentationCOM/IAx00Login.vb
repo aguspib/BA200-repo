@@ -1209,12 +1209,12 @@ Public Class UiAx00Login
         End Try
     End Sub
 
-    ''' <summary>
-    ''' Move focus to bsLoginButton when rhe user presses Enter User TextBox has the focus
-    ''' </summary>
-    ''' <remarks>
-    ''' Created by:  RH 09/03/2012
-    ''' </remarks>
+    ' ''' <summary>
+    ' ''' Move focus to bsLoginButton when rhe user presses Enter User TextBox has the focus
+    ' ''' </summary>
+    ' ''' <remarks>
+    ' ''' Created by:  RH 09/03/2012
+    ' ''' </remarks>
     'Private Sub bsPasswordTextBox_KeyUp(ByVal sender As System.Object, ByVal e As System.Windows.Forms.KeyEventArgs) Handles bsPasswordTextBox.KeyUp
     'Try
     '    If (e.KeyCode = Keys.Enter) Then
