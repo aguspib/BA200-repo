@@ -944,19 +944,26 @@ Namespace Biosystems.Ax00.LISCommunications
         '''                               in which case, it has the same value than field LISPatientID)  
         '''              SA  14/05/2013 - Changed validations of Duplicated Request and Duplicated Specimen: instead using field ESPatientID to compare by Patient, use
         '''                               field SampleID if ExternalQC is FALSE and SpecimenID used as SampleID if ExternalQC is TRUE
-        '''              SA  11/06/2013 - BT #1433 ==> When load data in an ImportErrorLogDS, inform field LineText as "MessageID | AwosID" instead of inform specific fields 
-        '''                                            MessageID and AwosID in the DS (due to these fields have been deleted). Call function ImportErrorsLogDelegate.Add to 
-        '''                                            save data loaded in the ImportErrorsLogDS in table twksImportErrorsLog
-        '''              JC  27/06/2013 - BT #1205 ==> When the processed Service Tag contains a Patient request to add, if field LISPatientID is not informed for it, 
-        '''                                            the AwosID is rejected. Patient Samples corresponding to an External QC are excluded from this validation
-        '''              SA  19/12/2013 - BT #1433 ==> When field LISPatientID is not informed in the processed Service Tag, a row is added to an ImportErrorLogDS with 
-        '''                                            error code LISPATIENTID_NOT_INFORMED
-        '''              SA  17/02/2014 - BT #1510 ==> Code for adding rejected Order Tests to the entry DS pRejectedOTLISInfoDS has been commented to avoid the sending 
-        '''                                            of rejecting messages to LIS and reduce message traffic. Exceptions: the rejections due to LIS_INVALID_FIELDNUM (a
-        '''                                            mandatory field is not informed in the message), LIS_INVALID_TEST (the requested Test is not mapped),  
-        '''                                            LIS_DUPLICATE_SPECIMEN (there is already an Order Test for the same SampleClass and SpecimenID but different Patient) 
-        '''                                            and LISPATIENTID_NOT_INFORMED (field LISPatientID is empty in the message) are still sent
-        '''              SA  01/04/2014 - BT #1564 ==> Added new parameter for the Message Date and Time, and inform them when calling function SaveFromLIS in SavedWSDelegate
+        '''              SA  11/06/2013 - BA-1433 ==> When load data in an ImportErrorLogDS, inform field LineText as "MessageID | AwosID" instead of inform specific fields 
+        '''                                           MessageID and AwosID in the DS (due to these fields have been deleted). Call function ImportErrorsLogDelegate.Add to 
+        '''                                           save data loaded in the ImportErrorsLogDS in table twksImportErrorsLog
+        '''              JC  27/06/2013 - BA-1205 ==> When the processed Service Tag contains a Patient request to add, if field LISPatientID is not informed for it, 
+        '''                                           the AwosID is rejected. Patient Samples corresponding to an External QC are excluded from this validation
+        '''              SA  19/12/2013 - BA-1433 ==> When field LISPatientID is not informed in the processed Service Tag, a row is added to an ImportErrorLogDS with 
+        '''                                           error code LISPATIENTID_NOT_INFORMED
+        '''              SA  17/02/2014 - BA-1510 ==> Code for adding rejected Order Tests to the entry DS pRejectedOTLISInfoDS has been commented to avoid the sending 
+        '''                                           of rejecting messages to LIS and reduce message traffic. Exceptions: the rejections due to:
+        '''                                           ** LIS_INVALID_FIELDNUM (a mandatory field is not informed in the message), returned by function DecodeXMLServiceTag
+        '''                                           ** LIS_INVALID_TEST (the requested Test is not mapped), returned by function DecodeXMLServiceTag
+        '''                                           ** LISPATIENTID_NOT_INFORMED (field LISPatientID is empty in the message) are still sent
+        '''                                           ** LIS_DUPLICATE_SPECIMEN (there is already an Order Test for the same SampleClass and SpecimenID but different Patient) 
+        '''                                           ** LIMS_INVALID_SAMPLETYPE (the Test/Sample Type does not exists in BAx00 or, for Controls, it exists but QC is not active 
+        '''                                              or it is active but there are not active linked Controls), returned by function ApplyValidationsForAddOrderTests
+        '''              SA  01/04/2014 - BA-1564 ==> Added new parameter for the Message Date and Time, and inform them when calling function SaveFromLIS in SavedWSDelegate
+        '''              SA  29/01/2015 - BA-1610 ==> When function ApplyValidationsForAddOrderTests returns error INCOMPLETE_TESTSAMPLE (which means the Test/Sample Type has
+        '''                                           been rejected due to its Calibration Programming in not complete), do not add a row in the DS of Rejected Order Tests, 
+        '''                                           due to a Rejected Message has not to be sent to LIS in this case.  Instead, a row is added in the ApplicationLog informing 
+        '''                                           the Test/SampleType and the error
         ''' </remarks>
         Public Function ProcessLISOrderTests(ByVal pXmlDoc As XmlDocument, ByVal pPatientsDS As PatientsDS, ByVal pOrdersDS As OrdersDS, ByRef pRejectedOTLISInfoDS As OrderTestsLISInfoDS, _
                                              ByVal pListTestsMappingDS As AllTestsByTypeDS, ByVal pLISConfgMappingsDS As LISMappingsDS, ByVal pDefaultPatientTube As String, _
@@ -1106,37 +1113,8 @@ Namespace Biosystems.Ax00.LISCommunications
                                                                         Select a).ToList
 
                                                         If (savedWSLinqRes.Count > 0) Then
-                                                            'Fill a row of OrderTestsLISInfoDS with following information from mySavedWSOrderTestDS.Row
-                                                            'Add data in the Service Node to a row in the DS needed to send a Rejected Delayed Message
-                                                            myRejectedRow = pRejectedOTLISInfoDS.twksOrderTestsLISInfo.NewtwksOrderTestsLISInfoRow
-                                                            With myRejectedRow
-                                                                .BeginEdit()
-                                                                .AwosID = auxRow.AwosID
-                                                                .SpecimenID = auxRow.SpecimenID
-                                                                .SampleClass = auxRow.LISSampleClass
-                                                                .StatFlagText = auxRow.LISStatFlag
-                                                                .SampleType = auxRow.LISSampleType
-                                                                .TestIDString = auxRow.LISTestID
-                                                                .ESPatientID = auxRow.ESPatientID
-                                                                .ESOrderID = auxRow.ESOrderID
-                                                                .CheckLISValues = False
-                                                                .EndEdit()
-                                                            End With
-
-                                                            pRejectedOTLISInfoDS.twksOrderTestsLISInfo.AddtwksOrderTestsLISInfoRow(myRejectedRow)
-                                                            pRejectedOTLISInfoDS.twksOrderTestsLISInfo.AcceptChanges()
-
-                                                            'Add MessageID, AwosID and ErrorCode to the local ImportErrorsDS used to write the XML file for Rejected Awos
-                                                            Dim myLISRow As ImportErrorsLogDS.twksImportErrorsLogRow
-                                                            myLISRow = lisImportErrorsDS.twksImportErrorsLog.NewtwksImportErrorsLogRow
-
-                                                            myLISRow.BeginEdit()
-                                                            myLISRow.ErrorCode = GlobalEnumerates.Messages.LIS_DUPLICATE_SPECIMEN.ToString()
-                                                            myLISRow.LineText = myMessageID & " | " & auxRow.AwosID
-                                                            myLISRow.EndEdit()
-
-                                                            lisImportErrorsDS.twksImportErrorsLog.AddtwksImportErrorsLogRow(myLISRow)
-                                                            lisImportErrorsDS.twksImportErrorsLog.AcceptChanges()
+                                                            validNode = False
+                                                            resultData.ErrorCode = GlobalEnumerates.Messages.LIS_DUPLICATE_SPECIMEN.ToString()
                                                         Else
                                                             'Inform the Number of Replicates assigned by default for the Test/SampleType
                                                             auxRow.ReplicatesNumber = validationDS.tparSavedWSOrderTests(0).ReplicatesNumber
@@ -1177,29 +1155,38 @@ Namespace Biosystems.Ax00.LISCommunications
                             End If
                         End If
 
-                        If (Not validNode) Then
-                            'Add data in the Service Node to a row in the DS needed to send a Rejected Delayed Message
-                            myRejectedRow = pRejectedOTLISInfoDS.twksOrderTestsLISInfo.NewtwksOrderTestsLISInfoRow
-                            With myRejectedRow
-                                .BeginEdit()
-                                .AwosID = auxRow.AwosID
-                                .SpecimenID = auxRow.SpecimenID
-                                .SampleClass = auxRow.LISSampleClass
-                                .StatFlagText = auxRow.LISStatFlag
-                                .SampleType = auxRow.LISSampleType
-                                .TestIDString = auxRow.LISTestID
-                                .ESPatientID = auxRow.ESPatientID
-                                .ESOrderID = auxRow.ESOrderID
-                                .CheckLISValues = False
-                                .EndEdit()
-                            End With
+                        If (Not validNode AndAlso resultData.ErrorCode <> String.Empty) Then
+                            'BA-1610: When a Test/Sample Type has been rejected due to its Calibration Programming in not complete, it is not 
+                            '         added to the DS of Rejected Order Tests, due to a Rejected Message has not to be sent to LIS in this case.
+                            '         Instead, a row is added in the ApplicationLog informing the Test/SampleType and the error
+                            If (resultData.ErrorCode = GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString) Then
+                                'Add Error, TestName and SampleType to the Application Log
+                                Dim logTrace = resultData.ErrorCode & ": " & auxRow.TestName & " [" & auxRow.SampleType & "]"
+                                GlobalBase.CreateLogActivity(logTrace, "xmlMessagesDelegate.ProcessLISOrderTests", EventLogEntryType.Information, False)
+                            Else
+                                'A Rejection Message is not sent for duplicated requests
+                                If (resultData.ErrorCode <> "DUPLICATED_REQUEST") Then
+                                    'For the rest of Error cases, add data in the Service Node to a row in the DS needed to send a Rejected Delayed Message
+                                    myRejectedRow = pRejectedOTLISInfoDS.twksOrderTestsLISInfo.NewtwksOrderTestsLISInfoRow
+                                    With myRejectedRow
+                                        .BeginEdit()
+                                        .AwosID = auxRow.AwosID
+                                        .SpecimenID = auxRow.SpecimenID
+                                        .SampleClass = auxRow.LISSampleClass
+                                        .StatFlagText = auxRow.LISStatFlag
+                                        .SampleType = auxRow.LISSampleType
+                                        .TestIDString = auxRow.LISTestID
+                                        .ESPatientID = auxRow.ESPatientID
+                                        .ESOrderID = auxRow.ESOrderID
+                                        .CheckLISValues = False
+                                        .EndEdit()
+                                    End With
 
-                            pRejectedOTLISInfoDS.twksOrderTestsLISInfo.AddtwksOrderTestsLISInfoRow(myRejectedRow)
-                            pRejectedOTLISInfoDS.twksOrderTestsLISInfo.AcceptChanges()
+                                    pRejectedOTLISInfoDS.twksOrderTestsLISInfo.AddtwksOrderTestsLISInfoRow(myRejectedRow)
+                                    pRejectedOTLISInfoDS.twksOrderTestsLISInfo.AcceptChanges()
+                                End If
 
-                            'Add MessageID, AwosID and ErrorCode to the local ImportErrorsDS used to write the XML file for Rejected Awos
-                            'SA 19/12/2013 - BT #1433 (add the code into an IF ... END IF block)
-                            If (resultData.ErrorCode <> String.Empty) Then
+                                'Add MessageID, AwosID and ErrorCode to the local ImportErrorsDS used to write the XML file for Rejected Awos
                                 Dim myLISRow As ImportErrorsLogDS.twksImportErrorsLogRow
                                 myLISRow = lisImportErrorsDS.twksImportErrorsLog.NewtwksImportErrorsLogRow
 
@@ -1552,6 +1539,8 @@ Namespace Biosystems.Ax00.LISCommunications
         ''' Created by:  AG 13/03/2013
         ''' Modified by: SA 04/04/2013 - When SampleClass = CTRL, update the ControlReplicates fields for the received SaveWSOrderTestsDS row, but do not inform
         '''                              field ControlID nor add additional rows if there are several Controls linked to the Test/SampleType
+        '''              SA 28/01/2015 - BA-1610 ==> If the STD Test/Sample Type requested by LIS has EnableStatus = FALSE (which means the Calibration programming  
+        '''                                          is incompleted for it), it is not added to the WorkSession and error INCOMPLETE_TESTSAMPLE is returned   
         ''' </remarks>
         Private Function ValidationsForAddSTDorISEOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                              ByVal pEntryRow As SavedWSOrderTestsDS.tparSavedWSOrderTestsRow) As GlobalDataTO
@@ -1565,6 +1554,7 @@ Namespace Biosystems.Ax00.LISCommunications
                     dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
                     If (Not dbConnection Is Nothing) Then
                         Dim withErrorFlag As Boolean = True 'Default value with errors
+                        Dim incompleteCalibProg As Boolean = False
 
                         'PATIENT Request
                         If (pEntryRow.SampleClass = "PATIENT") Then
@@ -1577,11 +1567,17 @@ Namespace Biosystems.Ax00.LISCommunications
                                     Dim localTestSamplesDS As TestSamplesDS = DirectCast(resultData.SetDatos, TestSamplesDS)
 
                                     If (localTestSamplesDS.tparTestSamples.Rows.Count > 0) Then
-                                        withErrorFlag = False
+                                        'BA-1610: When field EnableStatus for the STD Test/Sample Type is False, it means the Calibration programming is 
+                                        '         incompleted for it and then the STD Test/Sample Type cannot be added to the active Work Session
+                                        If (Not localTestSamplesDS.tparTestSamples.First.EnableStatus) Then
+                                            incompleteCalibProg = True
+                                        Else
+                                            withErrorFlag = False
 
-                                        pEntryRow.BeginEdit()
-                                        pEntryRow.ReplicatesNumber = localTestSamplesDS.tparTestSamples(0).ReplicatesNumber
-                                        pEntryRow.EndEdit()
+                                            pEntryRow.BeginEdit()
+                                            pEntryRow.ReplicatesNumber = localTestSamplesDS.tparTestSamples(0).ReplicatesNumber
+                                            pEntryRow.EndEdit()
+                                        End If
                                     End If
                                 End If
 
@@ -1603,16 +1599,6 @@ Namespace Biosystems.Ax00.LISCommunications
                                 End If
                             End If
 
-                            If (Not withErrorFlag) Then
-                                'Copy the updated entry row to the DS to return
-                                toReturnData.tparSavedWSOrderTests.ImportRow(pEntryRow)
-                                toReturnData.tparSavedWSOrderTests.AcceptChanges()
-                            Else
-                                'The requested Test/Sample Type does not exist in the application; an error is returned
-                                resultData.HasError = True
-                                resultData.ErrorCode = GlobalEnumerates.Messages.LIMS_INVALID_SAMPLETYPE.ToString
-                            End If
-
                             'CONTROL Request
                         ElseIf (pEntryRow.SampleClass = "CTRL") Then
                             withErrorFlag = True
@@ -1626,24 +1612,39 @@ Namespace Biosystems.Ax00.LISCommunications
                                 Dim localCtrlDS As TestControlsDS = CType(resultData.SetDatos, TestControlsDS)
 
                                 If (localCtrlDS.tparTestControls.Rows.Count > 0) Then
-                                    withErrorFlag = False
+                                    'BA-1610: When field EnableStatus for the STD Test/Sample Type is False, it means the Calibration programming is 
+                                    '         incompleted for it and then the STD Test/Sample Type cannot be added to the active Work Session. 
+                                    '         For ISE Tests, field EnableStatus is returned always as TRUE
+                                    If (Not localCtrlDS.tparTestControls.First.EnableStatus) Then
+                                        incompleteCalibProg = True
+                                    Else
+                                        withErrorFlag = False
 
-                                    pEntryRow.BeginEdit()
-                                    pEntryRow.ReplicatesNumber = localCtrlDS.tparTestControls(0).ControlReplicates
-                                    pEntryRow.EndEdit()
+                                        pEntryRow.BeginEdit()
+                                        pEntryRow.ReplicatesNumber = localCtrlDS.tparTestControls(0).ControlReplicates
+                                        pEntryRow.EndEdit()
+                                    End If
                                 End If
                             End If
+                        End If
 
-                            If (Not withErrorFlag) Then
-                                'Copy the updated entry row to the DS to return
-                                toReturnData.tparSavedWSOrderTests.ImportRow(pEntryRow)
-                                toReturnData.tparSavedWSOrderTests.AcceptChanges()
-                            Else
-                                'The requested Test/SampleType does not exist in the application or it exists but QC is not active for it; an error is returned
-                                resultData.HasError = True
+                        If (Not withErrorFlag) Then
+                            'Copy the updated entry row to the DS to return
+                            toReturnData.tparSavedWSOrderTests.ImportRow(pEntryRow)
+                            toReturnData.tparSavedWSOrderTests.AcceptChanges()
+                        Else
+                            'BA-1610: a different error code is returned when STD Test/Sample Type exists but its Calibration Programming is incomplete
+                            resultData.HasError = True
+                            If (Not incompleteCalibProg) Then
+                                'If SampleClass = PATIENT, the requested Test/Sample Type does not exist in the application
+                                'If SampleClass = CTRL, the requested Test/Sample Type does not exist in the application or it exits but QC is not active
                                 resultData.ErrorCode = GlobalEnumerates.Messages.LIMS_INVALID_SAMPLETYPE.ToString
+                            Else
+                                'Calibration programming for the STD Test/Sample Type is not complete
+                                resultData.ErrorCode = GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString
                             End If
                         End If
+
                         resultData.SetDatos = toReturnData
                     End If
                 End If
@@ -1751,7 +1752,10 @@ Namespace Biosystems.Ax00.LISCommunications
         '''                              of values of the entry parameter row
         '''              SA 23/05/2013 - Fixed error: when calling function Read in TestsDelegate, pass the ID of the Standard Test as parameter instead of the 
         '''                              ID of the Calculated Test
-        '''              XB 02/12/2014 - Add functionality to includes ISE and OFFS into CALC tests - BA-1867
+        '''              XB 02/12/2014 - BA-1867 ==> Added functionality to include ISE and OFFS into CALC Tests
+        '''              SA 28/01/2015 - BA-1610 ==> Added changes to verify if at least one of the STD Tests/Sample Types included in the Formula of the specified 
+        '''                                          Calculated Test has field EnableStatus = False (which means the Calibration programming is incompleted for it), 
+        '''                                          and in this case, return error INCOMPLETE_TESTSAMPLE (the Calculated Test is not added to the active WorkSession) 
         ''' </remarks>
         Private Function ValidationsForAddCALCOrderTests(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                          ByVal pEntryRow As SavedWSOrderTestsDS.tparSavedWSOrderTestsRow) As GlobalDataTO
@@ -1766,6 +1770,7 @@ Namespace Biosystems.Ax00.LISCommunications
                     If (Not dbConnection Is Nothing) Then
                         'Check for required data informed
                         Dim withErrorFlag As Boolean = True 'Default value with errors
+                        Dim incompleteCalibProg As Boolean = False
 
                         If (Not pEntryRow.IsSampleClassNull AndAlso Not pEntryRow.IsTestIDNull AndAlso Not pEntryRow.IsSampleTypeNull) Then
                             If (pEntryRow.SampleClass = "PATIENT") Then
@@ -1786,115 +1791,124 @@ Namespace Biosystems.Ax00.LISCommunications
                                                 Dim localFormDS As FormulasDS = DirectCast(resultData.SetDatos, FormulasDS)
 
                                                 If (localFormDS.tparFormulas.Rows.Count > 0) Then
-                                                    withErrorFlag = False 'No ERROR!!!
+                                                    'BA-1610: If at least one of the STD Tests/Sample Types included in the Formula of the specified Calculated Test has field
+                                                    '         EnableStatus = False (which means the Calibration programming is incompleted for it), the Calculated Test cannot
+                                                    '         be added to the active Work Session
+                                                    If (localFormDS.tparFormulas.ToList.Where(Function(a) Not a.EnableStatus).Count > 0) Then
+                                                        incompleteCalibProg = True
+                                                    Else
+                                                        'No ERROR, the Calculated Test and all its components can be added to the WorkSession!!!
+                                                        withErrorFlag = False
 
-                                                    'Edit the entry parameter and add row into structure to return
-                                                    pEntryRow.BeginEdit()
-                                                    pEntryRow.ReplicatesNumber = 1
-                                                    pEntryRow.FormulaText = localDS.tparCalculatedTests(0).FormulaText
-                                                    pEntryRow.EndEdit()
-                                                    toReturnData.tparSavedWSOrderTests.ImportRow(pEntryRow)
+                                                        'Edit the entry parameter and add row into structure to return
+                                                        pEntryRow.BeginEdit()
+                                                        pEntryRow.ReplicatesNumber = 1
+                                                        pEntryRow.FormulaText = localDS.tparCalculatedTests(0).FormulaText
+                                                        pEntryRow.EndEdit()
+                                                        toReturnData.tparSavedWSOrderTests.ImportRow(pEntryRow)
 
-                                                    Dim newRowToReturn As SavedWSOrderTestsDS.tparSavedWSOrderTestsRow
-                                                    For Each row As FormulasDS.tparFormulasRow In localFormDS.tparFormulas.Rows
-                                                        'Customize the entry parameter for each element in dataset and add into structure to return
-                                                        newRowToReturn = toReturnData.tparSavedWSOrderTests.NewtparSavedWSOrderTestsRow
+                                                        Dim newRowToReturn As SavedWSOrderTestsDS.tparSavedWSOrderTestsRow
+                                                        For Each row As FormulasDS.tparFormulasRow In localFormDS.tparFormulas.Rows
+                                                            'Customize the entry parameter for each element in dataset and add into structure to return
+                                                            newRowToReturn = toReturnData.tparSavedWSOrderTests.NewtparSavedWSOrderTestsRow
 
-                                                        'Fields which values have to be obtained from the FormulasDS
-                                                        newRowToReturn.TestType = row.TestType
-                                                        newRowToReturn.TestID = CInt(row.Value)
-                                                        newRowToReturn.SampleType = row.SampleType
-                                                        newRowToReturn.CalcTestIDs = row.CalcTestID.ToString
-                                                        newRowToReturn.CalcTestNames = row.TestName
+                                                            'Fields which values have to be obtained from the FormulasDS
+                                                            newRowToReturn.TestType = row.TestType
+                                                            newRowToReturn.TestID = CInt(row.Value)
+                                                            newRowToReturn.SampleType = row.SampleType
+                                                            newRowToReturn.CalcTestIDs = row.CalcTestID.ToString
+                                                            newRowToReturn.CalcTestNames = row.TestName
 
-                                                        'Fields which value have to be set to NULL
-                                                        newRowToReturn.SetAwosIDNull()
+                                                            'Fields which value have to be set to NULL
+                                                            newRowToReturn.SetAwosIDNull()
 
-                                                        'Fields whose value have to be get from the received SavedWSOrderTestsDS row
-                                                        newRowToReturn.SampleClass = pEntryRow.SampleClass
-                                                        newRowToReturn.StatFlag = pEntryRow.StatFlag
-                                                        newRowToReturn.ExternalQC = pEntryRow.ExternalQC
-                                                        newRowToReturn.SampleID = pEntryRow.SampleID
-                                                        newRowToReturn.PatientIDType = pEntryRow.PatientIDType
-                                                        newRowToReturn.SpecimenID = pEntryRow.SpecimenID
-                                                        newRowToReturn.ESPatientID = pEntryRow.ESPatientID
-                                                        newRowToReturn.LISPatientID = pEntryRow.LISPatientID
-                                                        newRowToReturn.ESOrderID = pEntryRow.ESOrderID
-                                                        If (Not pEntryRow.IsLISOrderIDNull) Then newRowToReturn.LISOrderID = pEntryRow.LISOrderID
-                                                        newRowToReturn.TubeType = pEntryRow.TubeType
+                                                            'Fields whose value have to be get from the received SavedWSOrderTestsDS row
+                                                            newRowToReturn.SampleClass = pEntryRow.SampleClass
+                                                            newRowToReturn.StatFlag = pEntryRow.StatFlag
+                                                            newRowToReturn.ExternalQC = pEntryRow.ExternalQC
+                                                            newRowToReturn.SampleID = pEntryRow.SampleID
+                                                            newRowToReturn.PatientIDType = pEntryRow.PatientIDType
+                                                            newRowToReturn.SpecimenID = pEntryRow.SpecimenID
+                                                            newRowToReturn.ESPatientID = pEntryRow.ESPatientID
+                                                            newRowToReturn.LISPatientID = pEntryRow.LISPatientID
+                                                            newRowToReturn.ESOrderID = pEntryRow.ESOrderID
+                                                            If (Not pEntryRow.IsLISOrderIDNull) Then newRowToReturn.LISOrderID = pEntryRow.LISOrderID
+                                                            newRowToReturn.TubeType = pEntryRow.TubeType
 
-                                                        'Fields which value have to be search in DB
-                                                        If (newRowToReturn.TestType = "CALC") Then
-                                                            Dim linqRes As List(Of FormulasDS.tparFormulasRow)
-                                                            linqRes = (From a As FormulasDS.tparFormulasRow In localFormDS.tparFormulas _
-                                                                       Where a.CalcTestID = newRowToReturn.TestID Select a).ToList
+                                                            'Fields which value have to be search in DB
+                                                            If (newRowToReturn.TestType = "CALC") Then
+                                                                Dim linqRes As List(Of FormulasDS.tparFormulasRow)
+                                                                linqRes = (From a As FormulasDS.tparFormulasRow In localFormDS.tparFormulas _
+                                                                           Where a.CalcTestID = newRowToReturn.TestID Select a).ToList
 
-                                                            If (linqRes.Count > 0) Then
-                                                                newRowToReturn.TestName = linqRes(0).TestName
-                                                                newRowToReturn.FormulaText = linqRes(0).FormulaText
-                                                                newRowToReturn.ReplicatesNumber = 1
-                                                            End If
-                                                            linqRes = Nothing
-
-                                                            ' XB 02/12/2014 - BA-1867
-                                                            'Else
-                                                            '    Dim myTests As New TestsDelegate
-                                                            '    resultData = myTests.Read(Nothing, newRowToReturn.TestID)
-
-                                                            '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                            '        Dim myTestsDS As TestsDS = DirectCast(resultData.SetDatos, TestsDS)
-
-                                                            '        If (myTestsDS.tparTests.Rows.Count > 0) Then
-                                                            '            newRowToReturn.TestName = myTestsDS.tparTests(0).TestName
-                                                            '            newRowToReturn.ReplicatesNumber = myTestsDS.tparTests(0).ReplicatesNumber
-                                                            '            newRowToReturn.SetFormulaTextNull()
-                                                            '        End If
-                                                            '    End If
-                                                            'End If
-
-                                                        ElseIf (newRowToReturn.TestType = "STD") Then
-                                                            Dim myTests As New TestsDelegate
-                                                            resultData = myTests.Read(Nothing, newRowToReturn.TestID)
-
-                                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                Dim myTestsDS As TestsDS = DirectCast(resultData.SetDatos, TestsDS)
-
-                                                                If (myTestsDS.tparTests.Rows.Count > 0) Then
-                                                                    newRowToReturn.TestName = myTestsDS.tparTests(0).TestName
-                                                                    newRowToReturn.ReplicatesNumber = myTestsDS.tparTests(0).ReplicatesNumber
-                                                                    newRowToReturn.SetFormulaTextNull()
-                                                                End If
-                                                            End If
-                                                        ElseIf (newRowToReturn.TestType = "ISE") Then
-                                                            Dim myISETests As New ISETestsDelegate
-                                                            resultData = myISETests.Read(Nothing, newRowToReturn.TestID)
-
-                                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                Dim myISETestsDS As ISETestsDS = DirectCast(resultData.SetDatos, ISETestsDS)
-
-                                                                If (myISETestsDS.tparISETests.Rows.Count > 0) Then
-                                                                    newRowToReturn.TestName = myISETestsDS.tparISETests(0).Name
+                                                                If (linqRes.Count > 0) Then
+                                                                    newRowToReturn.TestName = linqRes(0).TestName
+                                                                    newRowToReturn.FormulaText = linqRes(0).FormulaText
                                                                     newRowToReturn.ReplicatesNumber = 1
-                                                                    newRowToReturn.SetFormulaTextNull()
+                                                                End If
+                                                                linqRes = Nothing
+
+                                                                ' XB 02/12/2014 - BA-1867
+                                                                'Else
+                                                                '    Dim myTests As New TestsDelegate
+                                                                '    resultData = myTests.Read(Nothing, newRowToReturn.TestID)
+
+                                                                '    If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                                '        Dim myTestsDS As TestsDS = DirectCast(resultData.SetDatos, TestsDS)
+
+                                                                '        If (myTestsDS.tparTests.Rows.Count > 0) Then
+                                                                '            newRowToReturn.TestName = myTestsDS.tparTests(0).TestName
+                                                                '            newRowToReturn.ReplicatesNumber = myTestsDS.tparTests(0).ReplicatesNumber
+                                                                '            newRowToReturn.SetFormulaTextNull()
+                                                                '        End If
+                                                                '    End If
+                                                                'End If
+
+                                                            ElseIf (newRowToReturn.TestType = "STD") Then
+                                                                Dim myTests As New TestsDelegate
+                                                                resultData = myTests.Read(Nothing, newRowToReturn.TestID)
+
+                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                                    Dim myTestsDS As TestsDS = DirectCast(resultData.SetDatos, TestsDS)
+
+                                                                    If (myTestsDS.tparTests.Rows.Count > 0) Then
+                                                                        newRowToReturn.TestName = myTestsDS.tparTests(0).TestName
+                                                                        newRowToReturn.ReplicatesNumber = myTestsDS.tparTests(0).ReplicatesNumber
+                                                                        newRowToReturn.SetFormulaTextNull()
+                                                                    End If
+                                                                End If
+                                                            ElseIf (newRowToReturn.TestType = "ISE") Then
+                                                                Dim myISETests As New ISETestsDelegate
+                                                                resultData = myISETests.Read(Nothing, newRowToReturn.TestID)
+
+                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                                    Dim myISETestsDS As ISETestsDS = DirectCast(resultData.SetDatos, ISETestsDS)
+
+                                                                    If (myISETestsDS.tparISETests.Rows.Count > 0) Then
+                                                                        newRowToReturn.TestName = myISETestsDS.tparISETests(0).Name
+                                                                        newRowToReturn.ReplicatesNumber = 1
+                                                                        newRowToReturn.SetFormulaTextNull()
+                                                                    End If
+                                                                End If
+                                                            ElseIf (newRowToReturn.TestType = "OFFS") Then
+                                                                Dim myOFFSTests As New OffSystemTestsDelegate
+                                                                resultData = myOFFSTests.Read(Nothing, newRowToReturn.TestID)
+
+                                                                If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                                                                    Dim myOFFSTestsDS As OffSystemTestsDS = DirectCast(resultData.SetDatos, OffSystemTestsDS)
+
+                                                                    If (myOFFSTestsDS.tparOffSystemTests.Rows.Count > 0) Then
+                                                                        newRowToReturn.TestName = myOFFSTestsDS.tparOffSystemTests(0).Name
+                                                                        newRowToReturn.ReplicatesNumber = 1
+                                                                        newRowToReturn.SetFormulaTextNull()
+                                                                    End If
                                                                 End If
                                                             End If
-                                                        ElseIf (newRowToReturn.TestType = "OFFS") Then
-                                                            Dim myOFFSTests As New OffSystemTestsDelegate
-                                                            resultData = myOFFSTests.Read(Nothing, newRowToReturn.TestID)
+                                                            'XB 02/12/2014 - BA-1867
 
-                                                            If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                                                                Dim myOFFSTestsDS As OffSystemTestsDS = DirectCast(resultData.SetDatos, OffSystemTestsDS)
-
-                                                                If (myOFFSTestsDS.tparOffSystemTests.Rows.Count > 0) Then
-                                                                    newRowToReturn.TestName = myOFFSTestsDS.tparOffSystemTests(0).Name
-                                                                    newRowToReturn.ReplicatesNumber = 1
-                                                                    newRowToReturn.SetFormulaTextNull()
-                                                                End If
-                                                            End If
-                                                        End If
-                                                        ' XB 02/12/2014 - BA-1867
-                                                        toReturnData.tparSavedWSOrderTests.AddtparSavedWSOrderTestsRow(newRowToReturn)
-                                                    Next
+                                                            toReturnData.tparSavedWSOrderTests.AddtparSavedWSOrderTestsRow(newRowToReturn)
+                                                        Next
+                                                    End If
                                                 End If
                                             End If
 
@@ -1905,15 +1919,22 @@ Namespace Biosystems.Ax00.LISCommunications
                         End If
 
                         If (withErrorFlag) Then
+                            'BA-1610: a different error code is returned when CALC Test/Sample Type exists and has an unique Sample Type but the 
+                            '         Calibration Programming of at least one of the STD Test/SampleType included in its Formula is incomplete
                             resultData.HasError = True
-                            resultData.ErrorCode = GlobalEnumerates.Messages.LIMS_INVALID_SAMPLETYPE.ToString
+                            If (Not incompleteCalibProg) Then
+                                'The requested Test/Sample Type does not exist in the application
+                                resultData.ErrorCode = GlobalEnumerates.Messages.LIMS_INVALID_SAMPLETYPE.ToString
+                            Else
+                                'At least one of the STD Tests included in the Formula of the Calculated Test has Calibration Programming incomplete
+                                resultData.ErrorCode = GlobalEnumerates.Messages.INCOMPLETE_TESTSAMPLE.ToString
+                            End If
                         End If
 
                         If (toReturnData.tparSavedWSOrderTests.Rows.Count > 0) Then toReturnData.tparSavedWSOrderTests.AcceptChanges()
                         resultData.SetDatos = toReturnData
-
-                    End If 'If (Not dbConnection Is Nothing) Then
-                End If 'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
+                    End If
+                End If
             Catch ex As Exception
                 resultData = New GlobalDataTO()
                 resultData.HasError = True
@@ -1922,7 +1943,6 @@ Namespace Biosystems.Ax00.LISCommunications
 
                 'Dim myLogAcciones As New ApplicationLogManager()
                 GlobalBase.CreateLogActivity(ex.Message, "xmlMessagesDelegate.ValidationsForAddCALCOrderTests", EventLogEntryType.Error, False)
-
             Finally
                 If (pDBConnection Is Nothing) AndAlso (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
