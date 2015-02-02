@@ -11,10 +11,11 @@ Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.InfoAnalyzer
 Imports System.Timers
 Imports System.Data
+Imports Biosystems.Ax00.Core.Interfaces
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
+Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerManagerOLD
+    Partial Public Class AnalyzerEntity
 
 #Region "Instructions to send Flow"
 

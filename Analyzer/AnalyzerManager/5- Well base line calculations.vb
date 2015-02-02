@@ -12,9 +12,11 @@ Imports System.Timers
 Imports System.Data
 Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.DAL.DAO
+Imports Biosystems.Ax00.Core.Interfaces
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
-    Partial Public Class AnalyzerManagerOLD
+Namespace Biosystems.Ax00.Core.Entities
+
+    Partial Public Class AnalyzerEntity
 
 #Region "Background Worker events"
 
@@ -221,7 +223,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' AG 12/06/2012 - created (copied from wellBaseLineWorker_DoWork (v0.4.3)
+        ''' Created by:  AG 12/06/2012 - created (copied from wellBaseLineWorker_DoWork (v0.4.3)
+        ''' Modified by: IT 03/11/2014 - BA-2067: Dynamic BaseLine
         ''' </remarks>
         Private Function ProcessWellBaseLineReadings(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
             Dim resultData As New GlobalDataTO
@@ -269,6 +272,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         newRow.BaseLineID = newID
                         newRow.WellUsed = myBaseLineWell
                         newRow.DateTime = Now
+                        newRow.Type = GlobalEnumerates.BaseLineType.STATIC.ToString() 'BA-2067
                         newRow.SetMainDarkNull() 'This field is only used in base line with adjust
                         newRow.SetRefDarkNull() 'This field is only used in base line with adjust
                         newRow.SetDACNull() 'This field is only used in base line with adjust
@@ -309,41 +313,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     If Not resultData.HasError Then
                         'Peform well base line calculations
-                        resultData = baselineCalcs.ControlWellBaseLine(dbConnection, False, myWellBaseLineDS)
-                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            'ControlAdjustBaseLine only generates myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN  ... now 
-                            'we have to calculate his status = TRUE or FALSE
-                            Dim alarmStatus As Boolean = False 'By default no alarm
-                            Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                            myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
-                            If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
-                            'If Not alarmStatus Then myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN 'AG 04/06/2012 - This method is called in Running, if the alarm METHACRYL_ROTOR_WARN already exists do not remove it
-
-                            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
-                            Dim AlarmStatusList As New List(Of Boolean)
-                            PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
-                            'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                            If AlarmList.Count > 0 Then
-                                'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                                If GlobalBase.IsServiceAssembly Then
-                                    ' XBC 16/10/2012 - Alarms treatment for Service
-                                    ' Not Apply
-                                    'resultData = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
-                                Else
-                                    Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
-                                    resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
-                                    Dim myLogAcciones As New ApplicationLogManager()
-                                    myLogAcciones.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
-                                End If
-                            Else
-                                ''If no alarm items in list ... inform presentation the reactions rotor is good!!
-                                'resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _
-                                '                                 GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN.ToString, False)
-                            End If
-                        End If
-
+                        'AG 11/11/2014 BA-2065 #REFACTORING (prepare for dynamic base line)
+                        resultData = ControlWellBaseLine(dbConnection, False, myWellBaseLineDS)
                     End If
 
                 End If
@@ -375,6 +346,68 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return resultData
         End Function
+
+
+        ''' <summary>
+        ''' This business has been moved into a method from AnalyzerManager.ProcessWellBaseLineReadings
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pClassInitialization"></param>
+        ''' <param name="pWellBaseLine"></param>
+        ''' <returns></returns>
+        ''' <remarks>'AG 11/11/2014 BA-2065 #REFACTORING (prepare for dynamic base line)</remarks>
+        Private Function ControlWellBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pClassInitialization As Boolean, ByVal pWellBaseLine As BaseLinesDS) As GlobalDataTO
+            Dim resultData As New GlobalDataTO
+            Dim dbConnection As SqlClient.SqlConnection = Nothing
+            Try
+                resultData = BaseLine.ControlWellBaseLine(dbConnection, False, pWellBaseLine, GlobalEnumerates.BaseLineType.STATIC)
+                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                    'ControlAdjustBaseLine only generates myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN  ... now 
+                    'we have to calculate his status = TRUE or FALSE
+                    Dim alarmStatus As Boolean = False 'By default no alarm
+                    Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                    myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
+                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then alarmStatus = True
+                    'If Not alarmStatus Then myAlarm = GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN 'AG 04/06/2012 - This method is called in Running, if the alarm METHACRYL_ROTOR_WARN already exists do not remove it
+
+                    Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+                    Dim AlarmStatusList As New List(Of Boolean)
+                    PrepareLocalAlarmList(myAlarm, alarmStatus, AlarmList, AlarmStatusList)
+                    'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                    If AlarmList.Count > 0 Then
+                        'resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                        'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                        'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                        If GlobalBase.IsServiceAssembly Then
+                            ' XBC 16/10/2012 - Alarms treatment for Service
+                            ' Not Apply
+                            'resultData = ManageAlarms_SRV(dbConnection, AlarmList, AlarmStatusList)
+                        Else
+                            Dim StartTime As DateTime = Now 'AG 05/06/2012 - time estimation
+                            resultData = ManageAlarms(dbConnection, AlarmList, AlarmStatusList)
+                            Dim myLogAcciones As New ApplicationLogManager()
+                            myLogAcciones.CreateLogActivity("Treat alarms (well rejection): " & Now.Subtract(StartTime).TotalMilliseconds.ToStringWithDecimals(0), "AnalyzerManager.ProcessWellBaseLineReadings", EventLogEntryType.Information, False) 'AG 28/06/2012
+                        End If
+                    Else
+                        ''If no alarm items in list ... inform presentation the reactions rotor is good!!
+                        'resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, _
+                        '                                 GlobalEnumerates.Alarms.METHACRYL_ROTOR_WARN.ToString, False)
+                    End If
+                End If
+
+            Catch ex As Exception
+                resultData = New GlobalDataTO()
+                resultData.HasError = True
+                resultData.ErrorCode = GlobalEnumerates.Messages.SYSTEM_ERROR.ToString()
+                resultData.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ControlWellBaseLine", EventLogEntryType.Error, False)
+
+            End Try
+            Return resultData
+        End Function
+
 #End Region
 
 #Region "NEW METHODS FOR PERFORMANCE IMPROVEMENTS"
@@ -398,7 +431,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                              new ByRef parameter, and inform the Pause status when saving the received Readings
         '''              AG 22/11/2013 - #1397 During 'Recovery Results' in pause mode call method SaveReadings instead of SaverReadingsNEW (it checks if exists before call 
         '''                              the insert in DAO)
-        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)
+        ''' AG 22/05/2014 - #1637 Use exclusive lock (multithread protection)       
         ''' </remarks>
         Private Function ProcessBiochemicalReadingsNEW(ByVal pDBConnection As SqlClient.SqlConnection, _
                                                        ByVal pInstructionReceived As List(Of InstructionParameterTO), _
@@ -433,9 +466,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'Get the total number of Readings as: Value of limit READING1_CYCLES minus the internal Readings OffSet
+                'AG 10/11/2014 BA-2082 filter by Model
                 Dim totalReadingsNumber As Integer = 0
                 Dim limitList As List(Of FieldLimitsDS.tfmwFieldLimitsRow) = (From a As FieldLimitsDS.tfmwFieldLimitsRow In myClassFieldLimitsDS.tfmwFieldLimits _
-                                                                             Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING1_CYCLES.ToString _
+                                                                             Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING1_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                                                                             Select a).ToList
                 If (limitList.Count > 0) Then totalReadingsNumber = CInt(limitList.First.MaxValue) - internalReadingsOffset
                 'limitList = Nothing 'AG 24/10/2013
@@ -537,12 +571,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 myWellUsed = CInt(CType(myGlobal.SetDatos, InstructionParameterTO).ParameterValue)
 
                                 'Get the BaseLineID for the base lines without adjust (from table twksWSBLinesByWell)
-                                myGlobal = Me.GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
+                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, False)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 localBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
                                 'Get the BaseLineID for the base lines with adjust (from table twksWSBLines)
-                                myGlobal = Me.GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
+                                myGlobal = GetCurrentBaseLineID(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute, myWellUsed, True) ''AG 28/05/2014 - #1644 - Make code more readable (use Nothing instead of dbConnection)
                                 If (myGlobal.HasError OrElse myGlobal.SetDatos Is Nothing) Then Exit For
                                 myAdjustBaseLineID = DirectCast(myGlobal.SetDatos, Integer)
 
@@ -756,8 +790,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Dim maxReadingsWithR2 As Integer = 0
 
                             'Use linq for que the limits for R2
+                            'AG 10/11/2014 BA-2082 filter by model
                             limitList = (From a In myClassFieldLimitsDS.tfmwFieldLimits _
-                                        Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString _
+                                        Where a.LimitID = GlobalEnumerates.FieldLimitsEnum.READING2_CYCLES.ToString AndAlso a.AnalyzerModel = myAnalyzerModel _
                                         Select a).ToList
                             If limitList.Count > 0 Then
                                 defaultR2IsAdded = CInt(limitList(0).MinValue) - internalReadingsOffset
@@ -812,9 +847,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'Apply calculations only if all Readings for the Execution are complete and valid; otherwise mark the Execution as Closed by NOK
                                 executionCLOSEDNOK = True
                                 If (validAndCompleteReadings) Then
+                                    'AG 30/10/2014 BA-2064 comment new code temporally
                                     Dim myCalc As New CalculationsDelegate() '!!Declare this variable inside the loop. Otherwise, some structures keep information of previous Executions calculated
-                                    'myGlobal = myCalc.CalculateExecution(Nothing, readingsRow.ExecutionID, readingsRow.AnalyzerID, readingsRow.WorkSessionID, False, "")
                                     myGlobal = myCalc.CalculateExecutionNEW(Nothing, readingsRow.AnalyzerID, readingsRow.WorkSessionID, readingsRow.ExecutionID, False, "")
+                                    'myGlobal = Calculations.CalculateExecutionNEW(Nothing, readingsRow.AnalyzerID, readingsRow.WorkSessionID, readingsRow.ExecutionID, False, "")
 
                                     If (Not myGlobal.HasError) Then
                                         myGlobal = PrepareUIRefreshEvent(Nothing, GlobalEnumerates.UI_RefreshEvents.RESULTS_CALCULATED, readingsRow.ExecutionID, _
@@ -865,7 +901,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         Dim myExportDelegate As New ExportDelegate
 
                                         'Process Repetitions
-                                        Dim iseModuleReady As Boolean = (Not Me.ISE_Manager Is Nothing AndAlso Me.ISE_Manager.IsISEModuleReady)
+                                        Dim iseModuleReady As Boolean = (Not ISEAnalyzer Is Nothing AndAlso ISEAnalyzer.IsISEModuleReady)
                                         repCreatedFlag = False 'AG 03/06/2013 - Reset this flag for each results to be evaluated
 
                                         'JCM 12/06/2013

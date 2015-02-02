@@ -13,10 +13,11 @@ Imports System.Data
 Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports System.Globalization    ' XBC 29/01/2013 - change IsNumeric function by Double.TryParse method for Temperature values (Bugs tracking #1122)
+Imports Biosystems.Ax00.Core.Interfaces
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
+Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerManagerOLD
+    Partial Public Class AnalyzerEntity
 
 #Region "Main Manage Alarms treatment"
 
@@ -574,45 +575,45 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'If alarm is new: Automatically perform new Alight
                             'If already exists (2on tentative also fails): If running -> Go to StandBy
                             If pAlarmStatusList(index) Then 'Alarm Exists
-                                baselineInitializationFailuresAttribute += 1
-                                If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < BASELINE_INIT_FAILURES Then
-                                    'When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
-                                    Dim SwParams As New SwParametersDelegate
-                                    myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
-                                    If Not myGlobal.HasError Then
-                                        Dim SwParamsDS As New ParametersDS
-                                        SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
-                                        If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
-                                            Dim reactionsDelegate As New ReactionsRotorDelegate
-                                            CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
-                                        End If
-                                    End If
+                                'baselineInitializationFailuresAttribute += 1 'AG 27/11/2014 BA-2144
+                                If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
+                                    'AG 27/11/2014 BA-2144 comment code, business will be implemented in method SendAutomaticALIGHTRerun 
+                                    ''When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
+                                    'Dim SwParams As New SwParametersDelegate
+                                    'myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
+                                    'If Not myGlobal.HasError Then
+                                    '    Dim SwParamsDS As New ParametersDS
+                                    '    SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
+                                    '    If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
+                                    '        Dim reactionsDelegate As New ReactionsRotorDelegate
+                                    '        CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
+                                    '    End If
+                                    'End If
 
-                                    'AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
-                                    'myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                    If methodHasToAddInstructionToQueueFlag = 0 Then
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-                                        methodHasToAddInstructionToQueueFlag = 1
-                                    ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
-                                        ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
-                                        If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ADJUST_LIGHT) Then
-                                            myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT)
-                                            myParamsQueue.Add(CurrentWellAttribute.ToString)
-                                        End If
-                                    End If
-                                    'AG 14/05/2012
+                                    ''AG 14/05/2012 - if no instruction sent call ManagerAnalyzer. Else add instruction to queue 
+                                    ''myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                                    'If methodHasToAddInstructionToQueueFlag = 0 Then
+                                    '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                                    '    methodHasToAddInstructionToQueueFlag = 1
+                                    'ElseIf methodHasToAddInstructionToQueueFlag = 1 Then
+                                    '    ' XBC 21/05/2012 - to avoid send the same instruction more than 1 time
+                                    '    If Not myInstructionsQueue.Contains(AnalyzerManagerSwActionList.ADJUST_LIGHT) Then
+                                    '        myInstructionsQueue.Add(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT)
+                                    '        myParamsQueue.Add(CurrentWellAttribute.ToString)
+                                    '    End If
+                                    'End If
+                                    ''AG 14/05/2012
 
-                                    'When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                                    ''When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
+                                    'If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
 
-                                    'RUNNING
-                                    'AG 05/06/2012
-                                    'If 3 consecutive well rejection initializations have been refused (baselineCalcs.exitRunningType = 2) -> STANDBY
-                                    'RPM 06/09/2012 - StandBy NO!!!, leave running using END or ABORT (no prep started, so better use END)
-                                    '
-                                    'If 30 consecutive wells have been rejected once the initialization is OK (baselineCalcs.exitRunningType = 1) -> END
+
 
                                 ElseIf AnalyzerStatus = AnalyzerManagerStatus.RUNNING Then
+                                    'If 3 consecutive well rejection initializations have been refused (baselineCalcs.exitRunningType = 2) -> STANDBY
+                                    'RPM 06/09/2012 - StandBy NO!!!, leave running using END or ABORT (no prep started, so better use END)
+                                    'If 30 consecutive wells have been rejected once the initialization is OK (baselineCalcs.exitRunningType = 1) -> END
+
                                     Select Case wellBaseLineAutoPausesSession
                                         Case 0 'Nothing
 
@@ -662,7 +663,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
 
                             Else
-                                baselineInitializationFailuresAttribute = 0
+                                ResetBaseLineFailuresCounters() 'AG 27/11/2014 BA-2066
                             End If
 
                             'BUSINESS: Nothing
@@ -682,13 +683,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 '(NO, IMPLEMENT THIS BUSINESS, REJECTED!!!!) If no executions IN process -> Send ENDRUN, else do nothing (wait)
 
                                 'BUSINESS: Activate flag
-                                baselineParametersFailuresAttribute = True
+                                WELLbaselineParametersFailuresAttribute = True
 
                                 'PRESENTATION: Show message "Change methacrylate rotor is high recommend" when user performs Wup, Start or finish work session 
                                 '(Ax00MainMDI.OnManageReceptionEvent & ShowAlarmWarningMessages)
 
                             Else
-                                baselineParametersFailuresAttribute = False
+                                WELLbaselineParametersFailuresAttribute = False
                             End If
 
                             'Recover instruction error
@@ -781,7 +782,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'AG 23/03/2012 - ISE switch off
                         Case GlobalEnumerates.Alarms.ISE_OFF_ERR
                             If pAlarmStatusList(index) Then
-                                MyClass.ISE_Manager.IsISESwitchON = False 'SGM 29/06/2012
+                                ISEAnalyzer.IsISESwitchON = False 'SGM 29/06/2012
                                 MyClass.RefreshISEAlarms() 'SGM 19/06/2012
 
                                 'When this alarm appears in RUNNING: Lock all pending ISE preparations
@@ -1266,7 +1267,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 '                'SGM 18/09/2012
                 '                Case GlobalEnumerates.Alarms.ISE_OFF_ERR
                 '                    If pAlarmStatusList(index) Then
-                '                        MyClass.ISE_Manager.IsISESwitchON = False
+                '                        ISEAnalyzer.IsISESwitchON = False
                 '                        MyClass.RefreshISEAlarms()
                 '                    End If
 
@@ -1492,6 +1493,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by:  AG 18/03/2011
         ''' Modified by: AG 13/04/2012 - Added optional parameter pAddAlwaysFlag
         '''              AG 25/07/2012 - Added optional parameters pAddInfo and pAdditionalInfoList to be used for the volume missing and clot alarms
+        '''              AG 04/12/2014 BA-2236 add new optional parameters ErrorCode and pErrorCodesList
         ''' </remarks>
         Private Sub PrepareLocalAlarmList(ByVal pAlarmCode As GlobalEnumerates.Alarms, ByVal pAlarmStatus As Boolean, _
                                           ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
@@ -1673,32 +1675,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If (addFlag) Then
                     'New alarm exists ... add to list with TRUE status only if alarm doesnt exists
                     If Not myAlarmListAttribute.Contains(pAlarmCode) Then
-                        pAlarmList.Add(pAlarmCode)
-                        pAlarmStatusList.Add(True)
-                        If Not pAdditionalInfoList Is Nothing Then 'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
-                            pAdditionalInfoList.Add(pAddInfo)
-                        End If
+                        'AG 04/12/2014 BA-2236
+                        AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
 
                         'AG 24/07/2012 - some alarms are never markt as solved. They can be duplicated in pAlarmList
                     ElseIf alarmsWithOKTypeFalse.Contains(pAlarmCode.ToString) Then
                         'AG 29/08/2012 - exception BASELINE_WELL_WARN (change reactions rotor recommend). It can appear several times in the same WS but the alarm is generated once
                         If pAlarmCode <> GlobalEnumerates.Alarms.BASELINE_WELL_WARN Then
-                            pAlarmList.Add(pAlarmCode)
-                            pAlarmStatusList.Add(True)
-                            'AG 24/07/2012
-                            If Not pAdditionalInfoList Is Nothing Then 'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
-                                pAdditionalInfoList.Add(pAddInfo)
-                            End If
+                            'AG 04/12/2014 BA-2236
+                            AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
                         End If
 
                         'AG 07/09/2012 - base line init can appear several times in Running, for these alarm repetitions a flag defines when stop WS
                     ElseIf pAlarmCode = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
                         If wellBaseLineAutoPausesSession <> 0 Then
-                            pAlarmList.Add(pAlarmCode)
-                            pAlarmStatusList.Add(True)
-                            If Not pAdditionalInfoList Is Nothing Then 'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
-                                pAdditionalInfoList.Add(pAddInfo)
-                            End If
+                            'AG 04/12/2014 BA-2236
+                            AddLocalActiveAlarmToList(pAlarmCode, pAlarmList, pAlarmStatusList, pAddInfo, pAdditionalInfoList)
                         End If
                         'AG 07/09/2012
 
@@ -1846,6 +1838,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Sub
 
 
+        ''' <summary>
+        ''' Inform in a local alarm list the new active alarms. This list will be use for alarms treatment
+        ''' </summary>
+        ''' <param name="pAlarmCode"></param>
+        ''' <param name="pAlarmList"></param>
+        ''' <param name="pAlarmStatusList"></param>
+        ''' <param name="pAddInfo"></param>
+        ''' <param name="pAdditionalInfoList"></param>
+        ''' <remarks>AG 04/12/2014 BA-2236
+        ''' AG 09/12/2014 BA-2236 remove parameters pErrorCode and pErrorCodeList. We will use the AdditionalInfo field also for store the error codes</remarks>
+        Private Sub AddLocalActiveAlarmToList(ByVal pAlarmCode As GlobalEnumerates.Alarms, _
+                                  ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean), _
+                                  Optional ByVal pAddInfo As String = "", _
+                                  Optional ByRef pAdditionalInfoList As List(Of String) = Nothing)
+            Try
+                pAlarmList.Add(pAlarmCode)
+                pAlarmStatusList.Add(True)
+
+                'AG 25/07/2012 - used only for the volume missing, clot warnings, prep locked alarms
+                'AG 09/12/2014 BA-2236 now also for store the error codes
+                If Not pAdditionalInfoList Is Nothing AndAlso pAddInfo <> "" Then
+                    pAdditionalInfoList.Add(pAddInfo)
+                End If
+
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.AddLocalActiveAlarmToList", EventLogEntryType.Error, False)
+            End Try
+        End Sub
+
+
 
         ''' <summary>
         ''' Verify if there are Temperature Warning Alarms
@@ -1913,7 +1936,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 tempSetPoint = myUtil.FormatToSingle(adjustValue)
                             Else
                                 Dim myLogAcciones2 As New ApplicationLogManager()
-                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Information, False)
                             End If
 
                             'Verify the Reactions Rotor Temperature is inside the allowed limits: 
@@ -1954,7 +1977,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 tempSetPoint = myUtil.FormatToSingle(adjustValue)
                             Else
                                 Dim myLogAcciones2 As New ApplicationLogManager()
-                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Information, False)
                             End If
 
                             'Verify the Fridge Temperature is inside the allowed limits: 
@@ -1995,7 +2018,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 tempSetPoint = myUtil.FormatToSingle(adjustValue)
                             Else
                                 Dim myLogAcciones2 As New ApplicationLogManager()
-                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Information, False)
                             End If
 
                             'Verify the Washing Station Temperature is inside the allowed limits: 
@@ -2032,7 +2055,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     tempSetPoint = myUtil.FormatToSingle(adjustValue)
                                 Else
                                     Dim myLogAcciones2 As New ApplicationLogManager()
-                                    myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                    myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Information, False)
                                 End If
 
                                 'Verify the R1 Arm Temperature is inside the allowed limits: 
@@ -2067,7 +2090,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     tempSetPoint = myUtil.FormatToSingle(adjustValue)
                                 Else
                                     Dim myLogAcciones2 As New ApplicationLogManager()
-                                    myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Error, False)
+                                    myLogAcciones2.CreateLogActivity("Adjust Temperature value not valid [" & adjustValue & "]", "AnalyzerManager.CheckTemperaturesAlarms ", EventLogEntryType.Information, False)
                                 End If
 
                                 'Verify the R2 Arm Temperature is inside the allowed limits: 
@@ -2335,8 +2358,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pSensors "></param>
         ''' <returns></returns>
         ''' <remarks>
-        ''' Created by  AG 14/04/2011
-        ''' Modified by XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved (in stanby requires user clicks button Change Bottle confirm, not automatically fixed as in Running)
+        ''' Created by:  AG 14/04/2011
+        ''' Modified by: XB 27/05/2014 - BT #1630 ==> Fix bug Abort+Reset after Tanks Alarms solved (in stanby requires user clicks button Change Bottle confirm, not automatically fixed as in Running)
+        '''              IT 03/12/2014 - BA-2075
         ''' </remarks>
         Private Function UserSwANSINFTreatment(ByVal pSensors As Dictionary(Of GlobalEnumerates.AnalyzerSensors, Single)) As GlobalDataTO
 
@@ -2604,18 +2628,25 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'AG 16/03/2012 - Check if process can continue only when (ise intalled and isemanager initiated) or ise not installed 
                     '((Ise Instaled and (initiated or not swtiched on)) or not ise instaled)
-                    If ISE_Manager IsNot Nothing AndAlso ISE_Manager.ConnectionTasksCanContinue Then
+                    If ISEAnalyzer IsNot Nothing AndAlso ISEAnalyzer.ConnectionTasksCanContinue Then
 
                         'SGM 27/03/2012 proposal
-                        'If MyClass.ISE_Manager.IsISEModuleInstalled And _
-                        '((MyClass.ISE_Manager.IsISESwitchedON And MyClass.ISE_Manager.IsInitiatedOK) Or _
-                        ' (Not MyClass.ISE_Manager.IsISESwitchedON)) Then
+                        'If ISEAnalyzer.IsISEModuleInstalled And _
+                        '((ISEAnalyzer.IsISESwitchedON And ISEAnalyzer.IsInitiatedOK) Or _
+                        ' (Not ISEAnalyzer.IsISESwitchedON)) Then
+
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.Wash) 'BA-2075
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessStaticBaseLine) 'BA-2075
+                        ValidateWarmUpProcess(myAnalyzerFlagsDS, GlobalEnumerates.WarmUpProcessFlag.ProcessDynamicBaseLine) 'BA-2075
+
 
                         If Not CheckIfProcessCanContinue() Then
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 1, True)
                         Else
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ABORTED_DUE_BOTTLE_ALARMS, 0, False)
                         End If
+
+
 
                         'AG 23/03/2012 - While ise is initiating save all the ansinf received (commented)
                     Else
@@ -3778,8 +3809,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pSensor"></param>
         ''' <param name="pNewValue"></param>
         ''' <param name="pUIEventForChangesFlag"></param>
-        ''' <remarks></remarks>
-        Private Function UpdateSensorValuesAttribute(ByVal pSensor As GlobalEnumerates.AnalyzerSensors, ByVal pNewValue As Single, ByVal pUIEventForChangesFlag As Boolean) As Boolean
+        ''' <remarks>
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Function UpdateSensorValuesAttribute(ByVal pSensor As GlobalEnumerates.AnalyzerSensors, ByVal pNewValue As Single, ByVal pUIEventForChangesFlag As Boolean) As Boolean Implements IAnalyzerEntity.UpdateSensorValuesAttribute
             'NOTE: Do not implement Try .. Catch due the methods who call it implements it
 
             Dim flagChanges As Boolean = False
@@ -4029,7 +4062,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created SGM
         ''' Modified AG 27/04/2011 - use linq instead loop for searching the adjustment
         ''' </remarks>
-        Public Function GetBottlePercentage(ByVal pCounts As Integer, ByVal pWashSolutionBottleFlag As Boolean) As GlobalDataTO
+        Public Function GetBottlePercentage(ByVal pCounts As Integer, ByVal pWashSolutionBottleFlag As Boolean) As GlobalDataTO Implements IAnalyzerEntity.GetBottlePercentage
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -4121,7 +4154,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pErrorCodeList"></param>
         ''' <remarks>Created by XBC 07/11/2012</remarks>
-        Public Sub SolveErrorCodesToDisplay(ByVal pErrorCodeList As List(Of String))
+        Public Sub SolveErrorCodesToDisplay(ByVal pErrorCodeList As List(Of String)) Implements IAnalyzerEntity.SolveErrorCodesToDisplay
             Try
                 If Not myErrorCodesDisplayAttribute Is Nothing AndAlso _
                    myErrorCodesDisplayAttribute.Count > 0 AndAlso _
@@ -4187,7 +4220,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pErrorCodesDS"></param>
         ''' <remarks>Created by XBC 07/11/2012</remarks>
-        Public Sub AddErrorCodesToDisplay(ByVal pErrorCodesDS As AlarmErrorCodesDS)
+        Public Sub AddErrorCodesToDisplay(ByVal pErrorCodesDS As AlarmErrorCodesDS) Implements IAnalyzerEntity.AddErrorCodesToDisplay
             Try
                 If Not myErrorCodesDisplayAttribute Is Nothing AndAlso _
                    Not pErrorCodesDS Is Nothing AndAlso _
@@ -4229,7 +4262,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 07/11/2012</remarks>
-        Public Function RemoveErrorCodesToDisplay() As GlobalDataTO
+        Public Function RemoveErrorCodesToDisplay() As GlobalDataTO Implements IAnalyzerEntity.RemoveErrorCodesToDisplay
             Dim myGlobal As New GlobalDataTO
             Try
                 myErrorCodesDisplayAttribute.Clear()
@@ -4257,7 +4290,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' - During Abort do not sent WASH if bottle/deposit alarms exists
         ''' 
         ''' </summary>
-        ''' <remarks>AG 29/09/2011</remarks>
+        ''' <remarks>AG 29/09/2011
+        ''' Modified by: IT 01/12/2014 - BA-2075
+        ''' </remarks>
         Private Function CheckIfProcessCanContinue() As Boolean
             Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
             Try
@@ -4311,33 +4346,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 'AG 22/02/2012
 
                 If readyToSentInstruction Then
+
+                    If bottleErrAlarm OrElse reactRotorMissingAlarm Then
+                        readyToSentInstruction = False
+                    End If
+
                     'Some action button process required Wash instruction is bottle level OK before Sw sends it
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
-                            'Note the SDOWNprocess & WASHprocess are not controlled here due the alarm err check is done on the click event (Presentation Layer)
 
-                            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                readyToSentInstruction = False
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "CANCELED")
-
-                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
-
-                            Else
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
-
-                                ' XBC 01/10/2012 - correction : When Washing process into WUPprocess is starting, previous StartInstrument process must set as END
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
-                                ' XBC 01/10/2012
-
-                                'Send a WASH instruction (Conditioning complete)
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
-                            End If
-
-                            'AG 20/02/2012 - abort process
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
-
+                        'AG 20/02/2012 - abort process
+                        'ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ABORTprocess.ToString) = "INPROCESS" Then
                             If AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
                                 If bottleErrAlarm OrElse reactRotorMissingAlarm Then
                                     readyToSentInstruction = False
@@ -4373,51 +4392,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
 
                         End If
-
-                        'Some action button process required Alight instruction is bottle level OK before Sw sends it
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "END" AndAlso _
-                           mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "" Then 'If alight instruction has been not already sent
-
-                        'Some action button process required Alight instruction is bottle level OK
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
-                            'Note the NEWROTORprocess & BASELINEprocess are not controlled here due the alarm err check is done on the click event (Presentation Layer)
-
-                            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
-                                readyToSentInstruction = False
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "PAUSED")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "CANCELED")
-
-                                myGlobal = ManageAnalyzer(AnalyzerManagerSwActionList.CONFIG, True) 'AG 24/11/2011 - If Wup process canceled sent again the config instruction (maybe user has changed something)
-
-                            Else
-                                'Send the ALIGHT instruction
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WUPprocess, "INPROCESS") 'AG 05/03/2012
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-
-                                ' XBC 01/10/2012 - correction : When BaseLine process into WUPprocess is starting, previous StartInstrument and Washing processes must set as END
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "END")
-                                ' XBC 01/10/2012
-
-                                'Before send ALIGHT in wup process ... delete the all ALIGHT results
-                                Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                                If Not myGlobal.HasError Then
-                                    'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                    baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
-
-                                    'When a process involves an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                                        SetAnalyzerNotReady()
-                                    End If
-                                End If
-
-                            End If
-
-                        End If
-
                     End If
                 End If
 
@@ -4435,6 +4409,32 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return readyToSentInstruction
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Function CheckIfWashingIsPossible() As Boolean Implements IAnalyzerEntity.CheckIfWashingIsPossible
+
+            Dim readyToSentInstruction As Boolean = True ' True next instruction can be sent / False can not be sent due a bottle alarms
+            Dim bottleErrAlarm As Boolean = False
+            Dim reactRotorMissingAlarm As Boolean = myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.REACT_MISSING_ERR) 'AG 12/03/2012
+
+            If ExistBottleAlarms() Then
+                bottleErrAlarm = True
+            End If
+
+            If bottleErrAlarm OrElse reactRotorMissingAlarm Then
+                readyToSentInstruction = False
+            End If
+
+            Return readyToSentInstruction
+
+        End Function
+
 #End Region
 
 #Region "Freeze alarms methods"
@@ -4595,211 +4595,202 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
             Dim alarmIDEnumList As New List(Of GlobalEnumerates.Alarms)
             For Each row As String In pAlarmStringCodes
+                'AG 04/12/2014 BA-2236 code improvement
+                alarmIDEnumList.Add(DirectCast([Enum].Parse(GetType(GlobalEnumerates.Alarms), row), GlobalEnumerates.Alarms))
+
                 'This select must be updated with every alarmID added into enumerate GlobalEnumerates.Alarms
-                Select Case row
-                    Case "MAIN_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
-                    Case "MAIN_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
+                'Select Case row
+                '    Case "MAIN_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_ERR)
+                '    Case "MAIN_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.MAIN_COVER_WARN)
 
-                    Case "WASH_CONTAINER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
-                    Case "WASH_CONTAINER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
+                '    Case "WASH_CONTAINER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_ERR)
+                '    Case "WASH_CONTAINER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASH_CONTAINER_WARN)
 
-                    Case "HIGH_CONTAMIN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
-                    Case "HIGH_CONTAMIN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
+                '    Case "HIGH_CONTAMIN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_ERR)
+                '    Case "HIGH_CONTAMIN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.HIGH_CONTAMIN_WARN)
 
-                    Case "R1_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
-                        'DL 31/07/2012. Begin. Remove R1_TEMP_SYSTEM_ERR
-                    Case "R1_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
-                        'Case "R1_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR)
-                        'Case "R1_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "R1_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
-                    Case "R1_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN)
-                    Case "BOTTLE_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN) 'TR 01/10/2012 -Botlle locked alarm.
-                    Case "R1_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR)
-                    Case "R1_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
-                    Case "FRIDGE_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
-                    Case "FRIDGE_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
-                    Case "FRIDGE_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
-                    Case "FRIDGE_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
-                        'DL 31/07/2012. Begin Remove FRIDGE_TEMP_SYS_ERR
-                    Case "FRIDGE_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
-                        'Case "FRIDGE_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR)
-                        'Case "FRIDGE_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "FRIDGE_STATUS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
-                    Case "FRIDGE_STATUS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
+                '    Case "R1_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_WARN)
+                '        'DL 31/07/2012. Begin. Remove R1_TEMP_SYSTEM_ERR
+                '    Case "R1_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYSTEM_ERR)
+                '        'Case "R1_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS1_ERR)
+                '        'Case "R1_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "R1_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_SYSTEM_ERR)
+                '    Case "R1_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_NO_VOLUME_WARN)
+                '    Case "BOTTLE_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BOTTLE_LOCKED_WARN) 'TR 01/10/2012 -Botlle locked alarm.
+                '    Case "R1_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_ERR)
+                '    Case "R1_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_COLLISION_WARN)
+                '    Case "FRIDGE_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_ERR)
+                '    Case "FRIDGE_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_COVER_WARN)
+                '    Case "FRIDGE_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_WARN)
+                '    Case "FRIDGE_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_ERR)
+                '        'DL 31/07/2012. Begin Remove FRIDGE_TEMP_SYS_ERR
+                '    Case "FRIDGE_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS_ERR)
+                '        'Case "FRIDGE_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS1_ERR)
+                '        'Case "FRIDGE_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "FRIDGE_STATUS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_WARN)
+                '    Case "FRIDGE_STATUS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_STATUS_ERR)
 
-                    Case "R2_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
-                        'DL 31/07/2012. Begin. Remove R2_TEMP_SYSTEM_ERR
-                    Case "R2_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
-                        'Case "R2_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR)
-                        'Case "R2_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "R2_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
-                    Case "R2_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN)
-                    Case "R2_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR)
-                    Case "R2_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
-                    Case "WATER_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
-                    Case "WATER_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR)
-                    Case "WASTE_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
-                    Case "WASTE_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR)
-                    Case "REACT_ROTOR_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
-                    Case "FRIDGE_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
-                    Case "REACT_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR)
-                    Case "REACT_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
-                    Case "REACT_MISSING_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
-                    Case "REACT_ENCODER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
-                    Case "REACT_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
-                    Case "REACT_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
-                        'DL 31/07/2012. Begin. Remove REACT_TEMP_SYS_ERR
-                    Case "REACT_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)
-                        'Case "REACT_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR)
-                        'Case "REACT_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
-                    Case "REACT_SAFESTOP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_SAFESTOP_ERR)
-                    Case "WS_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
-                        'DL 31/07/2012. Begin. Remove WS_TEMP_SYSTEM_ERR
-                    Case "WS_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
-                        'Case "WS_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR)
-                        'Case "WS_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR)
-                        'DL 31/07/2012. End
+                '    Case "R2_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_WARN)
+                '        'DL 31/07/2012. Begin. Remove R2_TEMP_SYSTEM_ERR
+                '    Case "R2_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYSTEM_ERR)
+                '        'Case "R2_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS1_ERR)
+                '        'Case "R2_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "R2_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_SYSTEM_ERR)
+                '    Case "R2_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_NO_VOLUME_WARN)
+                '    Case "R2_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_ERR)
+                '    Case "R2_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_COLLISION_WARN)
+                '    Case "WATER_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR)
+                '    Case "WATER_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WATER_SYSTEM_ERR)
+                '    Case "WASTE_DEPOSIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR)
+                '    Case "WASTE_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WASTE_SYSTEM_ERR)
+                '    Case "REACT_ROTOR_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ROTOR_FAN_WARN)
+                '    Case "FRIDGE_FAN_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_FAN_WARN)
+                '    Case "REACT_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_ERR)
+                '    Case "REACT_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_COVER_WARN)
+                '    Case "REACT_MISSING_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_MISSING_ERR)
+                '    Case "REACT_ENCODER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_ENCODER_ERR)
+                '    Case "REACT_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_WARN)
+                '    Case "REACT_TEMP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_ERR)
+                '        'DL 31/07/2012. Begin. Remove REACT_TEMP_SYS_ERR
+                '    Case "REACT_TEMP_SYS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS_ERR)
+                '        'Case "REACT_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS1_ERR)
+                '        'Case "REACT_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
+                '    Case "REACT_SAFESTOP_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACT_SAFESTOP_ERR)
+                '    Case "WS_TEMP_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_WARN)
+                '        'DL 31/07/2012. Begin. Remove WS_TEMP_SYSTEM_ERR
+                '    Case "WS_TEMP_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYSTEM_ERR)
+                '        'Case "WS_TEMP_SYS1_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS1_ERR)
+                '        'Case "WS_TEMP_SYS2_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_TEMP_SYS2_ERR)
+                '        'DL 31/07/2012. End
 
-                    Case "WS_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
-                    Case "CLOT_DETECTION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
-                    Case "CLOT_DETECTION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
-                    Case "CLOT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)   'DL 13/06/2012
+                '    Case "WS_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_COLLISION_ERR)
+                '    Case "CLOT_DETECTION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_ERR)
+                '    Case "CLOT_DETECTION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_DETECTION_WARN)
+                '    Case "CLOT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.CLOT_SYSTEM_ERR)   'DL 13/06/2012
 
-                    Case "S_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
-                    Case "S_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN)
-                    Case "DS_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.DS_NO_VOLUME_WARN)
-                    Case "S_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR)
-                    Case "S_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_WARN)
-                    Case "S_OBSTRUCTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR)
+                '    Case "S_DETECT_SYSTEM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_SYSTEM_ERR)
+                '    Case "S_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_NO_VOLUME_WARN)
+                '    Case "DS_NO_VOLUME_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.DS_NO_VOLUME_WARN)
+                '    Case "S_COLLISION_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_ERR)
+                '    Case "S_COLLISION_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COLLISION_WARN)
+                '    Case "S_OBSTRUCTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_OBSTRUCTED_ERR)
 
-                    Case "S_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_ERR)
-                    Case "S_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
+                '    Case "S_COVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_ERR)
+                '    Case "S_COVER_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_COVER_WARN)
 
-                    Case "R1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_H_HOME_ERR)
-                    Case "R1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_V_HOME_ERR)
-                    Case "R2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_H_HOME_ERR)
-                    Case "R2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_V_HOME_ERR)
-                    Case "S_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_H_HOME_ERR)
-                    Case "S_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_V_HOME_ERR)
-                    Case "STIRRER1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_H_HOME_ERR)
-                    Case "STIRRER1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_V_HOME_ERR)
-                    Case "STIRRER2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_H_HOME_ERR)
-                    Case "STIRRER2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_V_HOME_ERR)
-                    Case "FRIDGE_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_HOME_ERR)
-                    Case "SAMPLES_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SAMPLES_HOME_ERR)
-                    Case "REACTIONS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACTIONS_HOME_ERR)
-                    Case "WS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_HOME_ERR)
-                    Case "WS_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PUMP_HOME_ERR)
-                    Case "R1_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_PUMP_HOME_ERR)
-                    Case "R2_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_PUMP_HOME_ERR)
-                    Case "S_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_PUMP_HOME_ERR)
+                '    Case "R1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_H_HOME_ERR)
+                '    Case "R1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_V_HOME_ERR)
+                '    Case "R2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_H_HOME_ERR)
+                '    Case "R2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_V_HOME_ERR)
+                '    Case "S_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_H_HOME_ERR)
+                '    Case "S_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_V_HOME_ERR)
+                '    Case "STIRRER1_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_H_HOME_ERR)
+                '    Case "STIRRER1_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_V_HOME_ERR)
+                '    Case "STIRRER2_H_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_H_HOME_ERR)
+                '    Case "STIRRER2_V_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_V_HOME_ERR)
+                '    Case "FRIDGE_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_HOME_ERR)
+                '    Case "SAMPLES_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SAMPLES_HOME_ERR)
+                '    Case "REACTIONS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REACTIONS_HOME_ERR)
+                '    Case "WS_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_HOME_ERR)
+                '    Case "WS_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PUMP_HOME_ERR)
+                '    Case "R1_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_PUMP_HOME_ERR)
+                '    Case "R2_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_PUMP_HOME_ERR)
+                '    Case "S_PUMP_HOME_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_PUMP_HOME_ERR)
 
-                    Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                    Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                    Case "RECOVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.RECOVER_ERR)
-                    Case "INST_REJECTED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_WARN)
-                    Case "PH_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PH_BOARD_ERR)
-                    Case "GLF_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_RESET_ERR)
-                    Case "SFX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_RESET_ERR)
-                    Case "JEX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_RESET_ERR)
+                '    Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
+                '    Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
+                '    Case "RECOVER_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.RECOVER_ERR)
+                '    Case "INST_REJECTED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_WARN)
+                '    Case "PH_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PH_BOARD_ERR)
+                '    Case "GLF_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_RESET_ERR)
+                '    Case "SFX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_RESET_ERR)
+                '    Case "JEX_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_RESET_ERR)
 
-                        'DL 13/06/2012. Begin
-                    Case "R1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_BOARD_ERR)
-                    Case "R1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_RESET_ERR)
-                    Case "R2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_BOARD_ERR)
-                    Case "R2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_RESET_ERR)
-                    Case "S_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_BOARD_ERR)
-                    Case "S_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_RESET_ERR)
-                    Case "STIRRER1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_BOARD_ERR)
-                    Case "STIRRER1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_RESET_ERR)
-                    Case "STIRRER2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_BOARD_ERR)
-                    Case "STIRRER2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_RESET_ERR)
-                    Case "R1_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_BOARD_ERR)
-                    Case "R1_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_RESET_ERR)
-                    Case "R2_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_BOARD_ERR)
-                    Case "R2_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_RESET_ERR)
-                    Case "S_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_BOARD_ERR)
-                    Case "S_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_RESET_ERR)
-                    Case "FRIDGE_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_BOARD_ERR)
-                    Case "FRIDGE_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_RESET_ERR)
-                    Case "S_ROTOR_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_BOARD_ERR)
-                    Case "S_ROTOR_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_RESET_ERR)
-                    Case "GLF_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_BOARD_ERR)
-                    Case "SFX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_BOARD_ERR)
-                    Case "JEX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_BOARD_ERR)
-                        'DL 13/06/2012. End
+                '        'DL 13/06/2012. Begin
+                '    Case "R1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_BOARD_ERR)
+                '    Case "R1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_RESET_ERR)
+                '    Case "R2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_BOARD_ERR)
+                '    Case "R2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_RESET_ERR)
+                '    Case "S_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_BOARD_ERR)
+                '    Case "S_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_RESET_ERR)
+                '    Case "STIRRER1_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_BOARD_ERR)
+                '    Case "STIRRER1_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER1_RESET_ERR)
+                '    Case "STIRRER2_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_BOARD_ERR)
+                '    Case "STIRRER2_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.STIRRER2_RESET_ERR)
+                '    Case "R1_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_BOARD_ERR)
+                '    Case "R1_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R1_DETECT_RESET_ERR)
+                '    Case "R2_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_BOARD_ERR)
+                '    Case "R2_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.R2_DETECT_RESET_ERR)
+                '    Case "S_DETECT_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_BOARD_ERR)
+                '    Case "S_DETECT_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_DETECT_RESET_ERR)
+                '    Case "FRIDGE_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_BOARD_ERR)
+                '    Case "FRIDGE_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FRIDGE_RESET_ERR)
+                '    Case "S_ROTOR_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_BOARD_ERR)
+                '    Case "S_ROTOR_RESET_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.S_ROTOR_RESET_ERR)
+                '    Case "GLF_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.GLF_BOARD_ERR)
+                '    Case "SFX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.SFX_BOARD_ERR)
+                '    Case "JEX_BOARD_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.JEX_BOARD_ERR)
+                '        'DL 13/06/2012. End
 
-                    Case "ISE_OFF_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
-                    Case "ISE_FAILED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR)
-                    Case "ISE_TIMEOUT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
+                '    Case "ISE_OFF_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_OFF_ERR)
+                '    Case "ISE_FAILED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_FAILED_ERR)
+                '    Case "ISE_TIMEOUT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_TIMEOUT_ERR)
 
-                        ' XBC 21/03/2012
-                    Case "ISE_RP_INVALID_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
-                    Case "ISE_RP_NOT_INSTALL" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
-                    Case "ISE_RP_DEPLETED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
-                    Case "ISE_ELEC_WRONG_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
-                    Case "ISE_CP_INSTALL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
-                    Case "ISE_CP_WRONG" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
-                    Case "ISE_LONG_DEACT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
-                    Case "ISE_RP_EXPIRED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
-                    Case "ISE_ELEC_CONS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
-                    Case "ISE_ELEC_DATE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
-                    Case "ISE_ACTIVATED" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
-                    Case "ISE_CONNECT_PDT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
-                        '
-                    Case "BASELINE_INIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                    Case "BASELINE_WELL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                    Case "PREP_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PREP_LOCKED_WARN)
-                    Case "COMMS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.COMMS_ERR)
-                    Case "REPORTSATLOADED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REPORTSATLOADED_WARN)
-                    Case "ADJUST_NO_EXIST" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ADJUST_NO_EXIST)
+                '        ' XBC 21/03/2012
+                '    Case "ISE_RP_INVALID_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_INVALID_ERR)
+                '    Case "ISE_RP_NOT_INSTALL" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_NO_INST_ERR)
+                '    Case "ISE_RP_DEPLETED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_DEPLETED_ERR)
+                '    Case "ISE_ELEC_WRONG_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_WRONG_ERR)
+                '    Case "ISE_CP_INSTALL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_INSTALL_WARN)
+                '    Case "ISE_CP_WRONG" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CP_WRONG_ERR)
+                '    Case "ISE_LONG_DEACT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_LONG_DEACT_ERR)
+                '    Case "ISE_RP_EXPIRED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_RP_EXPIRED_WARN)
+                '    Case "ISE_ELEC_CONS_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_CONS_WARN)
+                '    Case "ISE_ELEC_DATE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ELEC_DATE_WARN)
+                '    Case "ISE_ACTIVATED" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_ACTIVATED)
+                '    Case "ISE_CONNECT_PDT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ISE_CONNECT_PDT_ERR) 'SGM 26/03/2012
+                '        '
+                '    Case "BASELINE_INIT_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                '    Case "BASELINE_WELL_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                '    Case "PREP_LOCKED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.PREP_LOCKED_WARN)
+                '    Case "COMMS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.COMMS_ERR)
+                '    Case "REPORTSATLOADED_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.REPORTSATLOADED_WARN)
+                '    Case "ADJUST_NO_EXIST" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.ADJUST_NO_EXIST)
 
-                        'BT #1355 - Added Case for new Alarm WS_PAUSE_MODE_WARN
-                    Case "WS_PAUSE_MODE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN)
+                '        'BT #1355 - Added Case for new Alarm WS_PAUSE_MODE_WARN
+                '    Case "WS_PAUSE_MODE_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.WS_PAUSE_MODE_WARN)
 
-                    Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'TR 21/10/2013 Bug #1339 add this alamr on User app.
-                        '
-                        'Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)                     'DL 27/07/2012 
-                        'Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)     'DL 27/07/2012 
-                        'Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)       'DL 27/07/2012 
-                        'Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)           'DL 27/07/2012 
-                        'Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)           'DL 27/07/2012 
-                        'Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)                     'DL 27/07/2012 
-                        'Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)                     'DL 27/07/2012 
-                        'Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)           'DL 27/07/2012 
-                        'Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR) 'DL 27/07/2012 
-                        'Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'DL 27/07/2012 
-                        'Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)       'DL 27/07/2012 
-                        'Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)       'DL 27/07/2012 
+                '    Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR) 'TR 21/10/2013 Bug #1339 add this alamr on User app.
 
-                End Select
+                'End Select
 
-                ' XBC 18/10/2012 - Alarms treatment for Service
-                'SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
-                'If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                If GlobalBase.IsServiceAssembly Then
-                    Select Case row
-                        Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)
-                        Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)
-                        Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)
-                        Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)
-                        Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)
-                        Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)
-                        Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)
-                        Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)
-                        Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR)
-                        Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR)
-                        Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)
-                        Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)
-                        Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
-                        Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
-                    End Select
-                End If
-                ' XBC 18/10/2012 
+                '' XBC 18/10/2012 - Alarms treatment for Service
+                ''SGM 01/02/2012 - Check if it is Service Assembly - Bug #1112
+                ''If My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                'If GlobalBase.IsServiceAssembly Then
+                '    Select Case row
+                '        Case "FW_CPU_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CPU_ERR)
+                '        Case "FW_DISTRIBUTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_DISTRIBUTED_ERR)
+                '        Case "FW_REPOSITORY_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_REPOSITORY_ERR)
+                '        Case "FW_CHECKSUM_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CHECKSUM_ERR)
+                '        Case "FW_INTERNAL_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_INTERNAL_ERR)
+                '        Case "FW_MAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_MAN_ERR)
+                '        Case "FW_CAN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.FW_CAN_ERR)
+                '        Case "INST_UNKOWN_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_UNKOWN_ERR)
+                '        Case "INST_NOALLOW_STA_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_STA_ERR)
+                '        Case "INST_NOALLOW_INS_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_NOALLOW_INS_ERR)
+                '        Case "INST_COMMAND_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_COMMAND_WARN)
+                '        Case "INST_LOADADJ_WARN" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_LOADADJ_WARN)
+                '        Case "INST_REJECTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_REJECTED_ERR)
+                '        Case "INST_ABORTED_ERR" : alarmIDEnumList.Add(GlobalEnumerates.Alarms.INST_ABORTED_ERR)
+                '    End Select
+                'End If
+                '' XBC 18/10/2012 
+                'AG 04/12/2014 BA-2236
 
             Next
             Return alarmIDEnumList
@@ -5091,9 +5082,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 'SGM 25/10/2012 - Abort ISE Operation only if E:61, E:20, E:21
                                 If pErrorValue = 61 Or pErrorValue = 20 Or pErrorValue = 21 Then
-                                    If MyClass.ISE_Manager IsNot Nothing Then MyClass.ISE_Manager.AbortCurrentProcedureDueToException()
+                                    If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException()
                                 End If
-                                'If MyClass.ISE_Manager IsNot Nothing Then MyClass.ISE_Manager.AbortCurrentProcedureDueToException() SGM 25/10/2012
+                                'If ISEAnalyzer IsNot Nothing Then ISEAnalyzer.AbortCurrentProcedureDueToException() SGM 25/10/2012
                             End If
                         End If
                         'AG 30/03/2012

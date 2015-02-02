@@ -1,30 +1,24 @@
-﻿Option Explicit On
-Option Strict On
-
-Imports System.Data.SqlClient
-Imports Biosystems.Ax00.Global
-Imports Biosystems.Ax00.Global.TO
-Imports Biosystems.Ax00.BL
-Imports Biosystems.Ax00.DAL
-Imports Biosystems.Ax00.Types
-Imports Biosystems.Ax00.Calculations
+﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Global
+Imports Biosystems.Ax00.Types
+Imports Biosystems.Ax00.BL
 Imports Biosystems.Ax00.InfoAnalyzer
-Imports System.Data
+Imports Biosystems.Ax00.DAL
 Imports System.Globalization
+Imports System.Data
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
+Namespace Biosystems.Ax00.Core.Entities
 
-
-    Public Class ISEManager
-        'Implements IDisposable
+    Public Class ISEAnalyzerEntity
+        Implements IISEAnalyzerEntity
 
 #Region "Constructor"
 
-        Public Sub New(ByRef pAnalyzerManager As AnalyzerManagerOLD, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String, Optional ByVal pDisconnectedMode As Boolean = False)
+        Public Sub New(ByRef pAnalyzer As IAnalyzerEntity, ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String, Optional ByVal pDisconnectedMode As Boolean = False)
             Try
                 MyClass.IsAnalyzerDisconnectedAttr = pDisconnectedMode
-                MyClass.myAnalyzerManager = pAnalyzerManager
+                MyClass.myAnalyzer = pAnalyzer
                 MyClass.AnalyzerIDAttr = pAnalyzerID
                 MyClass.AnalyzerModelAttr = pAnalyzerModel
 
@@ -132,7 +126,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #End Region
 
 #Region "Declarations"
-        Private myAnalyzerManager As AnalyzerManagerOLD 'Instance of Analyzer Manager class that creates ISE manager
+        Private myAnalyzer As IAnalyzerEntity 'Instance of Analyzer Manager class that creates ISE manager 'REFACTORING
         Private myISEInfoDelegate As New ISEDelegate 'Delegate for accessing tinfoISE table
         Private myISECalibHistory As New ISECalibHistoryDelegate 'Delegate for calibration history 'JB 30/07/2012
         Private myISEInfoDS As ISEInformationDS 'Data obtained from tinfoISE table
@@ -140,9 +134,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private myISELimitsDS As FieldLimitsDS 'Data obtained from SwLimits
         ' XBC 26/03/2012
         Private myAlarms() As Boolean 'array of current ISE alarms
-
-        Public IsPendingToInitializeAfterActivation As Boolean = False 'SGM 14/06/2012
-
         ' XBC 02/07/2012
         Private SIPcycles As Single
         Private SIPIntervalConsumption As Single     ' interval of time that a SIP cycle is consumed (in minutes)
@@ -151,19 +142,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private ForceConsumptionsInitialize As Boolean = False
         Private ISE_EXECUTION_TIME_SER As Single = 0
         Private ISE_EXECUTION_TIME_URI As Single = 0
-
-        Public IsCommErrorDetected As Boolean = False 'SGM 01/08/2012
-
 #End Region
 
-#Region "public Events"
+#Region "Public Events"
 
-        Public Event ISEMonitorDataChanged() 'occurs when some change happens in Monitor Data
-        Public Event ISEProcedureFinished() 'occurs when some ISE procedure has finished
-        Public Event ISEReadyChanged() 'occurs when IsISEModuleReady property has changed
-        Public Event ISESwitchedOnChanged() 'occurs when IsISESwitchOn property has changed
-        Public Event ISEConnectionFinished(ByVal pOK As Boolean) 'occurs when Initialization has finished
-        Public Event ISEMaintenanceRequired(ByVal pOperation As MaintenanceOperations) 'occurs when maintenance (calibrations and cleaning) operations are required
+        Public Event ISEMonitorDataChanged() Implements IISEAnalyzerEntity.ISEMonitorDataChanged 'occurs when some change happens in Monitor Data
+        Public Event ISEProcedureFinished() Implements IISEAnalyzerEntity.ISEProcedureFinished 'occurs when some ISE procedure has finished
+        Public Event ISEReadyChanged() Implements IISEAnalyzerEntity.ISEReadyChanged 'occurs when IsISEModuleReady property has changed
+        Public Event ISESwitchedOnChanged() Implements IISEAnalyzerEntity.ISESwitchedOnChanged 'occurs when IsISESwitchOn property has changed
+        Public Event ISEConnectionFinished(ByVal pOK As Boolean) Implements IISEAnalyzerEntity.ISEConnectionFinished 'occurs when Initialization has finished
+        Public Event ISEMaintenanceRequired(ByVal pOperation As MaintenanceOperations) Implements IISEAnalyzerEntity.ISEMaintenanceRequired 'occurs when maintenance (calibrations and cleaning) operations are required
 #End Region
 
 #Region "Attributes"
@@ -334,7 +322,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #Region "Properties"
 
 #Region "Generic"
-        Public Property WorkSessionID() As String
+        Public Property WorkSessionID() As String Implements IISEAnalyzerEntity.WorkSessionID
             Get
                 Return MyClass.WorkSessionIDAttr
             End Get
@@ -343,7 +331,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property IsInUtilities() As Boolean
+        Public Property IsInUtilities() As Boolean Implements IISEAnalyzerEntity.IsInUtilities
             Get
                 Return IsInUtilitiesAttr
             End Get
@@ -355,7 +343,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'Counts the times that an ERC (A,B,S,F) error occured while WS
-        Public Property ISEWSCancelErrorCounter() As Integer
+        Public Property ISEWSCancelErrorCounter() As Integer Implements IISEAnalyzerEntity.ISEWSCancelErrorCounter
             Get
                 Return ISEWSCancelErrorCounterAttr
             End Get
@@ -374,7 +362,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 28/06/2012</remarks>
-        Public ReadOnly Property IsBiosystemsValidationMode() As Boolean
+        Public ReadOnly Property IsBiosystemsValidationMode() As Boolean Implements IISEAnalyzerEntity.IsBiosystemsValidationMode
             Get
                 Dim IsBioMode As Boolean = False
                 Dim myGlobal As New GlobalDataTO
@@ -391,7 +379,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsISEModuleInstalled() As Boolean
+        Public Property IsISEModuleInstalled() As Boolean Implements IISEAnalyzerEntity.IsISEModuleInstalled
             Get
                 'Dim myISEAdj As String = MyClass.myAnalyzerManager.ReadAdjustValue(Ax00Adjustsments.ISEINS)
                 'MyClass.IsISEModuleInstalledAttr = (IsNumeric(myISEAdj) AndAlso CInt(myISEAdj) > 0)
@@ -423,7 +411,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsISESwitchON() As Boolean
+        Public Property IsISESwitchON() As Boolean Implements IISEAnalyzerEntity.IsISESwitchON
             Get
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
                     Return True
@@ -482,7 +470,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsISECommsOk() As Boolean
+        Public Property IsISECommsOk() As Boolean Implements IISEAnalyzerEntity.IsISECommsOk
             Get
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
                     Return True
@@ -507,7 +495,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by XBC 17/01/2013 - Delete 'Readonly' property to be available from AnalyzerManager.ProcessUSBCableDisconnection
         '''                              ISE Object to reset it after a disconnection communications (Bugs tracking #1109)
         ''' </remarks>
-        Public Property IsAnalyzerDisconnected() As Boolean
+        Public Property IsAnalyzerDisconnected() As Boolean Implements IISEAnalyzerEntity.IsAnalyzerDisconnected
             Get
                 Return IsAnalyzerDisconnectedAttr
             End Get
@@ -522,7 +510,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsAnalyzerWarmUp() As Boolean
+        Public Property IsAnalyzerWarmUp() As Boolean Implements IISEAnalyzerEntity.IsAnalyzerWarmUp
             Get
                 Return IsAnalyzerWarmUpAttr
             End Get
@@ -532,6 +520,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
             End Set
         End Property
+
+        Public Property IsCommErrorDetected() As Boolean = False Implements IISEAnalyzerEntity.IsCommErrorDetected
+
 #End Region
 
 #Region "Initial Checkings"
@@ -543,7 +534,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEInitiating() As Boolean
+        Public ReadOnly Property IsISEInitiating() As Boolean Implements IISEAnalyzerEntity.IsISEInitiating
             Get
                 'AG 02/04/2012 - add "OrElse isISEStatusUnknownAttr"
                 Return Not MyClass.IsAnalyzerDisconnected And _
@@ -560,7 +551,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEInitializationDone() As Boolean
+        Public ReadOnly Property IsISEInitializationDone() As Boolean Implements IISEAnalyzerEntity.IsISEInitializationDone
             Get
                 Return IsISEInitializationDoneAttr
             End Get
@@ -573,7 +564,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEInitiatedOK() As Boolean
+        Public ReadOnly Property IsISEInitiatedOK() As Boolean Implements IISEAnalyzerEntity.IsISEInitiatedOK
             Get
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
                     Return True
@@ -590,7 +581,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property ConnectionTasksCanContinue() As Boolean
+        Public ReadOnly Property ConnectionTasksCanContinue() As Boolean Implements IISEAnalyzerEntity.ConnectionTasksCanContinue
             Get
                 ' XBC 03/10/2012 - Correction : some case didn't actives the menu
                 'Return ((IsISEModuleInstalled And (IsISEInitializationDone Or Not IsISESwitchON)) Or IsLongTermDeactivation Or Not IsISEModuleInstalled)
@@ -625,7 +616,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEOnceInitiatedOK() As Boolean
+        Public ReadOnly Property IsISEOnceInitiatedOK() As Boolean Implements IISEAnalyzerEntity.IsISEOnceInitiatedOK
             Get
                 Return IsISEOnceInitiatedOKAttr
             End Get
@@ -637,12 +628,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <value></value>
         ''' <remarks>Created by XBC 24/05/2012</remarks>
-        Public WriteOnly Property IsISEInitiatedDone() As Boolean
+        Public WriteOnly Property IsISEInitiatedDone() As Boolean Implements IISEAnalyzerEntity.IsISEInitiatedDone
             Set(ByVal value As Boolean)
                 MyClass.IsISEInitiatedOKAttr = value
                 MyClass.IsISEInitializationDoneAttr = value
             End Set
         End Property
+
+        Public Property IsPendingToInitializeAfterActivation() As Boolean = False Implements IISEAnalyzerEntity.IsPendingToInitializeAfterActivation
 
 #End Region
 
@@ -655,7 +648,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsISEModuleReady() As Boolean
+        Public ReadOnly Property IsISEModuleReady() As Boolean Implements IISEAnalyzerEntity.IsISEModuleReady
             Get
                 Dim myGlobal As GlobalDataTO = MyClass.UpdateISEModuleReady
                 If Not myGlobal.HasError Then
@@ -672,7 +665,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsLongTermDeactivation() As Boolean
+        Public Property IsLongTermDeactivation() As Boolean Implements IISEAnalyzerEntity.IsLongTermDeactivation
             Get
                 Dim myGlobal As New GlobalDataTO
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LONG_TERM_DEACTIVATED)
@@ -715,7 +708,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property IsReagentsPackReady() As Boolean
+        Public ReadOnly Property IsReagentsPackReady() As Boolean Implements IISEAnalyzerEntity.IsReagentsPackReady
             Get
                 Dim myReturn As Boolean = False
 
@@ -742,7 +735,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 02/07/2012 - NO V1
-        Public ReadOnly Property IsReagentsPackSerialNumberMatch() As Boolean
+        Public ReadOnly Property IsReagentsPackSerialNumberMatch() As Boolean Implements IISEAnalyzerEntity.IsReagentsPackSerialNumberMatch
             Get
                 Return MyClass.IsReagentsPackSerialNumberMatchAttr
             End Get
@@ -759,7 +752,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property IsElectrodesReady() As Boolean
+        Public Property IsElectrodesReady() As Boolean Implements IISEAnalyzerEntity.IsElectrodesReady
             Get
                 Dim myReturn As Boolean = False
                 Dim myGlobal As GlobalDataTO = MyClass.CheckElectrodesReady()
@@ -790,7 +783,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property MonitorDataTO() As ISEMonitorTO
+        Public ReadOnly Property MonitorDataTO() As ISEMonitorTO Implements IISEAnalyzerEntity.MonitorDataTO
             Get
                 Return MonitorDataTOAttr
             End Get
@@ -806,7 +799,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property CurrentProcedure() As ISEProcedures
+        Public Property CurrentProcedure() As ISEProcedures Implements IISEAnalyzerEntity.CurrentProcedure
             Get
                 Return CurrentProcedureAttr
             End Get
@@ -826,7 +819,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 27/08/2012 - Correction : Save consumptions after Current Procedure is finished
-        Public ReadOnly Property CurrentProcedureIsFinished() As Boolean
+        Public ReadOnly Property CurrentProcedureIsFinished() As Boolean Implements IISEAnalyzerEntity.CurrentProcedureIsFinished
             Get
                 Return CurrentProcedureIsFinishedAttr
             End Get
@@ -838,7 +831,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property CurrentCommandTO() As ISECommandTO
+        Public Property CurrentCommandTO() As ISECommandTO Implements IISEAnalyzerEntity.CurrentCommandTO
             Get
                 Return CurrentCommandTOAttr
             End Get
@@ -855,7 +848,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public Property LastISEResult() As ISEResultTO
+        Public Property LastISEResult() As ISEResultTO Implements IISEAnalyzerEntity.LastISEResult
             Get
                 Return LastISEResultAttr
             End Get
@@ -878,7 +871,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 12/03/2012</remarks>
-        Public ReadOnly Property LastProcedureResult() As ISEProcedureResult
+        Public ReadOnly Property LastProcedureResult() As ISEProcedureResult Implements IISEAnalyzerEntity.LastProcedureResult
             Get
                 Return LastProcedureResultAttr
             End Get
@@ -897,7 +890,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by XB 12/03/2012</remarks>
-        Public ReadOnly Property IsCalAUpdateRequired() As Boolean
+        Public ReadOnly Property IsCalAUpdateRequired() As Boolean Implements IISEAnalyzerEntity.IsCalAUpdateRequired
             Get
                 Return IsCalAUpdateRequiredAttr
             End Get
@@ -909,14 +902,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by XB 12/03/2012</remarks>
-        Public ReadOnly Property IsCalBUpdateRequired() As Boolean
+        Public ReadOnly Property IsCalBUpdateRequired() As Boolean Implements IISEAnalyzerEntity.IsCalBUpdateRequired
             Get
                 Return IsCalBUpdateRequiredAttr
             End Get
         End Property
 
         ' XBC 17/07/2012
-        Public Property PurgeAbyFirmware() As Integer
+        Public Property PurgeAbyFirmware() As Integer Implements IISEAnalyzerEntity.PurgeAbyFirmware
             Get
                 Return MyClass.PurgeAbyFirmwareAttr
             End Get
@@ -926,7 +919,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 17/07/2012
-        Public Property PurgeBbyFirmware() As Integer
+        Public Property PurgeBbyFirmware() As Integer Implements IISEAnalyzerEntity.PurgeBbyFirmware
             Get
                 Return MyClass.PurgeBbyFirmwareAttr
             End Get
@@ -936,7 +929,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 17/07/2012
-        Public Property WorkSessionOverallTime() As Single
+        Public Property WorkSessionOverallTime() As Single Implements IISEAnalyzerEntity.WorkSessionOverallTime
             Get
                 Return MyClass.WorkSessionOverallTimeAttr
             End Get
@@ -946,7 +939,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 17/07/2012
-        Public Property WorkSessionIsRunning() As Boolean
+        Public Property WorkSessionIsRunning() As Boolean Implements IISEAnalyzerEntity.WorkSessionIsRunning
             Get
                 Return MyClass.WorkSessionIsRunningAttr
             End Get
@@ -956,7 +949,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 23/07/2012
-        Public Property WorkSessionTestsByType() As String
+        Public Property WorkSessionTestsByType() As String Implements IISEAnalyzerEntity.WorkSessionTestsByType
             Get
                 Return MyClass.WorkSessionTestsByTypeAttr
             End Get
@@ -971,7 +964,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 #Region "Maintenance Needed"
 
         'This property is updated after validating that a Electrodes' Calibration is needed
-        Public Property IsCalibrationNeeded() As Boolean
+        Public Property IsCalibrationNeeded() As Boolean Implements IISEAnalyzerEntity.IsCalibrationNeeded
             Get
                 Return IsCalibrationNeededAttr
             End Get
@@ -992,7 +985,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'This property is updated after validating that a Pumps' Calibration is needed
-        Public Property IsPumpCalibrationNeeded() As Boolean
+        Public Property IsPumpCalibrationNeeded() As Boolean Implements IISEAnalyzerEntity.IsPumpCalibrationNeeded
             Get
                 Return IsPumpCalibrationNeededAttr
             End Get
@@ -1015,7 +1008,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         'SGM 25/07/2012
         'This property is updated after validating that a Bubble detector Calibration is needed
-        Public Property IsBubbleCalibrationNeeded() As Boolean
+        Public Property IsBubbleCalibrationNeeded() As Boolean Implements IISEAnalyzerEntity.IsBubbleCalibrationNeeded
             Get
                 Return IsBubbleCalibrationNeededAttr
             End Get
@@ -1035,7 +1028,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property IsCleanNeeded() As Boolean
+        Public Property IsCleanNeeded() As Boolean Implements IISEAnalyzerEntity.IsCleanNeeded
             Get
                 Return IsCleanNeededAttr
             End Get
@@ -1069,40 +1062,40 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Get
         End Property
 
-        Public ReadOnly Property IsReplaceNaRecommended() As Boolean
+        Public ReadOnly Property IsReplaceNaRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceNaRecommended
             Get
                 Return (IsNaInstalled And (IsNaExpired Or IsNaOverUsed))
             End Get
         End Property
 
-        Public ReadOnly Property IsReplaceKRecommended() As Boolean
+        Public ReadOnly Property IsReplaceKRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceKRecommended
             Get
                 Return (IsKInstalled And (IsKExpired Or IsKOverUsed))
             End Get
         End Property
 
-        Public ReadOnly Property IsReplaceClRecommended() As Boolean
+        Public ReadOnly Property IsReplaceClRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceClRecommended
             Get
                 Return (IsClInstalled And (IsClExpired Or IsClOverUsed))
             End Get
         End Property
 
 
-        Public ReadOnly Property IsReplaceRefRecommended() As Boolean
+        Public ReadOnly Property IsReplaceRefRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceRefRecommended
             Get
                 Return (IsRefInstalled And (IsRefExpired Or IsRefOverUsed))
             End Get
         End Property
 
 
-        Public ReadOnly Property IsReplaceFluidicTubingRecommended() As Boolean
+        Public ReadOnly Property IsReplaceFluidicTubingRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplaceFluidicTubingRecommended
             Get
                 Return ((FluidicTubingExpireDate <> Nothing) AndAlso FluidicTubingExpireDate > DateTime.Now)
             End Get
         End Property
 
 
-        Public ReadOnly Property IsReplacePumpTubingRecommended() As Boolean
+        Public ReadOnly Property IsReplacePumpTubingRecommended() As Boolean Implements IISEAnalyzerEntity.IsReplacePumpTubingRecommended
             Get
                 Return ((PumpTubingExpireDate <> Nothing) AndAlso PumpTubingExpireDate > DateTime.Now)
             End Get
@@ -1112,7 +1105,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #Region "Last Calibrations and Cleans"
 
-        Public Property LastElectrodesCalibrationResult1() As String
+        Public Property LastElectrodesCalibrationResult1() As String Implements IISEAnalyzerEntity.LastElectrodesCalibrationResult1
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_RESULT1)
@@ -1131,7 +1124,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
             End Set
         End Property
-        Public Property LastElectrodesCalibrationResult2() As String
+        Public Property LastElectrodesCalibrationResult2() As String Implements IISEAnalyzerEntity.LastElectrodesCalibrationResult2
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_RESULT2)
@@ -1151,7 +1144,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastElectrodesCalibrationError() As String
+        Public Property LastElectrodesCalibrationError() As String Implements IISEAnalyzerEntity.LastElectrodesCalibrationError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_ERROR)
@@ -1171,7 +1164,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property LastPumpsCalibrationResult() As String
+        Public Property LastPumpsCalibrationResult() As String Implements IISEAnalyzerEntity.LastPumpsCalibrationResult
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMPCAL_RESULT)
@@ -1191,7 +1184,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastPumpsCalibrationError() As String
+        Public Property LastPumpsCalibrationError() As String Implements IISEAnalyzerEntity.LastPumpsCalibrationError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMPCAL_ERROR)
@@ -1212,7 +1205,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
 
-        Public Property LastElectrodesCalibrationDate() As DateTime
+        Public Property LastElectrodesCalibrationDate() As DateTime Implements IISEAnalyzerEntity.LastElectrodesCalibrationDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CALB_DATE, True)
@@ -1232,7 +1225,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property LastPumpsCalibrationDate() As DateTime
+        Public Property LastPumpsCalibrationDate() As DateTime Implements IISEAnalyzerEntity.LastPumpsCalibrationDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_PUMP_CAL_DATE, True)
@@ -1252,7 +1245,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
         'SGM 25/07/2012
-        Public Property LastBubbleCalibrationResult() As String
+        Public Property LastBubbleCalibrationResult() As String Implements IISEAnalyzerEntity.LastBubbleCalibrationResult
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLECAL_RESULT)
@@ -1272,7 +1265,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastBubbleCalibrationError() As String
+        Public Property LastBubbleCalibrationError() As String Implements IISEAnalyzerEntity.LastBubbleCalibrationError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLECAL_ERROR)
@@ -1293,7 +1286,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 25/07/2012
-        Public Property LastBubbleCalibrationDate() As DateTime
+        Public Property LastBubbleCalibrationDate() As DateTime Implements IISEAnalyzerEntity.LastBubbleCalibrationDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_BUBBLE_CAL_DATE, True)
@@ -1313,7 +1306,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property LastCleanDate() As DateTime
+        Public Property LastCleanDate() As DateTime Implements IISEAnalyzerEntity.LastCleanDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_DATE, True)
@@ -1333,7 +1326,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
         'JB 02/08/2012
-        Public Property LastCleanError() As String
+        Public Property LastCleanError() As String Implements IISEAnalyzerEntity.LastCleanError
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LAST_CLEAN_ERROR)
@@ -1419,7 +1412,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         End Property
 
-        Public Property ReagentsPackInstallationDate() As DateTime
+        Public Property ReagentsPackInstallationDate() As DateTime Implements IISEAnalyzerEntity.ReagentsPackInstallationDate
             Get
                 If MyClass.ISEDallasPage01Attr IsNot Nothing Then
                     ReagentsPackInstallationDateAttr = MyClass.ISEDallasPage01Attr.InstallationDate
@@ -1554,7 +1547,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Get
         End Property
 
-        Public Property IsCleanPackInstalled() As Boolean
+        Public Property IsCleanPackInstalled() As Boolean Implements IISEAnalyzerEntity.IsCleanPackInstalled
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.CLEANING_PACK_INSTALLED)
@@ -1727,7 +1720,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #Region "Electrodes"
 
-        Public Property LiInstallDate() As DateTime
+        Public Property LiInstallDate() As DateTime Implements IISEAnalyzerEntity.LiInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LI_INSTALL_DATE, True)
@@ -1748,7 +1741,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property NaInstallDate() As DateTime
+        Public Property NaInstallDate() As DateTime Implements IISEAnalyzerEntity.NaInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.NA_INSTALL_DATE, True)
@@ -1769,7 +1762,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property KInstallDate() As DateTime
+        Public Property KInstallDate() As DateTime Implements IISEAnalyzerEntity.KInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.K_INSTALL_DATE, True)
@@ -1790,7 +1783,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property ClInstallDate() As DateTime
+        Public Property ClInstallDate() As DateTime Implements IISEAnalyzerEntity.ClInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.CL_INSTALL_DATE, True)
@@ -1811,7 +1804,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property RefInstallDate() As DateTime
+        Public Property RefInstallDate() As DateTime Implements IISEAnalyzerEntity.RefInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.REF_INSTALL_DATE, True)
@@ -1832,31 +1825,31 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public ReadOnly Property HasLiInstallDate() As Boolean
+        Public ReadOnly Property HasLiInstallDate() As Boolean Implements IISEAnalyzerEntity.HasLiInstallDate
             Get
                 Return (MyClass.LiInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasNaInstallDate() As Boolean
+        Public ReadOnly Property HasNaInstallDate() As Boolean Implements IISEAnalyzerEntity.HasNaInstallDate
             Get
                 Return (MyClass.NaInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasKInstallDate() As Boolean
+        Public ReadOnly Property HasKInstallDate() As Boolean Implements IISEAnalyzerEntity.HasKInstallDate
             Get
                 Return (MyClass.KInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasClInstallDate() As Boolean
+        Public ReadOnly Property HasClInstallDate() As Boolean Implements IISEAnalyzerEntity.HasClInstallDate
             Get
                 Return (MyClass.ClInstallDate <> Nothing)
             End Get
         End Property
 
-        Public ReadOnly Property HasRefInstallDate() As Boolean
+        Public ReadOnly Property HasRefInstallDate() As Boolean Implements IISEAnalyzerEntity.HasRefInstallDate
             Get
                 Return (MyClass.RefInstallDate <> Nothing)
             End Get
@@ -1921,7 +1914,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'defined by the user that the Lithium is usable
-        Public Property IsLiEnabledByUser() As Boolean
+        Public Property IsLiEnabledByUser() As Boolean Implements IISEAnalyzerEntity.IsLiEnabledByUser
             Get
                 Dim myGlobal As New GlobalDataTO
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.LI_ENABLED)
@@ -2209,7 +2202,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
 
-        Public Property PumpTubingInstallDate() As DateTime
+        Public Property PumpTubingInstallDate() As DateTime Implements IISEAnalyzerEntity.PumpTubingInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.PUMP_TUBING_INSTALL_DATE, True)
@@ -2239,7 +2232,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property FluidicTubingInstallDate() As DateTime
+        Public Property FluidicTubingInstallDate() As DateTime Implements IISEAnalyzerEntity.FluidicTubingInstallDate
             Get
                 Dim myGlobal As New GlobalDataTO 'get from info DS
                 myGlobal = MyClass.GetISEInfoSettingValue(GlobalEnumerates.ISEModuleSettings.FLUID_TUBING_INSTALL_DATE, True)
@@ -2270,14 +2263,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
 
-        Public ReadOnly Property HasPumpTubingInstallDate() As Boolean
+        Public ReadOnly Property HasPumpTubingInstallDate() As Boolean Implements IISEAnalyzerEntity.HasPumpTubingInstallDate
             Get
                 Return (MyClass.PumpTubingInstallDate <> Nothing)
             End Get
         End Property
 
 
-        Public ReadOnly Property HasFluidicTubingInstallDate() As Boolean
+        Public ReadOnly Property HasFluidicTubingInstallDate() As Boolean Implements IISEAnalyzerEntity.HasFluidicTubingInstallDate
             Get
                 Return (MyClass.FluidicTubingInstallDate <> Nothing)
             End Get
@@ -2343,12 +2336,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #End Region
 
-
 #Region "Private Methods"
 
 #Region "Common"
-
-
 
         ''' <summary>
         ''' 
@@ -2397,7 +2387,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         MyClass.IsISECommsOk = True 'there are communications
 
                         'SGM 01/08/2012 - Set ISE as not initialized
-                        If MyClass.myAnalyzerManager.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then
+                        If MyClass.myAnalyzer.AnalyzerStatus <> AnalyzerManagerStatus.RUNNING Then
                             If MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.R Or _
                                 MyClass.LastISEResult.Errors(0).CancelErrorCode = ISEErrorTO.ISECancelErrorCodes.N Then
                                 MyClass.IsISECommsOkAttr = False
@@ -3312,7 +3302,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function AbortCurrentProcedureDueToException() As GlobalDataTO
+        Public Function AbortCurrentProcedureDueToException() As GlobalDataTO Implements IISEAnalyzerEntity.AbortCurrentProcedureDueToException
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.CurrentProcedure = ISEProcedures.GeneralCheckings Then
@@ -3346,7 +3336,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function RefreshAllDatabaseInformation() As GlobalDataTO
+        Public Function RefreshAllDatabaseInformation() As GlobalDataTO Implements IISEAnalyzerEntity.RefreshAllDatabaseInformation
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = MyClass.LoadISEParameters()
@@ -3457,7 +3447,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Modified by XB 23/05/2014 - BT #1639 - Display Calibrations Expired Data times
         ''' </remarks>
-        Public Function RefreshMonitorDataTO() As GlobalDataTO
+        Public Function RefreshMonitorDataTO() As GlobalDataTO Implements IISEAnalyzerEntity.RefreshMonitorDataTO
             Dim myGlobal As New GlobalDataTO
             Try
                 If Not MyClass.IsISEModuleInstalled Or MyClass.IsLongTermDeactivation Then
@@ -3678,7 +3668,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 26/10/2012</remarks>
-        Public Function GetISEAlarmsForUtilities(ByRef pPendingCalibrations As List(Of MaintenanceOperations)) As GlobalDataTO
+        Public Function GetISEAlarmsForUtilities(ByRef pPendingCalibrations As List(Of MaintenanceOperations)) As GlobalDataTO Implements IISEAnalyzerEntity.GetISEAlarmsForUtilities
             Dim myGlobal As New GlobalDataTO
             Try
                 If Not MyClass.IsISEModuleInstalled Then
@@ -3973,7 +3963,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Add parameter pIsDatetime. Datetime Format must be controled due ISE info may be loaded into systems with different culture info
         ''' Modified by SGM 29/01/2013 - DateTime to Invariant Format - Bug #1121
         ''' </remarks>
-        Public Function UpdateISEInfoSetting(ByVal pISESettingID As GlobalEnumerates.ISEModuleSettings, ByVal pValue As Object, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO
+        Public Function UpdateISEInfoSetting(ByVal pISESettingID As GlobalEnumerates.ISEModuleSettings, ByVal pValue As Object, Optional ByVal pIsDatetime As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.UpdateISEInfoSetting
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.AnalyzerIDAttr.Length > 0 AndAlso MyClass.myISEInfoDS IsNot Nothing Then
@@ -4215,7 +4205,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' CREATED BY:  SGM 06/03/2012
         ''' MODIFIED BY: JBL 20/09/2012 - Added parameter pForcedLiEnabledValue set Public Function
         ''' </remarks>
-        Public Function ValidateElectrodesCalibration(ByVal pResultStr As String, Optional ByVal pForcedLiEnabledValue As TriState = TriState.UseDefault) As GlobalDataTO
+        Public Function ValidateElectrodesCalibration(ByVal pResultStr As String, Optional ByVal pForcedLiEnabledValue As TriState = TriState.UseDefault) As GlobalDataTO Implements IISEAnalyzerEntity.ValidateElectrodesCalibration
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim isError As Boolean = False
@@ -4225,7 +4215,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim isClOK As Boolean = False
                 Dim myCalibrationOK As Boolean = False
 
-                Dim myReceptionDecoder As New ISEReception(MyClass.myAnalyzerManager)
+                Dim myReceptionDecoder As New ISEReceptionEntity(MyClass.myAnalyzer)
                 myGlobal = myReceptionDecoder.GetLiNaKClValues(pResultStr)
                 If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                     Dim myValues As ISEResultTO.LiNaKCl = CType(myGlobal.SetDatos, ISEResultTO.LiNaKCl)
@@ -4326,7 +4316,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myCalibrationOK As Boolean = False
-                Dim myReceptionDecoder As New ISEReception(MyClass.myAnalyzerManager)
+                Dim myReceptionDecoder As New ISEReceptionEntity(MyClass.myAnalyzer)
                 myGlobal = myReceptionDecoder.GetPumpCalibrationValues(pResultStr)
                 If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                     Dim myValues As ISEResultTO.PumpCalibrationValues = CType(myGlobal.SetDatos, ISEResultTO.PumpCalibrationValues)
@@ -4367,7 +4357,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myCalibrationOK As Boolean = False
-                Dim myReceptionDecoder As New ISEReception(MyClass.myAnalyzerManager)
+                Dim myReceptionDecoder As New ISEReceptionEntity(MyClass.myAnalyzer)
                 myGlobal = myReceptionDecoder.GetBubbleDetectorCalibrationValues(pResultStr)
                 If (Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing) Then
                     Dim myValues As ISEResultTO.BubbleCalibrationValues = CType(myGlobal.SetDatos, ISEResultTO.BubbleCalibrationValues)
@@ -4683,7 +4673,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 07/09/2012</remarks>
-        Public Function CheckAnyCalibrationIsNeeded(ByRef pAffectedElectrodes As List(Of String)) As GlobalDataTO
+        Public Function CheckAnyCalibrationIsNeeded(ByRef pAffectedElectrodes As List(Of String)) As GlobalDataTO Implements IISEAnalyzerEntity.CheckAnyCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4700,7 +4690,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If IsNeeded Then 'check if it is result error
                                 'affected electrodes will be locked in current ws
                                 'pAffectedElectrodes = New List(Of String)
-                                Dim myISEReception As New ISEReception(MyClass.myAnalyzerManager)
+                                Dim myISEReception As New ISEReceptionEntity(MyClass.myAnalyzer)
 
                                 Dim myResultTO_1 As New ISEResultTO
                                 myISEReception.FillISEResultValues(myResultTO_1, ISEResultTO.ISEResultItemTypes.Calibration1, MyClass.LastElectrodesCalibrationResult1)
@@ -4759,7 +4749,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by SGM 12/03/2012
         ''' Modified by XB 23/05/2014 - BT #1639 - Do not lock ISE preparations during Runnning (not Pause) by Pending Calibrations
         ''' </remarks>
-        Public Function CheckElectrodesCalibrationIsNeeded() As GlobalDataTO
+        Public Function CheckElectrodesCalibrationIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckElectrodesCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4812,7 +4802,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 25/07/2012</remarks>
-        Public Function CheckBubbleCalibrationIsNeeded() As GlobalDataTO
+        Public Function CheckBubbleCalibrationIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckBubbleCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4851,7 +4841,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by SGM 12/03/2012
         ''' Modified by XB 07/04/2014 - Refresh MonitorTO when change - task #1485
         ''' </remarks>
-        Public Function CheckPumpsCalibrationIsNeeded() As GlobalDataTO
+        Public Function CheckPumpsCalibrationIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckPumpsCalibrationIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -4898,7 +4888,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 16/02/2012</remarks>
-        Public Function CheckCleanIsNeeded() As GlobalDataTO
+        Public Function CheckCleanIsNeeded() As GlobalDataTO Implements IISEAnalyzerEntity.CheckCleanIsNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim IsNeeded As Boolean = False
@@ -5026,7 +5016,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Not MyClass.ISEDallasPage01.ValidationError Then
 
                                 'SGM 22/01/2013 - separate the algorithm
-                                myGlobal = ISEManager.BiosystemsValidationAlgorithm(MyClass.ISEDallasSN, MyClass.ISEDallasPage00)
+                                myGlobal = ISEAnalyzerEntity.BiosystemsValidationAlgorithm(MyClass.ISEDallasSN, MyClass.ISEDallasPage00)
                                 If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
                                     result = CBool(myGlobal.SetDatos)
                                 End If
@@ -5558,7 +5548,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns>GlobalDataTO containing a Typed Dataset AnalyzerLedPositionsDS with the list of WaveLength items</returns>
         ''' <remarks>Created by XBC 08/03/2012</remarks>
-        Public Function GetConsumptionParameters() As GlobalDataTO
+        Public Function GetConsumptionParameters() As GlobalDataTO Implements IISEAnalyzerEntity.GetConsumptionParameters
             Dim myGlobal As New GlobalDataTO
             Dim myParams As New SwParametersDelegate
             Dim myParametersDS As New ParametersDS
@@ -6299,7 +6289,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 08/03/2012</remarks>
-        Public Function SaveConsumptionCalToDallasData(ByVal pCalibrator As String) As GlobalDataTO
+        Public Function SaveConsumptionCalToDallasData(ByVal pCalibrator As String) As GlobalDataTO Implements IISEAnalyzerEntity.SaveConsumptionCalToDallasData
             Dim myglobal As New GlobalDataTO
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -6495,7 +6485,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 17/07/2012</remarks>
-        Public Function EstimatedFWConsumptionWS() As Long
+        Public Function EstimatedFWConsumptionWS() As Long Implements IISEAnalyzerEntity.EstimatedFWConsumptionWS
             Dim myglobal As New GlobalDataTO
             Dim returnValue As Long = 0
             Try
@@ -6606,21 +6596,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #End Region
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #End Region
 
 #Region "Public Methods"
@@ -6633,7 +6608,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by SGM 08/02/2012
         ''' Modified by XB 23/10/2013 - ISECMDs instructions are allowed to send while Analyzer is in Running during Pause mode - BT #1343
         ''' </remarks>
-        Public Function SendISECommand() As GlobalDataTO
+        Public Function SendISECommand() As GlobalDataTO Implements IISEAnalyzerEntity.SendISECommand
             Dim myGlobal As New GlobalDataTO
             Try
                 If MyClass.CurrentCommandTO IsNot Nothing Then
@@ -6645,11 +6620,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Else
                         ' XB 23/10/2013
                         ' If MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
-                        If MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Or _
-                           (MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.RUNNING And MyClass.myAnalyzerManager.AllowScanInRunning) Then
+                        If MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Or _
+                           (MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.RUNNING And MyClass.myAnalyzer.AllowScanInRunning) Then
                             ' XB 23/10/2013
 
-                            myGlobal = MyClass.myAnalyzerManager.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, MyClass.CurrentCommandTO)
+                            myGlobal = MyClass.myAnalyzer.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ISE_CMD, True, Nothing, MyClass.CurrentCommandTO)
                             If Not myGlobal.HasError Then
 
                                 ' XBC 05/09/2012 - Start Timeout must emplaced inside ManageAnalyzer
@@ -6681,7 +6656,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 05/07/2012</remarks>
-        Public Function MoveR2ArmAway() As GlobalDataTO
+        Public Function MoveR2ArmAway() As GlobalDataTO Implements IISEAnalyzerEntity.MoveR2ArmAway
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6706,7 +6681,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 05/07/2012</remarks>
-        Public Function MoveR2ArmBack() As GlobalDataTO
+        Public Function MoveR2ArmBack() As GlobalDataTO Implements IISEAnalyzerEntity.MoveR2ArmBack
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6726,10 +6701,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return resultData
         End Function
 
-
         Public Function SetElectrodesInstallDates(ByVal pRef As DateTime, ByVal pNa As DateTime, _
                                                   ByVal pK As DateTime, ByVal pCl As DateTime, _
-                                                  ByVal pLi As DateTime, Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO
+                                                  ByVal pLi As DateTime, Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.SetElectrodesInstallDates
 
             Dim resultData As New GlobalDataTO
             Try
@@ -6760,7 +6734,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return resultData
         End Function
 
-        Public Function SetReagentsPackInstallDate(ByVal pdate As DateTime, Optional ByVal pResetConsumptions As Boolean = False) As GlobalDataTO
+        Public Function SetReagentsPackInstallDate(ByVal pdate As DateTime, Optional ByVal pResetConsumptions As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.SetReagentsPackInstallDate
 
             Dim resultData As New GlobalDataTO
             Try
@@ -6800,7 +6774,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pDate"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function SetPumpTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO
+        Public Function SetPumpTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO Implements IISEAnalyzerEntity.SetPumpTubingInstallDate
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.PumpTubingInstallDate = pDate
@@ -6823,7 +6797,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pDate"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function SetFluidicTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO
+        Public Function SetFluidicTubingInstallDate(ByVal pDate As DateTime) As GlobalDataTO Implements IISEAnalyzerEntity.SetFluidicTubingInstallDate
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.FluidicTubingInstallDate = pDate
@@ -6844,7 +6818,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function InstallISEModule() As GlobalDataTO
+        Public Function InstallISEModule() As GlobalDataTO Implements IISEAnalyzerEntity.InstallISEModule
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6872,7 +6846,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function DeactivateISEModule(ByVal pDeactivationMode As Boolean) As GlobalDataTO
+        Public Function DeactivateISEModule(ByVal pDeactivationMode As Boolean) As GlobalDataTO Implements IISEAnalyzerEntity.DeactivateISEModule
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.IsLongTermDeactivation = pDeactivationMode
@@ -6898,7 +6872,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by SGM 07/03/2012
         ''' Modified by SGM 16/01/2013 - Bug #1108
         ''' </remarks>
-        Public Function ActivateReagentsPack() As GlobalDataTO
+        Public Function ActivateReagentsPack() As GlobalDataTO Implements IISEAnalyzerEntity.ActivateReagentsPack
             Dim resultData As New GlobalDataTO
             Try
                 ' XBC 18/07/2012 - Initialize database consumptions counters
@@ -6956,7 +6930,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function ActivateElectrodes() As GlobalDataTO
+        Public Function ActivateElectrodes() As GlobalDataTO Implements IISEAnalyzerEntity.ActivateElectrodes
             Dim resultData As New GlobalDataTO
             Try
 
@@ -6981,7 +6955,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function ActivateISEPreparations() As GlobalDataTO
+        Public Function ActivateISEPreparations() As GlobalDataTO Implements IISEAnalyzerEntity.ActivateISEPreparations
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7007,7 +6981,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 11/06/2012</remarks>
-        Public Function DoPrimeAndCalibration() As GlobalDataTO
+        Public Function DoPrimeAndCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoPrimeAndCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7032,7 +7006,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 11/06/2012</remarks>
-        Public Function DoPrimeX2AndCalibration() As GlobalDataTO
+        Public Function DoPrimeX2AndCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoPrimeX2AndCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7058,7 +7032,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function DoGeneralCheckings(Optional ByVal pIsRPAlreadyRead As Boolean = False) As GlobalDataTO
+        Public Function DoGeneralCheckings(Optional ByVal pIsRPAlreadyRead As Boolean = False) As GlobalDataTO Implements IISEAnalyzerEntity.DoGeneralCheckings
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7091,7 +7065,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by SGM 07/03/2012
         ''' </remarks>
-        Public Function DoCleaning(ByVal pTubePos As Integer) As GlobalDataTO
+        Public Function DoCleaning(ByVal pTubePos As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.DoCleaning
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.CurrentProcedure = ISEProcedures.Clean
@@ -7115,7 +7089,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function DoMaintenanceExit() As GlobalDataTO
+        Public Function DoMaintenanceExit() As GlobalDataTO Implements IISEAnalyzerEntity.DoMaintenanceExit
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7141,7 +7115,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pType">"A" or "B"</param>
         ''' <returns></returns>
         ''' <remarks>Created by XB 28/04/2014 - Improve Initial Purges sends before StartWS - Task #1587</remarks>
-        Public Function DoPurge(ByVal pType As String) As GlobalDataTO
+        Public Function DoPurge(ByVal pType As String) As GlobalDataTO Implements IISEAnalyzerEntity.DoPurge
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.CurrentProcedure = ISEProcedures.SingleCommand
@@ -7216,7 +7190,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 07/03/2012</remarks>
-        Public Function CheckCleanPackInstalled() As GlobalDataTO
+        Public Function CheckCleanPackInstalled() As GlobalDataTO Implements IISEAnalyzerEntity.CheckCleanPackInstalled
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7243,7 +7217,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 26/03/2012</remarks>
-        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO
+        Public Function CheckAlarms(ByVal pConnectedAttribute As Boolean, ByRef pAlarmList As List(Of GlobalEnumerates.Alarms), ByRef pAlarmStatusList As List(Of Boolean)) As GlobalDataTO Implements IISEAnalyzerEntity.CheckAlarms
             Dim resultData As New GlobalDataTO
             Try
                 Dim treat As Boolean = True
@@ -7253,7 +7227,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Else
                     If Not MyClass.IsISEModuleInstalled Then
                         treat = False
-                    ElseIf MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
+                    ElseIf MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.SLEEPING Then
                         treat = False
                     ElseIf MyClass.IsISEInitiating Then
                         treat = False
@@ -7610,7 +7584,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             End If
 
                             ' Ise Clean Pack wrong installed           
-                            If MyClass.CurrentProcedure = ISEManager.ISEProcedures.CheckCleanPackInstalled Then
+                            If MyClass.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.CheckCleanPackInstalled Then
                                 Dim isFinished As Boolean = ((MyClass.CurrentCommandTO.ISECommandID = ISECommands.PURGEB) And (MyClass.LastISEResult.ISEResultType = ISEResultTO.ISEResultTypes.OK))
                                 If isFinished And Not MyClass.IsCleanPackInstalled Then
 
@@ -7719,7 +7693,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by XBC 04/04/2012
         ''' AG + XBC 28/09/2012 - Returns GlobalDataTo (SetDatos as boolean, TRUE any instruction sent, FALSE no instructin sent)
         ''' </remarks>
-        Public Function SaveConsumptions() As GlobalDataTO
+        Public Function SaveConsumptions() As GlobalDataTO Implements IISEAnalyzerEntity.SaveConsumptions
             Dim resultData As New GlobalDataTO
             Try
                 Dim instructionSentFlag As Boolean = False 'AG + XBC 28/09/2012
@@ -7728,7 +7702,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ' And Reagents Pack Ready (Has Distributor Code Ok and Installed)
                 If MyClass.IsISEInitiatedOKAttr And MyClass.IsReagentsPackReady Then
 
-                    If MyClass.myAnalyzerManager.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
+                    If MyClass.myAnalyzer.AnalyzerStatus = AnalyzerManagerStatus.STANDBY Then
 
                         If MyClass.IsCalAUpdateRequired Then 'update cal A consumption
 
@@ -7794,7 +7768,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 26/06/2012</remarks>
-        Public Function DoElectrodesCalibration() As GlobalDataTO
+        Public Function DoElectrodesCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoElectrodesCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7819,7 +7793,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 26/06/2012</remarks>
-        Public Function DoPumpsCalibration() As GlobalDataTO
+        Public Function DoPumpsCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoPumpsCalibration
             Dim resultData As New GlobalDataTO
             Try
 
@@ -7844,7 +7818,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 25/07/2012</remarks>
-        Public Function DoBubblesCalibration() As GlobalDataTO
+        Public Function DoBubblesCalibration() As GlobalDataTO Implements IISEAnalyzerEntity.DoBubblesCalibration
             Dim resultData As New GlobalDataTO
             Try
                 MyClass.CurrentProcedure = ISEProcedures.CalibrateBubbles
@@ -7863,7 +7837,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return resultData
         End Function
 
-        Public Function GetISEErrorDescription(ByVal pISEError As ISEErrorTO, Optional ByVal pIsUrine As Boolean = False, Optional ByVal pIsCalibration As Boolean = False) As String
+        Public Function GetISEErrorDescription(ByVal pISEError As ISEErrorTO, Optional ByVal pIsUrine As Boolean = False, Optional ByVal pIsCalibration As Boolean = False) As String Implements IISEAnalyzerEntity.GetISEErrorDescription
             Dim myDesc As String = ""
             Try
                 Dim myDescID As String = ""
@@ -7890,37 +7864,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Else
 
-                    Dim myRemarkID As CalculationRemarks
+                    Dim myRemarkID As GlobalEnumerates.Alarms
                     Select Case pISEError.ResultErrorCode
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample
-                            myRemarkID = CalculationRemarks.ISE_mVOutB
+                            myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = CalculationRemarks.ISE_mVOutA_SER
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutA_SER
                             Else
-                                myRemarkID = CalculationRemarks.ISE_mVOutB_URI
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVOutB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample
-                            myRemarkID = CalculationRemarks.ISE_mVNoiseB
+                            myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine
                             If Not pIsUrine Then
-                                myRemarkID = CalculationRemarks.ISE_mVNoiseA_SER
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseA_SER
                             Else
-                                myRemarkID = CalculationRemarks.ISE_mVNoiseB_URI
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_mVNoiseB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample
                             If Not pIsCalibration Then
-                                myRemarkID = CalculationRemarks.ISE_Drift_SER
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_Drift_SER
                             Else
-                                myRemarkID = CalculationRemarks.ISE_Drift_CAL
+                                myRemarkID = GlobalEnumerates.Alarms.ISE_Drift_CAL
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges
-                            myRemarkID = CalculationRemarks.ISE_OutSlope
+                            myRemarkID = GlobalEnumerates.Alarms.ISE_OutSlope
 
                     End Select
 
@@ -7956,7 +7930,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pAnalyzerModel"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XB 03/12/2013 - protection : Ensure that connected Analyzer is fine registered on ISE table DB - task #1410</remarks>
-        Public Function UpdateAnalyzerInformation(ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String) As GlobalDataTO
+        Public Function UpdateAnalyzerInformation(ByVal pAnalyzerID As String, ByVal pAnalyzerModel As String) As GlobalDataTO Implements IISEAnalyzerEntity.UpdateAnalyzerInformation
             Dim resultData As New GlobalDataTO
             Try
                 AnalyzerIDAttr = pAnalyzerID
@@ -7978,9 +7952,187 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Try
             Return resultData
         End Function
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <remarks></remarks>
+        Public Sub Initialize() Implements IISEAnalyzerEntity.Initialize
+            Try
+                MyClass.IsAnalyzerDisconnectedAttr = False
+
+                Dim myGlobal As New GlobalDataTO
+                myGlobal = MyClass.RefreshAllDatabaseInformation
+
+                If myGlobal.HasError Then
+                    Throw New Exception(myGlobal.ErrorMessage)
+                End If
+
+                myISEInfoDelegate = New ISEDelegate
+                myISECalibHistory = New ISECalibHistoryDelegate
+                myISEInfoDS = Nothing
+                myISESwParametersDS = Nothing
+                myISELimitsDS = Nothing
+                myAlarms = Nothing
+                SIPcycles = Nothing
+                SIPIntervalConsumption = Nothing
+                Interval1forPurgeACompletedbyFW = Nothing
+                Interval2forPurgeACompletedbyFW = Nothing
+                ForceConsumptionsInitialize = False
+                ISE_EXECUTION_TIME_SER = 0
+                ISE_EXECUTION_TIME_URI = 0
+
+                'Analyzer
+                IsAnalyzerDisconnectedAttr = False
+                IsAnalyzerWarmUpAttr = False
+                AnalyzerIDAttr = ""
+                AnalyzerModelAttr = ""
+                WorkSessionIDAttr = ""
+
+                'Procedures & results management
+                CurrentProcedureAttr = ISEProcedures.None
+                CurrentCommandTOAttr = Nothing
+                LastISEResultAttr = Nothing
+                LastProcedureResultAttr = ISEProcedureResult.None
+                CurrentProcedureIsFinishedAttr = False
+
+                'Monitor
+                MonitorDataTOAttr = Nothing
+
+                'Status
+                IsISEModuleInstalledAttr = False
+                IsISESwitchONAttr = False
+                IsISEInitializationDoneAttr = False
+                IsISEInitiatedOKAttr = False
+                IsISEOnceInitiatedOKAttr = False
+                IsISECommsOkAttr = False
+                IsISEModuleReadyAttr = False
+                IsLongTermDeactivationAttr = False
+                isISEStatusUnknownAttr = True
+
+                'Reagents Pack
+                ISEDallasSNAttr = Nothing
+                ISEDallasPage00Attr = Nothing
+                ISEDallasPage01Attr = Nothing
+                ReagentsPackInstallationDateAttr = Nothing
+                IsReagentsPackInstalledAttr = False
+                ReagentsPackExpirationDateAttr = Nothing
+                BiosystemsCodeAttr = ""
+                ReagentsPackInitialVolCalAAttr = 0
+                ReagentsPackInitialVolCalBAttr = 0
+                IsReagentsPackReadyAttr = False
+                IsCleanPackInstalledAttr = False
+                IsEnoughCalibratorAAttr = False
+                IsEnoughCalibratorBAttr = False
+                IsCalAUpdateRequiredAttr = False
+                IsCalBUpdateRequiredAttr = False
+
+                'Electrodes
+                IsElectrodesReadyAttr = False
+                IsLiEnabledByUserAttr = True
+
+                IsLiMountedAttr = False
+                IsNaMountedAttr = False
+                IsKMountedAttr = False
+                IsClMountedAttr = False
+
+                IsRefExpiredAttr = False
+                IsLiExpiredAttr = False
+                IsNaExpiredAttr = False
+                IsKExpiredAttr = False
+                IsClExpiredAttr = False
+
+                IsRefOverUsedAttr = False
+                IsLiOverUsedAttr = False
+                IsNaOverUsedAttr = False
+                IsKOverUsedAttr = False
+                IsClOverUsedAttr = False
+
+                RefInstallDateAttr = Nothing
+                LiInstallDateAttr = Nothing
+                NaInstallDateAttr = Nothing
+                KInstallDateAttr = Nothing
+                ClInstallDateAttr = Nothing
+
+                RefTestCountAttr = -1
+                LiTestCountAttr = -1
+                NaTestCountAttr = -1
+                KTestCountAttr = -1
+                ClTestCountAttr = -1
+
+                PumpTubingInstallDateAttr = Nothing
+                FluidicTubingInstallDateAttr = Nothing
+                PumpTubingExpireDateAttr = Nothing
+                FluidicTubingExpireDateAttr = Nothing
+
+                'recommended Procedures
+                IsCalibrationNeededAttr = False
+                IsPumpCalibrationNeededAttr = False
+                IsBubbleCalibrationNeededAttr = False
+                IsCleanNeededAttr = False
+
+                'last calibrations and clean
+                LastElectrodesCalibrationResult1Attr = ""
+                LastElectrodesCalibrationResult2Attr = ""
+                LastElectrodesCalibrationDateAttr = Nothing
+                LastElectrodesCalibrationErrorAttr = ""
+                LastPumpsCalibrationResultAttr = ""
+                LastPumpsCalibrationDateAttr = Nothing
+                LastPumpsCalibrationErrorAttr = ""
+                LastBubbleCalibrationResultAttr = ""
+                LastBubbleCalibrationDateAttr = Nothing
+                LastBubbleCalibrationErrorAttr = ""
+                LastCleanDateAttr = Nothing
+                LastCleanErrorAttr = ""
+                TestsCountSinceLastCleanAttr = -1
+
+                'Consumptions
+                ConsumptionCalAbySerumAttr = 0
+                ConsumptionCalBbySerumAttr = 0
+                ConsumptionCalAbyUrine1Attr = 0
+                ConsumptionCalBbyUrine1Attr = 0
+                ConsumptionCalAbyUrine2Attr = 0
+                ConsumptionCalBbyUrine2Attr = 0
+                ConsumptionCalAbyElectrodesCalAttr = 0
+                ConsumptionCalBbyElectrodesCalAttr = 0
+                ConsumptionCalAbyPumpsCalAttr = 0
+                ConsumptionCalBbyPumpsCalAttr = 0
+                ConsumptionCalAbyBubblesCalAttr = 0
+                ConsumptionCalBbyBubblesCalAttr = 0
+                ConsumptionCalAbyCleanCycleAttr = 0
+                ConsumptionCalBbyCleanCycleAttr = 0
+                ConsumptionCalAbyPurgeAAttr = 0
+                ConsumptionCalBbyPurgeAAttr = 0
+                ConsumptionCalAbyPurgeBAttr = 0
+                ConsumptionCalBbyPurgeBAttr = 0
+                ConsumptionCalAbyPrimeAAttr = 0
+                ConsumptionCalBbyPrimeAAttr = 0
+                ConsumptionCalAbyPrimeBAttr = 0
+                ConsumptionCalBbyPrimeBAttr = 0
+                ConsumptionCalAbySippingAttr = 0
+                ConsumptionCalBbySippingAttr = 0
+
+                Const CteVolumeToSaveDallasData = 1
+                MinConsumptionVolToSaveDallasData_CalA = 0
+                MinConsumptionVolToSaveDallasData_CalB = 0
+                CountConsumptionToSaveDallasData_CalA = 0
+                CountConsumptionToSaveDallasData_CalB = 0
+
+                PurgeAbyFirmwareAttr = 0
+                PurgeBbyFirmwareAttr = 0
+                WorkSessionOverallTimeAttr = 0
+                WorkSessionIsRunningAttr = False
+                WorkSessionTestsByTypeAttr = ""
+
+                IsReagentsPackSerialNumberMatchAttr = False
+                IsInUtilitiesAttr = False
+                ISEWSCancelErrorCounterAttr = 0
+            Catch ex As Exception
+                Throw ex
+            End Try
+        End Sub
+
 #End Region
-
-
 
 #Region "ISE Sendings"
 
@@ -7999,7 +8151,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Public ReadOnly Property IsWaitingForInstructionStart() As Boolean
+        Public ReadOnly Property IsWaitingForInstructionStart() As Boolean Implements IISEAnalyzerEntity.IsWaitingForInstructionStart
             Get
                 Return (MyClass.InstructionStartedTimer IsNot Nothing)
             End Get
@@ -8014,7 +8166,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by SGM 20/06/2012
         ''' Modified by XBC 04/09/2012 - change to Public to allow calls from ManageAnalyzer
         ''' </remarks>
-        Public Function StartInstructionStartedTimer(Optional ByVal pTime As Integer = 0) As GlobalDataTO
+        Public Function StartInstructionStartedTimer(Optional ByVal pTime As Integer = 0) As GlobalDataTO Implements IISEAnalyzerEntity.StartInstructionStartedTimer
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myTime As Integer
@@ -8049,7 +8201,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Stop Timer for controlling timeout until receiving Status Start instruction after sending ISECMD
         ''' </summary>
         ''' <remarks>Created by SGM 20/06/2012</remarks>
-        Public Sub StopInstructionStartedTimer()
+        Public Sub StopInstructionStartedTimer() Implements IISEAnalyzerEntity.StopInstructionStartedTimer
             Try
                 If MyClass.InstructionStartedTimer IsNot Nothing Then
                     MyClass.InstructionStartedTimer.Dispose()
@@ -8116,7 +8268,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                           Optional ByVal pParameter1 As String = "0", _
                                           Optional ByVal pParameter2 As String = "0", _
                                           Optional ByVal pParameter3 As String = "0", _
-                                          Optional ByVal pTubePosition As Integer = 1) As GlobalDataTO
+                                          Optional ByVal pTubePosition As Integer = 1) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend
 
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
@@ -8358,7 +8510,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_POLL() As GlobalDataTO
+        Public Function PrepareDataToSend_POLL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_POLL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8386,7 +8538,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_CALB() As GlobalDataTO
+        Public Function PrepareDataToSend_CALB() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_CALB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8414,7 +8566,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_CLEAN(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function PrepareDataToSend_CLEAN(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_CLEAN
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8443,7 +8595,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PUMP_CAL(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO
+        Public Function PrepareDataToSend_PUMP_CAL(ByVal pTubePosition As Integer, ByVal pAnalyzerID As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PUMP_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8471,7 +8623,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_START() As GlobalDataTO
+        Public Function PrepareDataToSend_START() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_START
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8499,7 +8651,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PURGEA() As GlobalDataTO
+        Public Function PrepareDataToSend_PURGEA() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PURGEA
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8527,7 +8679,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PURGEB() As GlobalDataTO
+        Public Function PrepareDataToSend_PURGEB() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PURGEB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8555,7 +8707,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_BUBBLE_CAL() As GlobalDataTO
+        Public Function PrepareDataToSend_BUBBLE_CAL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_BUBBLE_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8583,7 +8735,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_SHOW_BUBBLE_CAL() As GlobalDataTO
+        Public Function PrepareDataToSend_SHOW_BUBBLE_CAL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_SHOW_BUBBLE_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8611,7 +8763,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_SHOW_PUMP_CAL() As GlobalDataTO
+        Public Function PrepareDataToSend_SHOW_PUMP_CAL() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_SHOW_PUMP_CAL
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8640,7 +8792,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_DSPA(ByVal pVolume As String) As GlobalDataTO
+        Public Function PrepareDataToSend_DSPA(ByVal pVolume As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_DSPA
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8669,7 +8821,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_DSPB(ByVal pVolume As String) As GlobalDataTO
+        Public Function PrepareDataToSend_DSPB(ByVal pVolume As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_DSPB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8697,7 +8849,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_VERSION_CHECKSUM() As GlobalDataTO
+        Public Function PrepareDataToSend_VERSION_CHECKSUM() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_VERSION_CHECKSUM
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8725,7 +8877,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_READ_mV() As GlobalDataTO
+        Public Function PrepareDataToSend_READ_mV() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_READ_mV
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8753,7 +8905,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_LAST_SLOPES() As GlobalDataTO
+        Public Function PrepareDataToSend_LAST_SLOPES() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_LAST_SLOPES
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8781,7 +8933,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_DEBUG_mV(ByVal pDebugMode As ISECommands) As GlobalDataTO
+        Public Function PrepareDataToSend_DEBUG_mV(ByVal pDebugMode As ISECommands) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_DEBUG_mV
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8809,7 +8961,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_MAINTENANCE() As GlobalDataTO
+        Public Function PrepareDataToSend_MAINTENANCE() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_MAINTENANCE
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8837,7 +8989,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PRIME_CALA() As GlobalDataTO
+        Public Function PrepareDataToSend_PRIME_CALA() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PRIME_CALA
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8865,7 +9017,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_PRIME_CALB() As GlobalDataTO
+        Public Function PrepareDataToSend_PRIME_CALB() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_PRIME_CALB
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8894,7 +9046,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_READ_PAGE_DALLAS(ByVal pPage As Integer) As GlobalDataTO
+        Public Function PrepareDataToSend_READ_PAGE_DALLAS(ByVal pPage As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_READ_PAGE_DALLAS
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -8931,7 +9083,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by XBC 12/01/2012
         ''' </remarks>
         Public Function PrepareDataToSend_WRITE_DALLAS(ByVal pPosition As String, _
-                                                       ByVal pInfo As String) As GlobalDataTO
+                                                       ByVal pInfo As String) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_DALLAS
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9017,7 +9169,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_WRITE_INSTALL_DAY(ByVal pDay As Integer) As GlobalDataTO
+        Public Function PrepareDataToSend_WRITE_INSTALL_DAY(ByVal pDay As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_INSTALL_DAY
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -9075,7 +9227,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_WRITE_INSTALL_MONTH(ByVal pMonth As Integer) As GlobalDataTO
+        Public Function PrepareDataToSend_WRITE_INSTALL_MONTH(ByVal pMonth As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_INSTALL_MONTH
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -9133,7 +9285,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by XBC 12/01/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_WRITE_INSTALL_YEAR(ByVal pYear As Integer) As GlobalDataTO
+        Public Function PrepareDataToSend_WRITE_INSTALL_YEAR(ByVal pYear As Integer) As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_WRITE_INSTALL_YEAR
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             'Dim myUtility As New Utilities()
@@ -9190,7 +9342,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by SGM 03/07/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_R2_TO_WASH() As GlobalDataTO
+        Public Function PrepareDataToSend_R2_TO_WASH() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_R2_TO_WASH
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9218,7 +9370,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by SGM 03/07/2012
         ''' </remarks>
-        Public Function PrepareDataToSend_R2_TO_PARK() As GlobalDataTO
+        Public Function PrepareDataToSend_R2_TO_PARK() As GlobalDataTO Implements IISEAnalyzerEntity.PrepareDataToSend_R2_TO_PARK
             Dim resultData As GlobalDataTO = Nothing
             Dim myDataIseCmdTo As New ISECommandTO
             Try
@@ -9240,7 +9392,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Function
 
 #End Region
-
 
 #Region "Private Methods"
 
@@ -9427,7 +9578,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #End Region
 
-
     End Class
 
 End Namespace
+

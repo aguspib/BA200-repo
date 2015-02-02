@@ -11,9 +11,11 @@ Imports System.Data
 Imports System.Windows.Forms
 Imports System.Globalization
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Core.Services
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
-    Partial Public Class AnalyzerManagerOLD
+Namespace Biosystems.Ax00.Core.Entities
+    Partial Public Class AnalyzerEntity
 
 #Region "STATUS Business Logic"
 
@@ -326,6 +328,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Case GlobalEnumerates.AnalyzerManagerAx00Actions.END_RUN_END
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StopRunning, "END")
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RUNNINGprocess, "CLOSED")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.SoftwareWSonRUNNING, "CLOSED") 'AG 07/11/2014 - This flag was set to TRUE but never to FALSE except after results recover!!
 
                             If (String.Compare(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ENDprocess.ToString), "INPROCESS", False) = 0) Then
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ENDprocess, "CLOSED")
@@ -512,7 +515,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         End If
 
                         If Not myGlobal.HasError Then
-                            myGlobal = MyClass.ISE_Manager.StartInstructionStartedTimer
+                            myGlobal = ISEAnalyzer.StartInstructionStartedTimer
                         End If
                         ' XB 23/10/2013
 
@@ -566,12 +569,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by  AG 03/11/2010
         ''' Modified by AG 02/03/2011 - add parameter pNextWell
         '''             XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
+        '''             AG 14/11/2014 - BA-2065 Dynamic base line initial management (add cases FLIGHT_START and END)
+        '''             IT 26/11/2014 - BA-2075 Modified the Warm up Process to add the FLIGHT process
+        '''             AG 11/12/2014 - BA-2170 use new value "MIDDLE" for flag DynamicBL_Read - cancelled because it is not required
+        '''             IT 19/12/2014 - BA-2143
         ''' </remarks>
         Private Function ManageStandByStatus(ByVal pAx00ActionCode As GlobalEnumerates.AnalyzerManagerAx00Actions, ByVal pNextWell As Integer) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
             Try
+                Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
+                Dim AlarmStatusList As New List(Of Boolean)
+                Dim alarmStatus As Boolean = False 'By default no alarm
+                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+
+
                 Select Case pAx00ActionCode
                     'The STANDBY instruction starts (prepare event for inform UI layer)
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.STANDBY_START
@@ -579,8 +592,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         'AG 12/03/2012 - If exists remove the alarm REACTIONS ROTOR MISSING (only if current status is SLEEPING)
                         If AnalyzerStatus = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
-                            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
-                            Dim AlarmStatusList As New List(Of Boolean)
                             PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
                             If AlarmList.Count > 0 Then
@@ -628,12 +639,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             Dim updateISEConsumptionFlag As Boolean = False
                             ' XBC 17/07/2012 - Estimated ISE Consumption by Firmware during WS
-                            If Not MyClass.ISE_Manager Is Nothing _
-                               AndAlso MyClass.ISE_Manager.IsISEModuleInstalled Then    ' XBC 02/08/2012 - correction to allow complete processing with INFO start
-                                MyClass.ISE_Manager.EstimatedFWConsumptionWS()
+                            If Not ISEAnalyzer Is Nothing _
+                               AndAlso ISEAnalyzer.IsISEModuleInstalled Then    ' XBC 02/08/2012 - correction to allow complete processing with INFO start
+                                ISEAnalyzer.EstimatedFWConsumptionWS()
 
                                 'AG 12/04/2012 - Update ISE consumptions if required
-                                If MyClass.ISE_Manager.IsCalAUpdateRequired Or MyClass.ISE_Manager.IsCalBUpdateRequired Then
+                                If ISEAnalyzer.IsCalAUpdateRequired Or ISEAnalyzer.IsCalBUpdateRequired Then
                                     updateISEConsumptionFlag = True
                                 End If
                                 'AG 12/04/2012
@@ -706,7 +717,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                             Else
                                 UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption, "INI")
-                                myGlobal = MyClass.ISE_Manager.SaveConsumptions()
+                                myGlobal = ISEAnalyzer.SaveConsumptions()
 
                                 'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
                                 'AG + XBC 28/09/2012 - also evaluate that any instruction has been sent before to set the analyzer not ready
@@ -746,26 +757,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.WASHING_STDBY_END
                         UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "END")
 
-                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "INPROCESS" Then
-                            'ag 30/09/2011
-                            ' We has to wait until receive a ANSINFO instruction ... if no bottle / deposit alarms then send the ALIGHT, else show message and abort warmup process
-                            'Before send ALIGHT in wup process ... delete the all ALIGHT results
-                            'Dim ALightDelg As New WSBLinesDelegate
-                            'myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                            'If Not myGlobal.HasError Then
-                            '    'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                            '    baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
-                            '    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
-
-                            '    'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                            '    If Not myGlobal.HasError Then
-                            '        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                            '        SetAnalyzerNotReady()
-                            '    End If
-                            'End If
-                            'AG 30/09/2011
-
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WASHprocess.ToString) = "INPROCESS" Then
+                        If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WASHprocess.ToString) = "INPROCESS" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.WASHprocess, "CLOSED")
 
 
@@ -797,36 +789,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                         ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then 'AG 08/03/2012
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess, "CLOSED")
-
-                            'AG 24/05/2012
-                        ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
-                            'Case Start instrument failed before wash was performed (for example no reactions missing)
-                            'User execute the change reaction rotor: Sw instructions NRotor + Wash + Alight
-
-                            'Send the ALIGHT
-                            'Delete the current reactions rotor status (configuration) and crete a new one
-                            Dim cfgAnReactionsRotor As New AnalyzerReactionsRotorDelegate
-                            myGlobal = cfgAnReactionsRotor.ChangeRotorPerformed(Nothing, AnalyzerIDAttribute)
-
-                            'Before send ALIGHT process ... delete the all ALIGHT results
-                            If Not myGlobal.HasError Then
-                                Dim ALightDelg As New WSBLinesDelegate
-                                myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                                If Not myGlobal.HasError Then
-                                    'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                    baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
-                                    'AG 12/09/2011 - when change rotor is performed the ALIGHt well starts in 1, ignore the well field in status instruction (RPalazon, JGelabert, STortosa)
-                                    'myGlobal = Me.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
-                                    myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
-
-                                    'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                    If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                        UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                                        SetAnalyzerNotReady()
-                                    End If
-                                End If
-                            End If
-                            'AG 24/05/2012
 
                         End If
 
@@ -871,8 +833,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.WASHSTATION_CTRL_PERFORMED, 0, False)
 
                             'AG 12/03/2012 - If exists remove the alarm REACTIONS ROTOR MISSING
-                            Dim AlarmList As New List(Of GlobalEnumerates.Alarms)
-                            Dim AlarmStatusList As New List(Of Boolean)
                             PrepareLocalAlarmList(GlobalEnumerates.Alarms.REACT_MISSING_ERR, False, AlarmList, AlarmStatusList)
 
                             If AlarmList.Count > 0 Then
@@ -895,44 +855,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.NEW_ROTOR_END
                         If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
                             UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.NewRotor, "END")
-
-                            'AG 24/05/2012 - If start instrument wash paused and wash not finished sent the wash
-                            If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString) = "PAUSED" AndAlso _
-                               mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "" Then 'Send Wash
-                                'Case Start instrument failed before wash was performed (for example no reactions missing)
-                                'User execute the change reaction rotor: Sw instructions NRotor + Wash + Alight
-                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "INI")
-                                myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True) 'Send a WASH instruction (Conditioning complete)
-
-                            Else
-                                'Else Alight
-                                'User execute the change reaction rotor when start instrument OK: Sw instructions NRotor + Alight
-
-                                'Delete the current reactions rotor status (configuration) and crete a new one
-                                Dim cfgAnReactionsRotor As New AnalyzerReactionsRotorDelegate
-                                myGlobal = cfgAnReactionsRotor.ChangeRotorPerformed(Nothing, AnalyzerIDAttribute)
-
-                                'Before send ALIGHT process ... delete the all ALIGHT results
-                                If Not myGlobal.HasError Then
-                                    Dim ALightDelg As New WSBLinesDelegate
-                                    myGlobal = ALightDelg.ResetAdjustsBLines(Nothing, AnalyzerIDAttribute, WorkSessionIDAttribute)
-                                    If Not myGlobal.HasError Then
-                                        'Once the conditioning is finished the Sw send an ALIGHT instruction 
-                                        baselineInitializationFailuresAttribute = 0 'Reset ALIGHT failures counter
-                                        'AG 12/09/2011 - when change rotor is performed the ALIGHt well starts in 1, ignore the well field in status instruction (RPalazon, JGelabert, STortosa)
-                                        'myGlobal = Me.ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, pNextWell)
-                                        myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
-
-                                        'When a process involve an instruction sending sequence automatic (for instance STANDBY (end) + WASH) change the AnalyzerIsReady value
-                                        If Not myGlobal.HasError AndAlso ConnectedAttribute Then
-                                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "INI")
-                                            SetAnalyzerNotReady()
-                                        End If
-                                    End If
-                                End If
-                            End If
-                            'AG 24/05/2012
-
                         End If
 
                     Case GlobalEnumerates.AnalyzerManagerAx00Actions.RECOVER_INSTRUMENT_START
@@ -965,6 +887,49 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         InitializeAnalyzerFlags(Nothing)
                         'AG 23/03/2012
 
+                        'AG 14/11/2014 BA-2065
+                    Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_START
+
+                        'IT 26/11/2014 - BA-2075 INI
+                        Select Case CurrentInstructionAction
+                            Case GlobalEnumerates.InstructionActions.FlightFilling
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "INI")
+                            Case GlobalEnumerates.InstructionActions.FlightReading
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "INI")
+                            Case GlobalEnumerates.InstructionActions.FlightEmptying
+                                UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "INI")
+                        End Select
+                        'IT 26/11/2014 - BA-2075 END
+
+                    Case GlobalEnumerates.AnalyzerManagerAx00Actions.FLIGHT_ACTION_DONE
+
+                        'IT 26/11/2014 - BA-2075 INI
+                        Select Case CurrentInstructionAction
+                            'Fill rotor finishes
+                            Case GlobalEnumerates.InstructionActions.FlightFilling
+                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                                    SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "END")
+                                    CurrentInstructionAction = InstructionActions.None
+                                    RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill) 'BA-2143
+                                End If
+                                'Read rotor finishes
+                            Case GlobalEnumerates.InstructionActions.FlightReading
+                                'AG 15/01/2015 BA-2170 (in case we use the status MIDDLE it has to be used here instead of INI
+                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                                    SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "END")
+                                    CurrentInstructionAction = InstructionActions.None
+                                    RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read) 'BA-2143
+                                End If
+                                'Empty rotor finishes
+                            Case GlobalEnumerates.InstructionActions.FlightEmptying
+                                If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
+                                    SetSessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "END")
+                                    CurrentInstructionAction = InstructionActions.None
+                                    ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Finalize)
+                                    RaiseEvent ProcessFlagEventHandler(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty) 'BA-2143
+                                End If
+                        End Select
+                        'IT 26/11/2014 - BA-2075 END
                     Case Else
 
                 End Select
@@ -977,7 +942,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     End If
                 End If
 
-
+                AlarmStatusList = Nothing
+                AlarmList = Nothing
 
             Catch ex As Exception
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -1126,21 +1092,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         'From RUNNING to STANDBY
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING And pNewStatusValue = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             '1) Maybe there are some messages that can be shown
-                            If baselineParametersFailuresAttribute Then
+                            If WELLbaselineParametersFailuresAttribute Then
                                 'Prepare DS for inform presentation
                                 'Prepare UIRefresh Dataset (NEW_ALARMS_RECEIVED) for refresh screen when needed
                                 resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, GlobalEnumerates.Alarms.BASELINE_WELL_WARN.ToString, True)
                             End If
 
-                            'AG 26/09/2012 - COMMENTED
-                            ''2) Update the reactions rotor table (remove WellContent = 'W' washstation to 'E' empty due the wash station does not work in standby)
-                            'Dim reactionsDelegate As New ReactionsRotorDelegate
+                            'AG 26/09/2012 -NEW -Simplification: When analyzer enters in StandBy repaint the whole reactions rotor, not only the WashStation wells
+                            '2) Update the reactions rotor table (WellContent = 'E' or 'C' for all wells, we are in standby)
+                            Dim reactionsDelegate As New ReactionsRotorDelegate
+
+                            'AG 14/11/2014 BA-2065 REFACTORING
                             'resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
                             'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             '    Dim wellsDS As ReactionsRotorDS
                             '    wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
 
-                            '    'AG 13/12/2011
                             '    'All wells with WellContent = 'W' changes to WellContent = 'E' or to 'C'
                             '    'resultData = reactionsDelegate.SetToEmptyTheWellsInWashStation(dbConnection, AnalyzerIDAttribute)
                             '    Dim contaminatedWellsDS As New ReactionsRotorDS
@@ -1148,87 +1115,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                             '        contaminatedWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
                             '    End If
-                            '    'AG 13/12/2011
 
-                            '    'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
-                            '    'AG 26/09/2012 - in standby all wellContent must be E or C so change the linq
-                            '    Dim myList As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
-                            '    Dim myContaminatedList As List(Of ReactionsRotorDS.twksWSReactionsRotorRow)
-                            '    'myList = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor _
-                            '    '          Where a.WellContent = "W" Select a).ToList
-                            '    myList = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor _
-                            '              Where a.WellContent <> "E" AndAlso a.WellContent <> "C" Select a).ToList
+                            '    'Read again the complete current reactions rotor (last turn)
+                            '    resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
+                            '    If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                            '        wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
 
-                            '    If myList.Count > 0 Then
+                            '        'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
                             '        Dim newWellsDS As New ReactionsRotorDS
-
-                            '        For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In myList
+                            '        For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor.Rows
                             '            item.BeginEdit()
                             '            'WellContent must be 'E' (empty) or 'C' (contaminated)
-                            '            item.WellContent = "E"
-                            '            If contaminatedWellsDS.twksWSReactionsRotor.Rows.Count > 0 AndAlso Not item.IsWellNumberNull Then
-                            '                myContaminatedList = (From a As ReactionsRotorDS.twksWSReactionsRotorRow In contaminatedWellsDS.twksWSReactionsRotor _
-                            '                                        Where a.WellNumber = item.WellNumber Select a).ToList
-
-                            '                If myContaminatedList.Count > 0 Then
-                            '                    item.WellContent = "C"
-                            '                End If
-                            '            End If
+                            '            If item.WellContent <> "E" AndAlso item.WellContent <> "C" Then item.WellContent = "E"
 
                             '            'WellStatus must be 'R' (ready) or 'X' (rejected)
                             '            If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" Then item.WellStatus = "R"
                             '            item.EndEdit()
+
                             '            newWellsDS.twksWSReactionsRotor.ImportRow(item)
                             '        Next
                             '        newWellsDS.AcceptChanges()
                             '        resultData = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, newWellsDS, True) 'AG 05/06/2012 - In this case use the Main treat refreshDS because we have leave Running mode
                             '    End If
-                            '    myList = Nothing 'AG 02/08/2012 - free memory
-                            '    myContaminatedList = Nothing 'AG 02/08/2012 - free memory
                             'End If
-
-                            'AG 26/09/2012 - COMMENTED
-
-                            'AG 26/09/2012 -NEW -Simplification: When analyzer enters in StandBy repaint the whole reactions rotor, not only the WashStation wells
-                            '2) Update the reactions rotor table (WellContent = 'E' or 'C' for all wells, we are in standby)
-                            Dim reactionsDelegate As New ReactionsRotorDelegate
-                            resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
-                            If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim wellsDS As ReactionsRotorDS
-                                wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-
-                                'All wells with WellContent = 'W' changes to WellContent = 'E' or to 'C'
-                                'resultData = reactionsDelegate.SetToEmptyTheWellsInWashStation(dbConnection, AnalyzerIDAttribute)
-                                Dim contaminatedWellsDS As New ReactionsRotorDS
-                                resultData = reactionsDelegate.AsignFinalValuesAfterLeavingRunning(dbConnection, AnalyzerIDAttribute, wellsDS)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    contaminatedWellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-                                End If
-
-                                'Read again the complete current reactions rotor (last turn)
-                                resultData = reactionsDelegate.GetAllWellsLastTurn(dbConnection, AnalyzerIDAttribute)
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    wellsDS = CType(resultData.SetDatos, ReactionsRotorDS)
-
-                                    'Finally prepare DS for inform presentation with the wells inside Washing Station when Running has finished
-                                    Dim newWellsDS As New ReactionsRotorDS
-                                    For Each item As ReactionsRotorDS.twksWSReactionsRotorRow In wellsDS.twksWSReactionsRotor.Rows
-                                        item.BeginEdit()
-                                        'WellContent must be 'E' (empty) or 'C' (contaminated)
-                                        If item.WellContent <> "E" AndAlso item.WellContent <> "C" Then item.WellContent = "E"
-
-                                        'WellStatus must be 'R' (ready) or 'X' (rejected)
-                                        If item.WellStatus <> "R" AndAlso item.WellStatus <> "X" Then item.WellStatus = "R"
-                                        item.EndEdit()
-
-                                        newWellsDS.twksWSReactionsRotor.ImportRow(item)
-                                    Next
-                                    newWellsDS.AcceptChanges()
-                                    resultData = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, newWellsDS, True) 'AG 05/06/2012 - In this case use the Main treat refreshDS because we have leave Running mode
-                                End If
-
+                            ''AG 26/09/2012 -NEW
+                            resultData = reactionsDelegate.RepaintAllReactionsRotor(dbConnection, AnalyzerIDAttribute)
+                            If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                Dim newWellsDS As New ReactionsRotorDS
+                                newWellsDS = DirectCast(resultData.SetDatos, ReactionsRotorDS)
+                                resultData = PrepareUIRefreshEventNum3(dbConnection, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, newWellsDS, True) 'AG 05/06/2012 - In this case use the Main treat refreshDS because we have leave Running mode
                             End If
-                            'AG 26/09/2012 -NEW
+                            'AG 14/11/2014 REFACTORING
 
                             If (Not resultData.HasError) Then
                                 'When the Database Connection was opened locally, then the Commit is executed
@@ -1451,7 +1368,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 21/06/2012 - add optional parameter
         ''' XB 03/05/2013 - Copy current flags state to the new Analyzer ID connected in case of change it
         ''' </remarks>
-        Public Sub InitializeAnalyzerFlags(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pPreviousAnalyzerID As String = "")
+        Public Sub InitializeAnalyzerFlags(ByVal pDBConnection As SqlClient.SqlConnection, Optional ByVal pPreviousAnalyzerID As String = "") Implements IAnalyzerEntity.InitializeAnalyzerFlags
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -1840,8 +1757,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             'When the Database Connection was opened locally, then the Commit is executed
                             If (pDbConnection Is Nothing) Then DAOBase.CommitTransaction(dbConnection)
                             ''SGM 17/02/2012 Initialization of ISE Manager
-                            'If MyClass.ISE_Manager Is Nothing Then
-                            '    MyClass.ISE_Manager = New ISEManager(Me, MyClass.AnalyzerIDAttribute, MyClass.myAnalyzerModel)
+                            'If ISEAnalyzer Is Nothing Then
+                            '    ISEAnalyzer = New ISEManager(Me, MyClass.AnalyzerIDAttribute, MyClass.myAnalyzerModel)
                             'End If
                             ''end SGM 17/02/2012
                         Else
@@ -1943,9 +1860,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pFlagsDS"></param>
         ''' <param name="pFlagCode"></param>
         ''' <param name="pNewValue"></param>
-        ''' <remarks>AG 01/03/2011 - Tested PENDING</remarks>
-        Private Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, _
-                                            ByVal pNewValue As String)
+        ''' <remarks>AG 01/03/2011 - Tested PENDING
+        ''' Modified by: IT 19/12/2014 - BA-2143 (Accessibility Level)
+        ''' </remarks>
+        Public Sub UpdateSessionFlags(ByRef pFlagsDS As AnalyzerManagerFlagsDS, ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, _
+                                            ByVal pNewValue As String) Implements IAnalyzerEntity.UpdateSessionFlags
             Try
                 'Update dictionary flags variables
                 mySessionFlags(pFlagCode.ToString) = pNewValue
@@ -1981,7 +1900,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pFlagCode"></param>
         ''' <param name="pNewValue"></param>
         ''' <remarks>Created by XB 06/02/2014</remarks>
-        Public Function SetSessionFlags(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, ByVal pNewValue As String) As GlobalDataTO
+        Public Function SetSessionFlags(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags, ByVal pNewValue As String) As GlobalDataTO Implements IAnalyzerEntity.SetSessionFlags
             Dim resultData As GlobalDataTO = Nothing
             Try
                 Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
@@ -2108,21 +2027,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by: DL 21/06/2012 - 
         '''              AG 19/07/2012 -review and modify
         '''              XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
+        '''              AG 20 and 19/01/2015 BA-2216 add dynamic BL functionality and fix issues found!!! (Start instrument process)
+        '''                                           use the new RotorChangeServices (Change rotor process)
+        '''              IT 30/01/2015 - BA-2216
         ''' </remarks>
-        Private Function RecoverStableSetup(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Private Function ManageInterruptedProcess(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As SqlClient.SqlConnection = Nothing
             Dim stableSetupAchieved As Boolean = True '/True means that is not necessary any action to reachs a stable setup 
             '                                          /False means that some actions to reach stable setup has been started
 
             Try
-                'AG 19/07/2012
-                'resultData = DAOBase.GetOpenDBConnection(pDBConnection)
-                'If (Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing) Then
-                '    dbConnection = DirectCast(resultData.SetDatos, SqlClient.SqlConnection)
-                '    If (Not dbConnection Is Nothing) Then
-                'AG 19/07/2012
-
                 'DL 21/06/2012. Begin 
                 Dim myGlobal As GlobalDataTO
 
@@ -2131,28 +2046,66 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     '1.	StartInstrument = 'INI'
                     '2.	Washing         = 'INI'
                     '3.	BaseLine        = 'INI'
+                    '4. DynamicBL_Fill  = 'INI'
+                    '5. DynamicBL_Read  = 'INI'
+                    '6. DynamicBL_Empty = 'INI'
+
+                    Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.StartInstrument.ToString) = "INI" Then
                         '1.	Re-send STANDBY instruction. Requires analyzer status SLEEP
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.SLEEPING Then
+                            'AG 20/01/2015 BA-2216
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.StartInstrument)
+
+                            'AG 20/01/2015 BA-2216 - new conditions
+                        ElseIf AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.STANDBY, True)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.StartInstrument, "END")
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash)
+                            'AG 20/01/2015 BA-2216
                         End If
 
+                        'AG 20/01/2015 BA-2216 - changes conditions
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.Washing.ToString) = "INI" Then
                         '2.	Re-send WASH instruction. Requires analyzer status STANDBY
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.WASH, True)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.Washing, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.Wash)
                         End If
 
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
                         '3.	Re-send ALIGHT instruction (well CurrentWellAttribute). Requires analyzer status STANDBY
                         If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
                             stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.BaseLine, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessStaticBaseLine)
                         End If
 
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill.ToString) = "INI" Then
+                        '3.	Re-send FLIGHT instruction in mode fill
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Fill, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                        End If
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read.ToString) = "INI" Then
+                        '3.	Re-send FLIGHT instruction in mode read
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Read, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                        End If
+                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty.ToString) = "INI" Then
+                        '3.	Re-send FLIGHT instruction in mode empty
+                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
+                            stableSetupAchieved = False
+                            UpdateSessionFlags(myAnalyzerFlagsDS, GlobalEnumerates.AnalyzerManagerFlags.DynamicBL_Empty, "")
+                            ValidateWarmUpProcess(myAnalyzerFlagsDS, WarmUpProcessFlag.ProcessDynamicBaseLine)
+                        End If
                     End If
 
 
@@ -2218,26 +2171,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                     'New rotor in course
-                ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Then
+                ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "INPROCESS" Or
+                    mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NEWROTORprocess.ToString) = "PAUSED" Then
+
                     '1.	NewRotor = 'INI'
-                    '2.	BaseLine = 'INI'	
+                    '2.	BaseLine = 'INI'
+                    '3. DynamicBL_Fill  = 'INI'
+                    '4. DynamicBL_Read  = 'INI'
+                    '5. DynamicBL_Empty = 'INI'
 
-                    If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.NewRotor.ToString) = "INI" Then
-                        '1.	Re-send NROTOR instruction. Requires analyzer status STANDBY
-                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.NROTOR)
-                        End If
-
-                    ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BaseLine.ToString) = "INI" Then
-                        '2.	Re-send ALIGHT instruction (well 1). Requires analyzer status STANDBY
-                        If AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.STANDBY Then
-                            stableSetupAchieved = False
-                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, 1)
-                        End If
-
-                    End If
-
+                    UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.RECOVERING_PROCESSES, 1, True) 'IT 30/01/2015 - BA-2216
 
                     'Recover in course
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RECOVERprocess.ToString) = "INPROCESS" Then
@@ -2258,7 +2201,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.BarcodeSTARTWSProcess.ToString) = "INPROCESS" Then
                     'In this case the Sw must starts the process, read the barcode of reagents and samples rotor
                     'Call method ManageBarCodeRequestBeforeRUNNING in AnalyzerManager 
-                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST
+                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.BEFORE_RUNNING_REQUEST
                     myGlobal = ManageBarCodeRequestBeforeRUNNING(dbConnection, BarCodeBeforeRunningProcessStatusAttribute)
 
 
@@ -2287,11 +2230,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption.ToString) = "INI" Then
 
                         ' XBC 23/07/2012 - Estimated ISE Consumption by Firmware during WS
-                        If Not MyClass.ISE_Manager Is Nothing _
-                           AndAlso MyClass.ISE_Manager.IsISEModuleInstalled Then    ' XBC 02/08/2012 - correction to allow complete processing with INFO start
-                            MyClass.ISE_Manager.EstimatedFWConsumptionWS()
+                        If Not ISEAnalyzer Is Nothing _
+                           AndAlso ISEAnalyzer.IsISEModuleInstalled Then    ' XBC 02/08/2012 - correction to allow complete processing with INFO start
+                            ISEAnalyzer.EstimatedFWConsumptionWS()
 
-                            myGlobal = MyClass.ISE_Manager.SaveConsumptions()
+                            myGlobal = ISEAnalyzer.SaveConsumptions()
 
                             'AG + XBC 28/09/2012 - also evaluate that any instruction has been sent before to set the analyzer not ready
                             If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing AndAlso CType(myGlobal.HasError, Boolean) = True AndAlso ConnectedAttribute Then
@@ -2318,11 +2261,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ISEConsumption.ToString) = "INI" Then
 
                         ' XBC 23/07/2012 - Estimated ISE Consumption by Firmware during WS
-                        If Not MyClass.ISE_Manager Is Nothing _
-                           AndAlso MyClass.ISE_Manager.IsISEModuleInstalled Then    ' XBC 02/08/2012 - correction to allow complete processing with INFO start
-                            MyClass.ISE_Manager.EstimatedFWConsumptionWS()
+                        If Not ISEAnalyzer Is Nothing _
+                           AndAlso ISEAnalyzer.IsISEModuleInstalled Then    ' XBC 02/08/2012 - correction to allow complete processing with INFO start
+                            ISEAnalyzer.EstimatedFWConsumptionWS()
 
-                            myGlobal = MyClass.ISE_Manager.SaveConsumptions()
+                            myGlobal = ISEAnalyzer.SaveConsumptions()
 
                             'AG + XBC 28/09/2012 - also evaluate that any instruction has been sent before to set the analyzer not ready
                             If Not myGlobal.HasError AndAlso Not myGlobal.SetDatos Is Nothing AndAlso CType(myGlobal.HasError, Boolean) = True AndAlso ConnectedAttribute Then
@@ -2333,7 +2276,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     End If
 
-                    'AG 27/08/2012 -Recovery results in course
+                    'AG 27/08/2012 -Recovery results in course ... NOT APPLY!!
                 ElseIf mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.RESULTSRECOVERProcess.ToString) = "INPROCESS" Then
                     'AG 03/09/2012 - comment, this method is called only in STANDBY and these subprocesses requires Running
                     ''1.	ResRecoverPrepProblems = 'INI'
@@ -2366,9 +2309,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If Not stableSetupAchieved AndAlso Not resultData.HasError AndAlso ConnectedAttribute Then
                     SetAnalyzerNotReady()
                 End If
-
-                'End If'AG 19/07/2012
-                'End If'AG 19/07/2012
 
             Catch ex As Exception
                 resultData = New GlobalDataTO()
@@ -2557,7 +2497,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 28/10/2010</remarks>
-        Public Function ClearStartTaskQueueToSend() As GlobalDataTO
+        Public Function ClearStartTaskQueueToSend() As GlobalDataTO Implements IAnalyzerEntity.ClearStartTaskQueueToSend
             Dim myGlobal As New GlobalDataTO
             Try
                 MyClass.myStartTaskInstructionsQueue.Clear()

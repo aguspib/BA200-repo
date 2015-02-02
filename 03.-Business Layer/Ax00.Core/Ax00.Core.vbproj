@@ -86,28 +86,6 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="01.-Interfaces\IAnalyzerEntity.vb" />
-    <Compile Include="01.-Interfaces\IBaseLineEntity.vb" />
-    <Compile Include="01.-Interfaces\IISEAnalyzerEntity.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2801.-Declarations, Properties, Services%29.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2802.-Reception Processes - Service.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2802.-Reception Processes.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2803.-Status Business, Internal Flags.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2804.-Alarms.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2805.-Well base line calculations.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2806.-Sending Processes.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2807.-Recovery Results.vb" />
-    <Compile Include="02.-Entities\AnalyzerEntity %28Partial Class%29\AnalyzerEntity %2808.-Temporal Testing and Old Methods.vb" />
-    <Compile Include="02.-Entities\BA200AnalyzerEntity.vb" />
-    <Compile Include="02.-Entities\BA400AnalyzerEntity.vb" />
-    <Compile Include="02.-Entities\BaseLineEntity.vb" />
-    <Compile Include="02.-Entities\DynamicBaseLineEntity.vb" />
-    <Compile Include="02.-Entities\ISEAnalyzerEntity.vb" />
-    <Compile Include="02.-Entities\ISEReceptionEntity.vb" />
-    <Compile Include="02.-Entities\StaticBaseLineEntity.vb" />
-    <Compile Include="03.-Enums\AnalyzerModelEnum.vb" />
-    <Compile Include="03.-Enums\BarcodeWorksessionActionsEnum.vb" />
     <Compile Include="04.-Services\RotorChangeServices.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -185,6 +163,10 @@
       <Project>{a883608a-3d41-4339-9c2f-feea18befb68}</Project>
       <Name>WorkSession</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="01.-Interfaces\" />
+    <Folder Include="02.-Entities\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

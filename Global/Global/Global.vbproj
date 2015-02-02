@@ -117,6 +117,8 @@
     <Compile Include="ApplicationLogManager\ApplicationLog.vb" />
     <Compile Include="ApplicationLogManager\DAOBase.vb" />
     <Compile Include="ApplicationLogManager\tfmwApplicationLogDAO.vb" />
+    <Compile Include="Enums\AnalyzerModelEnum.vb" />
+    <Compile Include="Enums\BarcodeWorksessionActionsEnum.vb" />
     <Compile Include="Extensions.vb" />
     <Compile Include="FwAdjustments\ArmTO.vb" />
     <Compile Include="FwAdjustments\FwAdjustmentsDataTO.vb" />

@@ -12,10 +12,12 @@ Imports Biosystems.Ax00.InfoAnalyzer
 Imports System.Timers
 Imports System.Data
 Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+Imports Biosystems.Ax00.Core.Interfaces
+Imports Biosystems.Ax00.Global.GlobalEnumerates
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
+Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerManagerOLD
+    Partial Public Class AnalyzerEntity
 
 #Region "Connection process"
 
@@ -195,7 +197,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by:  AG 07/06/2012
         ''' Modified by: XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
         ''' </remarks>
-        Public Function ManageSendAndSearchNext(ByVal pNextWell As Integer) As GlobalDataTO
+        Public Function ManageSendAndSearchNext(ByVal pNextWell As Integer) As GlobalDataTO Implements IAnalyzerEntity.ManageSendAndSearchNext
             Dim myGlobal As New GlobalDataTO
             Try
                 'Dim startTime As DateTime = Now 'AG 05/06/2012 - time estimation
@@ -289,7 +291,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                 2) This method does not search, only send next instruction
         '''             XB 15/10/2013 - Implement mode when Analyzer allows Scan Rotors in RUNNING (PAUSE mode) - Change ENDprocess instead of PAUSEprocess - BT #1318
         ''' </remarks>
-        Public Function SendNextPreparation(ByVal pNextWell As Integer, ByRef pActionSentFlag As Boolean, ByRef pEndRunSentFlag As Boolean, ByRef pSystemErrorFlag As Boolean) As GlobalDataTO
+        Public Function SendNextPreparation(ByVal pNextWell As Integer, ByRef pActionSentFlag As Boolean, ByRef pEndRunSentFlag As Boolean, ByRef pSystemErrorFlag As Boolean) As GlobalDataTO Implements IAnalyzerEntity.SendNextPreparation
 
             Dim myGlobal As New GlobalDataTO
 
@@ -379,8 +381,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     If Not myAnManagerDS.nextPreparation(0).IsExecutionIDNull AndAlso myAnManagerDS.nextPreparation(0).ExecutionID <> GlobalConstants.NO_PENDING_PREPARATION_FOUND Then
                                         'ISEModuleIsReadyAttribute = False 'AG 27/10/2011 This information is sent by Analzyer (AG 18/01/2011 ISE module becomes not available)
                                         'SGM 08/03/2012
-                                        If MyClass.ISE_Manager IsNot Nothing Then
-                                            MyClass.ISE_Manager.CurrentProcedure = ISEManager.ISEProcedures.Test
+                                        If ISEAnalyzer IsNot Nothing Then
+                                            ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.Test
                                         End If
                                         'end SGM 08/03/2012
                                         StartTime = Now 'AG 28/06/2012
@@ -2014,23 +2016,26 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Function
 
         ''' <summary>
-        ''' Get the current baseline ID in order to inform every execution with his correct base line
+        ''' Get the Current (last) baseline ID in order to inform every execution with his correct base line
         ''' 
         ''' If pBaseLineWithAdjust = TRUE is ANSAL get the ID from twksWSBLines table, else get from twksWSBLinesByWell table
         ''' 
         ''' NOTE: Dont use connection TEMPLATE in order to avoid circular references (DataAccessLayer uses Global proyect)!!
         ''' </summary>
+        ''' <param name="pdbConnection"></param>
         ''' <param name="pAnalyzerID"></param>
         ''' <param name="pWorkSessionID"></param>
         ''' <param name="pWell"></param>
         ''' <param name="pBaseLineWithAdjust"></param>
+        ''' <param name="pType">STATIC or DYNAMIC</param>
         ''' <returns>GlobalDataTO indicating if error. If no error returns and integer with the current BaseLineID</returns>
         ''' <remarks>
         ''' Created by AG ?
         ''' Modified by AG 03/01/2011 - if pBaseLineWithAdjust = true (if ANSAL get current baselineid from twksWSBLines, else (FALSE) get from twksWSBLinesByWell
+        ''' AG 29/10/2014 BA-2064 adapt method to read the static or dynamic base line (add pType parameter)
         ''' </remarks>
-        Private Function GetCurrentBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                             ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+        Public Function GetCurrentBaseLineIDByType(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
+                                             ByVal pWorkSessionID As String, ByVal pWell As Integer, ByVal pBaseLineWithAdjust As Boolean, ByVal pType As String) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -2043,7 +2048,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         If pBaseLineWithAdjust Then 'Base line with adjust (ANSAL instruction received)
                             'Option1: Using table WSBLinesDelegate (adjustment base line)
                             Dim myDelegate As New WSBLinesDelegate
-                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID)
+                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, pWell, pType)
 
                         Else 'base line without adjust (ANSBL or ANSDL instruction received)
                             ''Option2: Using table WSBLinesByWellDelegate (1 base line in every well during washing cycles)
@@ -2060,7 +2065,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineIDByType", EventLogEntryType.Error, False)
             Finally
                 If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
             End Try
@@ -2080,12 +2085,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pdbConnection"></param>
         ''' <param name="pBaseLineDS"></param>
         ''' <param name="pBaseLineWithAdjust"></param>
+        ''' <param name="pType"></param>
         ''' <returns></returns>
         ''' <remarks>
         ''' Created by AG 20/05/2010
         ''' AG 03/01/2011 - new parameter pBaseLineWithAdjust if ANSAL then save into twksWSBLines, else save into twksWSBLinesByWell
+        ''' AG 29/10/2014 BA-2057 inform new parameter pType in method blDelegate.Exists
+        ''' 
         ''' </remarks>
-        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+        Private Function SaveBaseLineResults(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pBaseLineDS As BaseLinesDS, ByVal pBaseLineWithAdjust As Boolean, ByVal pType As String) As GlobalDataTO
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -2101,7 +2109,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If pBaseLineWithAdjust Then '(1) Base line with adjust ("ANSAL" instruction received)
                                     'Option1 using table twksBLines
                                     Dim blDelegate As New WSBLinesDelegate
-                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, pBaseLineDS.twksWSBaseLines(0).BaseLineID)
+                                    myGlobal = blDelegate.Exists(dbConnection, pBaseLineDS.twksWSBaseLines(0).AnalyzerID, pBaseLineDS.twksWSBaseLines(0).WorkSessionID, _
+                                                                 pBaseLineDS.twksWSBaseLines(0).BaseLineID, pBaseLineDS.twksWSBaseLines(0).Wavelength, pType)
                                     If Not myGlobal.HasError And Not myGlobal.SetDatos Is Nothing Then
                                         If DirectCast(myGlobal.SetDatos, Boolean) = True Then
                                             'Update
@@ -2179,9 +2188,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by AG 21/05/2010
         ''' AG 03/01/2011 - use twksWSBLines or twksWSBLinesByWell depending pBaseLineWithAdjust parameter value
+        ''' AG 29/10/2014 BA-2057 and BA-2062 define new optional parameter and inform it as part of the new parameters in myDelegate.GetCurrentBaseLineID
         ''' </remarks>
         Private Function GetNextBaseLineID(ByVal pdbConnection As SqlClient.SqlConnection, ByVal pAnalyzerID As String, _
-                                           ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean) As GlobalDataTO
+                                           ByVal pWorkSessionID As String, ByVal pWellUsed As Integer, ByVal pBaseLineWithAdjust As Boolean, _
+                                           Optional ByVal pType As String = "STATIC", Optional ByVal pLed As Integer = -1) As GlobalDataTO
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
 
@@ -2192,26 +2203,43 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     If (Not dbConnection Is Nothing) Then
                         Dim currBaseLineID As Integer = 0
-                        Dim baselineComplete As Boolean = False
+                        Dim incrementIDFlag As Boolean = False
 
                         If pBaseLineWithAdjust Then 'Base line with adjust (ansal instruction received)
                             ''Option1: Using table WSBLinesDelegate (adjustment base line)
                             Dim myDelegate As New WSBLinesDelegate
-                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID)
+                            'AG 29/10/2014 BA-2062 - We are saving a new value, so get the maximum independent of the Type
+                            resultData = myDelegate.GetCurrentBaseLineID(dbConnection, pAnalyzerID, pWorkSessionID, pWellUsed, "")
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
                                 currBaseLineID = DirectCast(resultData.SetDatos, Integer)
                             Else
                                 Exit Try
                             End If
 
-                            'AG 20/04/2011 - not required
-                            'resultData = myDelegate.IsComplete(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID)
-                            'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            '    baselineComplete = DirectCast(resultData.SetDatos, Boolean)
-                            'Else
-                            '    Exit Try
-                            'End If
-                            baselineComplete = True
+                            incrementIDFlag = True
+
+                            'If saving STATIC then next baseline ID is current+1 (code does it)
+                            'If DYNAMIC:
+                            '- Read base line with ID = currBaseLineID
+                            '    - If the type is STATIC then next ID = current+1
+                            '    - Else: If already exists for well, led then nextId = current+1
+                            If currBaseLineID > 0 AndAlso pType = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                                resultData = myDelegate.Read(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pLed, "")
+                                If Not resultData.HasError AndAlso Not resultData.SetDatos Is Nothing Then
+                                    Dim auxDS As New BaseLinesDS
+                                    auxDS = DirectCast(resultData.SetDatos, BaseLinesDS)
+
+                                    If auxDS.twksWSBaseLines.Rows.Count > 0 AndAlso auxDS.twksWSBaseLines(0).Type = GlobalEnumerates.BaseLineType.DYNAMIC.ToString Then
+                                        Dim linqRes As List(Of BaseLinesDS.twksWSBaseLinesRow)
+                                        linqRes = (From a As BaseLinesDS.twksWSBaseLinesRow In auxDS.twksWSBaseLines _
+                                                   Where a.WellUsed = pWellUsed AndAlso a.Wavelength = pLed Select a).ToList
+                                        If linqRes.Count = 0 Then
+                                            incrementIDFlag = False
+                                        End If
+                                    End If
+
+                                End If
+                            End If
 
                         Else 'ANSBL or ANSDL base line without adjust
                             'Option2: Using table WSBLinesByWellDelegate (1 base line in every well during washing cycles)
@@ -2222,20 +2250,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             Else
                                 Exit Try
                             End If
-
-                            'AG 20/04/2011 - not required
-                            'resultData = myDelegate2.IsComplete(dbConnection, pAnalyzerID, pWorkSessionID, currBaseLineID, pWellUsed)
-                            'If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                            '    baselineComplete = DirectCast(resultData.SetDatos, Boolean)
-                            'Else
-                            '    Exit Try
-                            'End If
-                            baselineComplete = True
+                            incrementIDFlag = True
 
                         End If
 
                         'Return the next baselineid depending if the current is completed or not
-                        If baselineComplete Then
+                        If incrementIDFlag = True Then
                             resultData.SetDatos = currBaseLineID + 1  'Next BaseLine = Current + 1
                         Else
                             resultData.SetDatos = currBaseLineID    'Next BaseLine = Current 
@@ -2250,7 +2270,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 resultData.ErrorMessage = ex.Message
 
                 Dim myLogAcciones As New ApplicationLogManager()
-                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetCurrentBaseLineID", EventLogEntryType.Error, False)
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.GetNextBaseLineID", EventLogEntryType.Error, False)
             Finally
 
             End Try
@@ -2261,6 +2281,53 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         End Function
 
+
+        ''' <summary>
+        ''' 
+        ''' </summary>
+        ''' <returns></returns>
+        ''' <remarks>AG 27/11/2014 BA-2144</remarks>
+        Private Function SendAutomaticALIGHTRerun(ByVal pdbConnection As SqlClient.SqlConnection) As GlobalDataTO
+            Dim myGlobal As GlobalDataTO
+            Dim dbConnection As New SqlClient.SqlConnection
+            Try
+                myGlobal = DAOBase.GetOpenDBConnection(pdbConnection)
+                If (Not myGlobal.HasError) And (Not myGlobal.SetDatos Is Nothing) Then
+                    dbConnection = CType(myGlobal.SetDatos, SqlClient.SqlConnection)
+                    If (Not dbConnection Is Nothing) Then
+                        If AnalyzerStatus = AnalyzerManagerStatus.STANDBY AndAlso baselineInitializationFailuresAttribute < ALIGHT_INIT_FAILURES Then
+                            'When ALIGHT has been rejected ... increment the variable CurrentWellAttribute to perform the new in other well
+                            Dim SwParams As New SwParametersDelegate
+                            myGlobal = SwParams.GetParameterByAnalyzer(dbConnection, AnalyzerIDAttribute, GlobalEnumerates.SwParameters.MAX_REACTROTOR_WELLS.ToString, False)
+                            If Not myGlobal.HasError Then
+                                Dim SwParamsDS As New ParametersDS
+                                SwParamsDS = CType(myGlobal.SetDatos, ParametersDS)
+                                If SwParamsDS.tfmwSwParameters.Rows.Count > 0 Then
+                                    Dim reactionsDelegate As New ReactionsRotorDelegate
+                                    CurrentWellAttribute = reactionsDelegate.GetRealWellNumber(CurrentWellAttribute + 1, CInt(SwParamsDS.tfmwSwParameters(0).ValueNumeric))
+                                End If
+                            End If
+                            myGlobal = ManageAnalyzer(GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_LIGHT, True, Nothing, CurrentWellAttribute)
+                            'When a process involve an instruction sending sequence automatic change the AnalyzerIsReady value
+                            If Not myGlobal.HasError AndAlso ConnectedAttribute Then SetAnalyzerNotReady()
+                        End If
+
+                    End If
+                End If
+
+
+            Catch ex As Exception
+                myGlobal.HasError = True
+                myGlobal.ErrorCode = "SYSTEM_ERROR"
+                myGlobal.ErrorMessage = ex.Message
+
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.SendAutomaticALIGHTRerun", EventLogEntryType.Error, False)
+            Finally
+                If (pdbConnection Is Nothing) And (Not dbConnection Is Nothing) Then dbConnection.Close()
+            End Try
+            Return myGlobal
+        End Function
 #End Region
 
     End Class

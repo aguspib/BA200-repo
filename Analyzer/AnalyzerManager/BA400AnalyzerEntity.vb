@@ -1,9 +1,10 @@
 ﻿Imports Biosystems.Ax00.Core.Interfaces
 Imports Biosystems.Ax00.Global
+Imports System.Data
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Public Class BA200AnalyzerEntity
+    Public Class BA400AnalyzerEntity
         Inherits AnalyzerEntity
 
         Public Sub New(assemblyName As String, analyzerModel As String, baseLine As IBaseLineEntity)

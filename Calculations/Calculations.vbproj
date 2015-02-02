@@ -119,6 +119,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BioChemical\BaseLineCalculations.vb" />
     <Compile Include="BioChemical\ResultsExcelTest.vb" />
     <Compile Include="CalculatedTests\TestOperateCalculatedTestDelegate.vb" />
     <Compile Include="BioChemical\CalculationsDelegate.vb" />
@@ -127,6 +128,7 @@
     <Compile Include="BioChemical\ExecutionsPartialResultsDelegate.vb" />
     <Compile Include="BioChemical\ExecutionsR1ResultsDelegate.vb" />
     <Compile Include="CalculatedTests\OperateCalculatedTestDelegate.vb" />
+    <Compile Include="Interfaces\IBaseLineEntity.vb" />
     <Compile Include="ISE\CalculationISEDelegate.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">

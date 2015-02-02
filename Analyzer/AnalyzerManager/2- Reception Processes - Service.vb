@@ -13,10 +13,11 @@ Imports System.Timers
 Imports System.Data
 Imports System.ComponentModel
 Imports System.Text
+Imports Biosystems.Ax00.Core.Interfaces
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
+Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerManagerOLD
+    Partial Public Class AnalyzerEntity
 
 #Region "Level1 Private Methods"
 
@@ -491,17 +492,21 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                     'SGM 17/02/2012 Initialization of ISE Manager
-                    If MyClass.ISE_Manager IsNot Nothing AndAlso MyClass.ISE_Manager.IsAnalyzerDisconnected Then
+                    '#REFACTORING 
+                    'If ISEAnalyzer IsNot Nothing AndAlso ISEAnalyzer.IsAnalyzerDisconnected Then
+                    If ISEAnalyzer.IsAnalyzerDisconnected Then
                         'MyClass.ISE_Manager.Dispose() 'SGM 13/09/2012 clear all resources 
-                        MyClass.ISE_Manager = Nothing 'kill instance of when disconnected mode
+                        'ISEAnalyzer = Nothing 'kill instance of when disconnected mode
+                        ISEAnalyzer.Initialize()
                     End If
 
-                    If MyClass.ISE_Manager Is Nothing Then
-                        MyClass.ISE_Manager = New ISEManager(Me, MyClass.AnalyzerIDAttribute, MyClass.myAnalyzerModel)
-                    End If
+                    '#REFACTORING 
+                    'If ISEAnalyzer Is Nothing Then
+                    'MyClass.ISE_Manager = New ISEManager(Me, MyClass.AnalyzerIDAttribute, MyClass.myAnalyzerModel)
+                    'End If
 
                     'update ISE is installed
-                    If MyClass.ISE_Manager IsNot Nothing Then
+                    If ISEAnalyzer IsNot Nothing Then
                         Dim myISEInstalled As Boolean = False
                         myGlobal = myAdjustmentDelegate.ReadAdjustmentValueByCode(GlobalEnumerates.Ax00Adjustsments.ISEINS.ToString)
                         If Not myGlobal.HasError AndAlso myGlobal.SetDatos IsNot Nothing Then
@@ -509,7 +514,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If IsNumeric(res) Then
                                 myISEInstalled = (CInt(res) > 0)
                             End If
-                            MyClass.ISE_Manager.IsISEModuleInstalled = myISEInstalled
+                            ISEAnalyzer.IsISEModuleInstalled = myISEInstalled
                         Else
                             Exit Try
                         End If
@@ -519,8 +524,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
 
                 'AG 02/05/2011 - On receive the adjustments inform them into base line calculations class
-                If Not baselineCalcs Is Nothing And Not readAdjustmentsDS Is Nothing Then
-                    baselineCalcs.Adjustments = readAdjustmentsDS
+                If Not BaseLine Is Nothing And Not readAdjustmentsDS Is Nothing Then
+                    BaseLine.Adjustments = readAdjustmentsDS
                 End If
                 'AG 02/05/2011
 
@@ -2674,7 +2679,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInstructionReceived"></param>
         ''' <returns></returns>
         ''' <remarks>SGM 04/10/2012</remarks>
-        Public Function ProcessANSUTILReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO
+        Public Function ProcessANSUTILReceived(ByVal pInstructionReceived As List(Of InstructionParameterTO)) As GlobalDataTO Implements IAnalyzerEntity.ProcessANSUTILReceived
 
             Dim myGlobal As New GlobalDataTO
 
@@ -2873,7 +2878,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pFileStringData"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function CalculateFwFileCRC32(ByVal pFileStringData As String) As GlobalDataTO
+        Public Function CalculateFwFileCRC32(ByVal pFileStringData As String) As GlobalDataTO Implements IAnalyzerEntity.CalculateFwFileCRC32
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myUtil As New Utilities
@@ -2900,7 +2905,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pFileBytes"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function CalculateFwFileCRC32(ByVal pFileBytes As Byte()) As GlobalDataTO
+        Public Function CalculateFwFileCRC32(ByVal pFileBytes As Byte()) As GlobalDataTO Implements IAnalyzerEntity.CalculateFwFileCRC32
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myUtil As New Utilities
@@ -2941,7 +2946,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SGM 30/05/2012</remarks>
-        Public Function ValidateFwSwCompatibility(ByVal pFWVersion As String, ByVal pSWVersion As String) As GlobalDataTO
+        Public Function ValidateFwSwCompatibility(ByVal pFWVersion As String, ByVal pSWVersion As String) As GlobalDataTO Implements IAnalyzerEntity.ValidateFwSwCompatibility
 
             Dim myGlobal As New GlobalDataTO
 
@@ -2989,7 +2994,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pSWVersion"></param>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 22/06/2012</remarks>
-        Public Function GetFwVersionNeeded(ByVal pSWVersion As String) As GlobalDataTO
+        Public Function GetFwVersionNeeded(ByVal pSWVersion As String) As GlobalDataTO Implements IAnalyzerEntity.GetFwVersionNeeded
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myVersionsDS As VersionsDS

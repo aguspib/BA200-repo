@@ -1,7 +1,6 @@
 ﻿Option Explicit On
 Option Strict On
 
-'Imports System.Data.SqlClient
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Global.TO
 Imports Biosystems.Ax00.Global.GlobalConstants
@@ -13,10 +12,12 @@ Imports Biosystems.Ax00.Calculations
 Imports System.Timers
 Imports System.Data
 Imports System.ComponentModel 'AG 20/04/2011 - added when create instance to an BackGroundWorker
+Imports Biosystems.Ax00.CommunicationsSwFw
+Imports Biosystems.Ax00.Core.Interfaces
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
+Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerManagerOLD
+    Partial Public MustInherit Class AnalyzerEntity
 
 #Region "Declarations"
         'General use Class variables
@@ -63,7 +64,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         Private REAGENT_CONTAMINATION_PERSISTANCE As Integer = 2 'Default initial value for the contamination persistance (real value will be read in the Init method)
         Private MULTIPLE_ERROR_CODE As Integer = 99 'Default value (real value will be read in the Init method)
-        Private BASELINE_INIT_FAILURES As Integer = 2 'Default initial value for MAX baseline failures without warning (real value will be read in the Init method)
+        Private ALIGHT_INIT_FAILURES As Integer = 2 'Default initial value for MAX ALIGHT failures without warning (real value will be read in the Init method)
+        Private FLIGHT_INIT_FAILURES As Integer = 2 'AG 27/11/2014 BA-2066 - Default initial value for MAX FLIGHT failures without warning (real value will be read in the Init method)
+
         Private SENSORUNKNOWNVALUE As Integer = -1 'Default value for several sensors when the 0 value means alarm
         Private WELL_OFFSET_FOR_PREDILUTION As Integer = 4 'Default well offset until next request when a PTEST instruction is sent
         Private WELL_OFFSET_FOR_ISETEST_SERPLM As Integer = 2 'Default well offset until next request when a ISETEST (ser or plm) instruction is sent
@@ -85,21 +88,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private thermoR2ArmWarningTimer As New Timer() 'AG 05/01/2012- Controls thermo R2 arm maximum time allowed for the warning alarm
 
         Private wellBaseLineWorker As New BackgroundWorker 'Worker to perform the well base line process C:\Documents and Settings\Sergio_Garcia\Mis documentos\Ax00_v1.0\FwScriptsManagement\Screen Delegates\PositionsAdjustmentDelegate.vb
-        Private WithEvents baselineCalcs As BaseLineCalculations 'AG 29/04/2011 - Instance is created in AnalyzerManager constructor
+        '#REFACTORING Private WithEvents baselineCalcs As BaseLineCalculations 'AG 29/04/2011 - Instance is created in AnalyzerManager constructor
 
         Private wellContaminatedWithWashSent As Integer = 0 'AG 07/06/2011
         Private myBarcodeRequestDS As New AnalyzerManagerDS 'AG 03/08/2011 - When barcode request has several records. Sw has to send: 1st row ... wait results, 2on row ... wait results and so on
-
-        Public Enum BarcodeWorksessionActions
-            BARCODE_AVAILABLE = 0 'Barcode has not pending work to performe
-            NO_RUNNING_REQUEST = 1 'User press read barcode from RotorPosition screen
-            BEFORE_RUNNING_REQUEST = 2 'User press START o CONTINUE worksession button
-            REAGENTS_REQUEST_BEFORE_RUNNING = 3 'After (1) ... the Reagents barcode request has been sent. Waiting for results
-            SAMPLES_REQUEST_BEFORE_RUNNING = 4 'After (2) ... the Samples barcode request has been sent. Waiting for results
-            ENTER_RUNNING = 5 'Barcode read management performed ... ready to enter in Running
-            FORCE_ENTER_RUNNING = 6 'AG 08/03/2013 - Force enter running although exists samples without requests assigned
-            FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS = 7 'AG 01/04/2014 - #1565 Force enter running when autoWSCreation process finishes adding new rquests to WS, in this case the executions have already created, it is not necessary created them again
-        End Enum
         Private readBarCodeBeforeRunningPerformedFlag As Boolean = False 'AG 09/05/2012
 
         'AG 12/06/2012 - The photometric instructions are treated in a different threat in order to attend quickly to the analyzer requests in Running
@@ -136,13 +128,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private InfoRefreshFirstTimeAttr As Boolean = True
 
         'SGM 17/02/2012
-        Public WithEvents ISE_Manager As ISEManager
+        'Public WithEvents ISEAnalyzer As ISEManager 'REFACTORING
 
         ' XBC 24/05/2012 - Declare this flag Private for the class
         Private ISEAlreadyStarted As Boolean = False 'provisional flag for starting ISE just the first time 
-
-        'SGM 29/05/2012
-        Public FWUpdateResponseData As FWUpdateResponseTO
 
         ' XBC 13/06/2012
         Private myTmpConnectedAnalyzerDS As New AnalyzersDS
@@ -203,8 +192,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         Private validALIGHTAttribute As Boolean = False 'AG - inform if exist an valid ALIGHT results (twksWSBLines table)
         Private existsALIGHTAttribute As Boolean = False 'AG 20/06/2012
-        Private baselineInitializationFailuresAttribute As Integer = 0 'Alight and well base line initialization failures (used for repeat instructions or show messages)
-        Private baselineParametersFailuresAttribute As Boolean = False 'well base line parameters update failures (in Running) (used for show messages)
+        Private baselineInitializationFailuresAttribute As Integer = 0 'Alight base line initialization failures (used for repeat instructions or show messages)
+        Private dynamicbaselineInitializationFailuresAttribute As Integer = 0 'AG 27/11/2014 BA-2066 Flight base line initialization failures (used for repeat instructions or show messages)
+        Private WELLbaselineParametersFailuresAttribute As Boolean = False 'well base line parameters update failures (in Running) (used for show messages)
+
 
 
         'AG 01/04/2011 - Analyzer numerical values attributes (for inform the presentation is needed)
@@ -217,7 +208,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '1) Reagents Request + manage results
         '2) Samples Request + manage results
         '3) If warnings -> User solution are required Else Go to Running
-        Private BarCodeBeforeRunningProcessStatusAttribute As BarcodeWorksessionActions = BarcodeWorksessionActions.BARCODE_AVAILABLE
+        Private BarCodeBeforeRunningProcessStatusAttribute As BarcodeWorksessionActionsEnum = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE
 
         Private endRunAlreadySentFlagAttribute As Boolean = False 'AG 05/12/2011 - Remember the ENDRUN instruction has been sent and do not send it again
         '                                                This flag gets TRUE value when instrument sent action ENDRUN_START and is set to FALSE again when action is START_RUNNING_START
@@ -259,7 +250,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         'SGM 28/11/2011
         Private FwVersionAttribute As String = ""
-        Public AdjustmentsFilePath As String = "" '#REFACTORING
 
         'SGM 11/01/2012
         'Private LastISECommandAttr As ISECommandTO
@@ -336,7 +326,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #Region "Properties"
 
-        Public Property classInitializationError() As Boolean '15/07/2011 AG
+        Public Property classInitializationError() As Boolean Implements IAnalyzerEntity.classInitializationError '15/07/2011 AG
             Get
                 Return classInitializationErrorAttribute
             End Get
@@ -345,7 +335,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property ActiveWorkSession() As String   '19/04/2010 AG
+        Public Property ActiveWorkSession() As String Implements IAnalyzerEntity.ActiveWorkSession   '19/04/2010 AG
             Get
                 Return WorkSessionIDAttribute
             End Get
@@ -356,14 +346,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public ReadOnly Property WorkSessionStatus() As String  ' XBC 14/06/2012
+        Public ReadOnly Property WorkSessionStatus() As String Implements IAnalyzerEntity.WorkSessionStatus  ' XBC 14/06/2012
             Get
                 Return WorkSessionStatusAttribute
             End Get
         End Property
 
 
-        Public Property ActiveAnalyzer() As String  '19/04/2010 AG
+        Public Property ActiveAnalyzer() As String Implements IAnalyzerEntity.ActiveAnalyzer  '19/04/2010 AG
             Get
                 Return AnalyzerIDAttribute
             End Get
@@ -372,62 +362,67 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 If AnalyzerIDAttribute <> value Then
                     Dim previousValue As String = AnalyzerIDAttribute 'AG 21/06/2012 - Previous analyzer id
                     AnalyzerIDAttribute = value
-                    myAnalyzerModel = GetModelValue(AnalyzerIDAttribute)
 
-                    'AG 20/03/2012 - inform about the current analyzer to the applayer
-                    If Not AppLayer Is Nothing Then
-                        AppLayer.currentAnalyzerID = AnalyzerIDAttribute
-                    End If
+                    If value <> "" Then 'AG 20/11/2014 BA-2133
+                        myAnalyzerModel = GetModelValue(AnalyzerIDAttribute)
 
-                    InitClassStructuresFromDataBase(Nothing) 'AG 31/05/2012
+                        'AG 20/03/2012 - inform about the current analyzer to the applayer
+                        If Not AppLayer Is Nothing Then
+                            AppLayer.currentAnalyzerID = AnalyzerIDAttribute
+                            AppLayer.currentAnalyzerModel = myAnalyzerModel '13/11/2014 AG BA-2118
+                        End If
 
-                    'AG 20/03/2012
-                    'Initialize internal flags structure
-                    InitializeAnalyzerFlags(Nothing, previousValue)
+                        InitClassStructuresFromDataBase(Nothing) 'AG 31/05/2012
 
-                    'Initialize the analyzer settings
-                    InitializeAnalyzerSettings(Nothing)
+                        'AG 20/03/2012
+                        'Initialize internal flags structure
+                        InitializeAnalyzerFlags(Nothing, previousValue)
 
-                    'Initialize the analyzer led positions
-                    InitializeAnalyzerLedPositions(Nothing)
+                        'Initialize the analyzer settings
+                        InitializeAnalyzerSettings(Nothing)
 
-                    'Initialize the ISE information master data
-                    InitializeISEInformation(Nothing)
+                        'Initialize the analyzer led positions
+                        InitializeAnalyzerLedPositions(Nothing)
 
-                    'SGM 22/03/2012 Init ISEManager instance as disconnected mode
-                    'it will be replaced by a new instance when Adjustments received
-                    If MyClass.ISE_Manager Is Nothing Then
-                        MyClass.ISE_Manager = New ISEManager(Me, MyClass.ActiveAnalyzer, myAnalyzerModel, True)
-                    End If
+                        'Initialize the ISE information master data
+                        InitializeISEInformation(Nothing)
 
-                    ''Initialize the FwAdjustments master data
-                    'If FwVersionAttribute.Length > 0 Then
-                    '    InitializeFWAdjustments(Nothing)
-                    'End If
+                        'SGM 22/03/2012 Init ISEManager instance as disconnected mode
+                        'it will be replaced by a new instance when Adjustments received
+                        If ISEAnalyzer Is Nothing Then
+                            '#TODO REFACTORING ISEAnalyzer = New ISEManager(Me, MyClass.ActiveAnalyzer, myAnalyzerModel, True)
+                        End If
 
-                    'AG 30/08/2013 - Bug # 1271 - when new analyzer is connected Sw has to clear all alarms related to the last analyzer connected
-                    'The complete solution is next code but requires a futher validation because it could exists some exceptions (alarm not depending on the connected analyzer) - so remove
-                    'only the alarms recalculated with data in DataBase (the base line alarms)
-                    'myAlarmListAttribute.Clear()
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
-                    If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                    'AG 30/08/2013
+                        ''Initialize the FwAdjustments master data
+                        'If FwVersionAttribute.Length > 0 Then
+                        '    InitializeFWAdjustments(Nothing)
+                        'End If
 
-                    ' XBC 14/06/2012
-                    TemporalAnalyzerConnectedAttr = value
-                    'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
-                    'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
-                    If Not GlobalBase.IsServiceAssembly Then
-                        ' User Sw
-                        MyClass.InitBaseLineCalculations(Nothing, StartingApplicationAttr)
-                    End If
-                    ' XBC 14/06/2012
+                        'AG 30/08/2013 - Bug # 1271 - when new analyzer is connected Sw has to clear all alarms related to the last analyzer connected
+                        'The complete solution is next code but requires a futher validation because it could exists some exceptions (alarm not depending on the connected analyzer) - so remove
+                        'only the alarms recalculated with data in DataBase (the base line alarms)
+                        'myAlarmListAttribute.Clear()
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
+                        If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
+                        'AG 30/08/2013
+
+                        ' XBC 14/06/2012
+                        TemporalAnalyzerConnectedAttr = value
+                        'SGM 01/02/2012 - Check if it is User Assembly - Bug #1112
+                        'If Not My.Application.Info.AssemblyName.ToUpper.Contains("SERVICE") Then
+                        If Not GlobalBase.IsServiceAssembly Then
+                            ' User Sw
+                            MyClass.InitBaseLineCalculations(Nothing, StartingApplicationAttr)
+                        End If
+                        ' XBC 14/06/2012
+                    End If 'AG 20/11/2014 BA-2133
 
                 End If
             End Set
+
         End Property
 
-        Public Property ActiveFwVersion() As String  'SGM 28/11/2011
+        Public Property ActiveFwVersion() As String Implements IAnalyzerEntity.ActiveFwVersion  'SGM 28/11/2011
             Get
                 Return FwVersionAttribute
             End Get
@@ -451,7 +446,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Property ReadedFwVersion() As String  'SGM 28/11/2011
+        Public Property ReadedFwVersion() As String Implements IAnalyzerEntity.ReadedFwVersion  'SGM 28/11/2011
             Get
                 Return ReadedFwVersionAttribute
             End Get
@@ -463,7 +458,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property CommThreadsStarted() As Boolean    '21/04/2010 AG
+        Public Property CommThreadsStarted() As Boolean Implements IAnalyzerEntity.CommThreadsStarted    '21/04/2010 AG
             Get
                 Return CommThreadsStartedAttribute
             End Get
@@ -485,7 +480,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'End Property
         'END AG 05/05/2010
 
-        Public ReadOnly Property Connected() As Boolean    '22/04/2010 AG
+        Public ReadOnly Property Connected() As Boolean Implements IAnalyzerEntity.Connected    '22/04/2010 AG
             Get
 
                 If GlobalConstants.REAL_DEVELOPMENT_MODE > 0 Then
@@ -503,7 +498,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 22/09/2011
-        Public Property IsShutDownRequested() As Boolean
+        Public Property IsShutDownRequested() As Boolean Implements IAnalyzerEntity.IsShutDownRequested
             Get
                 Return IsShutDownRequestedAttribute
             End Get
@@ -513,7 +508,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 22/09/2011
-        Public Property IsUserConnectRequested() As Boolean
+        Public Property IsUserConnectRequested() As Boolean Implements IAnalyzerEntity.IsUserConnectRequested
             Get
                 Return IsUserConnectRequestedAttribute
             End Get
@@ -522,7 +517,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property PortName() As String  '22/04/2010 AG
+        Public Property PortName() As String Implements IAnalyzerEntity.PortName  '22/04/2010 AG
             Get
                 Return PortNameAttribute
             End Get
@@ -532,7 +527,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property Bauds() As String  '22/04/2010 AG
+        Public Property Bauds() As String Implements IAnalyzerEntity.Bauds  '22/04/2010 AG
             Get
                 Return BaudsAttribute
             End Get
@@ -542,7 +537,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property AnalyzerIsReady() As Boolean    '19/05/2010 AG
+        Public Property AnalyzerIsReady() As Boolean Implements IAnalyzerEntity.AnalyzerIsReady    '19/05/2010 AG
             Get
                 Return AnalyzerIsReadyAttribute
             End Get
@@ -552,7 +547,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property AnalyzerStatus() As GlobalEnumerates.AnalyzerManagerStatus  'AG 01/06/2010
+        Public Property AnalyzerStatus() As GlobalEnumerates.AnalyzerManagerStatus Implements IAnalyzerEntity.AnalyzerStatus 'AG 01/06/2010
             Get
                 Return AnalyzerStatusAttribute
             End Get
@@ -563,7 +558,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property AnalyzerCurrentAction() As GlobalEnumerates.AnalyzerManagerAx00Actions   'AG 01/06/2010
+        Public Property AnalyzerCurrentAction() As GlobalEnumerates.AnalyzerManagerAx00Actions Implements IAnalyzerEntity.AnalyzerCurrentAction   'AG 01/06/2010
             Get
                 Return AnalyzerCurrentActionAttribute
             End Get
@@ -572,7 +567,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property InstructionSent() As String    '20/10/2010 AG
+        Public Property InstructionSent() As String Implements IAnalyzerEntity.InstructionSent    '20/10/2010 AG
             Get
                 Return InstructionSentAttribute
             End Get
@@ -582,7 +577,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property InstructionReceived() As String    '20/10/2010 AG
+        Public Property InstructionReceived() As String Implements IAnalyzerEntity.InstructionReceived    '20/10/2010 AG
             Get
                 Return InstructionReceivedAttribute
             End Get
@@ -592,7 +587,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property InstructionTypeReceived() As GlobalEnumerates.AnalyzerManagerSwActionList    '02/11/2010 AG
+        Public Property InstructionTypeReceived() As GlobalEnumerates.AnalyzerManagerSwActionList Implements IAnalyzerEntity.InstructionTypeReceived    '02/11/2010 AG
             Get
                 Return InstructionTypeReceivedAttribute
             End Get
@@ -602,13 +597,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public ReadOnly Property InstructionTypeSent() As GlobalEnumerates.AppLayerEventList    '27/03/2012 AG
+        Public ReadOnly Property InstructionTypeSent() As GlobalEnumerates.AppLayerEventList Implements IAnalyzerEntity.InstructionTypeSent    '27/03/2012 AG
             Get
                 Return AppLayer.LastInstructionTypeSent
             End Get
         End Property
 
-        Public Property ISEModuleIsReady() As Boolean    '18/01/2011 AG
+        Public Property ISEModuleIsReady() As Boolean Implements IAnalyzerEntity.ISEModuleIsReady    '18/01/2011 AG
             Get
                 Return ISEModuleIsReadyAttribute
             End Get
@@ -618,14 +613,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public ReadOnly Property Alarms() As List(Of GlobalEnumerates.Alarms)
+        Public ReadOnly Property Alarms() As List(Of GlobalEnumerates.Alarms) Implements IAnalyzerEntity.Alarms
             Get
                 Return myAlarmListAttribute
             End Get
         End Property
 
         ' XBC 16/10/2012
-        Public ReadOnly Property ErrorCodes() As String
+        Public ReadOnly Property ErrorCodes() As String Implements IAnalyzerEntity.ErrorCodes
             Get
                 Dim returnValue As String = ""
 
@@ -643,7 +638,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 22/10/2012 SERVICE
-        Public Property IsServiceAlarmInformed() As Boolean
+        Public Property IsServiceAlarmInformed() As Boolean Implements IAnalyzerEntity.IsServiceAlarmInformed
             Get
                 Return IsServiceAlarmInformedAttr
             End Get
@@ -653,7 +648,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 09/11/2012 SERVICE
-        Public Property IsServiceRotorMissingInformed() As Boolean
+        Public Property IsServiceRotorMissingInformed() As Boolean Implements IAnalyzerEntity.IsServiceRotorMissingInformed
             Get
                 Return IsServiceRotorMissingInformedAttr
             End Get
@@ -664,7 +659,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
         'SGM 24/10/2012 SERVICE
-        Public Property IsFwUpdateInProcess() As Boolean
+        Public Property IsFwUpdateInProcess() As Boolean Implements IAnalyzerEntity.IsFwUpdateInProcess
             Get
                 Return IsFwUpdateInProcessAttr
             End Get
@@ -676,7 +671,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 25/10/2012 SERVICE
-        Public Property IsConfigGeneralProcess() As Boolean
+        Public Property IsConfigGeneralProcess() As Boolean Implements IAnalyzerEntity.IsConfigGeneralProcess
             Get
                 Return IsConfigGeneralProcessAttr
             End Get
@@ -687,20 +682,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public ReadOnly Property AnalyzerIsFreeze() As Boolean
+        Public ReadOnly Property AnalyzerIsFreeze() As Boolean Implements IAnalyzerEntity.AnalyzerIsFreeze
             Get
                 Return analyzerFREEZEFlagAttribute
             End Get
         End Property
 
         'AG 02/03/2012
-        Public ReadOnly Property AnalyzerFreezeMode() As String
+        Public ReadOnly Property AnalyzerFreezeMode() As String Implements IAnalyzerEntity.AnalyzerFreezeMode
             Get
                 Return analyzerFREEZEModeAttribute
             End Get
         End Property
 
-        Public Property SessionFlag(ByVal pFlag As GlobalEnumerates.AnalyzerManagerFlags) As String  '19/04/2010 AG
+        Public Property SessionFlag(ByVal pFlag As GlobalEnumerates.AnalyzerManagerFlags) As String Implements IAnalyzerEntity.SessionFlag  '19/04/2010 AG
             Get
                 Return mySessionFlags(pFlag.ToString)
             End Get
@@ -710,7 +705,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public ReadOnly Property GetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single
+        Public ReadOnly Property GetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single Implements IAnalyzerEntity.GetSensorValue
             Get
                 If SensorValuesAttribute.ContainsKey(pSensorID) Then
                     Return SensorValuesAttribute(pSensorID)
@@ -728,7 +723,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Get
         End Property
 
-        Public WriteOnly Property SetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single
+        Public WriteOnly Property SetSensorValue(ByVal pSensorID As GlobalEnumerates.AnalyzerSensors) As Single Implements IAnalyzerEntity.SetSensorValue
             Set(ByVal pValue As Single)
                 If SensorValuesAttribute.ContainsKey(pSensorID) Then
                     SensorValuesAttribute(pSensorID) = pValue
@@ -758,24 +753,32 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '    End Get
         'End Property
 
-        Public ReadOnly Property MaxWaitTime() As Integer
+        Public ReadOnly Property MaxWaitTime() As Integer Implements IAnalyzerEntity.MaxWaitTime
             Get
                 Return Me.AppLayer.MaxWaitTime
             End Get
         End Property
 
-        Public ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean
+
+        ''' <summary>
+        ''' ALIGHT fails or FLIGHT fails (all tentatives)
+        ''' </summary>
+        ''' <value></value>
+        ''' <returns></returns>
+        ''' <remarks>Modify AG 27/11/2014 BA-2066</remarks>
+        Public ReadOnly Property ShowBaseLineInitializationFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineInitializationFailedMessage
             Get
-                Return CBool(IIf(baselineInitializationFailuresAttribute >= BASELINE_INIT_FAILURES, True, False))
+                'Return CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False))
+                Return (CBool(IIf(baselineInitializationFailuresAttribute >= ALIGHT_INIT_FAILURES, True, False)) OrElse CBool(IIf(dynamicbaselineInitializationFailuresAttribute >= FLIGHT_INIT_FAILURES, True, False)))
             End Get
 
         End Property
 
 
-        Public ReadOnly Property ShowBaseLineParameterFailedMessage() As Boolean
+        Public ReadOnly Property ShowBaseLineWellRejectionParameterFailedMessage() As Boolean Implements IAnalyzerEntity.ShowBaseLineWellRejectionParameterFailedMessage
             Get
-                Dim result As Boolean = CBool(IIf(AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING And baselineParametersFailuresAttribute, True, False))
-                If result Then baselineParametersFailuresAttribute = False 'Once the alarm is shown clear this flag
+                Dim result As Boolean = CBool(IIf(AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING And WELLbaselineParametersFailuresAttribute, True, False))
+                If result Then WELLbaselineParametersFailuresAttribute = False 'Once the alarm is shown clear this flag
 
                 Return result
             End Get
@@ -783,35 +786,35 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 17/05/2011
-        Public ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable
+        Public ReadOnly Property SensorValueChanged() As UIRefreshDS.SensorValueChangedDataTable Implements IAnalyzerEntity.SensorValueChanged
             Get
                 Return Me.myUI_RefreshDS.SensorValueChanged
             End Get
         End Property
 
-        Public ReadOnly Property ValidALIGHT() As Boolean    '20/05/2011 AG
+        Public ReadOnly Property ValidALIGHT() As Boolean Implements IAnalyzerEntity.ValidALIGHT    '20/05/2011 AG
             Get
                 Return validALIGHTAttribute
             End Get
         End Property
 
-        Public ReadOnly Property ExistsALIGHT() As Boolean    '20/06/2012 AG
+        Public ReadOnly Property ExistsALIGHT() As Boolean Implements IAnalyzerEntity.ExistsALIGHT    '20/06/2012 AG
             Get
                 Return existsALIGHTAttribute
             End Get
         End Property
 
-        Public ReadOnly Property CurrentWell() As Integer
+        Public ReadOnly Property CurrentWell() As Integer Implements IAnalyzerEntity.CurrentWell
             Get
                 Return CurrentWellAttribute
             End Get
         End Property
 
-        Public Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActions 'AG 04/08/2011
+        Public Property BarCodeProcessBeforeRunning() As BarcodeWorksessionActionsEnum Implements IAnalyzerEntity.BarCodeProcessBeforeRunning 'AG 04/08/2011
             Get
                 Return BarCodeBeforeRunningProcessStatusAttribute
             End Get
-            Set(ByVal value As BarcodeWorksessionActions)
+            Set(ByVal value As BarcodeWorksessionActionsEnum)
                 BarCodeBeforeRunningProcessStatusAttribute = value
             End Set
         End Property
@@ -834,8 +837,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '    End Get
         'End Property
 
-        Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String
+
+        Public ReadOnly Property GetModelValue(ByVal pAnalyzerID As String) As String Implements IAnalyzerEntity.GetModelValue
             Get
+                'AG 10/11/2014 BA-2082 pending to adapt for compatibility between BA200 and BA400
                 Dim returnValue As String = ""
 
                 If pAnalyzerID.Length > 0 Then
@@ -844,10 +849,11 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     strTocompare = GetUpperPartSN(pAnalyzerID)
 
                     Select Case strTocompare
-                        Case "SN0"  ' TO DELETE
-                            returnValue = "A400"
+                        Case "SN0"  ' Generic
+                            returnValue = "A200"
+
                         Case GlobalBase.BA400ModelID
-                            returnValue = "A400"
+                            returnValue = "A200"
                     End Select
                 End If
 
@@ -856,7 +862,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 07/06/2012
-        Public ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String
+        Public ReadOnly Property GetUpperPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerEntity.GetUpperPartSN
             Get
                 Dim returnValue As String = ""
 
@@ -869,7 +875,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 07/06/2012
-        Public ReadOnly Property GetLowerPartSN(ByVal pAnalyzerID As String) As String
+        Public ReadOnly Property GetLowerPartSN(ByVal pAnalyzerID As String) As String Implements IAnalyzerEntity.GetLowerPartSN
             Get
                 Dim returnValue As String = ""
 
@@ -882,7 +888,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
 
-        Public ReadOnly Property Ringing() As Boolean    '26/10/2011 AG
+        Public ReadOnly Property Ringing() As Boolean Implements IAnalyzerEntity.Ringing    '26/10/2011 AG
             Get
                 Return AnalyzerIsRingingAttribute
             End Get
@@ -890,7 +896,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         'SGM 24/11/2011
-        Public Property IsAutoInfoActivated() As Boolean
+        Public Property IsAutoInfoActivated() As Boolean Implements IAnalyzerEntity.IsAutoInfoActivated
             Get
                 Return IsAutoInfoActivatedAttr
             End Get
@@ -900,7 +906,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 26/10/2012 -SERVICE: INFO:Q2 is sent. wait for ANSERR
-        Public Property IsAlarmInfoRequested() As Boolean
+        Public Property IsAlarmInfoRequested() As Boolean Implements IAnalyzerEntity.IsAlarmInfoRequested
             Get
                 Return IsAlarmInfoRequestedAttr
             End Get
@@ -925,7 +931,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'End Property
 
         'SGM 29/10/2012 -SERVICE: E:20 Instruction Rejected Error Received
-        Public Property IsInstructionRejected() As Boolean
+        Public Property IsInstructionRejected() As Boolean Implements IAnalyzerEntity.IsInstructionRejected
             Get
                 Return IsInstructionRejectedAttr
             End Get
@@ -937,7 +943,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 07/11/2012 -SERVICE: E:22 Recover Failed
-        Public Property IsRecoverFailed() As Boolean
+        Public Property IsRecoverFailed() As Boolean Implements IAnalyzerEntity.IsRecoverFailed
             Get
                 Return IsRecoverFailedAttr
             End Get
@@ -949,7 +955,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 19/11/2012 -SERVICE: E:22 Instruction Aborted
-        Public Property IsInstructionAborted() As Boolean
+        Public Property IsInstructionAborted() As Boolean Implements IAnalyzerEntity.IsInstructionAborted
             Get
                 Return IsInstructionAbortedAttr
             End Get
@@ -960,7 +966,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public Property LevelDetected() As Boolean
+        Public Property LevelDetected() As Boolean Implements IAnalyzerEntity.LevelDetected
             Get
                 Return (LevelDetectedAttr > 0)
             End Get
@@ -969,39 +975,39 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             End Set
         End Property
 
-        Public ReadOnly Property EndRunInstructionSent() As Boolean
+        Public ReadOnly Property EndRunInstructionSent() As Boolean Implements IAnalyzerEntity.EndRunInstructionSent
             Get
                 Return endRunAlreadySentFlagAttribute
             End Get
         End Property
 
-        Public ReadOnly Property AbortInstructionSent() As Boolean
+        Public ReadOnly Property AbortInstructionSent() As Boolean Implements IAnalyzerEntity.AbortInstructionSent
             Get
                 Return abortAlreadySentFlagAttribute
             End Get
         End Property
 
-        Public ReadOnly Property RecoverInstructionSent() As Boolean
+        Public ReadOnly Property RecoverInstructionSent() As Boolean Implements IAnalyzerEntity.RecoverInstructionSent
             Get
                 Return recoverAlreadySentFlagAttribute
             End Get
         End Property
 
         ' XB 15/10/2013 - BT #1318
-        Public ReadOnly Property PauseInstructionSent() As Boolean
+        Public ReadOnly Property PauseInstructionSent() As Boolean Implements IAnalyzerEntity.PauseInstructionSent
             Get
                 Return PauseAlreadySentFlagAttribute
             End Get
         End Property
 
         'TR 25/10/2013 BT #1340
-        Public ReadOnly Property ContinueAlreadySentFlag() As Boolean
+        Public ReadOnly Property ContinueAlreadySentFlag() As Boolean Implements IAnalyzerEntity.ContinueAlreadySentFlag
             Get
                 Return ContinueAlreadySentFlagAttribute
             End Get
         End Property
 
-        Public Property InfoActivated() As Integer 'AG 14/03/2012
+        Public Property InfoActivated() As Integer Implements IAnalyzerEntity.InfoActivated 'AG 14/03/2012
             Get
                 Return AnalyzerIsInfoActivatedAttribute
             End Get
@@ -1031,7 +1037,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         ' XBC 03/05/2012
-        Public Property IsStressing() As Boolean
+        Public Property IsStressing() As Boolean Implements IAnalyzerEntity.IsStressing
             Get
                 Return IsStressingAttribute
             End Get
@@ -1042,7 +1048,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
         'SGM 30/05/2012
-        Public Property IsFwSwCompatible() As Boolean
+        Public Property IsFwSwCompatible() As Boolean Implements IAnalyzerEntity.IsFwSwCompatible
             Get
                 Return IsFwSwCompatibleAttr
             End Get
@@ -1052,7 +1058,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 21/06/2012
-        Public Property IsFwReaded() As Boolean
+        Public Property IsFwReaded() As Boolean Implements IAnalyzerEntity.IsFwReaded
             Get
                 Return IsFwReadedAttr
             End Get
@@ -1062,14 +1068,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'AG 07/06/2012 - Informs that well base line calculations has paused the work session (consecutive rejected wells > Limit)
-        Public ReadOnly Property wellBaseLineAutoPausesSession() As Integer
+        Public ReadOnly Property wellBaseLineAutoPausesSession() As Integer Implements IAnalyzerEntity.wellBaseLineAutoPausesSession
             Get
-                Return baselineCalcs.exitRunningType
+                Return BaseLine.exitRunningType
             End Get
         End Property
 
         ' XBC 21/06/2012
-        Public Property IsAnalyzerIDNotLikeWS() As Boolean
+        Public Property IsAnalyzerIDNotLikeWS() As Boolean Implements IAnalyzerEntity.IsAnalyzerIDNotLikeWS
             Get
                 Return IsAnalyzerIDNotLikeWSAttr
             End Get
@@ -1079,7 +1085,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 14/06/2012
-        Public Property StartingApplication() As Boolean
+        Public Property StartingApplication() As Boolean Implements IAnalyzerEntity.StartingApplication
             Get
                 Return StartingApplicationAttr
             End Get
@@ -1089,14 +1095,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XCB 18/06/2012
-        Public ReadOnly Property TemporalAnalyzerConnected() As String
+        Public ReadOnly Property TemporalAnalyzerConnected() As String Implements IAnalyzerEntity.TemporalAnalyzerConnected
             Get
                 Return TemporalAnalyzerConnectedAttr
             End Get
         End Property
 
         ' XBC 19/06/2012
-        Public Property ForceAbortSession() As Boolean
+        Public Property ForceAbortSession() As Boolean Implements IAnalyzerEntity.ForceAbortSession
             Get
                 Return ForceAbortSessionAttr
             End Get
@@ -1106,7 +1112,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 02/08/2012
-        Public Property DifferentWSType() As String
+        Public Property DifferentWSType() As String Implements IAnalyzerEntity.DifferentWSType
             Get
                 Return MyClass.DifferentWSTypeAtrr
             End Get
@@ -1116,7 +1122,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 03/10/2012
-        Public Property AdjustmentsRead() As Boolean
+        Public Property AdjustmentsRead() As Boolean Implements IAnalyzerEntity.AdjustmentsRead
             Get
                 Return AdjustmentsReadAttr
             End Get
@@ -1126,7 +1132,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 10/10/2012 - SERVICE
-        Public Property TestingCollidedNeedle() As UTILCollidedNeedles
+        Public Property TestingCollidedNeedle() As UTILCollidedNeedles Implements IAnalyzerEntity.TestingCollidedNeedle
             Get
                 Return TestingCollidedNeedleAttribute
             End Get
@@ -1136,7 +1142,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'SGM 10/10/2012 - SERVICE
-        Public Property SaveSNResult() As UTILSNSavedResults
+        Public Property SaveSNResult() As UTILSNSavedResults Implements IAnalyzerEntity.SaveSNResult
             Get
                 Return SaveSNResultAttribute
             End Get
@@ -1146,14 +1152,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         ' XBC 07/11/2012 - SERVICE
-        Public ReadOnly Property ErrorCodesDisplay() As List(Of ErrorCodesDisplayStruct)
+        Public ReadOnly Property ErrorCodesDisplay() As List(Of ErrorCodesDisplayStruct) Implements IAnalyzerEntity.ErrorCodesDisplay
             Get
                 Return myErrorCodesDisplayAttribute
             End Get
         End Property
 
         'SGM 08/11/2012 SERVICE for refreshing sensors monitor
-        Public Property InfoRefreshFirstTime() As Boolean
+        Public Property InfoRefreshFirstTime() As Boolean Implements IAnalyzerEntity.InfoRefreshFirstTime
             Get
                 Return InfoRefreshFirstTimeAttr
             End Get
@@ -1172,7 +1178,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
 
         'AG 19/03/2013 - Information to export to LIS (using ES) that will be executed from presentation layer
-        Public ReadOnly Property LastExportedResults() As ExecutionsDS
+        Public ReadOnly Property LastExportedResults() As ExecutionsDS Implements IAnalyzerEntity.LastExportedResults
             Get
                 SyncLock lockThis
                     Return lastExportedResultsDSAttribute
@@ -1181,20 +1187,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Property
         'AG 19/03/2013
 
-        Public WriteOnly Property autoWSCreationWithLISMode() As Boolean 'AG 11/07/2013
+        Public WriteOnly Property autoWSCreationWithLISMode() As Boolean Implements IAnalyzerEntity.autoWSCreationWithLISMode 'AG 11/07/2013
             Set(ByVal value As Boolean)
                 autoWSCreationWithLISModeAttribute = value
             End Set
         End Property
 
-        Public ReadOnly Property AllowScanInRunning() As Boolean
+        Public ReadOnly Property AllowScanInRunning() As Boolean Implements IAnalyzerEntity.AllowScanInRunning
             Get
                 Return AllowScanInRunningAttribute
             End Get
         End Property
 
         ' XB 29/01/2014 - Task #1438
-        Public Property BarcodeStartInstrExpected As Boolean
+        Public Property BarcodeStartInstrExpected As Boolean Implements IAnalyzerEntity.BarcodeStartInstrExpected
             Get
                 Return BarcodeStartInstrExpectedAttr
             End Get
@@ -1202,6 +1208,33 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 BarcodeStartInstrExpectedAttr = value
             End Set
         End Property
+
+        'SGM 29/05/2012
+        Public Property FWUpdateResponseData As FWUpdateResponseTO Implements IAnalyzerEntity.FWUpdateResponseData '#REFACTORING
+        Public Property AdjustmentsFilePath As String Implements IAnalyzerEntity.AdjustmentsFilePath '#REFACTORING
+        <DefaultValue(GlobalEnumerates.InstructionActions.None)>
+        Public Property CurrentInstructionAction As GlobalEnumerates.InstructionActions Implements IAnalyzerEntity.CurrentInstructionAction 'BA-2075
+
+        'IT 19/12/2014 - BA-2143
+        Public Property FlightInitFailures As Integer Implements IAnalyzerEntity.FlightInitFailures
+            Get
+                Return FLIGHT_INIT_FAILURES
+            End Get
+            Set(ByVal value As Integer)
+                FLIGHT_INIT_FAILURES = value
+            End Set
+        End Property
+
+        'IT 19/12/2014 - BA-2143
+        Public Property DynamicBaselineInitializationFailures As Integer Implements IAnalyzerEntity.DynamicBaselineInitializationFailures
+            Get
+                Return dynamicbaselineInitializationFailuresAttribute
+            End Get
+            Set(ByVal value As Integer)
+                dynamicbaselineInitializationFailuresAttribute = value
+            End Set
+        End Property
+
 
 #End Region
 
@@ -1215,26 +1248,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInstructionReceived"></param>
         ''' <param name="pTreated"></param>
         ''' <remarks>AG 29/10/2010</remarks>
-        Public Shared Event ReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
-                                           ByVal pUIRefresh_Event As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean)
-
-
+        Public Event ReceptionEvent(ByVal pInstructionReceived As String, ByVal pTreated As Boolean, _
+                                           ByVal pUIRefresh_Event As List(Of GlobalEnumerates.UI_RefreshEvents), ByVal pUI_RefreshDS As UIRefreshDS, ByVal pMainThread As Boolean) Implements IAnalyzerEntity.ReceptionEvent '#REFACTORING
         ''' <summary>
         ''' Event with the instruction sent
         ''' </summary>
         ''' <param name="pInstructionSent"></param>
         ''' <remarks>AG 29/10/2010</remarks>
-        Public Shared Event SendEvent(ByVal pInstructionSent As String)
-
+        Public Event SendEvent(ByVal pInstructionSent As String) Implements IAnalyzerEntity.SendEvent '#REFACTORING
 
         ''' <summary>
         ''' Event to activate/deactivate WatchDog timer - Task #1438
         ''' </summary>
         ''' <param name="pEnable"></param>
         ''' <remarks>XB 29/01/2014</remarks>
-        Public Shared Event WatchDogEvent(ByVal pEnable As Boolean)
 
-
+        Public Event WatchDogEvent(ByVal pEnable As Boolean) Implements IAnalyzerEntity.WatchDogEvent '#REFACTORING
 
         'AG 20/04/2010
         ''' <summary>
@@ -1354,11 +1383,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Get the event generated by the base line well calculations
         ''' </summary>
         ''' <param name="pReactionsRotorWellDS"></param>
+        ''' <param name="pFromDynamicBaseLineProcessingFlag">TRUE when the event is raised after process dynamic base line results</param>
         ''' <remarks>AG 20/05/2011 - creation
-        ''' AG 13/09/2012 - only in Running</remarks>
-        Public Sub OnManageWellReactionsChanges(ByVal pReactionsRotorWellDS As ReactionsRotorDS) Handles baselineCalcs.WellReactionsChanges
+        ''' AG 13/09/2012 - only in Running, during well base line (not in standby when treat the ansphr queue
+        ''' AG 28/11/2014 BA.2081 in standby the refresh information has to be prepared after dynamic base line processing</remarks>
+        Public Sub OnManageWellReactionsChanges(ByVal pReactionsRotorWellDS As ReactionsRotorDS, ByVal pFromDynamicBaseLineProcessingFlag As Boolean) Handles _baseLine.WellReactionsChanges
             Try
-                If AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING AndAlso pReactionsRotorWellDS.twksWSReactionsRotor.Rows.Count > 0 Then
+                If (AnalyzerStatusAttribute = AnalyzerManagerStatus.RUNNING OrElse pFromDynamicBaseLineProcessingFlag) AndAlso pReactionsRotorWellDS.twksWSReactionsRotor.Rows.Count > 0 Then
                     Dim myGlobal As New GlobalDataTO
                     myGlobal = PrepareUIRefreshEventNum3(Nothing, GlobalEnumerates.UI_RefreshEvents.REACTIONS_WELL_STATUS_CHANGED, pReactionsRotorWellDS, True) 'AG 12/06/2012 'False)
 
@@ -1381,20 +1412,22 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
         ' SERVICE SOFTWARE
         ' XBC 16/11/2010
-        Public Shared Event ReceptionFwScriptEvent(ByVal pDataReceived As String, _
+        Public Event ReceptionFwScriptEvent(ByVal pDataReceived As String, _
                                                    ByVal pResponseValue As String, _
-                                                   ByVal pTreated As Boolean)
+                                                   ByVal pTreated As Boolean) Implements IAnalyzerEntity.ReceptionFwScriptEvent
 
         ' XBC 17/05/2011 - delete redundant Events replaced using AnalyzerManager.ReceptionEvent
         ' SGM 15/04/2011 
         'Public Shared Event SensorValuesChangedEvent(ByVal pSensorValuesChangedDT As UIRefreshDS.SensorValueChangedDataTable)
 
+        Public Event ReceivedStatusInformationEventHandler() Implements IAnalyzerEntity.ReceivedStatusInformationEventHandler 'IT 19/12/2014 - BA-2143
+        Public Event ProcessFlagEventHandler(ByVal pFlagCode As GlobalEnumerates.AnalyzerManagerFlags) Implements IAnalyzerEntity.ProcessFlagEventHandler 'IT 19/12/2014 - BA-2143
 
         ''' <summary>
         ''' Detects that the ISE data aimed to be displayed in the Monitor has been changed
         ''' </summary>
         ''' <remarks>Created by SGM 15/03/2012</remarks>
-        Public Sub OnISEMonitorDataChanged() Handles ISE_Manager.ISEMonitorDataChanged
+        Public Sub OnISEMonitorDataChanged() Handles _iseAnalyzer.ISEMonitorDataChanged
             Try
                 UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_MONITOR_DATA_CHANGED, 1, True)
             Catch ex As Exception
@@ -1407,7 +1440,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Detects that the ISE is ready for ISE Preparations
         ''' </summary>
         ''' <remarks>Created by SGM 15/03/2012</remarks>
-        Public Sub OnISEReadyChanged() Handles ISE_Manager.ISEReadyChanged
+        Public Sub OnISEReadyChanged() Handles _iseAnalyzer.ISEReadyChanged
             Try
                 UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_READY_CHANGED, 1, True)
             Catch ex As Exception
@@ -1420,7 +1453,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Detects that the ISE has been switched On
         ''' </summary>
         ''' <remarks>Created by SGM 15/03/2012</remarks>
-        Public Sub OnISESwitchedOnChanged() Handles ISE_Manager.ISESwitchedOnChanged
+        Public Sub OnISESwitchedOnChanged() Handles _iseAnalyzer.ISESwitchedOnChanged
             Try
                 UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_SWITCHON_CHANGED, 1, True)
             Catch ex As Exception
@@ -1433,7 +1466,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Detects that the ISE has finished the initial data retrieving process (Ok or not)
         ''' </summary>
         ''' <remarks>Created by SGM 15/03/2012</remarks>
-        Public Sub OnISEConnectionFinished(ByVal pOk As Boolean) Handles ISE_Manager.ISEConnectionFinished
+        Public Sub OnISEConnectionFinished(ByVal pOk As Boolean) Handles _iseAnalyzer.ISEConnectionFinished
             Try
                 Dim myGlobal As New GlobalDataTO
                 Dim myValue As Integer = 0
@@ -1443,7 +1476,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 Dim myAlarmList As New List(Of GlobalEnumerates.Alarms)
                 Dim myAlarmStatusList As New List(Of Boolean)
 
-                myGlobal = MyClass.ISE_Manager.CheckAlarms(MyClass.Connected, myAlarmList, myAlarmStatusList)
+                myGlobal = ISEAnalyzer.CheckAlarms(MyClass.Connected, myAlarmList, myAlarmStatusList)
 
                 If pOk Then
                     myValue = 1
@@ -1498,7 +1531,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Created by SGM 15/03/2012
         ''' </remarks>
-        Public Sub OnISEProcedureFinished() Handles ISE_Manager.ISEProcedureFinished
+        Public Sub OnISEProcedureFinished() Handles _iseAnalyzer.ISEProcedureFinished
 
             Dim myGlobalDataTO As New GlobalDataTO
 
@@ -1507,7 +1540,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 
                 'SGM 12/04/2012 Update ISE conssumption flag in case of Session ended, paused or aborted
-                If ISE_Manager.CurrentProcedure = ISEManager.ISEProcedures.WriteConsumption Then
+                If ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.WriteConsumption Then
 
                     Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
@@ -1529,8 +1562,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 End If
                 'end SGM 12/04/2012
 
-                ISE_Manager.CurrentCommandTO = Nothing
-                ISE_Manager.CurrentProcedure = ISEManager.ISEProcedures.None
+                ISEAnalyzer.CurrentCommandTO = Nothing
+                ISEAnalyzer.CurrentProcedure = ISEAnalyzerEntity.ISEProcedures.None
 
 
             Catch ex As Exception
@@ -1543,12 +1576,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Detects that some maintenance schedule is needed
         ''' </summary>
         ''' <remarks>Created by SGM 15/03/2012</remarks>
-        Public Sub OnISEMaintenanceRequired(ByVal pOperation As ISEManager.MaintenanceOperations) Handles ISE_Manager.ISEMaintenanceRequired
+        Public Sub OnISEMaintenanceRequired(ByVal pOperation As ISEAnalyzerEntity.MaintenanceOperations) Handles _iseAnalyzer.ISEMaintenanceRequired
             Try
                 Select Case pOperation
-                    Case ISEManager.MaintenanceOperations.ElectrodesCalibration : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CALB_REQUIRED, 1, True)
-                    Case ISEManager.MaintenanceOperations.PumpsCalibration : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_PUMPCAL_REQUIRED, 1, True)
-                    Case ISEManager.MaintenanceOperations.Clean : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CLEAN_REQUIRED, 1, True)
+                    Case ISEAnalyzerEntity.MaintenanceOperations.ElectrodesCalibration : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CALB_REQUIRED, 1, True)
+                    Case ISEAnalyzerEntity.MaintenanceOperations.PumpsCalibration : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_PUMPCAL_REQUIRED, 1, True)
+                    Case ISEAnalyzerEntity.MaintenanceOperations.Clean : UpdateSensorValuesAttribute(GlobalEnumerates.AnalyzerSensors.ISE_CLEAN_REQUIRED, 1, True)
                 End Select
 
             Catch ex As Exception
@@ -1662,6 +1695,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 AddHandler thermoR2ArmWarningTimer.Elapsed, AddressOf thermoR2ArmWarningTimer_Timer
                 'END AG 05/01/2012
 
+                AdjustmentsFilePath = String.Empty '#REFACTORING
+
             Catch ex As Exception
                 classInitializationErrorAttribute = True
                 Dim myLogAcciones As New ApplicationLogManager()
@@ -1677,7 +1712,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pStartingApplication" >TRUE when app is starting FALSE when a reportsat is loaded</param>
         ''' <remarks>AG 29/04/2011
         '''          AG 25/10/2011 - add parameter pStartingApplication for differentiate when the application is started and when a reportsat or restore point is loaded</remarks>
-        Public Sub InitBaseLineCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStartingApplication As Boolean)
+        Public Sub InitBaseLineCalculations(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pStartingApplication As Boolean) Implements IAnalyzerEntity.InitBaseLineCalculations
             Dim resultData As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -1688,8 +1723,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     If (Not dbConnection Is Nothing) Then
 
                         'AG 25/10/2011 - When a ReportSAT is loaded or a RestorePoint is restored the baseline calc must to be created again
-                        If Not baselineCalcs Is Nothing AndAlso Not pStartingApplication Then
-                            baselineCalcs = Nothing
+                        If Not BaseLine Is Nothing AndAlso Not pStartingApplication Then
+                            'BaseLine = Nothing '#REFACTORING
 
                             'AG 09/03/2012 - when load a reportsat and no connection remove all previous refresh information
                             If Not ConnectedAttribute Then
@@ -1701,76 +1736,75 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) Then myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_INIT_ERR)
                             If myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_WELL_WARN) Then
                                 myAlarmListAttribute.Remove(GlobalEnumerates.Alarms.BASELINE_WELL_WARN)
-                                baselineParametersFailuresAttribute = False
+                                WELLbaselineParametersFailuresAttribute = False
                             End If
 
                             resultData = InitClassStructuresFromDataBase(dbConnection)
-                        Else
-                            If Not baselineCalcs Is Nothing Then baselineCalcs = Nothing 'AG 30/08/2013 - When the analyzer is different from the last connected we must rebuild this structure
+                            'Else '#REFACTORING
+                            '    If Not BaseLine Is Nothing Then BaseLine = Nothing 'AG 30/08/2013 - When the analyzer is different from the last connected we must rebuild this structure
                         End If
                         'AG 25/10/2011
 
-                        If baselineCalcs Is Nothing Then
-                            baselineCalcs = New BaseLineCalculations
-                            baselineCalcs.fieldLimits = myClassFieldLimitsDS
+                        'If BaseLine Is Nothing Then '#REFACTORING
+                        'baselineCalcs = New BaseLineCalculations '#REFACTORING
+                        BaseLine.Initialize() '#REFACTORING
 
-                            Dim mySwParameterDelegate As New SwParametersDelegate
-                            resultData = mySwParameterDelegate.ReadByAnalyzerModel(Nothing, myAnalyzerModel)
+                        BaseLine.fieldLimits = myClassFieldLimitsDS
+
+                        Dim mySwParameterDelegate As New SwParametersDelegate
+                        resultData = mySwParameterDelegate.ReadByAnalyzerModel(Nothing, myAnalyzerModel)
+                        If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
+                            Dim myParamDS As New ParametersDS
+                            myParamDS = CType(resultData.SetDatos, ParametersDS)
+                            BaseLine.SwParameters = myParamDS
+
+                            validALIGHTAttribute = False
+                            resultData = BaseLine.GetLatestBaseLines(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myAnalyzerModel)
+                            validALIGHTAttribute = BaseLine.validALight
+                            existsALIGHTAttribute = BaseLine.existsAlightResults 'AG 20/06/2012
+
                             If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                Dim myParamDS As New ParametersDS
-                                myParamDS = CType(resultData.SetDatos, ParametersDS)
-                                baselineCalcs.SwParameters = myParamDS
+                                Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
+                                myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
+                                'Update internal alarm list if exists alarm but not saved it into database!!!
+                                If myAlarm <> GlobalEnumerates.Alarms.NONE Then
+                                    If Not myAlarmListAttribute.Contains(myAlarm) Then
+                                        myAlarmListAttribute.Add(myAlarm)
 
-                                validALIGHTAttribute = False
-                                resultData = baselineCalcs.GetLatestBaseLines(dbConnection, AnalyzerIDAttribute, WorkSessionIDAttribute, myAnalyzerModel)
-                                validALIGHTAttribute = baselineCalcs.validALight
-                                existsALIGHTAttribute = baselineCalcs.existsAlightResults 'AG 20/06/2012
-
-                                If Not resultData.HasError And Not resultData.SetDatos Is Nothing Then
-                                    Dim myAlarm As GlobalEnumerates.Alarms = GlobalEnumerates.Alarms.NONE
-                                    myAlarm = CType(resultData.SetDatos, GlobalEnumerates.Alarms)
-                                    'Update internal alarm list if exists alarm but not saved it into database!!!
-                                    If myAlarm <> GlobalEnumerates.Alarms.NONE Then
-                                        If Not myAlarmListAttribute.Contains(myAlarm) Then
-                                            myAlarmListAttribute.Add(myAlarm)
-
-                                            'AG 12/09/2012 - If base line error when app is starting set the attribute baselineInitializationFailuresAttribute to value in order to show the alarm globe in monitor
-                                            'Wup not in process 
-                                            If pStartingApplication AndAlso myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
-                                                Dim showGlobeFlag As Boolean = False
-                                                If (String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
-                                                    String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
-                                                    If Not IgnoreAlarmWhileWarmUp(myAlarm) Then
-                                                        showGlobeFlag = True
-                                                    End If
-                                                Else
+                                        'AG 12/09/2012 - If base line error when app is starting set the attribute baselineInitializationFailuresAttribute to value in order to show the alarm globe in monitor
+                                        'Wup not in process 
+                                        If pStartingApplication AndAlso myAlarm = GlobalEnumerates.Alarms.BASELINE_INIT_ERR Then
+                                            Dim showGlobeFlag As Boolean = False
+                                            If (String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "INPROCESS") OrElse _
+                                                String.Equals(mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.WUPprocess.ToString), "PAUSED")) Then
+                                                If Not IgnoreAlarmWhileWarmUp(myAlarm) Then
                                                     showGlobeFlag = True
                                                 End If
-
-                                                If showGlobeFlag Then
-                                                    'Set this attribute to limit in order the alarm will be shown as monitor globe
-                                                    baselineInitializationFailuresAttribute = BASELINE_INIT_FAILURES
-                                                End If
-
+                                            Else
+                                                showGlobeFlag = True
                                             End If
-                                            'AG 12/09/2012
 
-                                            'AG 13/02/2012
-                                            'Prepare UIRefresh DS (generate event only when a ReportSAT is loaded or a RestorePoint is restored)
-                                            resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
-                                            If Not baselineCalcs Is Nothing AndAlso Not pStartingApplication Then
-                                                InstructionReceivedAttribute = ""
-                                                RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                                            If showGlobeFlag Then
+                                                'Set this attribute to limit in order the alarm will be shown as monitor globe
+                                                baselineInitializationFailuresAttribute = ALIGHT_INIT_FAILURES
                                             End If
-                                            'AG 13/02/2012
+
                                         End If
+                                        'AG 12/09/2012
 
+                                        'AG 13/02/2012
+                                        'Prepare UIRefresh DS (generate event only when a ReportSAT is loaded or a RestorePoint is restored)
+                                        resultData = PrepareUIRefreshEvent(dbConnection, GlobalEnumerates.UI_RefreshEvents.ALARMS_RECEIVED, 0, 0, myAlarm.ToString, True)
+                                        If Not BaseLine Is Nothing AndAlso Not pStartingApplication Then
+                                            InstructionReceivedAttribute = ""
+                                            RaiseEvent ReceptionEvent(InstructionReceivedAttribute, True, myUI_RefreshEvent, myUI_RefreshDS, True)
+                                        End If
+                                        'AG 13/02/2012
                                     End If
                                 End If
-
                             End If
                         End If
-
+                        'End If
                     End If
                 End If
 
@@ -1831,7 +1865,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                       Where a.ParameterName = GlobalEnumerates.SwParameters.BLINE_INIT_FAILURES.ToString Select a).ToList
 
                             If myQRes.Count > 0 Then
-                                BASELINE_INIT_FAILURES = CInt(myQRes(0).ValueNumeric)
+                                ALIGHT_INIT_FAILURES = CInt(myQRes(0).ValueNumeric)
                             End If
 
                             myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
@@ -1872,6 +1906,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 WELL_OFFSET_FOR_ISETEST_URI = CInt(myQRes(0).ValueNumeric)  'Well offset for ise test (uri) (cycles until Fw activates the biochemical request after receive an URI isetest)
                             End If
                             'AG 12/07/2012
+
+                            'AG 27/11/2014 BA-2066
+                            myQRes = (From a As ParametersDS.tfmwSwParametersRow In myParamDS.tfmwSwParameters _
+                                      Where a.ParameterName = GlobalEnumerates.SwParameters.FLIGHT_INIT_FAILURES.ToString Select a).ToList
+                            If myQRes.Count > 0 Then
+                                FLIGHT_INIT_FAILURES = CInt(myQRes(0).ValueNumeric)
+                            End If
+
                             myQRes = Nothing 'AG 02/08/2012 - free memory
                         End If
                         'AG 02/05/2011
@@ -1912,7 +1954,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pPooling"></param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function Start(ByVal pPooling As Boolean) As Boolean
+        Public Function Start(ByVal pPooling As Boolean) As Boolean Implements IAnalyzerEntity.Start
             Dim myReturn As Boolean = False
             Try
                 Dim myGlobal As New GlobalDataTO
@@ -1936,7 +1978,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 04/07/2012</remarks>
-        Public Function SynchronizeComm() As Boolean
+        Public Function SynchronizeComm() As Boolean Implements IAnalyzerEntity.SynchronizeComm
             Dim myReturn As Boolean = False
             Try
                 Dim myGlobal As New GlobalDataTO
@@ -1961,7 +2003,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Public Function Terminate() As Boolean
+        Public Function Terminate() As Boolean Implements IAnalyzerEntity.Terminate
             Dim myReturn As Boolean = False
             Try
                 CommThreadsStartedAttribute = False
@@ -1980,7 +2022,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Stop communications channel
         ''' </summary>
         ''' <remarks>Created by XBC 18/06/2012</remarks>
-        Public Function StopComm() As Boolean
+        Public Function StopComm() As Boolean Implements IAnalyzerEntity.StopComm
             Dim myReturn As Boolean = False
             Try
                 Dim myGlobal As New GlobalDataTO
@@ -2004,7 +2046,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Start communications channel after a previous Stop
         ''' </summary>
         ''' <remarks>Created by XBC 18/06/2012</remarks>
-        Public Function StartComm() As Boolean
+        Public Function StartComm() As Boolean Implements IAnalyzerEntity.StartComm
             Dim myReturn As Boolean = False
             Dim myGlobal As New GlobalDataTO
             Try
@@ -2052,7 +2094,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <remarks>
         ''' Creation AG 22/04/2010
         ''' </remarks>
-        Public Function ReadRegistredPorts() As GlobalDataTO
+        Public Function ReadRegistredPorts() As GlobalDataTO Implements IAnalyzerEntity.ReadRegistredPorts
             Dim myReturn As New GlobalDataTO
             Try
                 myReturn = AppLayer.ReadRegistredPorts  'Pending to develop!!
@@ -2069,7 +2111,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' When a worksession finish clear the DS with the last reagents prepared
         ''' </summary>
         ''' <remarks>AG 19/01/2011</remarks>
-        Public Sub ResetWorkSession()
+        Public Sub ResetWorkSession() Implements IAnalyzerEntity.ResetWorkSession
             Try
                 If Not mySentPreparationsDS Is Nothing Then
                     mySentPreparationsDS.Clear()
@@ -2079,8 +2121,8 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myNextPreparationToSendDS.Clear()
                 End If
 
-                If Not baselineCalcs Is Nothing Then
-                    baselineCalcs.ResetWS()
+                If Not BaseLine Is Nothing Then
+                    BaseLine.ResetWS()
                 End If
                 WorkSessionIDAttribute = ""
                 futureRequestNextWell = 0
@@ -2105,7 +2147,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <param name="pMainThread"></param>
         ''' <remarks></remarks>
-        Public Sub ReadyToClearUIRefreshDS(ByVal pMainThread As Boolean)
+        Public Sub ReadyToClearUIRefreshDS(ByVal pMainThread As Boolean) Implements IAnalyzerEntity.ReadyToClearUIRefreshDS
             Try
                 If pMainThread Then
                     eventDataPendingToTriggerFlag = False
@@ -2145,12 +2187,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''          XB 06/02/2014 - Improve WDOG BARCODE_SCAN - Task #1438
         '''          XB 03/04/2014 - Avoid send ISECMD out of running cycle - task #1573
         '''          AG 15/04/2014 - #1591 do not send START while analyzer is starting pause
+        '''          AG 11/12/2014 BA-2170 Analyzer does not becomes ready when receives an ANSFBLD instruction. This is an exception to the general rule!!
         ''' </remarks>
         Public Function ManageAnalyzer(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList, ByVal pSendingEvent As Boolean, _
                                        Optional ByVal pInstructionReceived As List(Of InstructionParameterTO) = Nothing, _
                                        Optional ByVal pSwAdditionalParameters As Object = Nothing, _
                                        Optional ByVal pFwScriptID As String = "", _
-                                       Optional ByVal pParams As List(Of String) = Nothing) As GlobalDataTO
+                                       Optional ByVal pParams As List(Of String) = Nothing) As GlobalDataTO Implements IAnalyzerEntity.ManageAnalyzer
 
             Dim myGlobal As New GlobalDataTO
 
@@ -2217,18 +2260,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                             If Not AnalyzerIsReadyAttribute Then
                                 Select Case pAction
                                     'AG 26/03/2012 - all reception instructions except status set analyzerisready = True (exception Running)
-                                    'Case GlobalEnumerates.AnalyzerManagerSwActionList.BASELINE_RECEIVED, GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED, _
-                                    '    GlobalEnumerates.AnalyzerManagerSwActionList.ANSERR_RECEIVED, GlobalEnumerates.AnalyzerManagerSwActionList.ANSINF_RECEIVED
-
-                                    '    AnalyzerIsReadyAttribute = True
-
-                                    'Case GlobalEnumerates.AnalyzerManagerSwActionList.ISE_RESULT_RECEIVED
-                                    '    If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
-                                    '        AnalyzerIsReadyAttribute = True
-                                    '    End If
-                                    'Case Else
                                     Case GlobalEnumerates.AnalyzerManagerSwActionList.STATUS_RECEIVED
                                         'Do nothing ... when the status instruction is treated the Software updates the AnalyzerIsReadyAttribute
+
+                                        'AG 11/12/2014 BA-2170
+                                    Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                        'Exception: The analyzer will be ready when receives STATUS with A:47
+                                        'AG 11/12/2014
 
                                     Case Else
                                         If AnalyzerStatusAttribute <> GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
@@ -2529,6 +2567,16 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 End If
                                 Exit Select
 
+
+                                'IT 29/10/2014: BA-2061
+                            Case GlobalEnumerates.AnalyzerManagerSwActionList.ADJUST_FLIGHT
+                                If ConnectedAttribute Then
+                                    If Not pParams Is Nothing Then
+                                        myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.FLIGHT, Nothing, String.Empty, String.Empty, pParams)
+                                    End If
+                                End If
+                                Exit Select
+
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.INFO
 
                                 If ConnectedAttribute Then
@@ -2735,7 +2783,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                             ' XBC 05/09/2012 - Start Timeout for ISE commands must emplaced inside ManageAnalyzer
                                             If Not myGlobal.HasError Then
-                                                myGlobal = MyClass.ISE_Manager.StartInstructionStartedTimer
+                                                myGlobal = ISEAnalyzer.StartInstructionStartedTimer
                                             End If
                                             ' XBC 05/09/2012 
 
@@ -3108,6 +3156,17 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 Exit Select
                                 'END AG 18/05/2010 
 
+                                'AG 29/10/2014 BA-2062 - Dynamic base line results
+                            Case AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSFBLD_RECEIVED
+                                If GlobalBase.IsServiceAssembly Then
+
+                                Else
+                                    myGlobal = ProcessANSFBLDReceived(pInstructionReceived)
+                                End If
+                                'AG 29/10/2014 BA-2062
+
+
                             Case GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED
                                 Dim myBarCodeRotorTypeRead As String = ""
                                 InstructionTypeReceivedAttribute = GlobalEnumerates.AnalyzerManagerSwActionList.ANSCBR_RECEIVED
@@ -3121,7 +3180,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         'TODO
 
                                     Else
-                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.NO_RUNNING_REQUEST Then 'Barcode read requests from RotorPosition Screen
+                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST Then 'Barcode read requests from RotorPosition Screen
                                             'AG 03/08/2011 - When several individual position to read ... Sw has to manage the send/receive results one by one
                                             If myBarcodeRequestDS.barCodeRequests.Rows.Count > 1 Then
                                                 myBarcodeRequestDS.barCodeRequests(0).Delete() 'Remove the 1st row (already sent and with results treated)
@@ -3129,7 +3188,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                 myGlobal = AppLayer.ActivateProtocol(GlobalEnumerates.AppLayerEventList.BARCODE_REQUEST, myBarcodeRequestDS)
                                             Else
                                                 myBarcodeRequestDS.Clear()
-                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BARCODE_AVAILABLE 'Barcode free for more work
+                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE 'Barcode free for more work
 
                                                 'When barcode finish reading the sample rotor ... Sw inform if some critical warnings exists
                                                 If myBarCodeRotorTypeRead = "SAMPLES" Then
@@ -3145,7 +3204,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             End If
                                             'AG 03/08/2011
 
-                                        ElseIf BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.ENTER_RUNNING Then 'Barcode read requests from START or CONTINUE worksession
+                                        ElseIf BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActionsEnum.ENTER_RUNNING Then 'Barcode read requests from START or CONTINUE worksession
                                             myGlobal = ManageBarCodeRequestBeforeRUNNING(Nothing, BarCodeBeforeRunningProcessStatusAttribute)
 
                                         End If
@@ -3159,7 +3218,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'ISEModuleIsReadyAttribute = True 'AG 27/10/2011 This information is sent by Analzyer (AG 18/01/2011 - ISE module becomes available again)
 
                                 'AG 27/08/2012 - ISE results are received in running or when recovery results process is working
-                                'If MyClass.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                'If ISEAnalyzer.CurrentProcedure <> ISEManager.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                                 '    myGlobal = Me.ProcessRecivedISEResult(pInstructionReceived)
                                 '    'SGM 07/03/2012
                                 '    myGlobal = MyClass.ProcessISEManagerProcedures
@@ -3172,7 +3231,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     mySessionFlags(GlobalEnumerates.AnalyzerManagerFlags.ResRecoverISE.ToString) = "END") Then
                                     ' XB 09/01/2014
 
-                                    If MyClass.ISE_Manager.CurrentProcedure <> ISEManager.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
+                                    If ISEAnalyzer.CurrentProcedure <> ISEAnalyzerEntity.ISEProcedures.None OrElse AnalyzerStatusAttribute = GlobalEnumerates.AnalyzerManagerStatus.RUNNING Then
                                         myGlobal = Me.ProcessRecivedISEResult(pInstructionReceived)
                                         'SGM 07/03/2012
                                         myGlobal = MyClass.ProcessISEManagerProcedures
@@ -3608,7 +3667,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Remove any instruction from the queue
         ''' </summary>
         ''' <remarks>Created by XB 06/11/2013</remarks>
-        Public Sub RemoveItemFromQueue(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList)
+        Public Sub RemoveItemFromQueue(ByVal pAction As GlobalEnumerates.AnalyzerManagerSwActionList) Implements IAnalyzerEntity.RemoveItemFromQueue
             Try
                 Dim j As Integer = -1
                 For Each A As GlobalEnumerates.AnalyzerManagerSwActionList In myInstructionsQueue
@@ -3636,7 +3695,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by AG 29/10/2010</remarks>
-        Public Function ClearQueueToSend() As GlobalDataTO
+        Public Function ClearQueueToSend() As GlobalDataTO Implements IAnalyzerEntity.ClearQueueToSend
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -3664,7 +3723,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pInstruction"></param>
         ''' <returns>Boolean</returns>
         ''' <remarks>AG 26/03/2012 - creation</remarks>
-        Public Function QueueContains(ByVal pInstruction As GlobalEnumerates.AnalyzerManagerSwActionList) As Boolean
+        Public Function QueueContains(ByVal pInstruction As GlobalEnumerates.AnalyzerManagerSwActionList) As Boolean Implements IAnalyzerEntity.QueueContains
             Dim returnValue As Boolean = False
             Try
                 returnValue = myInstructionsQueue.Contains(pInstruction)
@@ -3674,6 +3733,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                 myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.QueueContains", EventLogEntryType.Error, False)
                 returnValue = False
             End Try
+            Return returnValue
         End Function
 
         ''' <summary>
@@ -3681,7 +3741,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Scripts</returns>
         ''' <remarks>Created by XBC 08/11/2010</remarks>
-        Public Function ReadFwScriptData() As GlobalDataTO
+        Public Function ReadFwScriptData() As GlobalDataTO Implements IAnalyzerEntity.ReadFwScriptData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadFwScriptData()
@@ -3704,7 +3764,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>SG 24/11/10</remarks>
-        Public Function LoadAppFwScriptsData() As GlobalDataTO
+        Public Function LoadAppFwScriptsData() As GlobalDataTO Implements IAnalyzerEntity.LoadAppFwScriptsData
             Dim myGlobal As New GlobalDataTO
             Try
 
@@ -3730,7 +3790,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Modified by XBC : 30/09/2011 - Add Master data feature
         ''' Modified by SGM : 24/11/2011 - Get Master data from resources if SimulationMode
         ''' </remarks>
-        Public Function LoadFwAdjustmentsMasterData(Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO
+        Public Function LoadFwAdjustmentsMasterData(Optional ByVal pSimulationMode As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.LoadFwAdjustmentsMasterData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.LoadFwAdjustmentsMasterData("MasterData", pSimulationMode)
@@ -3751,7 +3811,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns>DS with FW Adjustments</returns>
         ''' <remarks>Created by SG 26/01/11</remarks>
-        Public Function ReadFwAdjustmentsDS() As GlobalDataTO
+        Public Function ReadFwAdjustmentsDS() As GlobalDataTO Implements IAnalyzerEntity.ReadFwAdjustmentsDS
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadFwAdjustmentsDS
@@ -3771,7 +3831,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Updates FW Adjustments DS
         ''' </summary>
         ''' <remarks>Created by SG 26/01/11</remarks>
-        Public Function UpdateFwAdjustmentsDS(ByVal pAdjustmentsDS As SRVAdjustmentsDS) As GlobalDataTO
+        Public Function UpdateFwAdjustmentsDS(ByVal pAdjustmentsDS As SRVAdjustmentsDS) As GlobalDataTO Implements IAnalyzerEntity.UpdateFwAdjustmentsDS
             Dim myGlobal As New GlobalDataTO
             Try
                 If pAdjustmentsDS IsNot Nothing Then
@@ -3897,7 +3957,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Photometry</returns>
         ''' <remarks>Created by XBC 28/02/2011</remarks>
-        Public Function ReadPhotometryData() As GlobalDataTO
+        Public Function ReadPhotometryData() As GlobalDataTO Implements IAnalyzerEntity.ReadPhotometryData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadPhotometryData()
@@ -3920,7 +3980,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pPhotometryData">GlobalDataTo with the data of the Photometry</param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 02/03/2011</remarks>
-        Public Function SetPhotometryData(ByVal pPhotometryData As PhotometryDataTO) As GlobalDataTO
+        Public Function SetPhotometryData(ByVal pPhotometryData As PhotometryDataTO) As GlobalDataTO Implements IAnalyzerEntity.SetPhotometryData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.SetPhotometryData(pPhotometryData)
@@ -3941,7 +4001,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Stress Mode</returns>
         ''' <remarks>Created by XBC 22/03/2011</remarks>
-        Public Function ReadStressModeData() As GlobalDataTO
+        Public Function ReadStressModeData() As GlobalDataTO Implements IAnalyzerEntity.ReadStressModeData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.ReadStressModeData()
@@ -3964,7 +4024,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pStressModeData">GlobalDataTo with the data of the Stress Mode</param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 22/03/2011</remarks>
-        Public Function SetStressModeData(ByVal pStressModeData As StressDataTO) As GlobalDataTO
+        Public Function SetStressModeData(ByVal pStressModeData As StressDataTO) As GlobalDataTO Implements IAnalyzerEntity.SetStressModeData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal = AppLayer.SetStressModeData(pStressModeData)
@@ -4007,7 +4067,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns>GlobalDataTo with the data of the Optic centering</returns>
         ''' <remarks>Created by XBC 12/05/2011</remarks>
-        Public Function ReadOpticCenterData() As GlobalDataTO
+        Public Function ReadOpticCenterData() As GlobalDataTO Implements IAnalyzerEntity.ReadOpticCenterData
             Dim myGlobal As New GlobalDataTO
             Try
                 myGlobal.SetDatos = Me.OpticCenterResultsAttr
@@ -4029,14 +4089,14 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Modified by XBC 06/09/2012 - Add new parameter pConnectionCompleted</remarks>
-        Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO
+        Public Function ProcessUSBCableDisconnection(Optional ByVal pConnectionCompleted As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.ProcessUSBCableDisconnection
             Dim myGlobal As New GlobalDataTO
             Try
                 ConnectedAttribute = False
 
                 ' XBC 16/01/2013 - Prepare ISE Object to reset it after a disconnection communications (Bugs tracking #1109)
-                If Not MyClass.ISE_Manager Is Nothing Then
-                    MyClass.ISE_Manager.IsAnalyzerDisconnected = True
+                If Not ISEAnalyzer Is Nothing Then
+                    ISEAnalyzer.IsAnalyzerDisconnected = True
                     MyClass.ISEAlreadyStarted = False
                 End If
                 ' XBC 16/01/2013
@@ -4119,7 +4179,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <param name="pForceEndSound">Force End Sound.</param>
         ''' <remarks>create by: TR 28/10/2011</remarks>
-        Public Function StopAnalyzerRinging(Optional ByVal pForceEndSound As Boolean = False) As GlobalDataTO
+        Public Function StopAnalyzerRinging(Optional ByVal pForceEndSound As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.StopAnalyzerRinging
             Dim myGlobalDataTO As New GlobalDataTO
             Try
                 'Send the sound off only when is ringing
@@ -4145,7 +4205,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pForceSound"></param>
         ''' <returns></returns>
         ''' <remarks>AG 22/07/2013 - based and adapted from StopAnalyzerRinging</remarks>
-        Public Function StartAnalyzerRinging(Optional ByVal pForceSound As Boolean = False) As GlobalDataTO
+        Public Function StartAnalyzerRinging(Optional ByVal pForceSound As Boolean = False) As GlobalDataTO Implements IAnalyzerEntity.StartAnalyzerRinging
             Dim myGlobalDataTO As New GlobalDataTO
             Try
                 'Check the alarm sound setting is not disabled
@@ -4177,7 +4237,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks>Created by SGM 16/07/2012</remarks>
-        Public Function StopAnalyzerInfo() As GlobalDataTO
+        Public Function StopAnalyzerInfo() As GlobalDataTO Implements IAnalyzerEntity.StopAnalyzerInfo
             Dim myGlobalDataTO As New GlobalDataTO
             Try
                 If ConnectedAttribute AndAlso AnalyzerStatusAttribute = AnalyzerManagerStatus.STANDBY Then
@@ -4212,7 +4272,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pAdjust"></param>
         ''' <returns>String with the adjust value (String due this field is saved as nvarchar into database</returns>
         ''' <remarks>Created by AG 23 11 2011</remarks>
-        Public Function ReadAdjustValue(ByVal pAdjust As GlobalEnumerates.Ax00Adjustsments) As String
+        Public Function ReadAdjustValue(ByVal pAdjust As GlobalEnumerates.Ax00Adjustsments) As String Implements IAnalyzerEntity.ReadAdjustValue
             Dim myGlobal As New GlobalDataTO
             Dim returnValue As String = ""
 
@@ -4251,7 +4311,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         '''                                           Status is Running. This is to allow block/unblock Executions when elements have been positioned/unpositioned 
         '''                                           during the Pause
         ''' </remarks>
-        Public Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActions) As GlobalDataTO
+        Public Function ManageBarCodeRequestBeforeRUNNING(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pBarcodeProcessCurrentStep As BarcodeWorksessionActionsEnum) As GlobalDataTO Implements IAnalyzerEntity.ManageBarCodeRequestBeforeRUNNING
             Dim resultData As GlobalDataTO = Nothing
             Dim dbConnection As SqlClient.SqlConnection = Nothing
 
@@ -4263,7 +4323,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                         Dim myAnalyzerFlagsDS As New AnalyzerManagerFlagsDS
 
                         'When user press START or CONTINUE buttons ... check the configuration status as first step
-                        If (pBarcodeProcessCurrentStep = BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST) Then
+                        If (pBarcodeProcessCurrentStep = BarcodeWorksessionActionsEnum.BEFORE_RUNNING_REQUEST) Then
                             'Read barcode before RUNNING is enabled?
                             '** If YES: send active barcode requests for read + apply results business
                             '** If NO: go to running
@@ -4282,54 +4342,54 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                 If (Not barcodeReadBeforeRunningFlag) Then
                                     'BARCODE_BEFORE_START_WS not active: go to Running directly
-                                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.FORCE_ENTER_RUNNING  'AG 08/03/2013 change ENTER_RUNNING for the new enum value
+                                    BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING  'AG 08/03/2013 change ENTER_RUNNING for the new enum value
                                 Else
                                     'BARCODE_BEFORE_START_WS active
                                     '1st) If Reagents Barcode is active -> send a request for full Reagents Rotor scanning
                                     Dim barcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.REAGENT_BARCODE_DISABLED.ToString)
                                     If (Not barcodeDisabled) Then
-                                        BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.REAGENTS_REQUEST_BEFORE_RUNNING
+                                        BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING
                                     Else
                                         '2nd) If Samples Barcode is active -> send a request for full Samples Rotor scanning
                                         barcodeDisabled = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
                                         If (Not barcodeDisabled) Then
-                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING
+                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                                         Else
-                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.ENTER_RUNNING
+                                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.ENTER_RUNNING
                                         End If
                                     End If
                                 End If
                             End If
 
-                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActions.REAGENTS_REQUEST_BEFORE_RUNNING) Then
+                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING) Then
                             'After receive Reagents Barcode results, evaluate if Samples Barcode is active
                             'If Samples Barcode is active -> send a request for full Samples Rotor scanning
                             readBarCodeBeforeRunningPerformedFlag = True
                             Dim samplesBarcodeDisabled As Boolean = ReadBarCodeRotorSettingEnabled(dbConnection, GlobalEnumerates.AnalyzerSettingsEnum.SAMPLE_BARCODE_DISABLED.ToString)
                             If (Not samplesBarcodeDisabled) Then
-                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING
+                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                             Else
-                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.ENTER_RUNNING
+                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.ENTER_RUNNING
                             End If
 
-                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING) Then
+                        ElseIf (pBarcodeProcessCurrentStep = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING) Then
                             'After receive Samples Barcode results go to Running
                             readBarCodeBeforeRunningPerformedFlag = True
-                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.ENTER_RUNNING
+                            BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.ENTER_RUNNING
                         End If
 
                         If (Not resultData.HasError) Then
                             Select Case BarCodeBeforeRunningProcessStatusAttribute
-                                Case BarcodeWorksessionActions.BEFORE_RUNNING_REQUEST, BarcodeWorksessionActions.NO_RUNNING_REQUEST
+                                Case BarcodeWorksessionActionsEnum.BEFORE_RUNNING_REQUEST, BarcodeWorksessionActionsEnum.NO_RUNNING_REQUEST
                                     'Do nothing
 
-                                Case BarcodeWorksessionActions.REAGENTS_REQUEST_BEFORE_RUNNING, BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING
+                                Case BarcodeWorksessionActionsEnum.REAGENTS_REQUEST_BEFORE_RUNNING, BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING
                                     'Send read FULL REAGENTS / SAMPLES ROTOR request
                                     Dim BarCodeDS As New AnalyzerManagerDS
                                     Dim rowBarCode As AnalyzerManagerDS.barCodeRequestsRow
 
                                     Dim rotorType As String = "REAGENTS"
-                                    If (BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.SAMPLES_REQUEST_BEFORE_RUNNING) Then rotorType = "SAMPLES"
+                                    If (BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.SAMPLES_REQUEST_BEFORE_RUNNING) Then rotorType = "SAMPLES"
 
                                     'All positions
                                     rowBarCode = BarCodeDS.barCodeRequests.NewbarCodeRequestsRow
@@ -4350,7 +4410,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                     'AG 08/03/2013 - add FORCE_ENTER_RUNNING
                                     'AG 01/04/2014 - #1565 add FORCE_ENTER_RUNNING_AUTO_WS_CREATION 
-                                Case BarcodeWorksessionActions.ENTER_RUNNING, BarcodeWorksessionActions.FORCE_ENTER_RUNNING, BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
+                                Case BarcodeWorksessionActionsEnum.ENTER_RUNNING, BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING, BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS
                                     'START WorkSession process finished. Barcodes are available
                                     'BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BARCODE_AVAILABLE 'AG 08/03/2013
 
@@ -4362,15 +4422,15 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                         'AG 12/07/2013 - Special case for automate the WS creation with LIS (force the HQ monitor screen to be open)
                                         'AG 01/04/2014 - #1565 add also FORCE_ENTER_RUNNING_AUTO_WS_CREATION
                                         'If autoWSCreationWithLISModeAttribute AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING Then
-                                        If autoWSCreationWithLISModeAttribute AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING _
-                                            AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
+                                        If autoWSCreationWithLISModeAttribute AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING _
+                                            AndAlso BarCodeBeforeRunningProcessStatusAttribute <> BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
                                             resultData.SetDatos = True
                                         End If
                                         'AG 12/07/2013
 
                                         'AG 08/03/2013 - case FORCE_ENTER_RUNNING do not stops process instead there are barcode warnings
-                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.FORCE_ENTER_RUNNING Then resultData.SetDatos = False
-                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then resultData.SetDatos = False 'AG 01/04/2014 - #1565
+                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING Then resultData.SetDatos = False
+                                        If BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then resultData.SetDatos = False 'AG 01/04/2014 - #1565
 
                                         If (CType(resultData.SetDatos, Boolean) = False) Then 'No critical errors ... Sw can send the go to running instruction
                                             'AG 09/05/2012 - When barcode is read before running call the method to create WS Executions again with the real rotor contents
@@ -4380,9 +4440,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                 'AG 01/04/2014 - #1565 Do not execute CreateWSExecutions when we are in the AutoWSCreation case
                                                 'and the WS has been modified (executions have been created on close rotor positions screen)
                                                 '(put previous code inside the next IF - ENDIF block)
-                                                If BarCodeProcessBeforeRunning <> BarcodeWorksessionActions.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
+                                                If BarCodeProcessBeforeRunning <> BarcodeWorksessionActionsEnum.FORCE_ENTER_RUNNING_WITHOUT_CREATE_EXECUTIONS Then
 
-                                                    Dim iseModuleReady As Boolean = (Not Me.ISE_Manager Is Nothing AndAlso Me.ISE_Manager.IsISEModuleReady)
+                                                    Dim iseModuleReady As Boolean = (Not ISEAnalyzer Is Nothing AndAlso ISEAnalyzer.IsISEModuleReady)
 
                                                     'Inside this IF: Use Nothing instead of dbConnection to open a new transaction!!
                                                     Dim myExecutionsDlg As New ExecutionsDelegate
@@ -4456,7 +4516,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                             'AG 19/01/2012
 
                                             If (enterInRunningModeFlag) Then
-                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActions.BARCODE_AVAILABLE 'AG 11/03/2013
+                                                BarCodeBeforeRunningProcessStatusAttribute = BarcodeWorksessionActionsEnum.BARCODE_AVAILABLE 'AG 11/03/2013
 
                                                 'TODO
                                                 'Evaluate if auto ISE maintenance is required or not and update flag ISEConditioningProcess
@@ -4518,7 +4578,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <returns></returns>
         ''' <remarks>AG 20/02/2012</remarks>
         ''' Modified by: JV 23/01/2014 #1467
-        Public Function ExistBottleAlarms() As Boolean
+        Public Function ExistBottleAlarms() As Boolean Implements IAnalyzerEntity.ExistBottleAlarms
             Dim returnValue As Boolean = False
             Try
                 'JV 23/01/2014 #1467
@@ -4566,7 +4626,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by XBC : 11/06/2012
         ''' Modified by XB : 12/11/2013 - Allow Sw Service the full functionality about WorkSession - BT #169 SERVICE
         ''' </remarks>
-        Public Function ProcessUpdateWSByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function ProcessUpdateWSByAnalyzerID(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO Implements IAnalyzerEntity.ProcessUpdateWSByAnalyzerID
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -4757,7 +4817,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Created by:  XBC 12/06/2012
         ''' Modified by: XBC 25/04/2013 - Add value = FALSE for the new optional pSaveLISPendingOrders parameter to indicate that the process to Save the LIS orders not processed Is NOT required
         ''' </remarks>
-        Public Function ProcessToMountTheNewSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSAnalyzerID As String) As GlobalDataTO
+        Public Function ProcessToMountTheNewSession(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWSAnalyzerID As String) As GlobalDataTO Implements IAnalyzerEntity.ProcessToMountTheNewSession
             Dim myGlobal As New GlobalDataTO
 
             Try
@@ -4778,9 +4838,9 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                     'Reset the current WS
                     If (Not HISTWorkingMode) Then
-                        myGlobal = myWSDelegate.ResetWS(pDBConnection, pWSAnalyzerID, ActiveWorkSession, False)
+                        myGlobal = myWSDelegate.ResetWS(pDBConnection, pWSAnalyzerID, ActiveWorkSession, myAnalyzerModel, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
                     Else
-                        myGlobal = myWSDelegate.ResetWSNEW(pDBConnection, pWSAnalyzerID, ActiveWorkSession, False, False)
+                        myGlobal = myWSDelegate.ResetWSNEW(pDBConnection, pWSAnalyzerID, ActiveWorkSession, myAnalyzerModel, False, False) 'AG 17/11/2014 BA-2065 inform analyzerModel
                     End If
                     If (Not myGlobal.HasError) Then MyClass.ResetWorkSession()
                 End If
@@ -4833,7 +4893,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pDBConnection"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 13/06/2012</remarks>
-        Public Function InsertConnectedAnalyzer(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function InsertConnectedAnalyzer(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO Implements IAnalyzerEntity.InsertConnectedAnalyzer
             Dim myGlobal As New GlobalDataTO
             Try
                 Dim myLogAccionesAux As New ApplicationLogManager()
@@ -4881,7 +4941,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' <param name="pDBConnection"></param>
         ''' <returns></returns>
         ''' <remarks>Created by XBC 06/07/2012</remarks>
-        Public Function ReadAdjustments(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO
+        Public Function ReadAdjustments(ByVal pDBConnection As SqlClient.SqlConnection) As GlobalDataTO Implements IAnalyzerEntity.ReadAdjustments
             Dim myGlobal As New GlobalDataTO
             Dim dbConnection As New SqlClient.SqlConnection
             Try
@@ -4933,7 +4993,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' Remove the DS with information with the results automatically exported
         ''' </summary>
         ''' <remarks>AG 02/04/2013 - Creation</remarks>
-        Public Sub ClearLastExportedResults()
+        Public Sub ClearLastExportedResults() Implements IAnalyzerEntity.ClearLastExportedResults
             SyncLock lockThis
                 lastExportedResultsDSAttribute.Clear()
             End SyncLock
@@ -4948,7 +5008,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         ''' AG 29/05/2012 - when analyzer is FREEZE software can not send the START instruction (added to IF)
         ''' AG 19/06/2012 - add CLOT_DETECTION_ERR alarm
         ''' AG 21/10/2013 - Method moved from MDI.ExistSomeAlarmThatRequiresSendENDRUN to analyzer manager class and adapted (remove parameter pCurrentAlarmList and use attribute myAlarmListAttribute) </remarks>
-        Public Function ExistSomeAlarmThatRequiresStopWS() As Boolean
+        Public Function ExistSomeAlarmThatRequiresStopWS() As Boolean Implements IAnalyzerEntity.ExistSomeAlarmThatRequiresStopWS
             Dim returnValue As Boolean = False
             Try
                 If myAlarmListAttribute.Count > 0 Then
@@ -4962,7 +5022,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                     myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WATER_DEPOSIT_ERR) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.WASTE_DEPOSIT_ERR) OrElse _
                     myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R1_COLLISION_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.R2_COLLISION_WARN) OrElse _
                     myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.S_COLLISION_WARN) OrElse myAlarmListAttribute.Contains(GlobalEnumerates.Alarms.BASELINE_INIT_ERR) OrElse _
-                    baselineCalcs.exitRunningType <> 0 OrElse analyzerFREEZEFlagAttribute Then
+                    BaseLine.exitRunningType <> 0 OrElse analyzerFREEZEFlagAttribute Then
                         returnValue = True
                     End If
                 End If
@@ -4974,6 +5034,28 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
             Return returnValue
         End Function
 
+        ''' <summary>
+        ''' Using the results of the FLIGHT instruction (for all leds) prepares the database for a quick running (updates table twksWSBLinesByWell)
+        ''' Used:
+        ''' - After FLIGHT results reception
+        ''' - After RESET WS the last FLIGHT results must be treated again in order to prepare next worksession - CANCELLED!!!
+        '''              (after reset the well rejections will be obtained from the last rotor turn in previous worksession)
+        ''' </summary>
+        ''' <param name="pDBConnection"></param>
+        ''' <param name="pWorkSessionID"></param>
+        ''' <param name="pInitialWell"></param>
+        ''' <returns></returns>
+        ''' <remarks>AG 20/11/2014 BA-2065</remarks>
+        Public Function ProcessDynamicBaseLine(ByVal pDBConnection As SqlClient.SqlConnection, ByVal pWorkSessionID As String, ByVal pInitialWell As Integer) As GlobalDataTO Implements IAnalyzerEntity.ProcessDynamicBaseLine
+            Dim myGlobal As New GlobalDataTO
+            Try
+                myGlobal = BaseLine.ControlDynamicBaseLine(pDBConnection, pWorkSessionID, pInitialWell)
+            Catch ex As Exception
+                Dim myLogAcciones As New ApplicationLogManager()
+                myLogAcciones.CreateLogActivity(ex.Message, "AnalyzerManager.ProcessDynamicBaseLine", EventLogEntryType.Error, False)
+            End Try
+            Return myGlobal
+        End Function
 #End Region
 
     End Class

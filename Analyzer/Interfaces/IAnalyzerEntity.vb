@@ -4,6 +4,7 @@ Imports Biosystems.Ax00.Types
 Imports Biosystems.Ax00.Core.Entities
 Imports Biosystems.Ax00.Global.GlobalEnumerates
 Imports Biosystems.Ax00.Calculations
+Imports System.Data
 
 Namespace Biosystems.Ax00.Core.Interfaces
 

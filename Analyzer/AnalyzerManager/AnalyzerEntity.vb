@@ -4,10 +4,11 @@ Imports Biosystems.Ax00.CommunicationsSwFw
 Imports Biosystems.Ax00.Global
 Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports System.Data
 
 Namespace Biosystems.Ax00.Core.Entities
 
-    Partial Public Class AnalyzerEntity
+    Partial Public MustInherit Class AnalyzerEntity
         Implements IAnalyzerEntity
 
         Private WithEvents _baseLine As IBaseLineEntity

@@ -10,14 +10,14 @@ Imports System.Data
 'Imports System.Configuration
 Imports Biosystems.Ax00.Calculations
 Imports Biosystems.Ax00.Global.GlobalEnumerates
+Imports Biosystems.Ax00.Core.Interfaces
 
-Namespace Biosystems.Ax00.CommunicationsSwFw
+Namespace Biosystems.Ax00.Core.Entities
 
-    Public Class ISEReception
-
-
+    Public Class ISEReceptionEntity
 
 #Region "Declarations"
+
         Private ReadOnly ISEResultErrorsHT As New Hashtable()
         Private ReadOnly ISECancelErrorsHT As New Hashtable()
         Private ReadOnly ISEResultErrorDescriptionsHT As New Hashtable()
@@ -26,21 +26,20 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         Private ReadOnly myISEModuleErrorHT As New Hashtable()
         Private ReadOnly myResultErrorDescHT As New Hashtable() 'SGM 20/07/2012
 
-        Private myAnalyzer As AnalyzerManagerOLD 'SGM 23/07/2012
-        Private myISEManager As ISEManager 'SGM 23/07/2012
+        Private myAnalyzer As IAnalyzerEntity 'SGM 23/07/2012 '#REFACTORING
+        'Private myISEManager As IISEAnalyzerEntity 'SGM 23/07/2012 '#REFACTORING
 
 #End Region
 
-
 #Region "Constructor"
-        Public Sub New(ByVal pAnalyzer As AnalyzerManagerOLD) '!!!! QUITAR OPCIONAL
+
+        Public Sub New(ByVal pAnalyzer As IAnalyzerEntity) '#REFACTORING
             MyClass.LoadISEErrorsDataHT()
             MyClass.FillAffectedElementHT()
             MyClass.FillISECancelErrorDescHT()
 
             MyClass.myAnalyzer = pAnalyzer
-            MyClass.myISEManager = MyClass.myAnalyzer.ISE_Manager
-
+            'MyClass.myISEManager = MyClass.myAnalyzer.ISEAnalyzer '#REFACTORING
         End Sub
 #End Region
 
@@ -134,7 +133,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 'JB 20/09/2012 -  Added parameter pForcedLiEnabledValue (to historical validations)
                                 'If MyClass.myISEManager IsNot Nothing AndAlso Not MyClass.myISEManager.IsLiEnabledByUser Then
                                 If pForcedLiEnabledValue = TriState.False OrElse _
-                                  (pForcedLiEnabledValue = TriState.UseDefault AndAlso MyClass.myISEManager IsNot Nothing AndAlso Not MyClass.myISEManager.IsLiEnabledByUser) Then
+                                  (pForcedLiEnabledValue = TriState.UseDefault AndAlso MyClass.myAnalyzer.ISEAnalyzer IsNot Nothing AndAlso Not MyClass.myAnalyzer.ISEAnalyzer.IsLiEnabledByUser) Then
 
                                     If myResultError.Affected.Contains("Li") Then
                                         If String.Equals(CStr(posValue), "1") Then
@@ -326,7 +325,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
 #End Region
 
-
 #Region "ISE TEST Results"
         ''' <summary>
         ''' Initializes structures, get the execution, set the results values and finaly save results into database
@@ -393,12 +391,12 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                 If (pISEResult.IsCancelError) Then
                                     Select Case myResultErrors(0).CancelErrorCode
                                         Case ISEErrorTO.ISECancelErrorCodes.A, ISEErrorTO.ISECancelErrorCodes.B, ISEErrorTO.ISECancelErrorCodes.S, ISEErrorTO.ISECancelErrorCodes.F
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter += 1
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter += 1
                                         Case ISEErrorTO.ISECancelErrorCodes.N
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter = 3
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 3
                                     End Select
                                 Else
-                                    MyClass.myISEManager.ISEWSCancelErrorCounter = 0
+                                    MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 0
                                 End If
                             End If
 
@@ -1342,7 +1340,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         End Sub
 
 #End Region
-
 
 #Region "ISE TEST Result Decoding"
 
@@ -2587,37 +2584,37 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                 Else
                     'result error
-                    Dim myAlarm As CalculationRemarks
+                    Dim myAlarm As Alarms
                     Select Case pISEError.ResultErrorCode
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalBSample
-                            myAlarm = CalculationRemarks.ISE_mVOutB
+                            myAlarm = Alarms.ISE_mVOutB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvOut_CalASample_CalBUrine
                             If Not pIsUrine Then
-                                myAlarm = CalculationRemarks.ISE_mVOutA_SER
+                                myAlarm = Alarms.ISE_mVOutA_SER
                             Else
-                                myAlarm = CalculationRemarks.ISE_mVOutB_URI
+                                myAlarm = Alarms.ISE_mVOutB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample
-                            myAlarm = CalculationRemarks.ISE_mVNoiseB
+                            myAlarm = Alarms.ISE_mVNoiseB
 
                         Case ISEErrorTO.ISEResultErrorCodes.mvNoise_CalBSample_CalBUrine
                             If Not pIsUrine Then
-                                myAlarm = CalculationRemarks.ISE_mVNoiseA_SER
+                                myAlarm = Alarms.ISE_mVNoiseA_SER
                             Else
-                                myAlarm = CalculationRemarks.ISE_mVNoiseB_URI
+                                myAlarm = Alarms.ISE_mVNoiseB_URI
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.Drift_CalASample
                             If Not pIsCalibration Then
-                                myAlarm = CalculationRemarks.ISE_Drift_SER
+                                myAlarm = Alarms.ISE_Drift_SER
                             Else
-                                myAlarm = CalculationRemarks.ISE_Drift_CAL
+                                myAlarm = Alarms.ISE_Drift_CAL
                             End If
 
                         Case ISEErrorTO.ISEResultErrorCodes.OutOfSlope_MachineRanges
-                            myAlarm = CalculationRemarks.ISE_OutSlope
+                            myAlarm = Alarms.ISE_OutSlope
 
                         Case ISEErrorTO.ISEResultErrorCodes.None
                             myGlobal.SetDatos = "" : Exit Try
@@ -2734,13 +2731,13 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                     'SGM 01/08/2012
                                     Select Case myResultErrors(0).CancelErrorCode
                                         Case ISEErrorTO.ISECancelErrorCodes.A, ISEErrorTO.ISECancelErrorCodes.B, ISEErrorTO.ISECancelErrorCodes.S, ISEErrorTO.ISECancelErrorCodes.F
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter += 1
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter += 1
                                         Case ISEErrorTO.ISECancelErrorCodes.N
-                                            MyClass.myISEManager.ISEWSCancelErrorCounter = 3
+                                            MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 3
                                     End Select
 
                                 Else
-                                    MyClass.myISEManager.ISEWSCancelErrorCounter = 0
+                                    MyClass.myAnalyzer.ISEAnalyzer.ISEWSCancelErrorCounter = 0
                                 End If
                             End If
                             'SG 23/01/2012 -END.
@@ -2927,10 +2924,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
 
                                                                     If (execRow.CONC_Value < Convert.ToSingle(.First.NormalLowerLimit)) Then
                                                                         'Set lower alarm value
-                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                                                                     ElseIf (execRow.CONC_Value > Convert.ToSingle(.First.NormalUpperLimit)) Then
                                                                         'Set hight alarm value
-                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
+                                                                        myExecutionAlarmsRow.AlarmID &= GlobalEnumerates.Alarms.CONC_REMARK8.ToString
                                                                     End If
 
                                                                 Else
@@ -3067,10 +3064,10 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                                     If Convert.ToInt16(ResultRow.CONC_Value) <> -1 Then
                                                                         If (ResultRow.CONC_Value < Convert.ToSingle(.First.NormalLowerLimit)) Then
                                                                             'Set lower alarm value
-                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString
+                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString
                                                                         ElseIf (ResultRow.CONC_Value > Convert.ToSingle(.First.NormalUpperLimit)) Then
                                                                             'Set hight alarm value
-                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK8.ToString
+                                                                            myResultAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK8.ToString
                                                                         End If
                                                                     End If
                                                                 End If
@@ -3111,7 +3108,7 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
                                                             myResultExecutionsAlarmsDS = DirectCast(myGlobalDataTO.SetDatos, WSExecutionAlarmsDS)
 
                                                             For Each ResultExeAlarmRow As WSExecutionAlarmsDS.twksWSExecutionAlarmsRow In myResultExecutionsAlarmsDS.twksWSExecutionAlarms.Rows
-                                                                If (Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.CalculationRemarks.CONC_REMARK7.ToString) Then
+                                                                If (Not ResultExeAlarmRow.AlarmID = GlobalEnumerates.Alarms.CONC_REMARK7.ToString) Then
                                                                     'Before adding the row validate if not exist in curren Dataset
                                                                     If Not myResultAlarmsDS.twksResultAlarms.Where(Function(a) a.OrderTestID = ResultRow.OrderTestID _
                                                                                                                    AndAlso a.RerunNumber = ResultRow.RerunNumber _
@@ -3589,7 +3586,6 @@ Namespace Biosystems.Ax00.CommunicationsSwFw
         'End Function
 
 #End Region
-
 
     End Class
 
