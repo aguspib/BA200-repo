@@ -118,6 +118,10 @@
       <Project>{bd38761f-269a-428a-a15e-9d40b387f992}</Project>
       <Name>Ax00.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Analyzer\Analyzer.vbproj">
+      <Project>{BD816D19-6903-4603-8A75-A14C099D4EB2}</Project>
+      <Name>Analyzer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\AX00Types\AX00Types.vbproj">
       <Project>{3b617ebf-0488-46bd-ab56-094f81d0e4c3}</Project>
       <Name>AX00Types</Name>
